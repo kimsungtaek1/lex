@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "*.php": "php"
+    },
+    "search.includes": [
+        "**/application_recovery/**",
+        "**/js/**"
+    ],
+    "php.debug.executablePath": "C:\\php\\php.exe",
+    "php.validate.executablePath": "C:\\php\\php.exe"
+}

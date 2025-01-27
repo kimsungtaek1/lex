@@ -1,0 +1,117 @@
+{
+  "ftp://lez062801@lexmarketing.kr": {
+    "www": {
+      "adm": {
+        "api": {},
+        "application_bankruptcy.php": {
+          "type": "-",
+          "size": 337,
+          "lmtime": 0,
+          "modified": false
+        },
+        "application_recovery.php": {
+          "type": "-",
+          "size": 16813,
+          "lmtime": 0,
+          "modified": false
+        },
+        "calendar.php": {
+          "type": "-",
+          "size": 1652,
+          "lmtime": 0,
+          "modified": false
+        },
+        "case_management.php": {
+          "type": "-",
+          "size": 2312,
+          "lmtime": 0,
+          "modified": false
+        },
+        "chatbot.php": {
+          "type": "-",
+          "size": 6900,
+          "lmtime": 0,
+          "modified": false
+        },
+        "config.php": {
+          "type": "-",
+          "size": 1826,
+          "lmtime": 0,
+          "modified": false
+        },
+        "consult_manager.php": {
+          "type": "-",
+          "size": 1954,
+          "lmtime": 0,
+          "modified": false
+        },
+        "consult_paper.php": {
+          "type": "-",
+          "size": 2034,
+          "lmtime": 0,
+          "modified": false
+        },
+        "css": {},
+        "employee.php": {
+          "type": "-",
+          "size": 4518,
+          "lmtime": 0,
+          "modified": false
+        },
+        "header.php": {
+          "type": "-",
+          "size": 3872,
+          "lmtime": 0,
+          "modified": false
+        },
+        "img": {},
+        "index.php": {
+          "type": "-",
+          "size": 2361,
+          "lmtime": 0,
+          "modified": false
+        },
+        "inflow.php": {
+          "type": "-",
+          "size": 1940,
+          "lmtime": 0,
+          "modified": false
+        },
+        "js": {},
+        "lez062801.sql": {
+          "type": "-",
+          "size": 25892,
+          "lmtime": 0,
+          "modified": true
+        },
+        "logs": {},
+        "main.php": {
+          "type": "-",
+          "size": 3390,
+          "lmtime": 0,
+          "modified": false
+        },
+        "schedule.php": {
+          "type": "-",
+          "size": 1870,
+          "lmtime": 0,
+          "modified": false
+        },
+        "settings.json": {
+          "type": "-",
+          "size": 268,
+          "lmtime": 0,
+          "modified": false
+        },
+        "sql": {},
+        "statistics.php": {
+          "type": "-",
+          "size": 8056,
+          "lmtime": 0,
+          "modified": false
+        }
+      }
+    }
+  },
+  "$version": 1
+}
