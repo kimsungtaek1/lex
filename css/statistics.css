@@ -56,8 +56,8 @@
 .stats-row{display:flex;border-bottom:1px solid #ddd;width:100%;}
 .date-cell{width:10%;min-width:120px;display:flex;align-items:center;padding:8px 5px;border-right:1px solid #ddd;background-color:#f9f9f9;justify-content: space-between;padding:0 1vw;}
 .day-name{margin-left:5px;color:#777;}
-.manager-stats{flex:1;min-width:120px;display:flex;}
-.stat-value{flex:1;text-align:center;padding:8px 5px;border-right:1px solid #ddd;}
+.manager-stats{flex:1;min-width:120px;display:flex;border-right:1px solid #ddd;}
+.stat-value{flex:1;text-align:center;padding:8px 5px;}
 .stat-value:last-child{border-right:none;}
 .manager-stats-footer{display:flex;background-color:#6c6c6c;color:white;font-weight:bold;width:100%;}
 .stats-footer{display:flex;width:100%;}
