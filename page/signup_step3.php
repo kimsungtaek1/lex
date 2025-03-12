@@ -53,12 +53,9 @@ unset($_SESSION['signup_member_type']);
 		<div class="complete-box">
 			<div class="complete-message">
 				<h1>회원 가입 완료</h1>
-				<img src="../img/logo_small.png"></img>
+				<img src="../img/logo_gray.png"></img>
 				<p>회원가입해주셔서 감사합니다.</p>
-			</div>
-			<div class="form-buttons">
-				<button type="button" class="prev-btn" onclick="location.href='signup_step1.php'">◀&nbsp;&nbsp;이전</button>
-				<button type="submit" class="next-btn"onclick="location.href='../index.php'">로그인&nbsp;&nbsp;▶</button>
+				<button class="home-btn" onclick="location.href='../index.php'"><img src="../img/home.png"></img></button>
 			</div>
 		</div>
 	</div>
