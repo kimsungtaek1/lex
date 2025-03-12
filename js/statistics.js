@@ -37,7 +37,7 @@ $(document).ready(function() {
 		$(this).addClass('active');
 		
 		// 모든 통계 컨텐츠 영역 숨김
-		$('#bankruptcyStats, #caseStats, #managerStats, #documentStats').hide();
+		$('#bankruptcyStats, #caseStats, #managerDailyStats, #documentStats').hide();
 		
 		// 클릭한 탭에 해당하는 컨텐츠만 표시
 		const type = $(this).data('type');
@@ -57,7 +57,7 @@ $(document).ready(function() {
 	const activeTabType = $('.stat-tab.active').data('type');
 	
 	// 모든 통계 컨텐츠 영역 숨김
-	$('#bankruptcyStats, #caseStats, #managerStats, #documentStats').hide();
+	$('#bankruptcyStats, #caseStats, #managerDailyStats, #documentStats').hide();
 	
 	// 활성 탭에 해당하는 컨텐츠만 표시
 	$(`#${activeTabType}Stats`).show();
@@ -93,19 +93,19 @@ function loadManagerDailyStats() {
 				renderManagerDailyStats(response.data);
 			} else {
 				console.error('사무장 일별 통계를 불러오는데 실패했습니다:', response.message);
-				$('#managerStatsBody').html('<div class="error-message">데이터를 불러오는데 실패했습니다.</div>');
+				$('#managerDailyStatsBody').html('<div class="error-message">데이터를 불러오는데 실패했습니다.</div>');
 			}
 		},
 		error: function(xhr, status, error) {
 			console.error('사무장 일별 통계를 불러오는데 실패했습니다:', error);
-			$('#managerStatsBody').html('<div class="error-message">데이터를 불러오는데 실패했습니다.</div>');
+			$('#managerDailyStatsBody').html('<div class="error-message">데이터를 불러오는데 실패했습니다.</div>');
 		}
 	});
 }
 
 // 사무장 일별 통계 렌더링 함수 수정
 function renderManagerDailyStats(data) {
-	const statsBody = $('#managerStatsBody');
+	const statsBody = $('#managerDailyStatsBody');
 	statsBody.empty();
 	
 	// 관리자 계정 정보 가져오기(API 호출)
@@ -127,7 +127,7 @@ function renderManagerDailyStats(data) {
 				}
 				
 				// 헤더 섹션 업데이트
-				updateManagerStatsHeader(response.data);
+				updatemanagerDailyStatsHeader(response.data);
 				
 				// 이제 일별 통계 데이터 표시
 				const displayData = data && data.length > 0 ? data : [];
@@ -197,7 +197,7 @@ function renderManagerDailyStats(data) {
 				});
 				
 				// 푸터 업데이트 - 월간 총합 표시
-				updateManagerStatsFooter(monthlyTotals, columnsToShow);
+				updatemanagerDailyStatsFooter(monthlyTotals, columnsToShow);
 				
 				// 각 스크롤 영역 동기화를 위한 이벤트 처리
 				$('.managers-scroll-area').on('scroll', function() {
@@ -215,7 +215,7 @@ function renderManagerDailyStats(data) {
 }
 
 // 푸터 업데이트 함수 추가
-function updateManagerStatsFooter(monthlyTotals, columnsToShow) {
+function updatemanagerDailyStatsFooter(monthlyTotals, columnsToShow) {
 	$('.manager-stats-footer').empty();
 	$('.manager-stats-footer').append(`<div class="date-column-total">합계</div>`);
 	
@@ -251,7 +251,7 @@ function updateManagerStatsFooter(monthlyTotals, columnsToShow) {
 }
 
 // 헤더 섹션 업데이트 함수 수정
-function updateManagerStatsHeader(managers) {
+function updatemanagerDailyStatsHeader(managers) {
     // 기존 헤더 컨테이너 비우기
     $('.manager-stats-header').empty();
     
@@ -340,7 +340,7 @@ function loadManagersData() {
 		success: function(response) {
 			console.log('사무장 데이터:', response);
 			if(response.success) {
-				updateManagerStatsUI(response.data);
+				updatemanagerDailyStatsUI(response.data);
 			} else {
 				console.error('사무장 데이터를 불러오는데 실패했습니다:', response.message);
 				// 오류 메시지 표시
@@ -356,7 +356,7 @@ function loadManagersData() {
 }
 
 // 사무장 통계 UI 업데이트 함수
-function updateManagerStatsUI(data) {
+function updatemanagerDailyStatsUI(data) {
 	const $nameColumn = $('.name-column');
 	const $dataColumns = $('.data-column');
 	
