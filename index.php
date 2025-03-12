@@ -15,7 +15,6 @@
             <ul>
                 <li><a href="#">렉스솔루션</a></li>
                 <li><a href="#">제품소개</a></li>
-                <li><a href="#">마이페이지</a></li>
                 <li><a href="#">공지사항</a></li>
                 <li><a href="#">고객지원</a></li>
             </ul>
