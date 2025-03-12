@@ -191,7 +191,7 @@ function updateManagerStatsHeader(managers) {
 	
 	// 실제 사무장 수만큼 칼럼 추가
 	for (let i = 0; i < columnsToShow; i++) {
-		let managerName = i < actualManagerCount ? managers[i].name + ' 사무장' : '';
+		let managerName = i < actualManagerCount ? managers[i].name + ' 사무장' : '사무장';
 		
 		header.append(`
 			<div class="manager-column">
