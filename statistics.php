@@ -2,7 +2,6 @@
 $additional_css = '<link rel="stylesheet" href="css/statistics.css">';
 include 'header.php'; 
 ?>
-<script>alert('test');</script>
 <div class="statistics-container">
     <div class="tab">
         <table>
