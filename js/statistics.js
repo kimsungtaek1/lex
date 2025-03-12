@@ -66,7 +66,7 @@ $(document).ready(function() {
 		const tabHeight = $(this).outerHeight();
 		
 		$('#managerDropdown').css({
-			top: tabPosition.top + tabHeight - 50 + 'px',
+			top: tabPosition.top + tabHeight - 40 + 'px',
 			left: tabPosition.left + tabWidth - 100 + 'px'
 		}).toggle();
 	});
