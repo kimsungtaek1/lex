@@ -236,25 +236,15 @@ include 'header.php';
 	<!-- 사무장 통계 탭 -->
 	<div id="managerStats" class="statistics-content" style="display: none;">
 		<div class="statistics-row">
-			<div class="manager-stats-container">
+			<div class="manager-stats-container has-few-managers">
 				<div class="manager-stats-header">
-					<div class="date-column-fixed">1일 상담<span class="sort-icon">▼</span></div>
-					<div class="managers-scroll-area">
-						<div class="manager-columns-container">
-							<!-- 여기에 사무장 칼럼이 동적으로 추가됩니다 -->
-						</div>
-					</div>
+					<!-- JavaScript로 동적 생성 -->
 				</div>
 				<div class="manager-stats-body" id="managerStatsBody">
-					<!-- 자바스크립트로 행을 동적으로 추가할 예정 -->
+					<!-- JavaScript로 동적 생성 -->
 				</div>
 				<div class="manager-stats-footer">
-					<div class="date-footer">합계</div>
-					<div class="managers-scroll-area">
-						<div class="manager-columns-container" id="managerStatsFooter">
-							<!-- 여기에 사무장 칼럼이 동적으로 추가됩니다 -->
-						</div>
-					</div>
+					<!-- JavaScript로 동적 생성 -->
 				</div>
 			</div>
 		</div>
