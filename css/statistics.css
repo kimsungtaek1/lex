@@ -40,31 +40,69 @@
 .data-value {display:flex;align-items: center; justify-content: center;padding-left:2vw;font-size:1vw;}
 .info-icon { background-color: #00E2BD; color: white; width: 1.4vw; height: 1.4vw; border-radius: 0.3vw; display: flex; align-items: center; justify-content: center; font-weight: bold; margin:auto 2vw;}
 
-.manager-stats-container{width:100%;font-size:1.2vw;overflow-x:auto;}
+.manager-stats-container{width:100%;font-size:1.2vw;}
 .manager-stats-scroll-container{display:flex;width:100%;}
-.date-column-fixed{min-width:120px;width:10%;position:sticky;left:0;z-index:10;background-color:#444;}
-.managers-scroll-area{overflow-x:auto;display:flex;flex:1;}
-.manager-columns-container{display:flex;min-width:max-content;}
-.manager-stats-header{display:flex;background-color:#444;color:white;font-weight:bold;}
-.date-column{min-width:120px;width:10%;display:flex;align-items:center;justify-content:center;border-right:1px solid #ddd;padding:10px 5px;}
+.manager-stats-header{display:flex;background-color:#444;color:white;font-weight:bold;width:100%;}
+.date-column{width:10%;min-width:120px;display:flex;align-items:center;justify-content:center;border-right:1px solid #ddd;padding:10px 5px;}
 .date-column .sort-icon{color:#00e6c3;margin-left:5px;}
-.manager-column{min-width:120px;border-right:1px solid #ddd;}
+.managers-scroll-area{display:flex;width:90%;overflow-x:auto;}
+.manager-columns-container{display:flex;width:100%;}
+.manager-column{flex:1;min-width:120px;border-right:1px solid #ddd;}
 .manager-column:last-child{border-right:none;}
 .manager-header{padding:5px;text-align:center;border-bottom:1px solid #ddd;}
 .stats-header{display:flex;}
 .stat-header{flex:1;padding:5px;text-align:center;border-right:1px solid #ddd;}
 .stat-header:last-child{border-right:none;}
-.stats-row{display:flex;border-bottom:1px solid #ddd;}
+.stats-row{display:flex;border-bottom:1px solid #ddd;width:100%;}
 .stats-row:nth-child(odd){background-color:#f9f9f9;}
-.date-cell{min-width:120px;width:10%;position:sticky;left:0;z-index:10;display:flex;align-items:center;padding:8px 5px;border-right:1px solid #ddd;}
-.stats-row:nth-child(odd) .date-cell{background-color:#f9f9f9;}
-.stats-row:nth-child(even) .date-cell{background-color:#fff;}
+.date-cell{width:10%;min-width:120px;display:flex;align-items:center;padding:8px 5px;border-right:1px solid #ddd;}
 .day-name{margin-left:5px;color:#777;}
-.manager-stats{min-width:120px;display:flex;border-right:1px solid #ddd;}
+.manager-stats{flex:1;min-width:120px;display:flex;border-right:1px solid #ddd;}
 .stat-value{flex:1;text-align:center;padding:8px 5px;border-right:1px solid #ddd;}
 .stat-value:last-child{border-right:none;}
-.manager-stats-footer{display:flex;background-color:#444;color:white;font-weight:bold;}
-.date-footer{min-width:120px;width:10%;display:flex;align-items:center;justify-content:center;border-right:1px solid #ddd;padding:10px 5px;position:sticky;left:0;z-index:10;background-color:#444;}
-.stats-footer{display:flex;}
+.manager-stats-footer{display:flex;background-color:#444;color:white;font-weight:bold;width:100%;}
+.stats-footer{display:flex;width:100%;}
 .stat-footer{flex:1;padding:8px 5px;text-align:center;border-right:1px solid #ddd;}
 .stat-footer:last-child{border-right:none;}
+
+/* 6명 이하일 때 스크롤 없이 표시 */
+@media screen and (min-width: 1200px) {
+    .manager-stats-container.has-few-managers .managers-scroll-area {
+        overflow-x: visible;
+    }
+    .manager-stats-container.has-few-managers .manager-columns-container {
+        width: 100%;
+    }
+}
+
+/* 7명 이상일 때 스크롤 적용 */
+.manager-stats-container.has-many-managers .date-column {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background-color: #444;
+}
+.manager-stats-container.has-many-managers .date-cell {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+}
+.manager-stats-container.has-many-managers .stats-row:nth-child(odd) .date-cell {
+    background-color: #f9f9f9;
+}
+.manager-stats-container.has-many-managers .stats-row:nth-child(even) .date-cell {
+    background-color: #fff;
+}
+.manager-stats-container.has-many-managers .date-footer {
+    width: 10%;
+    min-width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid #ddd;
+    padding: 10px 5px;
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background-color: #444;
+}
