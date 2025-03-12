@@ -67,7 +67,7 @@ $(document).ready(function() {
 		
 		$('#managerDropdown').css({
 			top: tabPosition.top + tabHeight - 40 + 'px',
-			left: tabPosition.left + tabWidth - 100 + 'px'
+			left: tabPosition.left + tabWidth - 80 + 'px'
 		}).toggle();
 	});
 	
