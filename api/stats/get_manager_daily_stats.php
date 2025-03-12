@@ -4,10 +4,12 @@ include_once '../../config.php';
 header('Content-Type: application/json');
 
 try {
-	// 현재 월 기준으로 데이터 조회 (예: 3월)
-	$currentMonth = date('m');
-	$currentYear = date('Y');
-	$daysInMonth = date('t');
+	// 연도와 월 파라미터 받기
+	$year = isset($_GET['year']) ? intval($_GET['year']) : date('Y');
+	$month = isset($_GET['month']) ? str_pad($_GET['month'], 2, '0', STR_PAD_LEFT) : date('m');
+	
+	// 선택된 월의 일수 계산
+	$daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 	
 	// 사무장 목록 조회
 	$managerQuery = "SELECT employee_no, name FROM employee WHERE position = '사무장' AND status = '재직' ORDER BY employee_no";
@@ -17,9 +19,9 @@ try {
 	
 	$result = [];
 	
-	// 월의 각 날짜에 대한 데이터 조회
+	// 선택된 월의 각 날짜에 대한 데이터 조회
 	for ($day = 1; $day <= $daysInMonth; $day++) {
-		$date = sprintf("%04d-%02d-%02d", $currentYear, $currentMonth, $day);
+		$date = sprintf("%04d-%02d-%02d", $year, $month, $day);
 		$dayOfWeek = date('w', strtotime($date)); // 0(일)~6(토)
 		$dayNames = ['일', '월', '화', '수', '목', '금', '토'];
 		
