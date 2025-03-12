@@ -199,101 +199,115 @@ $(document).ready(function() {
             left: headerPosition.left + 'px'
         }).toggle();
     });
+	
+		// 문서 클릭 이벤트를 추가하여 드롭다운 닫기
+	$(document).on('click', function(e) {
+		if(!$(e.target).closest('#dateFilterDropdown, .date-dropdown-toggle').length) {
+			$('#dateFilterDropdown').hide();
+		}
+	});
 });
 
-// 날짜 필터 드롭다운 초기화 함수를 수정합니다
+// 날짜 필터 드롭다운 초기화 함수 수정
 function initDateFilterDropdown() {
-    // 현재 년도와 월 구하기
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth() + 1; // JavaScript의 month는 0부터 시작
-    const startYear = currentYear - 20; // 10년 전부터 선택 가능
-    
-    // 연도 옵션 생성
-    const yearSection = $('#dateFilterDropdown .dropdown-section:first-child .dropdown-scroll');
-    yearSection.empty();
-    
-    for (let year = currentYear; year >= startYear; year--) {
-        const isCurrentYear = year === currentYear;
-        yearSection.append(`<div class="dropdown-option year-option ${isCurrentYear ? 'selected' : ''}" data-year="${year}">${year}년</div>`);
-    }
-    
-    // 월 옵션 생성
-    const monthSection = $('#dateFilterDropdown .dropdown-section:last-of-type .dropdown-scroll');
-    monthSection.empty();
-    
-    for (let month = 1; month <= 12; month++) {
-        const isCurrentMonth = month === currentMonth;
-        monthSection.append(`<div class="dropdown-option month-option ${isCurrentMonth ? 'selected' : ''}" data-month="${month}">${month}월</div>`);
-    }
-    
-    // 이전 이벤트 핸들러 제거
-    $(document).off('click', '.year-option');
-    $(document).off('click', '.month-option');
-    $(document).off('click', '.date-dropdown-toggle');
-    $('.apply-button').off('click');
-    $('.reset-button').off('click');
-    $(document).off('click.dateFilter');
-    
-    // 연도 선택 이벤트
-    $(document).on('click', '.year-option', function() {
-        $('.year-option').removeClass('selected');
-        $(this).addClass('selected');
-    });
-    
-    // 월 선택 이벤트
-    $(document).on('click', '.month-option', function() {
-        $('.month-option').removeClass('selected');
-        $(this).addClass('selected');
-    });
-    
-    // 드롭다운 토글 이벤트 - 문서 전체에 이벤트 위임 방식으로 변경
-    $(document).on('click', '.date-dropdown-toggle', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        // 드롭다운 위치 설정
-        const headerPosition = $(this).closest('.date-column').offset();
-        const headerHeight = $(this).closest('.date-column').outerHeight();
-        
-        $('#dateFilterDropdown').css({
-            top: headerPosition.top + headerHeight + 'px',
-            left: headerPosition.left + 'px'
-        }).toggle();
-    });
-    
-    // 적용 버튼 클릭 이벤트
-    $(document).on('click', '.apply-button', function() {
-        const selectedYear = $('.year-option.selected').data('year');
-        const selectedMonth = $('.month-option.selected').data('month');
-        
-        if (selectedYear && selectedMonth) {
-            // 선택된 년도와 월로 데이터 로드
-            loadFilteredManagerDailyStats(selectedYear, selectedMonth);
-            $('#dateFilterDropdown').hide();
-        } else {
-            alert('연도와 월을 모두 선택해주세요.');
-        }
-    });
-    
-    // 초기화 버튼 클릭 이벤트
-    $(document).on('click', '.reset-button', function() {
-        $('.dropdown-option').removeClass('selected');
-        // 현재 연도와 월 옵션 선택
-        $(`.year-option[data-year="${currentYear}"]`).addClass('selected');
-        $(`.month-option[data-month="${currentMonth}"]`).addClass('selected');
-        // 현재 월 데이터 로드
-        loadFilteredManagerDailyStats(currentYear, currentMonth);
-        $('#dateFilterDropdown').hide();
-    });
-    
-    // 다른 곳 클릭 시 드롭다운 닫기
-    $(document).on('click.dateFilter', function(e) {
-        if(!$(e.target).closest('#dateFilterDropdown, .date-dropdown-toggle').length) {
-            $('#dateFilterDropdown').hide();
-        }
-    });
+	// 현재 년도와 월 구하기
+	const currentDate = new Date();
+	const currentYear = currentDate.getFullYear();
+	const currentMonth = currentDate.getMonth() + 1;
+	const startYear = currentYear - 20;
+	
+	// 연도 옵션 생성
+	const yearSection = $('#dateFilterDropdown .dropdown-section:first-child .dropdown-scroll');
+	yearSection.empty();
+	
+	for (let year = currentYear; year >= startYear; year--) {
+		const isCurrentYear = year === currentYear;
+		yearSection.append(`<div class="dropdown-option year-option ${isCurrentYear ? 'selected' : ''}" data-year="${year}">${year}년</div>`);
+	}
+	
+	// 월 옵션 생성
+	const monthSection = $('#dateFilterDropdown .dropdown-section:last-of-type .dropdown-scroll');
+	monthSection.empty();
+	
+	for (let month = 1; month <= 12; month++) {
+		const isCurrentMonth = month === currentMonth;
+		monthSection.append(`<div class="dropdown-option month-option ${isCurrentMonth ? 'selected' : ''}" data-month="${month}">${month}월</div>`);
+	}
+	
+	// 이벤트 핸들러 모두 제거 후 다시 바인딩
+	$(document).off('click', '.year-option');
+	$(document).off('click', '.month-option');
+	$(document).off('click', '.date-dropdown-toggle');
+	$(document).off('click', '.apply-button');
+	$(document).off('click', '.reset-button');
+	$(document).off('click.dateFilter');
+	
+	// 연도 선택 이벤트
+	$(document).on('click', '.year-option', function() {
+		$('.year-option').removeClass('selected');
+		$(this).addClass('selected');
+	});
+	
+	// 월 선택 이벤트
+	$(document).on('click', '.month-option', function() {
+		$('.month-option').removeClass('selected');
+		$(this).addClass('selected');
+	});
+	
+	// 드롭다운 토글 이벤트 수정
+	$(document).on('click', '.date-dropdown-toggle', function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		
+		const $dateColumn = $(this).closest('.date-column');
+		
+		// 드롭다운 위치 설정
+		const headerPosition = $dateColumn.offset();
+		const headerHeight = $dateColumn.outerHeight();
+		
+		// 드롭다운 표시 위치 수정
+		$('#dateFilterDropdown').css({
+			display: 'block',
+			top: (headerPosition.top + headerHeight) + 'px',
+			left: headerPosition.left + 'px',
+			position: 'absolute',
+			zIndex: 1000
+		});
+	});
+	
+	// 적용 버튼 클릭 이벤트
+	$(document).on('click', '.apply-button', function() {
+		const selectedYear = $('.year-option.selected').data('year');
+		const selectedMonth = $('.month-option.selected').data('month');
+		
+		if (selectedYear && selectedMonth) {
+			// 선택된 년도와 월로 데이터 로드
+			loadFilteredManagerDailyStats(selectedYear, selectedMonth);
+			$('#dateFilterDropdown').hide();
+		} else {
+			alert('연도와 월을 모두 선택해주세요.');
+		}
+	});
+	
+	// 초기화 버튼 클릭 이벤트
+	$(document).on('click', '.reset-button', function() {
+		$('.dropdown-option').removeClass('selected');
+		// 현재 연도와 월 옵션 선택
+		$(`.year-option[data-year="${currentYear}"]`).addClass('selected');
+		$(`.month-option[data-month="${currentMonth}"]`).addClass('selected');
+		// 현재 월 데이터 로드
+		loadFilteredManagerDailyStats(currentYear, currentMonth);
+		$('#dateFilterDropdown').hide();
+	});
+	
+	// 다른 곳 클릭 시 드롭다운 닫기
+	$(document).on('click.dateFilter', function(e) {
+		if(!$(e.target).closest('#dateFilterDropdown, .date-dropdown-toggle').length) {
+			$('#dateFilterDropdown').hide();
+		}
+	});
 }
+
 // 필터링된 사무장 일간 통계 로드 함수
 function loadFilteredManagerDailyStats(year, month) {
 	// API 호출 URL에 년도와 월 파라미터 추가
