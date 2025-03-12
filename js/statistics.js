@@ -108,48 +108,118 @@ function renderManagerDailyStats(data) {
 	const statsBody = $('#managerStatsBody');
 	statsBody.empty();
 	
-	// 이미지에 있는 데이터를 샘플로 사용
-	const sampleData = [
-		{ date: '2025. 01. 01.', day: '수', managers: [{ inflow: 3, contract: 2 }, { inflow: 0, contract: 0 }, { inflow: 0, contract: 0 }, { inflow: 0, contract: 0 }, { inflow: 0, contract: 0 }, { inflow: 0, contract: 0 }], total: { inflow: 3, contract: 2 } },
-		{ date: '2025. 01. 02.', day: '목', managers: [{ inflow: 8, contract: 4 }, { inflow: 0, contract: 0 }, { inflow: 0, contract: 0 }, { inflow: 0, contract: 0 }, { inflow: 0, contract: 0 }, { inflow: 0, contract: 0 }], total: { inflow: 8, contract: 4 } },
-		{ date: '2025. 01. 03.', day: '금', managers: [{ inflow: 9, contract: 5 }, { inflow: 0, contract: 0 }, { inflow: 0, contract: 0 }, { inflow: 0, contract: 0 }, { inflow: 0, contract: 0 }, { inflow: 0, contract: 0 }], total: { inflow: 9, contract: 5 } },
-		// 실제 API에서 데이터를 받아오면 data 변수를 사용하세요
-		// 여기서는 샘플 데이터의 일부만 표시
-	];
-	
-	// 데이터가 있으면 해당 데이터 사용, 없으면 샘플 데이터 사용
-	const displayData = data && data.length > 0 ? data : sampleData;
-	
-	displayData.forEach(item => {
-		const row = $('<div class="stats-row"></div>');
-		
-		// 날짜 열
-		row.append(`
-			<div class="date-cell">
-				${item.date} <span class="day-name">${item.day}</span>
-			</div>
-		`);
-		
-		// 각 사무장 데이터
-		item.managers.forEach(manager => {
-			row.append(`
-				<div class="manager-stats">
-					<div class="stat-value">${manager.inflow}</div>
-					<div class="stat-value">${manager.contract}</div>
-				</div>
-			`);
-		});
-		
-		// 합계 열
-		row.append(`
-			<div class="manager-stats">
-				<div class="stat-value">${item.total.inflow}</div>
-				<div class="stat-value">${item.total.contract}</div>
-			</div>
-		`);
-		
-		statsBody.append(row);
+	// 관리자 계정 정보 가져오기(API 호출)
+	$.ajax({
+		url: '../adm/api/stats/get_manager_stats.php',
+		method: 'GET',
+		dataType: 'json',
+		async: false,
+		success: function(response) {
+			if(response.success) {
+				// 헤더 섹션 업데이트
+				updateManagerStatsHeader(response.data);
+				
+				// 이제 일별 통계 데이터 표시
+				const displayData = data && data.length > 0 ? data : [];
+				
+				displayData.forEach(item => {
+					const row = $('<div class="stats-row"></div>');
+					
+					// 날짜 열
+					row.append(`
+						<div class="date-cell">
+							${item.date} <span class="day-name">${item.day}</span>
+						</div>
+					`);
+					
+					// 각 사무장 데이터(실제 사무장 수만큼만 표시)
+					const managerCount = response.data.length;
+					for(let i = 0; i < managerCount; i++) {
+						if(i < item.managers.length) {
+							row.append(`
+								<div class="manager-stats">
+									<div class="stat-value">${item.managers[i].inflow}</div>
+									<div class="stat-value">${item.managers[i].contract}</div>
+								</div>
+							`);
+						}
+					}
+					
+					// 합계 열
+					row.append(`
+						<div class="manager-stats">
+							<div class="stat-value">${item.total.inflow}</div>
+							<div class="stat-value">${item.total.contract}</div>
+						</div>
+					`);
+					
+					statsBody.append(row);
+				});
+			} else {
+				console.error('사무장 목록을 불러오는데 실패했습니다:', response.message);
+			}
+		},
+		error: function(xhr, status, error) {
+			console.error('사무장 목록을 불러오는데 실패했습니다:', error);
+		}
 	});
+}
+
+// 헤더 섹션 업데이트 함수 추가
+function updateManagerStatsHeader(managers) {
+	const header = $('.manager-stats-header');
+	// 날짜 칼럼 제외한 나머지 칼럼 제거
+	header.find('.manager-column').remove();
+	
+	// 실제 사무장 수에 따라 칼럼 추가
+	managers.forEach(manager => {
+		header.append(`
+			<div class="manager-column">
+				<div class="manager-header">${manager.name} 사무장</div>
+				<div class="stats-header">
+					<div class="stat-header">유입</div>
+					<div class="stat-header">계약</div>
+				</div>
+			</div>
+		`);
+	});
+	
+	// 합계 칼럼 추가
+	header.append(`
+		<div class="manager-column">
+			<div class="manager-header">합계</div>
+			<div class="stats-header">
+				<div class="stat-header">유입</div>
+				<div class="stat-header">계약</div>
+			</div>
+		</div>
+	`);
+	
+	// 푸터도 업데이트
+	const footer = $('.manager-stats-footer');
+	footer.find('.manager-column').remove();
+	
+	// 각 사무장별 푸터 칼럼 추가
+	managers.forEach(manager => {
+		footer.append(`
+			<div class="manager-column">
+				<div class="stats-footer">
+					<div class="stat-footer">0</div>
+					<div class="stat-footer">0</div>
+				</div>
+			</div>
+		`);
+	});
+	
+	// 합계 칼럼 추가
+	footer.append(`
+		<div class="manager-column">
+			<div class="stats-footer">
+				<div class="stat-footer">0</div>
+				<div class="stat-footer">0</div>
+			</div>
+		</div>
+	`);
 }
 
 // 사무장 데이터 로드 함수
