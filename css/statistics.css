@@ -49,7 +49,7 @@
 .managers-scroll-area{display:flex;width:90%;overflow-x:auto;}
 .manager-columns-container{display:flex;width:100%;}
 .manager-column{flex:1;background-color:#b0b0b0;min-width:120px;border-right:1px solid #ddd;}
-.manager-column:last-child{border-right:none;}
+.manager-column:last-child{border-right:none;background-color:#6c6c6c;}
 .manager-header{padding:5px;text-align:center;border-bottom:1px solid #ddd;}
 .stats-header{display:flex;}
 .stat-header{flex:1;padding:5px;text-align:center;border-right:1px solid #ddd;}
@@ -60,7 +60,7 @@
 .manager-stats{flex:1;min-width:120px;display:flex;border-right:1px solid #ddd;}
 .stat-value{flex:1;text-align:center;padding:8px 5px;}
 .stat-value:last-child{border-right:none;}
-.manager-stats-footer{display:flex;background-color:#6c6c6c;color:white;font-weight:bold;width:100%;border-radius:5px;}
+.manager-stats-footer{display:flex;color:white;font-weight:bold;width:100%;border-radius:5px;}
 .stats-footer{display:flex;width:100%;}
 .stat-footer{flex:1;padding:10px 5px;text-align:center;border-right:1px solid #ddd;}
 .stat-footer:last-child{border-right:none;}
