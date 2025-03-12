@@ -16,8 +16,8 @@ jobs:
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@4.3.0
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
+          server: http://lexmarketing.kr
+          username: lez062801
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./  # 로컬 프로젝트 폴더
-          server-dir: /www/  # 업로드할 서버 경로
+          server-dir: /adm  # 업로드할 서버 경로
