@@ -9,7 +9,7 @@
 .summary-box{flex:1 1;display:flex;flex-direction:row;justify-content:space-between;background:#6c6c6c;border-radius:0.3vw;padding:0.5vw 3vw;box-shadow:0 0.5vh 0.5vh rgba(0,0,0,0.4);}
 .total-label{color:#fff;align-content:center;}
 .total-value{color:#fff;align-content:center;font-weight:bold}
-.statistics-row{display:flex;gap:2vw;margin-bottom:2vh;flex-wrap:wrap;padding:3vw;}
+.statistics-row{display:flex;gap:2vw;margin-bottom:2vh;flex-wrap:wrap;}
 .statistics-col{flex:1 1 20vw;min-width:15vw;display:flex;flex-direction:column;gap:2vh;border-radius:0.2vw}
 .statistics-box{background:#fff;border-radius:0.3vw;padding:1.5vw;box-shadow:0 0.2vh 0.4vh rgba(0,0,0,0.05);width:100%}
 .box-title{margin-bottom:1.5vh;padding-left:2vw;}
