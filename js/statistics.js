@@ -185,8 +185,10 @@ $(document).ready(function() {
 
 // 날짜 필터 드롭다운 초기화 함수
 function initDateFilterDropdown() {
-	// 현재 년도 구하기
-	const currentYear = new Date().getFullYear();
+	// 현재 년도와 월 구하기
+	const currentDate = new Date();
+	const currentYear = currentDate.getFullYear();
+	const currentMonth = currentDate.getMonth() + 1; // JavaScript의 month는 0부터 시작
 	const startYear = currentYear - 10; // 10년 전부터 선택 가능
 	
 	// 연도 옵션 생성
@@ -194,7 +196,8 @@ function initDateFilterDropdown() {
 	yearSection.empty();
 	
 	for (let year = currentYear; year >= startYear; year--) {
-		yearSection.append(`<div class="dropdown-option year-option" data-year="${year}">${year}년</div>`);
+		const isCurrentYear = year === currentYear;
+		yearSection.append(`<div class="dropdown-option year-option ${isCurrentYear ? 'selected' : ''}" data-year="${year}">${year}년</div>`);
 	}
 	
 	// 월 옵션 생성
@@ -202,7 +205,8 @@ function initDateFilterDropdown() {
 	monthSection.empty();
 	
 	for (let month = 1; month <= 12; month++) {
-		monthSection.append(`<div class="dropdown-option month-option" data-month="${month}">${month}월</div>`);
+		const isCurrentMonth = month === currentMonth;
+		monthSection.append(`<div class="dropdown-option month-option ${isCurrentMonth ? 'selected' : ''}" data-month="${month}">${month}월</div>`);
 	}
 	
 	// 연도 선택 이벤트
@@ -248,8 +252,11 @@ function initDateFilterDropdown() {
 	// 초기화 버튼 클릭 이벤트
 	$('.reset-button').click(function() {
 		$('.dropdown-option').removeClass('selected');
+		// 현재 연도와 월 옵션 선택
+		$(`.year-option[data-year="${currentYear}"]`).addClass('selected');
+		$(`.month-option[data-month="${currentMonth}"]`).addClass('selected');
 		// 현재 월 데이터 로드
-		loadManagerDailyStats();
+		loadFilteredManagerDailyStats(currentYear, currentMonth);
 		$('#dateFilterDropdown').hide();
 	});
 	
@@ -259,9 +266,6 @@ function initDateFilterDropdown() {
 			$('#dateFilterDropdown').hide();
 		}
 	});
-	
-	// 날짜 필터 드롭다운 초기화
-	initDateFilterDropdown();
 }
 
 // 필터링된 사무장 일간 통계 로드 함수
@@ -278,39 +282,25 @@ function loadFilteredManagerDailyStats(year, month) {
 		success: function(response) {
 			if(response.success) {
 				renderManagerDailyStats(response.data);
-				// 필터 적용 표시
-				$('.date-column').html(`${year}년 ${month}월 통계&nbsp;&nbsp;<span class="sort-icon date-dropdown-toggle">▼</span>`);
 			} else {
 				console.error('사무장 일별 통계를 불러오는데 실패했습니다:', response.message);
-				$('#managerDailyStatsBody').html('<div class="error-message">데이터를 불러오는데 실패했습니다.</div>');
 			}
 		},
 		error: function(xhr, status, error) {
 			console.error('사무장 일별 통계를 불러오는데 실패했습니다:', error);
-			$('#managerDailyStatsBody').html('<div class="error-message">데이터를 불러오는데 실패했습니다.</div>');
 		}
 	});
 }
 
 // 사무장 일별 통계 데이터 로드 함수
 function loadManagerDailyStats() {
-	$.ajax({
-		url: '../adm/api/stats/get_manager_daily_stats.php',
-		method: 'GET',
-		dataType: 'json',
-		success: function(response) {
-			if(response.success) {
-				renderManagerDailyStats(response.data);
-			} else {
-				console.error('사무장 일별 통계를 불러오는데 실패했습니다:', response.message);
-				$('#managerDailyStatsBody').html('<div class="error-message">데이터를 불러오는데 실패했습니다.</div>');
-			}
-		},
-		error: function(xhr, status, error) {
-			console.error('사무장 일별 통계를 불러오는데 실패했습니다:', error);
-			$('#managerDailyStatsBody').html('<div class="error-message">데이터를 불러오는데 실패했습니다.</div>');
-		}
-	});
+	// 현재 연도와 월 구하기
+	const currentDate = new Date();
+	const currentYear = currentDate.getFullYear();
+	const currentMonth = currentDate.getMonth() + 1; // JavaScript의 month는 0부터 시작
+	
+	// 초기 로드 시 현재 연도와 월 데이터 사용
+	loadFilteredManagerDailyStats(currentYear, currentMonth);
 }
 
 // 사무장 일별 통계 렌더링 함수 수정
