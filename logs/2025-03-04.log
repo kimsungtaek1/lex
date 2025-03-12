@@ -1,0 +1,1183 @@
+[2025-03-04 09:13:57] Query results: Array
+(
+    [0] => Array
+        (
+            [case_no] => 16
+            [consult_no] => 13
+            [paper_no] => 15
+            [datetime] => 2024-12-18 10:14:48
+            [category] => 개인회생영업
+            [case_number] => 서울2025개회100002
+            [contract_date] => 
+            [application_fee] => 
+            [payment_amount] => 0
+            [unpaid_amount] => 0
+            [name] => 이기자
+            [phone] => 010-2234-5678
+            [consultant] => 1
+            [paper] => 6
+            [court_name] => 서울회생법원
+            [assign_date] => 2024-12-18
+            [accept_date] => 
+            [start_date] => 
+            [approval_date] => 
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-18 10:14:48
+            [updated_at] => 2025-02-19 15:13:51
+            [consultant_name] => 김성택
+            [paper_name] => 송윤정
+            [consult_paper_accept_date] => 
+            [consult_paper_start_date] => 
+        )
+
+    [1] => Array
+        (
+            [case_no] => 10
+            [consult_no] => 11
+            [paper_no] => 10
+            [datetime] => 2024-12-16 11:41:32
+            [category] => 개인회생영업
+            [case_number] => 부산2025개회100002
+            [contract_date] => 
+            [application_fee] => 2500000
+            [payment_amount] => 10000
+            [unpaid_amount] => 2490000
+            [name] => 두번째
+            [phone] => 010-0000-0000
+            [consultant] => 1
+            [paper] => 1
+            [court_name] => 서울회생법원
+            [assign_date] => 2024-12-16
+            [accept_date] => 2024-12-17
+            [start_date] => 2024-12-18
+            [approval_date] => 2024-12-19
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-16 11:41:32
+            [updated_at] => 2025-01-21 13:19:46
+            [consultant_name] => 김성택
+            [paper_name] => 김성택
+            [consult_paper_accept_date] => 2024-12-17
+            [consult_paper_start_date] => 2024-12-18
+        )
+
+    [2] => Array
+        (
+            [case_no] => 1
+            [consult_no] => 4
+            [paper_no] => 3
+            [datetime] => 2024-12-05 15:12:25
+            [category] => 개인파산
+            [case_number] => 서울2024개회123456
+            [contract_date] => 2024-12-02
+            [application_fee] => 1500000
+            [payment_amount] => 539000
+            [unpaid_amount] => 961000
+            [name] => 갑식이
+            [phone] => 010-1234-5678
+            [consultant] => 1
+            [paper] => 1
+            [court_name] => 의정부지방법원
+            [assign_date] => 2024-12-08
+            [accept_date] => 2024-12-08
+            [start_date] => 2024-12-10
+            [approval_date] => 2024-12-14
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-05 15:12:25
+            [updated_at] => 2025-03-03 14:05:23
+            [consultant_name] => 김성택
+            [paper_name] => 김성택
+            [consult_paper_accept_date] => 2024-12-08
+            [consult_paper_start_date] => 2024-12-10
+        )
+
+)
+
+[2025-03-04 09:14:06] Query results: Array
+(
+    [0] => Array
+        (
+            [case_no] => 16
+            [consult_no] => 13
+            [paper_no] => 15
+            [datetime] => 2024-12-18 10:14:48
+            [category] => 개인회생영업
+            [case_number] => 서울2025개회100002
+            [contract_date] => 
+            [application_fee] => 
+            [payment_amount] => 0
+            [unpaid_amount] => 0
+            [name] => 이기자
+            [phone] => 010-2234-5678
+            [consultant] => 1
+            [paper] => 6
+            [court_name] => 서울회생법원
+            [assign_date] => 2024-12-18
+            [accept_date] => 
+            [start_date] => 
+            [approval_date] => 
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-18 10:14:48
+            [updated_at] => 2025-02-19 15:13:51
+            [consultant_name] => 김성택
+            [paper_name] => 송윤정
+            [consult_paper_accept_date] => 
+            [consult_paper_start_date] => 
+        )
+
+    [1] => Array
+        (
+            [case_no] => 10
+            [consult_no] => 11
+            [paper_no] => 10
+            [datetime] => 2024-12-16 11:41:32
+            [category] => 개인회생영업
+            [case_number] => 부산2025개회100002
+            [contract_date] => 
+            [application_fee] => 2500000
+            [payment_amount] => 10000
+            [unpaid_amount] => 2490000
+            [name] => 두번째
+            [phone] => 010-0000-0000
+            [consultant] => 1
+            [paper] => 1
+            [court_name] => 서울회생법원
+            [assign_date] => 2024-12-16
+            [accept_date] => 2024-12-17
+            [start_date] => 2024-12-18
+            [approval_date] => 2024-12-19
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-16 11:41:32
+            [updated_at] => 2025-01-21 13:19:46
+            [consultant_name] => 김성택
+            [paper_name] => 김성택
+            [consult_paper_accept_date] => 2024-12-17
+            [consult_paper_start_date] => 2024-12-18
+        )
+
+    [2] => Array
+        (
+            [case_no] => 1
+            [consult_no] => 4
+            [paper_no] => 3
+            [datetime] => 2024-12-05 15:12:25
+            [category] => 개인파산
+            [case_number] => 서울2024개회123456
+            [contract_date] => 2024-12-02
+            [application_fee] => 1500000
+            [payment_amount] => 539000
+            [unpaid_amount] => 961000
+            [name] => 갑식이
+            [phone] => 010-1234-5678
+            [consultant] => 1
+            [paper] => 1
+            [court_name] => 의정부지방법원
+            [assign_date] => 2024-12-08
+            [accept_date] => 2024-12-08
+            [start_date] => 2024-12-10
+            [approval_date] => 2024-12-14
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-05 15:12:25
+            [updated_at] => 2025-03-03 14:05:23
+            [consultant_name] => 김성택
+            [paper_name] => 김성택
+            [consult_paper_accept_date] => 2024-12-08
+            [consult_paper_start_date] => 2024-12-10
+        )
+
+)
+
+[2025-03-04 09:37:03] Query results: Array
+(
+    [0] => Array
+        (
+            [case_no] => 16
+            [consult_no] => 13
+            [paper_no] => 15
+            [datetime] => 2024-12-18 10:14:48
+            [category] => 개인회생영업
+            [case_number] => 서울2025개회100002
+            [contract_date] => 
+            [application_fee] => 
+            [payment_amount] => 0
+            [unpaid_amount] => 0
+            [name] => 이기자
+            [phone] => 010-2234-5678
+            [consultant] => 1
+            [paper] => 6
+            [court_name] => 서울회생법원
+            [assign_date] => 2024-12-18
+            [accept_date] => 
+            [start_date] => 
+            [approval_date] => 
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-18 10:14:48
+            [updated_at] => 2025-02-19 15:13:51
+            [consultant_name] => 김성택
+            [paper_name] => 송윤정
+            [consult_paper_accept_date] => 
+            [consult_paper_start_date] => 
+        )
+
+    [1] => Array
+        (
+            [case_no] => 10
+            [consult_no] => 11
+            [paper_no] => 10
+            [datetime] => 2024-12-16 11:41:32
+            [category] => 개인회생영업
+            [case_number] => 부산2025개회100002
+            [contract_date] => 
+            [application_fee] => 2500000
+            [payment_amount] => 10000
+            [unpaid_amount] => 2490000
+            [name] => 두번째
+            [phone] => 010-0000-0000
+            [consultant] => 1
+            [paper] => 1
+            [court_name] => 서울회생법원
+            [assign_date] => 2024-12-16
+            [accept_date] => 2024-12-17
+            [start_date] => 2024-12-18
+            [approval_date] => 2024-12-19
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-16 11:41:32
+            [updated_at] => 2025-01-21 13:19:46
+            [consultant_name] => 김성택
+            [paper_name] => 김성택
+            [consult_paper_accept_date] => 2024-12-17
+            [consult_paper_start_date] => 2024-12-18
+        )
+
+    [2] => Array
+        (
+            [case_no] => 1
+            [consult_no] => 4
+            [paper_no] => 3
+            [datetime] => 2024-12-05 15:12:25
+            [category] => 개인파산
+            [case_number] => 서울2024개회123456
+            [contract_date] => 2024-12-02
+            [application_fee] => 1500000
+            [payment_amount] => 539000
+            [unpaid_amount] => 961000
+            [name] => 갑식이
+            [phone] => 010-1234-5678
+            [consultant] => 1
+            [paper] => 1
+            [court_name] => 의정부지방법원
+            [assign_date] => 2024-12-08
+            [accept_date] => 2024-12-08
+            [start_date] => 2024-12-10
+            [approval_date] => 2024-12-14
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-05 15:12:25
+            [updated_at] => 2025-03-03 14:05:23
+            [consultant_name] => 김성택
+            [paper_name] => 김성택
+            [consult_paper_accept_date] => 2024-12-08
+            [consult_paper_start_date] => 2024-12-10
+        )
+
+)
+
+[2025-03-04 09:37:13] Query results: Array
+(
+    [0] => Array
+        (
+            [case_no] => 16
+            [consult_no] => 13
+            [paper_no] => 15
+            [datetime] => 2024-12-18 10:14:48
+            [category] => 개인회생영업
+            [case_number] => 서울2025개회100002
+            [contract_date] => 
+            [application_fee] => 
+            [payment_amount] => 0
+            [unpaid_amount] => 0
+            [name] => 이기자
+            [phone] => 010-2234-5678
+            [consultant] => 1
+            [paper] => 6
+            [court_name] => 서울회생법원
+            [assign_date] => 2024-12-18
+            [accept_date] => 
+            [start_date] => 
+            [approval_date] => 
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-18 10:14:48
+            [updated_at] => 2025-02-19 15:13:51
+            [consultant_name] => 김성택
+            [paper_name] => 송윤정
+            [consult_paper_accept_date] => 
+            [consult_paper_start_date] => 
+        )
+
+    [1] => Array
+        (
+            [case_no] => 10
+            [consult_no] => 11
+            [paper_no] => 10
+            [datetime] => 2024-12-16 11:41:32
+            [category] => 개인회생영업
+            [case_number] => 부산2025개회100002
+            [contract_date] => 
+            [application_fee] => 2500000
+            [payment_amount] => 10000
+            [unpaid_amount] => 2490000
+            [name] => 두번째
+            [phone] => 010-0000-0000
+            [consultant] => 1
+            [paper] => 1
+            [court_name] => 서울회생법원
+            [assign_date] => 2024-12-16
+            [accept_date] => 2024-12-17
+            [start_date] => 2024-12-18
+            [approval_date] => 2024-12-19
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-16 11:41:32
+            [updated_at] => 2025-01-21 13:19:46
+            [consultant_name] => 김성택
+            [paper_name] => 김성택
+            [consult_paper_accept_date] => 2024-12-17
+            [consult_paper_start_date] => 2024-12-18
+        )
+
+    [2] => Array
+        (
+            [case_no] => 1
+            [consult_no] => 4
+            [paper_no] => 3
+            [datetime] => 2024-12-05 15:12:25
+            [category] => 개인파산
+            [case_number] => 서울2024개회123456
+            [contract_date] => 2024-12-02
+            [application_fee] => 1500000
+            [payment_amount] => 539000
+            [unpaid_amount] => 961000
+            [name] => 갑식이
+            [phone] => 010-1234-5678
+            [consultant] => 1
+            [paper] => 1
+            [court_name] => 의정부지방법원
+            [assign_date] => 2024-12-08
+            [accept_date] => 2024-12-08
+            [start_date] => 2024-12-10
+            [approval_date] => 2024-12-14
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-05 15:12:25
+            [updated_at] => 2025-03-03 14:05:23
+            [consultant_name] => 김성택
+            [paper_name] => 김성택
+            [consult_paper_accept_date] => 2024-12-08
+            [consult_paper_start_date] => 2024-12-10
+        )
+
+)
+
+[2025-03-04 09:50:47] No data found or access denied for case_no: 1
+[2025-03-04 10:15:56] No data found or access denied for case_no: 1
+[2025-03-04 10:16:18] Query results: Array
+(
+    [0] => Array
+        (
+            [case_no] => 16
+            [consult_no] => 13
+            [paper_no] => 15
+            [datetime] => 2024-12-18 10:14:48
+            [category] => 개인회생영업
+            [case_number] => 서울2025개회100002
+            [contract_date] => 
+            [application_fee] => 
+            [payment_amount] => 0
+            [unpaid_amount] => 0
+            [name] => 이기자
+            [phone] => 010-2234-5678
+            [consultant] => 1
+            [paper] => 6
+            [court_name] => 서울회생법원
+            [assign_date] => 2024-12-18
+            [accept_date] => 
+            [start_date] => 
+            [approval_date] => 
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-18 10:14:48
+            [updated_at] => 2025-02-19 15:13:51
+            [consultant_name] => 김성택
+            [paper_name] => 송윤정
+            [consult_paper_accept_date] => 
+            [consult_paper_start_date] => 
+        )
+
+    [1] => Array
+        (
+            [case_no] => 10
+            [consult_no] => 11
+            [paper_no] => 10
+            [datetime] => 2024-12-16 11:41:32
+            [category] => 개인회생영업
+            [case_number] => 부산2025개회100002
+            [contract_date] => 
+            [application_fee] => 2500000
+            [payment_amount] => 10000
+            [unpaid_amount] => 2490000
+            [name] => 두번째
+            [phone] => 010-0000-0000
+            [consultant] => 1
+            [paper] => 1
+            [court_name] => 서울회생법원
+            [assign_date] => 2024-12-16
+            [accept_date] => 2024-12-17
+            [start_date] => 2024-12-18
+            [approval_date] => 2024-12-19
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-16 11:41:32
+            [updated_at] => 2025-01-21 13:19:46
+            [consultant_name] => 김성택
+            [paper_name] => 김성택
+            [consult_paper_accept_date] => 2024-12-17
+            [consult_paper_start_date] => 2024-12-18
+        )
+
+    [2] => Array
+        (
+            [case_no] => 1
+            [consult_no] => 4
+            [paper_no] => 3
+            [datetime] => 2024-12-05 15:12:25
+            [category] => 개인파산
+            [case_number] => 서울2024개회123456
+            [contract_date] => 2024-12-02
+            [application_fee] => 1500000
+            [payment_amount] => 539000
+            [unpaid_amount] => 961000
+            [name] => 갑식이
+            [phone] => 010-1234-5678
+            [consultant] => 1
+            [paper] => 1
+            [court_name] => 의정부지방법원
+            [assign_date] => 2024-12-08
+            [accept_date] => 2024-12-08
+            [start_date] => 2024-12-10
+            [approval_date] => 2024-12-14
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-05 15:12:25
+            [updated_at] => 2025-03-03 14:05:23
+            [consultant_name] => 김성택
+            [paper_name] => 김성택
+            [consult_paper_accept_date] => 2024-12-08
+            [consult_paper_start_date] => 2024-12-10
+        )
+
+)
+
+[2025-03-04 10:16:24] Query results: Array
+(
+    [0] => Array
+        (
+            [case_no] => 16
+            [consult_no] => 13
+            [paper_no] => 15
+            [datetime] => 2024-12-18 10:14:48
+            [category] => 개인회생영업
+            [case_number] => 서울2025개회100002
+            [contract_date] => 
+            [application_fee] => 
+            [payment_amount] => 0
+            [unpaid_amount] => 0
+            [name] => 이기자
+            [phone] => 010-2234-5678
+            [consultant] => 1
+            [paper] => 6
+            [court_name] => 서울회생법원
+            [assign_date] => 2024-12-18
+            [accept_date] => 
+            [start_date] => 
+            [approval_date] => 
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-18 10:14:48
+            [updated_at] => 2025-02-19 15:13:51
+            [consultant_name] => 김성택
+            [paper_name] => 송윤정
+            [consult_paper_accept_date] => 
+            [consult_paper_start_date] => 
+        )
+
+    [1] => Array
+        (
+            [case_no] => 10
+            [consult_no] => 11
+            [paper_no] => 10
+            [datetime] => 2024-12-16 11:41:32
+            [category] => 개인회생영업
+            [case_number] => 부산2025개회100002
+            [contract_date] => 
+            [application_fee] => 2500000
+            [payment_amount] => 10000
+            [unpaid_amount] => 2490000
+            [name] => 두번째
+            [phone] => 010-0000-0000
+            [consultant] => 1
+            [paper] => 1
+            [court_name] => 서울회생법원
+            [assign_date] => 2024-12-16
+            [accept_date] => 2024-12-17
+            [start_date] => 2024-12-18
+            [approval_date] => 2024-12-19
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-16 11:41:32
+            [updated_at] => 2025-01-21 13:19:46
+            [consultant_name] => 김성택
+            [paper_name] => 김성택
+            [consult_paper_accept_date] => 2024-12-17
+            [consult_paper_start_date] => 2024-12-18
+        )
+
+    [2] => Array
+        (
+            [case_no] => 1
+            [consult_no] => 4
+            [paper_no] => 3
+            [datetime] => 2024-12-05 15:12:25
+            [category] => 개인파산
+            [case_number] => 서울2024개회123456
+            [contract_date] => 2024-12-02
+            [application_fee] => 1500000
+            [payment_amount] => 539000
+            [unpaid_amount] => 961000
+            [name] => 갑식이
+            [phone] => 010-1234-5678
+            [consultant] => 1
+            [paper] => 1
+            [court_name] => 의정부지방법원
+            [assign_date] => 2024-12-08
+            [accept_date] => 2024-12-08
+            [start_date] => 2024-12-10
+            [approval_date] => 2024-12-14
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-05 15:12:25
+            [updated_at] => 2025-03-03 14:05:23
+            [consultant_name] => 김성택
+            [paper_name] => 김성택
+            [consult_paper_accept_date] => 2024-12-08
+            [consult_paper_start_date] => 2024-12-10
+        )
+
+)
+
+[2025-03-04 10:16:51] Query results: Array
+(
+    [0] => Array
+        (
+            [case_no] => 10
+            [consult_no] => 11
+            [paper_no] => 10
+            [datetime] => 2024-12-16 11:41:32
+            [category] => 개인회생영업
+            [case_number] => 부산2025개회100002
+            [contract_date] => 
+            [application_fee] => 2500000
+            [payment_amount] => 10000
+            [unpaid_amount] => 2490000
+            [name] => 두번째
+            [phone] => 010-0000-0000
+            [consultant] => 1
+            [paper] => 1
+            [court_name] => 서울회생법원
+            [assign_date] => 2024-12-16
+            [accept_date] => 2024-12-17
+            [start_date] => 2024-12-18
+            [approval_date] => 2024-12-19
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-16 11:41:32
+            [updated_at] => 2025-01-21 13:19:46
+            [consultant_name] => 김성택
+            [paper_name] => 김성택
+            [consult_paper_accept_date] => 2024-12-17
+            [consult_paper_start_date] => 2024-12-18
+        )
+
+    [1] => Array
+        (
+            [case_no] => 1
+            [consult_no] => 4
+            [paper_no] => 3
+            [datetime] => 2024-12-05 15:12:25
+            [category] => 개인파산
+            [case_number] => 서울2024개회123456
+            [contract_date] => 2024-12-02
+            [application_fee] => 1500000
+            [payment_amount] => 539000
+            [unpaid_amount] => 961000
+            [name] => 갑식이
+            [phone] => 010-1234-5678
+            [consultant] => 1
+            [paper] => 1
+            [court_name] => 의정부지방법원
+            [assign_date] => 2024-12-08
+            [accept_date] => 2024-12-08
+            [start_date] => 2024-12-10
+            [approval_date] => 2024-12-14
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-05 15:12:25
+            [updated_at] => 2025-03-03 14:05:23
+            [consultant_name] => 김성택
+            [paper_name] => 김성택
+            [consult_paper_accept_date] => 2024-12-08
+            [consult_paper_start_date] => 2024-12-10
+        )
+
+)
+
+[2025-03-04 10:16:57] No data found or access denied for case_no: 10
+[2025-03-04 10:21:17] No data found or access denied for case_no: 10
+[2025-03-04 10:21:27] No data found or access denied for case_no: 10
+[2025-03-04 10:33:32] No data found or access denied for case_no: 10
+[2025-03-04 10:34:18] Received POST data: Array
+(
+    [consult_no] => 13
+    [name] => 이기자
+    [phone] => 010-2234-5678
+    [category] => 개인회생급여
+    [datetime] => 2024-12-17 15:05
+    [region] => 광주
+    [birth_date] => 2010-01-04
+    [debt_amount] => 5천
+    [consultation_time] => 14
+    [content] => 안녕하세요
+    [prospect] => 높음
+    [consultant] => 6
+    [paper] => 6
+)
+
+[2025-03-04 10:37:32] No data found or access denied for case_no: 17
+[2025-03-04 10:40:03] Received POST data: Array
+(
+    [consult_no] => 14
+    [name] => 네번째
+    [phone] => 010-1234-1234
+    [category] => 개인파산
+    [datetime] => 2025-03-04 10:38
+    [region] => 
+    [birth_date] => 
+    [debt_amount] => 
+    [consultation_time] => 
+    [content] => 
+    [prospect] => 높음
+    [consultant] => 6
+    [paper] => 6
+)
+
+[2025-03-04 10:40:31] Query results: Array
+(
+    [0] => Array
+        (
+            [case_no] => 18
+            [consult_no] => 14
+            [paper_no] => 17
+            [datetime] => 2025-03-04 10:40:03
+            [category] => 개인파산
+            [case_number] => 
+            [contract_date] => 
+            [application_fee] => 0
+            [payment_amount] => 0
+            [unpaid_amount] => 0
+            [name] => 네번째
+            [phone] => 010-1234-1234
+            [consultant] => 6
+            [paper] => 6
+            [court_name] => 
+            [assign_date] => 2025-03-04
+            [accept_date] => 
+            [start_date] => 
+            [approval_date] => 
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2025-03-04 10:40:03
+            [updated_at] => 2025-03-04 10:40:03
+            [consultant_name] => 송윤정
+            [paper_name] => 송윤정
+            [consult_paper_accept_date] => 
+            [consult_paper_start_date] => 
+        )
+
+    [1] => Array
+        (
+            [case_no] => 17
+            [consult_no] => 13
+            [paper_no] => 16
+            [datetime] => 2025-03-04 10:34:18
+            [category] => 개인회생급여
+            [case_number] => 
+            [contract_date] => 
+            [application_fee] => 0
+            [payment_amount] => 0
+            [unpaid_amount] => 0
+            [name] => 이기자
+            [phone] => 010-2234-5678
+            [consultant] => 6
+            [paper] => 6
+            [court_name] => 
+            [assign_date] => 2025-03-04
+            [accept_date] => 
+            [start_date] => 
+            [approval_date] => 
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2025-03-04 10:34:18
+            [updated_at] => 2025-03-04 10:34:18
+            [consultant_name] => 송윤정
+            [paper_name] => 송윤정
+            [consult_paper_accept_date] => 
+            [consult_paper_start_date] => 
+        )
+
+    [2] => Array
+        (
+            [case_no] => 10
+            [consult_no] => 11
+            [paper_no] => 10
+            [datetime] => 2024-12-16 11:41:32
+            [category] => 개인회생영업
+            [case_number] => 부산2025개회100002
+            [contract_date] => 
+            [application_fee] => 2500000
+            [payment_amount] => 10000
+            [unpaid_amount] => 2490000
+            [name] => 두번째
+            [phone] => 010-0000-0000
+            [consultant] => 1
+            [paper] => 1
+            [court_name] => 서울회생법원
+            [assign_date] => 2024-12-16
+            [accept_date] => 2024-12-17
+            [start_date] => 2024-12-18
+            [approval_date] => 2024-12-19
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-16 11:41:32
+            [updated_at] => 2025-01-21 13:19:46
+            [consultant_name] => 김성택
+            [paper_name] => 김성택
+            [consult_paper_accept_date] => 2024-12-17
+            [consult_paper_start_date] => 2024-12-18
+        )
+
+    [3] => Array
+        (
+            [case_no] => 1
+            [consult_no] => 4
+            [paper_no] => 3
+            [datetime] => 2024-12-05 15:12:25
+            [category] => 개인파산
+            [case_number] => 서울2024개회123456
+            [contract_date] => 2024-12-02
+            [application_fee] => 1500000
+            [payment_amount] => 539000
+            [unpaid_amount] => 961000
+            [name] => 갑식이
+            [phone] => 010-1234-5678
+            [consultant] => 1
+            [paper] => 1
+            [court_name] => 의정부지방법원
+            [assign_date] => 2024-12-08
+            [accept_date] => 2024-12-08
+            [start_date] => 2024-12-10
+            [approval_date] => 2024-12-14
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-05 15:12:25
+            [updated_at] => 2025-03-03 14:05:23
+            [consultant_name] => 김성택
+            [paper_name] => 김성택
+            [consult_paper_accept_date] => 2024-12-08
+            [consult_paper_start_date] => 2024-12-10
+        )
+
+)
+
+[2025-03-04 10:40:39] Query results: Array
+(
+    [0] => Array
+        (
+            [case_no] => 18
+            [consult_no] => 14
+            [paper_no] => 17
+            [datetime] => 2025-03-04 10:40:03
+            [category] => 개인파산
+            [case_number] => 
+            [contract_date] => 
+            [application_fee] => 0
+            [payment_amount] => 0
+            [unpaid_amount] => 0
+            [name] => 네번째
+            [phone] => 010-1234-1234
+            [consultant] => 6
+            [paper] => 6
+            [court_name] => 
+            [assign_date] => 2025-03-04
+            [accept_date] => 
+            [start_date] => 
+            [approval_date] => 
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2025-03-04 10:40:03
+            [updated_at] => 2025-03-04 10:40:03
+            [consultant_name] => 송윤정
+            [paper_name] => 송윤정
+            [consult_paper_accept_date] => 
+            [consult_paper_start_date] => 
+        )
+
+    [1] => Array
+        (
+            [case_no] => 17
+            [consult_no] => 13
+            [paper_no] => 16
+            [datetime] => 2025-03-04 10:34:18
+            [category] => 개인회생급여
+            [case_number] => 
+            [contract_date] => 
+            [application_fee] => 0
+            [payment_amount] => 0
+            [unpaid_amount] => 0
+            [name] => 이기자
+            [phone] => 010-2234-5678
+            [consultant] => 6
+            [paper] => 6
+            [court_name] => 
+            [assign_date] => 2025-03-04
+            [accept_date] => 
+            [start_date] => 
+            [approval_date] => 
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2025-03-04 10:34:18
+            [updated_at] => 2025-03-04 10:34:18
+            [consultant_name] => 송윤정
+            [paper_name] => 송윤정
+            [consult_paper_accept_date] => 
+            [consult_paper_start_date] => 
+        )
+
+    [2] => Array
+        (
+            [case_no] => 10
+            [consult_no] => 11
+            [paper_no] => 10
+            [datetime] => 2024-12-16 11:41:32
+            [category] => 개인회생영업
+            [case_number] => 부산2025개회100002
+            [contract_date] => 
+            [application_fee] => 2500000
+            [payment_amount] => 10000
+            [unpaid_amount] => 2490000
+            [name] => 두번째
+            [phone] => 010-0000-0000
+            [consultant] => 1
+            [paper] => 1
+            [court_name] => 서울회생법원
+            [assign_date] => 2024-12-16
+            [accept_date] => 2024-12-17
+            [start_date] => 2024-12-18
+            [approval_date] => 2024-12-19
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-16 11:41:32
+            [updated_at] => 2025-01-21 13:19:46
+            [consultant_name] => 김성택
+            [paper_name] => 김성택
+            [consult_paper_accept_date] => 2024-12-17
+            [consult_paper_start_date] => 2024-12-18
+        )
+
+    [3] => Array
+        (
+            [case_no] => 1
+            [consult_no] => 4
+            [paper_no] => 3
+            [datetime] => 2024-12-05 15:12:25
+            [category] => 개인파산
+            [case_number] => 서울2024개회123456
+            [contract_date] => 2024-12-02
+            [application_fee] => 1500000
+            [payment_amount] => 539000
+            [unpaid_amount] => 961000
+            [name] => 갑식이
+            [phone] => 010-1234-5678
+            [consultant] => 1
+            [paper] => 1
+            [court_name] => 의정부지방법원
+            [assign_date] => 2024-12-08
+            [accept_date] => 2024-12-08
+            [start_date] => 2024-12-10
+            [approval_date] => 2024-12-14
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-05 15:12:25
+            [updated_at] => 2025-03-03 14:05:23
+            [consultant_name] => 김성택
+            [paper_name] => 김성택
+            [consult_paper_accept_date] => 2024-12-08
+            [consult_paper_start_date] => 2024-12-10
+        )
+
+)
+
+[2025-03-04 10:40:56] No data found or access denied for case_no: 17
+[2025-03-04 10:48:34] No data found or access denied for case_no: 18
+[2025-03-04 10:48:49] No data found or access denied for case_no: 18
+[2025-03-04 10:49:06] No data found or access denied for case_no: 17
+[2025-03-04 10:50:32] No data found or access denied for case_no: 17
+[2025-03-04 10:59:59] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 10:59:59] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(83): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:00:01] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:00:01] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(83): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:00:06] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:00:06] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(83): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:09:11] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:09:11] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:09:21] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:09:21] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:09:48] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:09:48] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:09:53] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:09:53] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:10:04] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:10:04] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:10:16] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:10:16] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:10:42] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:10:42] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:11:20] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:11:20] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:11:23] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:11:23] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:12:45] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:12:45] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:12:49] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:12:49] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:12:51] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:12:51] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:13:03] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:13:03] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:13:08] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:13:08] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:13:29] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:13:29] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:14:48] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:14:48] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:20:17] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:20:17] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:20:20] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:20:20] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:43:16] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:43:16] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:44:24] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:44:24] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:45:08] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:45:08] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:45:18] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:45:18] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:46:13] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:46:13] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:50:12] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:50:12] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:50:33] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:50:33] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:50:44] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:50:44] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:51:05] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:51:05] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 11:53:24] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 11:53:24] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 12:01:05] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 12:01:05] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 12:01:27] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 12:01:27] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 12:02:50] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 12:02:50] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 12:17:24] Database Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'ar.repayment_monthly' in 'field list'
+[2025-03-04 12:17:24] Stack trace: #0 /lez062801/www/adm/api/application_bankruptcy/get_bankruptcy_data.php(99): PDO->prepare('\n        SELECT...')
+#1 {main}
+[2025-03-04 12:59:00] Query results: Array
+(
+    [0] => Array
+        (
+            [case_no] => 18
+            [consult_no] => 14
+            [paper_no] => 17
+            [datetime] => 2025-03-04 10:40:03
+            [category] => 개인파산
+            [case_number] => 
+            [contract_date] => 
+            [application_fee] => 0
+            [payment_amount] => 0
+            [unpaid_amount] => 0
+            [name] => 네번째
+            [phone] => 010-1234-1234
+            [consultant] => 6
+            [paper] => 6
+            [court_name] => 
+            [assign_date] => 2025-03-04
+            [accept_date] => 
+            [start_date] => 
+            [approval_date] => 
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2025-03-04 10:40:03
+            [updated_at] => 2025-03-04 10:41:44
+            [consultant_name] => 송윤정
+            [paper_name] => 송윤정
+            [consult_paper_accept_date] => 
+            [consult_paper_start_date] => 
+        )
+
+    [1] => Array
+        (
+            [case_no] => 17
+            [consult_no] => 13
+            [paper_no] => 
+            [datetime] => 2025-03-04 10:34:18
+            [category] => 개인회생급여
+            [case_number] => 
+            [contract_date] => 
+            [application_fee] => 0
+            [payment_amount] => 0
+            [unpaid_amount] => 0
+            [name] => 이기자
+            [phone] => 010-2234-5678
+            [consultant] => 6
+            [paper] => 6
+            [court_name] => 
+            [assign_date] => 2025-03-04
+            [accept_date] => 
+            [start_date] => 
+            [approval_date] => 
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2025-03-04 10:34:18
+            [updated_at] => 2025-03-04 10:41:14
+            [consultant_name] => 송윤정
+            [paper_name] => 송윤정
+            [consult_paper_accept_date] => 
+            [consult_paper_start_date] => 
+        )
+
+    [2] => Array
+        (
+            [case_no] => 10
+            [consult_no] => 11
+            [paper_no] => 10
+            [datetime] => 2024-12-16 11:41:32
+            [category] => 개인회생영업
+            [case_number] => 부산2025개회100002
+            [contract_date] => 
+            [application_fee] => 2500000
+            [payment_amount] => 10000
+            [unpaid_amount] => 2490000
+            [name] => 두번째
+            [phone] => 010-0000-0000
+            [consultant] => 1
+            [paper] => 1
+            [court_name] => 서울회생법원
+            [assign_date] => 2024-12-16
+            [accept_date] => 2024-12-17
+            [start_date] => 2024-12-18
+            [approval_date] => 2024-12-19
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-16 11:41:32
+            [updated_at] => 2025-01-21 13:19:46
+            [consultant_name] => 김성택
+            [paper_name] => 김성택
+            [consult_paper_accept_date] => 2024-12-17
+            [consult_paper_start_date] => 2024-12-18
+        )
+
+    [3] => Array
+        (
+            [case_no] => 1
+            [consult_no] => 4
+            [paper_no] => 3
+            [datetime] => 2024-12-05 15:12:25
+            [category] => 개인파산
+            [case_number] => 서울2024개회123456
+            [contract_date] => 2024-12-02
+            [application_fee] => 1500000
+            [payment_amount] => 539000
+            [unpaid_amount] => 961000
+            [name] => 갑식이
+            [phone] => 010-1234-5678
+            [consultant] => 1
+            [paper] => 1
+            [court_name] => 의정부지방법원
+            [assign_date] => 2024-12-08
+            [accept_date] => 2024-12-08
+            [start_date] => 2024-12-10
+            [approval_date] => 2024-12-14
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-05 15:12:25
+            [updated_at] => 2025-03-03 14:05:23
+            [consultant_name] => 김성택
+            [paper_name] => 김성택
+            [consult_paper_accept_date] => 2024-12-08
+            [consult_paper_start_date] => 2024-12-10
+        )
+
+)
+

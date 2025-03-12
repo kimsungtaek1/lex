@@ -1,0 +1,46 @@
+.container{margin:20px;}
+
+/* 캘린더 헤더 */
+.calendar-header{display:flex;align-items:center;padding:10px;background:#666;color:#fff;}
+.month-nav{background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:0 15px;}
+.month-title{flex:1;text-align:center;font-size:18px;}
+.category-filter{display:flex;gap:15px;margin-right:20px;}
+
+/* 카테고리 필터 스타일 */
+.filter-item{display:flex;align-items:center;gap:5px;font-size:14px;}
+.filter-item::before{content:'';width:12px;height:12px;display:inline-block;margin-right:5px;}
+.filter-item.type-1::before{background:#4caf50;}
+.filter-item.type-2::before{background:#2196f3;}
+.filter-item.type-3::before{background:#ff9800;}
+.filter-item.type-4::before{background:#9e9e9e;}
+
+/* 캘린더 테이블 */
+.calendar table{width:100%;border-collapse:separate;border-spacing:1px;background:#ddd;}
+.calendar th{background:#666;color:#fff;padding:10px;text-align:center;font-weight:normal;}
+.calendar td{background:#fff;vertical-align:top;height:120px;padding:8px;}
+.calendar td.other-month{background:#f5f5f5;}
+.calendar td.today{background:#f8f8f8;}
+
+/* 날짜 셀 내부 스타일 */
+.date-number{font-size:14px;color:#666;margin-bottom:5px;}
+.date-number.sun{color:#ff4444;}
+.date-number.sat{color:#4444ff;}
+
+/* 일정 아이템 스타일 */
+.schedule-item{margin-bottom:5px;font-size:12px;display:flex;align-items:flex-start;gap:5px;}
+.schedule-item::before{content:'';width:12px;height:12px;flex-shrink:0;margin-top:3px;}
+.schedule-item.type-1::before{background:#4caf50;}
+.schedule-item.type-2::before{background:#2196f3;}
+.schedule-item.type-3::before{background:#ff9800;}
+.schedule-item.type-4::before{background:#9e9e9e;}
+
+.schedule-content{flex:1;}
+.schedule-time{font-weight:bold;margin-right:5px;}
+.schedule-text{word-break:break-all;}
+
+@media screen and (max-width:768px){
+.calendar-header{flex-direction:column;gap:10px;}
+.category-filter{margin:10px 0;flex-wrap:wrap;justify-content:center;}
+.calendar td{height:100px;padding:5px;}
+.schedule-item{font-size:11px;}
+}

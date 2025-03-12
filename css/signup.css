@@ -1,0 +1,53 @@
+/* 회원가입 페이지 스타일 */
+.signup-container{width:100%;background-color:#f5f5f5;}
+.signup-top{width:50%;margin:0 auto;}
+.signup-title{font-size:1.4vw;padding:5vh 0 2vh;color:#6c6c6c;font-weight:900;}
+/* 단계 표시 */
+.signup-steps{display:flex;justify-content:center;align-items:center;margin-bottom:40px;width:100%;}
+.step{flex:1;}
+.step-box{background-color:#777;color:white;text-align:center;padding:15px 10px;border-radius:0.3vw;font-weight:900;}
+.step-desc{display:block;font-size:0.8vw;margin-top:5px;}
+.step-arrow{margin:0 2vw;color:#999;font-size:2vw;}
+.step.active .step-box{background-color:#777;}
+.step.current .step-box{background-color:#00E2BD;}
+.highlight{color:#6c6c6c;}
+/* 폼 스타일 */
+.signup-content{width:100%;background-color:white;}
+.signup-form{width:50%;padding:5vh 0;margin:0 auto;border-radius:5px;}
+.form-group{margin-bottom:15px;display:flex;align-items:center;}
+.form-group label{width:20%;min-width:120px;padding:0.6vw 0;font-weight:bold;font-size:0.8vw;}
+.form-group input{width:80%;border:1px solid #ddd;border-radius:3px;background-color:#eee;font-size:0.8vw;padding:0.6vw 1vw;}
+.input-with-button{width:80%;display:flex;align-items:center;}
+.input-with-button input{width:100%;flex-grow:1;padding:0.6vw 1vw;}
+.check-btn, .address-btn{background-color:#999;color:white;border:none;padding:0.6vw 15px;margin-left:10px;cursor:pointer;border-radius:3px;white-space:nowrap;font-size:0.8vw;}
+/* 버튼 스타일 */
+.form-buttons{text-align:right;margin-top:5vh;clear:both;}
+.prev-btn{background-color:#ccc;color:#000;border:none;padding:10px 20px;margin-right:10px;cursor:pointer;border-radius:3px;}
+.next-btn{background-color:#00E2BD;color:#000;border:none;padding:10px 20px;cursor:pointer;border-radius:3px;}
+/* 약관 스타일 */
+.agreement-area h3{font-size:1vw;color:#555;margin:20px 0 10px;}
+.terms-box{border:1px solid #ddd;border-radius:3px;margin-bottom:20px;}
+.terms-content{height:150px;overflow-y:scroll;padding:15px;background-color:#f9f9f9;font-size:0.8vw;line-height:1.6;}
+.terms-agree{padding:10px 15px;border-top:1px solid #ddd;background-color:#eee;}
+.all-agree{background-color:#f0f0f0;padding:15px;border-radius:3px;margin:20px 0;font-weight:bold;text-align:center;}
+/* 회원 유형 선택 */
+.member-type-area{margin-bottom:20px;}
+.member-type-selection{display:flex;padding:15px 0;}
+.member-type-selection label{margin-right:30px;cursor:pointer;}
+.member-type-selection input[type="radio"]{margin-right:5px;}
+
+.complete-box{width:50%;margin:0 auto;padding:12vh 0 6vh;}
+.complete-message h1{margin:2vh 0;color:#6c6c6c;font-size:1.8vw;}
+.complete-message{display: flex;flex-direction:column;text-align:center;}
+.complete-message img{width:20vw;margin:0 auto;}
+.complete-message p{font-size:1.5vw;color:#6c6c6c;}
+.complete-box .form-buttons{margin-top:15vh;}
+/* 반응형 스타일 */
+@media (max-width:768px){
+	.form-group label{float:none;width:100%;margin-bottom:5px;}
+	.form-group input, .input-with-button{width:100%;float:none;}
+	.signup-steps{flex-direction:column;}
+	.step{width:100%;margin-bottom:10px;}
+	.step-arrow{transform:rotate(90deg);margin:10px 0;}
+	.signup-top, .signup-form{width:90%;}
+}
