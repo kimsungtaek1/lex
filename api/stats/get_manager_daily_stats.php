@@ -4,10 +4,20 @@ include_once '../../config.php';
 header('Content-Type: application/json');
 
 try {
-	// 현재 월 기준으로 데이터 조회 (예: 3월)
-	$currentMonth = date('m');
+	// 요청 파라미터에서 년도와 월 받기
+	$requestedYear = isset($_GET['year']) ? intval($_GET['year']) : null;
+	$requestedMonth = isset($_GET['month']) ? intval($_GET['month']) : null;
+	
+	// 현재 날짜 정보
 	$currentYear = date('Y');
-	$daysInMonth = date('t');
+	$currentMonth = date('m');
+	
+	// 요청받은 년도와 월이 있으면 사용, 없으면 현재 년도와 월 사용
+	$year = $requestedYear ? $requestedYear : $currentYear;
+	$month = $requestedMonth ? $requestedMonth : $currentMonth;
+	
+	// 선택된 월의 일수 계산
+	$daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 	
 	// 사무장 목록 조회
 	$managerQuery = "SELECT employee_no, name FROM employee WHERE position = '사무장' AND status = '재직' ORDER BY employee_no";
@@ -17,9 +27,9 @@ try {
 	
 	$result = [];
 	
-	// 월의 각 날짜에 대한 데이터 조회
+	// 선택된 월의 각 날짜에 대한 데이터 조회
 	for ($day = 1; $day <= $daysInMonth; $day++) {
-		$date = sprintf("%04d-%02d-%02d", $currentYear, $currentMonth, $day);
+		$date = sprintf("%04d-%02d-%02d", $year, $month, $day);
 		$dayOfWeek = date('w', strtotime($date)); // 0(일)~6(토)
 		$dayNames = ['일', '월', '화', '수', '목', '금', '토'];
 		
@@ -62,7 +72,9 @@ try {
 	
 	echo json_encode([
 		'success' => true,
-		'data' => $result
+		'data' => $result,
+		'year' => $year,
+		'month' => $month
 	]);
 	
 } catch (PDOException $e) {
