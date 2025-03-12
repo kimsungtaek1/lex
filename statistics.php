@@ -238,15 +238,23 @@ include 'header.php';
 		<div class="statistics-row">
 			<div class="manager-stats-container">
 				<div class="manager-stats-header">
-					<div class="date-column">1일 상담<span class="sort-icon">▼</span></div>
-					<!-- 여기에 사무장 칼럼이 동적으로 추가됩니다 -->
+					<div class="date-column-fixed">1일 상담<span class="sort-icon">▼</span></div>
+					<div class="managers-scroll-area">
+						<div class="manager-columns-container">
+							<!-- 여기에 사무장 칼럼이 동적으로 추가됩니다 -->
+						</div>
+					</div>
 				</div>
 				<div class="manager-stats-body" id="managerStatsBody">
 					<!-- 자바스크립트로 행을 동적으로 추가할 예정 -->
 				</div>
 				<div class="manager-stats-footer">
-					<div class="date-column">합계</div>
-					<!-- 여기에 사무장 칼럼이 동적으로 추가됩니다 -->
+					<div class="date-footer">합계</div>
+					<div class="managers-scroll-area">
+						<div class="manager-columns-container" id="managerStatsFooter">
+							<!-- 여기에 사무장 칼럼이 동적으로 추가됩니다 -->
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
