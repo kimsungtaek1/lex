@@ -207,7 +207,7 @@ function updateManagerStatsHeader(managers) {
     
     // 날짜 열 추가
     $('.manager-stats-header').append(`
-        <div class="date-column">1일 상담<span class="sort-icon">▼</span></div>
+        <div class="date-column">1일 상담 통계<span class="sort-icon">▼</span></div>
     `);
     
     // 사무장 컬럼 영역 추가
