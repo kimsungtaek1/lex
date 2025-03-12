@@ -294,7 +294,6 @@ function initDateFilterDropdown() {
 
 // 필터링된 사무장 일간 통계 로드 함수
 function loadFilteredManagerDailyStats(year, month) {
-	// 월을 두 자리 문자열로 변환
 	const formattedMonth = month.toString().padStart(2, '0');
 
 	$.ajax({
@@ -306,16 +305,25 @@ function loadFilteredManagerDailyStats(year, month) {
 		},
 		dataType: 'json',
 		success: function(response) {
-			if(response.success) {				
+			if(response.success) {
+				$('.date-column').html(`${year}. ${month}월 상담 통계&nbsp;&nbsp;<span class="sort-icon date-dropdown-toggle">▼</span>`);
 				renderManagerDailyStats(response.data);
 			} else {
-				console.error('사무장 일별 통계를 불러오는데 실패했습니다:', response.message);
-				alert('해당 월의 데이터를 불러올 수 없습니다.');
+				console.error('통계 로드 실패:', response);
+				alert('통계 데이터를 불러올 수 없습니다: ' + response.message);
 			}
 		},
 		error: function(xhr, status, error) {
-			console.error('사무장 일별 통계를 불러오는데 실패했습니다:', error);
-			alert('데이터를 불러오는 중 오류가 발생했습니다.');
+			// 500 에러 시 상세 오류 정보 출력
+			try {
+				const errorResponse = JSON.parse(xhr.responseText);
+				console.error('서버 오류 상세 정보:', errorResponse);
+				alert('서버 오류: ' + errorResponse.message);
+			} catch(e) {
+				console.error('AJAX 오류:', status, error);
+				console.error('원시 응답:', xhr.responseText);
+				alert('데이터를 불러오는 중 심각한 오류가 발생했습니다.');
+			}
 		}
 	});
 }
