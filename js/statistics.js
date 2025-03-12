@@ -105,99 +105,149 @@ function loadManagerDailyStats() {
 
 // 사무장 일별 통계 렌더링 함수 수정
 function renderManagerDailyStats(data) {
-    const statsBody = $('#managerStatsBody');
-    statsBody.empty();
-    
-    // 관리자 계정 정보 가져오기(API 호출)
-    $.ajax({
-        url: '../adm/api/stats/get_manager_stats.php',
-        method: 'GET',
-        dataType: 'json',
-        async: false,
-        success: function(response) {
-            if(response.success) {
-                // 사무장 수에 따라 컨테이너 클래스 설정
-                const managerCount = response.data.length;
-                const statsContainer = $('.manager-stats-container');
-                
-                if (managerCount > 6) {
-                    statsContainer.removeClass('has-few-managers').addClass('has-many-managers');
-                } else {
-                    statsContainer.removeClass('has-many-managers').addClass('has-few-managers');
-                }
-                
-                // 헤더 섹션 업데이트
-                updateManagerStatsHeader(response.data);
-                
-                // 이제 일별 통계 데이터 표시
-                const displayData = data && data.length > 0 ? data : [];
-                
-                // 최소 컬럼 수 설정 (6명)
-                const minColumns = 6;
-                const actualManagerCount = response.data.length;
-                const columnsToShow = Math.max(minColumns, actualManagerCount);
-                
-                displayData.forEach(item => {
-                    const row = $('<div class="stats-row"></div>');
-                    
-                    // 날짜 열
-                    row.append(`
-                        <div class="date-cell">
-                            ${item.date} <span class="day-name">${item.day}</span>
-                        </div>
-                    `);
-                    
-                    // 스크롤 영역을 위한 컨테이너
-                    const managersArea = $('<div class="managers-scroll-area"></div>');
-                    const managersContainer = $('<div class="manager-columns-container"></div>');
-                    
-                    // 각 사무장 데이터
-                    for(let i = 0; i < columnsToShow; i++) {
-                        if(i < item.managers.length && i < actualManagerCount) {
-                            // 실제 사무장 데이터가 있는 경우
-                            managersContainer.append(`
-                                <div class="manager-stats">
-                                    <div class="stat-value">${item.managers[i].inflow}</div>
-                                    <div class="stat-value">${item.managers[i].contract}</div>
-                                </div>
-                            `);
-                        } else {
-                            // 빈 컬럼 추가
-                            managersContainer.append(`
-                                <div class="manager-stats">
-                                    <div class="stat-value">0</div>
-                                    <div class="stat-value">0</div>
-                                </div>
-                            `);
-                        }
-                    }
-                    
-                    // 합계 열
-                    managersContainer.append(`
-                        <div class="manager-stats">
-                            <div class="stat-value">${item.total.inflow}</div>
-                            <div class="stat-value">${item.total.contract}</div>
-                        </div>
-                    `);
-                    
-                    managersArea.append(managersContainer);
-                    row.append(managersArea);
-                    statsBody.append(row);
-                });
-                
-                // 각 스크롤 영역 동기화를 위한 이벤트 처리
-                $('.managers-scroll-area').on('scroll', function() {
-                    const scrollLeft = $(this).scrollLeft();
-                    $('.managers-scroll-area').scrollLeft(scrollLeft);
-                });
-            } else {
-                console.error('사무장 목록을 불러오는데 실패했습니다:', response.message);
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error('사무장 목록을 불러오는데 실패했습니다:', error);
-        }
-    });
+	const statsBody = $('#managerStatsBody');
+	statsBody.empty();
+	
+	// 관리자 계정 정보 가져오기(API 호출)
+	$.ajax({
+		url: '../adm/api/stats/get_manager_stats.php',
+		method: 'GET',
+		dataType: 'json',
+		async: false,
+		success: function(response) {
+			if(response.success) {
+				// 사무장 수에 따라 컨테이너 클래스 설정
+				const managerCount = response.data.length;
+				const statsContainer = $('.manager-stats-container');
+				
+				if (managerCount > 6) {
+					statsContainer.removeClass('has-few-managers').addClass('has-many-managers');
+				} else {
+					statsContainer.removeClass('has-many-managers').addClass('has-few-managers');
+				}
+				
+				// 헤더 섹션 업데이트
+				updateManagerStatsHeader(response.data);
+				
+				// 이제 일별 통계 데이터 표시
+				const displayData = data && data.length > 0 ? data : [];
+				
+				// 최소 컬럼 수 설정 (6명)
+				const minColumns = 6;
+				const actualManagerCount = response.data.length;
+				const columnsToShow = Math.max(minColumns, actualManagerCount);
+				
+				// 월별 합계 계산을 위한 변수 초기화
+				let monthlyTotals = {
+					managers: Array(columnsToShow).fill().map(() => ({ inflow: 0, contract: 0 })),
+					total: { inflow: 0, contract: 0 }
+				};
+				
+				displayData.forEach(item => {
+					const row = $('<div class="stats-row"></div>');
+					
+					// 날짜 열
+					row.append(`
+						<div class="date-cell">
+							${item.date} <span class="day-name">${item.day}</span>
+						</div>
+					`);
+					
+					// 스크롤 영역을 위한 컨테이너
+					const managersArea = $('<div class="managers-scroll-area"></div>');
+					const managersContainer = $('<div class="manager-columns-container"></div>');
+					
+					// 각 사무장 데이터
+					for(let i = 0; i < columnsToShow; i++) {
+						let inflowValue = 0;
+						let contractValue = 0;
+						
+						if(i < item.managers.length && i < actualManagerCount) {
+							// 실제 사무장 데이터가 있는 경우
+							inflowValue = item.managers[i].inflow;
+							contractValue = item.managers[i].contract;
+							
+							// 월별 합계에 더함
+							monthlyTotals.managers[i].inflow += inflowValue;
+							monthlyTotals.managers[i].contract += contractValue;
+						}
+						
+						managersContainer.append(`
+							<div class="manager-stats">
+								<div class="stat-value">${inflowValue}</div>
+								<div class="stat-value">${contractValue}</div>
+							</div>
+						`);
+					}
+					
+					// 합계 열
+					monthlyTotals.total.inflow += item.total.inflow;
+					monthlyTotals.total.contract += item.total.contract;
+					
+					managersContainer.append(`
+						<div class="manager-stats">
+							<div class="stat-value">${item.total.inflow}</div>
+							<div class="stat-value">${item.total.contract}</div>
+						</div>
+					`);
+					
+					managersArea.append(managersContainer);
+					row.append(managersArea);
+					statsBody.append(row);
+				});
+				
+				// 푸터 업데이트 - 월간 총합 표시
+				updateManagerStatsFooter(monthlyTotals, columnsToShow);
+				
+				// 각 스크롤 영역 동기화를 위한 이벤트 처리
+				$('.managers-scroll-area').on('scroll', function() {
+					const scrollLeft = $(this).scrollLeft();
+					$('.managers-scroll-area').scrollLeft(scrollLeft);
+				});
+			} else {
+				console.error('사무장 목록을 불러오는데 실패했습니다:', response.message);
+			}
+		},
+		error: function(xhr, status, error) {
+			console.error('사무장 목록을 불러오는데 실패했습니다:', error);
+		}
+	});
+}
+
+// 푸터 업데이트 함수 추가
+function updateManagerStatsFooter(monthlyTotals, columnsToShow) {
+	$('.manager-stats-footer').empty();
+	$('.manager-stats-footer').append(`<div class="date-column-total">합계</div>`);
+	
+	const footerScrollArea = $('<div class="managers-scroll-area"></div>');
+	const footerColumnsContainer = $('<div class="manager-columns-container"></div>');
+	
+	// 사무장 푸터 추가
+	for (let i = 0; i < columnsToShow; i++) {
+		const managerTotal = i < monthlyTotals.managers.length ? monthlyTotals.managers[i] : { inflow: 0, contract: 0 };
+		
+		footerColumnsContainer.append(`
+			<div class="manager-column">
+				<div class="stats-footer">
+					<div class="stat-footer">${managerTotal.inflow}</div>
+					<div class="stat-footer">${managerTotal.contract}</div>
+				</div>
+			</div>
+		`);
+	}
+	
+	// 합계 칼럼 추가
+	footerColumnsContainer.append(`
+		<div class="manager-column">
+			<div class="stats-footer">
+				<div class="stat-footer">${monthlyTotals.total.inflow}</div>
+				<div class="stat-footer">${monthlyTotals.total.contract}</div>
+			</div>
+		</div>
+	`);
+	
+	footerScrollArea.append(footerColumnsContainer);
+	$('.manager-stats-footer').append(footerScrollArea);
 }
 
 // 헤더 섹션 업데이트 함수 수정
