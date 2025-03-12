@@ -6,10 +6,11 @@
 .tab th:last-child{width:40%;cursor:auto;}
 
 /* 드롭다운 메뉴 스타일 */
-.manager-dropdown{position:absolute;display:none;background-color:#fff;border-radius:3px;box-shadow:0 2px 5px rgba(0,0,0,0.2);z-index:100;min-width:100px;}
+.manager-dropdown{position:absolute;display:none;background-color:#fff;border-radius:0.3vw;box-shadow:0 2px 5px rgba(0,0,0,0.2);z-index:100;min-width:100px;}
 .dropdown-option{padding:10px 15px;cursor:pointer;color:#333;font-size:0.7vw;}
 .dropdown-option:hover{background-color:#f5f5f5;}
 .dropdown-option.active{background-color:#00e6c3;color:#fff;}
+.dropdown-option:first-child.active{border-radius:0.3vw 0.3vw 0 0;}
 .empty-stats-message{display:flex;align-items:center;justify-content:center;height:20vh;color:#666;font-size:1.2vw;}
 #managerTab{position:relative;cursor:pointer;}
 
