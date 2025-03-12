@@ -245,7 +245,25 @@ include 'header.php';
 		<div class="statistics-row">
 			<div class="manager-stats-container has-few-managers">
 				<div class="manager-stats-header">
-					<!-- JavaScript로 동적 생성 -->
+					<div class="date-column">1일 상담 통계&nbsp;&nbsp;<span class="sort-icon date-dropdown-toggle">▼</span></div>
+				</div>
+				<div id="dateFilterDropdown" class="date-filter-dropdown">
+					<div class="dropdown-section">
+						<div class="dropdown-title">연도 선택</div>
+						<div class="dropdown-scroll">
+							<!-- 자바스크립트로 동적 생성될 연도 목록 -->
+						</div>
+					</div>
+					<div class="dropdown-section">
+						<div class="dropdown-title">월 선택</div>
+						<div class="dropdown-scroll">
+							<!-- 자바스크립트로 동적 생성될 월 목록 -->
+						</div>
+					</div>
+					<div class="dropdown-buttons">
+						<button class="apply-button">적용</button>
+						<button class="reset-button">초기화</button>
+					</div>
 				</div>
 				<div class="manager-stats-body" id="managerDailyStatsBody">
 					<!-- JavaScript로 동적 생성 -->
