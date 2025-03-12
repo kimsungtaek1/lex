@@ -282,6 +282,15 @@ $(document).on('change', 'input[name="incomeType"]', function() {
         $(`label[for="${this.id}"]`).attr('data-selected', isSelected.toString());
     });
  });
+<<<<<<< HEAD
+=======
+ 
+$(document).on('change','input[type="checkbox"]', function(){
+  const isChecked = $(this).is(':checked');
+  $(this).attr('data-selected', isChecked.toString());
+  $(`label[for="${this.id}"]`).attr('data-selected', isChecked.toString());
+});
+>>>>>>> 719d7c8 (Delete all files)
 
 // 초기화 함수
 function initializeView() {
@@ -377,12 +386,34 @@ $(document).ready(function() {
         if (!caseNo) return;
         
         currentCaseNo = caseNo;
+<<<<<<< HEAD
+=======
+        window.currentCaseNo = caseNo; // window 객체에도 설정
+>>>>>>> 719d7c8 (Delete all files)
         
         $('#caseList tr').removeClass('active');
         $(this).addClass('active');
         
         switchTab('applicant');
         window.loadCaseData(caseNo);
+<<<<<<< HEAD
+=======
+        
+        // AssetManager 초기화 또는 재로드
+        if (!window.assetManager) {
+            window.assetManager = new AssetManager();
+        } else {
+            window.assetManager.loadAllAssets();
+        }
+		
+        if (!window.incomeExpenditureManager) {
+            window.incomeExpenditureManager = new ApplicationRecoveryIncomeExpenditure();
+        }
+		
+		if (!window.statementManager) {
+			window.statementManager = new StatementManager();
+        }
+>>>>>>> 719d7c8 (Delete all files)
     });
 
        // 소득유형 초기값 설정
@@ -459,7 +490,10 @@ $(document).ready(function() {
     });
     
     // 중지명령 버튼 이벤트
+<<<<<<< HEAD
     // 중지명령 버튼 이벤트
+=======
+>>>>>>> 719d7c8 (Delete all files)
     $('#stayOrder').on('click', function(e) {
         e.preventDefault();
         

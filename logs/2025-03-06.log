@@ -1,0 +1,128 @@
+[2025-03-06 16:20:39] Query results: Array
+(
+    [0] => Array
+        (
+            [case_no] => 18
+            [consult_no] => 14
+            [paper_no] => 17
+            [datetime] => 2025-03-04 10:40:03
+            [category] => 개인파산
+            [case_number] => 
+            [contract_date] => 
+            [application_fee] => 0
+            [payment_amount] => 0
+            [unpaid_amount] => 0
+            [name] => 네번째
+            [phone] => 123-1231-2312
+            [consultant] => 6
+            [paper] => 6
+            [court_name] => 
+            [assign_date] => 2025-03-04
+            [accept_date] => 
+            [start_date] => 
+            [approval_date] => 
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2025-03-04 10:40:03
+            [updated_at] => 2025-03-05 11:23:14
+            [consultant_name] => 송윤정
+            [paper_name] => 송윤정
+            [consult_paper_accept_date] => 
+            [consult_paper_start_date] => 
+        )
+
+    [1] => Array
+        (
+            [case_no] => 17
+            [consult_no] => 13
+            [paper_no] => 
+            [datetime] => 2025-03-04 10:34:18
+            [category] => 개인회생급여
+            [case_number] => 
+            [contract_date] => 
+            [application_fee] => 0
+            [payment_amount] => 0
+            [unpaid_amount] => 0
+            [name] => 이기자
+            [phone] => 010-2234-5678
+            [consultant] => 6
+            [paper] => 6
+            [court_name] => 
+            [assign_date] => 2025-03-04
+            [accept_date] => 
+            [start_date] => 
+            [approval_date] => 
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2025-03-04 10:34:18
+            [updated_at] => 2025-03-04 10:41:14
+            [consultant_name] => 송윤정
+            [paper_name] => 송윤정
+            [consult_paper_accept_date] => 
+            [consult_paper_start_date] => 
+        )
+
+    [2] => Array
+        (
+            [case_no] => 10
+            [consult_no] => 11
+            [paper_no] => 10
+            [datetime] => 2024-12-16 11:41:32
+            [category] => 개인회생영업
+            [case_number] => 부산2025개회100002
+            [contract_date] => 
+            [application_fee] => 2500000
+            [payment_amount] => 10000
+            [unpaid_amount] => 2490000
+            [name] => 두번째
+            [phone] => 010-0000-0000
+            [consultant] => 1
+            [paper] => 1
+            [court_name] => 서울회생법원
+            [assign_date] => 2024-12-16
+            [accept_date] => 2024-12-17
+            [start_date] => 2024-12-18
+            [approval_date] => 2024-12-19
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-16 11:41:32
+            [updated_at] => 2025-01-21 13:19:46
+            [consultant_name] => 김성택
+            [paper_name] => 김성택
+            [consult_paper_accept_date] => 2024-12-17
+            [consult_paper_start_date] => 2024-12-18
+        )
+
+    [3] => Array
+        (
+            [case_no] => 1
+            [consult_no] => 4
+            [paper_no] => 3
+            [datetime] => 2024-12-05 15:12:25
+            [category] => 개인파산
+            [case_number] => 서울2024개회123456
+            [contract_date] => 2024-12-02
+            [application_fee] => 1500000
+            [payment_amount] => 539000
+            [unpaid_amount] => 961000
+            [name] => 갑식이
+            [phone] => 
+            [consultant] => 1
+            [paper] => 1
+            [court_name] => 의정부지방법원
+            [assign_date] => 2024-12-08
+            [accept_date] => 2024-12-08
+            [start_date] => 2024-12-10
+            [approval_date] => 2024-12-14
+            [status] => 접수
+            [memo] => 
+            [created_at] => 2024-12-05 15:12:25
+            [updated_at] => 2025-03-05 11:16:16
+            [consultant_name] => 김성택
+            [paper_name] => 김성택
+            [consult_paper_accept_date] => 2024-12-08
+            [consult_paper_start_date] => 2024-12-10
+        )
+
+)
+

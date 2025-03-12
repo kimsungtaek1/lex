@@ -1,4 +1,8 @@
 *{font-size:0.7vw}
+<<<<<<< HEAD
+=======
+textarea{outline: none;}
+>>>>>>> 719d7c8 (Delete all files)
 .transparent{color:transparent}
 .container{margin:0 5vw}
 .tab{width:100%;overflow-x:auto;border:none;background:#6c6c6c;box-shadow:0 0.5vh 0.5vh rgba(0,0,0,0.4)}
@@ -23,10 +27,21 @@
 .form-notitle{border-bottom:none}
 .form-title span{padding-left:10%;width:90%}
 .form-content{flex:1;display:flex;flex-direction:row;align-items:center;padding:0 2.5%;position:relative;background:#f7f7f7;border-bottom:1px solid #d4d4d4;height:2vw}
+<<<<<<< HEAD
+=======
+.form-header-long{background:#a7a7a7;color:white;display:flex;border-radius:0.3vw}
+.form-header-long option{background:#fff;color:black;}
+.form-header-long select{background:#a7a7a7;color:white;}
+.form-divide{flex:1;}
+>>>>>>> 719d7c8 (Delete all files)
 .form-content-2{height:4vw}
 .form-content-3{height:6vw}
 .form-content-long{width:100% !important}
 .form-content-short{width:30% !important}
+<<<<<<< HEAD
+=======
+.form-content-short5{width:5% !important}
+>>>>>>> 719d7c8 (Delete all files)
 .form-content-justify{width:85.5% !important}
 .form-nocontent{border-bottom:none}
 .form-row{flex-direction:row}
@@ -34,6 +49,10 @@
 .form:nth-child(1) .form-content{border-top-right-radius:0.3vw}
 .form:nth-last-child(1) .form-title{border-bottom-left-radius:0.3vw}
 .form:nth-last-child(1) .form-content{border-bottom-right-radius:0.3vw}
+<<<<<<< HEAD
+=======
+.form-header{width:100%;background:red;}
+>>>>>>> 719d7c8 (Delete all files)
 .form .row2{flex-direction:row;justify-content:left;align-items:center}
 .form-control{background:transparent;border:none}
 .form-control-long{width:100% !important}
@@ -49,6 +68,10 @@
 .form-content .form-group{flex:1;display:flex;align-content:center}
 .form-select:not(:first-of-type){margin-left:2.3vw}
 .btn-long{width:5vw}
+<<<<<<< HEAD
+=======
+.btn-long6{width:6vw}
+>>>>>>> 719d7c8 (Delete all files)
 .btn-right{flex-direction:row-reverse}
 .btn-right:last-child button{margin:0 0 0 0.2vw}
 .btn-nomargin{margin:6px 0.5vw 6px 0 !important}
@@ -57,16 +80,33 @@
 #severance_deduction_amount:-ms-input-placeholder,#severance_liquidation_value:-ms-input-placeholder{color:#000}
 .form-income{display:flex;flex-direction:row;width:95%;margin:4px auto;padding:6px 0;gap:0.5vw}
 .form-income label{line-height:2;margin-right:2vw}
+<<<<<<< HEAD
 input[type="checkbox"],input[type="radio"]{position:absolute;opacity:0;width:0;height:0}
 
 /* Radio 체크박스 */
 input[type="radio"]+label::after{content:'';position:absolute;left:0.25vw;top:0.18vw;width:0.3vw;height:0.3vw;border:solid #000;border-width:0 0.1vw 0.1vw 0;transform:rotate(45deg)}
 input[type="radio"]:not(:checked)+label::after{content:none}
+=======
+
+input[type="checkbox"],input[type="radio"]{position:absolute;opacity:0;width:0;height:0}
+input[type="radio"] + label::after{content:'';position:absolute;left:0.25vw;top:0.18vw;width:0.3vw;height:0.3vw;border:solid #000;border-width:0 0.1vw 0.1vw 0;transform:rotate(45deg)}
+input[type="radio"]:not(:checked) + label::after{content:none}
+input[type="checkbox"]:checked + label::after{content:'';position:absolute;left:0.25vw;top:0.18vw;width:0.3vw;height:0.3vw;border:solid #000;border-width:0 0.1vw 0.1vw 0;transform:rotate(45deg);z-index:1}
+input[type="checkbox"]:not(:checked) + label::after{content:none}
+
+.input100{width:100%!important;} /* input이 너무 짧을때 사용 */
+.input86{width:85.7%!important;}
+.form-group select:nth-child(2){margin-left:2.2vw;}
+.radio{margin-right:2.2vw;}
+>>>>>>> 719d7c8 (Delete all files)
 
 
 .checkbox-right{justify-content:right}
 .checkbox-space{margin-left:0.5vw!important;color:transparent!important;-webkit-user-select:none!important;-moz-user-select:none!important;-ms-user-select:none!important;user-select:none!important}
+<<<<<<< HEAD
 .btn-save{padding:6px 20px;background:#007bff;color:#fff;border:none;border-radius:3px;cursor:pointer;float:right;margin-top:20px}
+=======
+>>>>>>> 719d7c8 (Delete all files)
 #loadingIndicator{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.8);display:flex;justify-content:center;align-items:center;z-index:9999}
 #loadingIndicator div{padding:20px;background:#fff;border-radius:5px;box-shadow:0 0 10px rgba(0,0,0,0.1)}
 .creditor-title{display:flex;justify-content:space-between;width:100%}
@@ -141,7 +181,51 @@ input[type="radio"]:not(:checked)+label::after{content:none}
 .btn-add,.btn-save,.btn-delete,.btn-detail-add,.btn-detail-delete{height:1.2vw;background:#b0b0b0;min-width:3vw;color:#000;border:none;border-radius:5px;cursor:pointer}
 .btn-save,.btn-delete,.btn-detail-add,.btn-detail-delete{border-radius:4px;margin-bottom:5px;box-shadow:2px 2px 4px rgba(0,0,0,0.2)}
 .btn-save:hover,.btn-delete:hover,.btn-detail-add:hover,.btn-detail-delete:hover{background:#999;box-shadow:1px 1px 3px rgba(0,0,0,0.3)}
+<<<<<<< HEAD
 .btn-add2{min-width:2.5vw;height:1vw;background:#d9d9d9;padding:0 0.5vw;margin-left:1vw;color:#000;border:none;border-radius:5px;cursor:pointer}
 #creditorList{width:100%}
 .creditor-form-box{display:flex;width:100%;gap:1.5vw}
 .asset-box:last-child{margin-bottom:2vw}
+=======
+.btn-file{background:#d9d9d9;cursor:pointer;border-radius:3px;box-shadow:1px 1px 3px rgba(0,0,0,0.3);border:none;}
+.btn-add2{min-width:2.5vw;height:1vw;background:#d9d9d9;padding:0 0.5vw;margin-left:1vw;color:#000;border:none;border-radius:5px;cursor:pointer}
+#creditorList{width:100%}
+.creditor-form-box{display:flex;width:100%;gap:1.5vw}
+.asset-box:last-child{margin-bottom:2vw}
+.asset-block + .asset-block{margin-top:15px;}
+
+.long-table{width:100%;border-collapse: collapse;border-radius:4px;box-shadow:2px 2px 4px rgba(0,0,0,0.2);}
+.long-table th{background:#a7a7a7;padding:1vh 1vw;color:white;text-align:left;font-weight: normal;}
+.long-table th:nth-child(1){width:8%;border-radius:4px 0 0 0;}
+.long-table th:nth-child(2){width:8%;}
+.long-table th:nth-child(3){width:12%;}
+.long-table th:nth-child(4){width:20%;}
+.long-table th:nth-child(5){width:10%;}
+.long-table th:nth-child(6){width:10%;}
+.long-table th:nth-child(7){width:10%;}
+.long-table th:nth-child(8){width:10%;}
+.long-table th:nth-child(9){width:12%;border-radius:0 4px 0 0;}
+.long-table td {padding:0.5vh 0 0.5vh 1vw;background:#f7f7f7;border-bottom:1px solid #d4d4d4;}
+.long-table td .button-group{display: flex;justify-content:end;padding-right:1vw;}
+.long-table td .button-group button{margin-left:0.2vw;margin-bottom:0;}
+.long-table td input{width:80%;outline:none;padding:6px 0;}
+.long-table td:nth-child(3) input{width:30%;}
+.long-table td:nth-child(4) input{width:30%;}
+
+.twotwo-box{display:flex;gap:1vw;flex-wrap:wrap;width:100%;justify-content:right;}
+#iex-livingExpenseBox,#iex-monthPaymentBox,#iex-monthCountBox,#iex-repaymentRateBox{width:calc(50% - 0.5vw);padding:1.14vw;box-shadow:0 0.1vw 0.1vw rgba(0,0,0,0.2);border-radius:0.3vw;display:flex;flex-direction:column;justify-content:center;color:#fff;}
+#iex-livingExpenseBox,#iex-monthCountBox{background:#a7a7a7;font-size:1.2vw;}
+#iex-monthPaymentBox,#iex-repaymentRateBox{background:#00e6c3;font-size:1.2vw;}
+.iex-title{font-size:0.8vw;font-weight:bold;margin-bottom:0.4vw;}
+.iex-box{text-align:right;display:flex;flex-direction:row;justify-content:right;}
+.iex-value{font-size:1.2vw;}
+#iex-livingExpenseValue,#iex-monthPaymentValue,#iex-monthCountValue,#iex-repaymentRateValue{font-size:1.2vw;text-align:right;outline:none;color:#fff;}
+#iex-livingExpenseValue::placeholder,#iex-monthPaymentValue::placeholder,#iex-monthCountValue::placeholder,#iex-repaymentRateValue::placeholder{color:#fff;}
+#iex-calcPlanBtn{padding:0 0.5vw;height:1.2vw;border:none;background:#b0b0b0;border-radius:3px;box-shadow:0.1vw 0.1vw 0.1vw rgba(0,0,0,0.2);cursor:pointer}
+
+.flex-column{flex-direction:column;align-items:baseline;}
+.view-print-list{background:#f7f7f7;padding:1vw;}
+.view-print-item{margin:1vw 0 0 0;}
+.view-print-item:first-child{margin:0;}
+.view-print-button{margin:1vw 1vw 0 0;display:flex;justify-content:flex-end;}
+>>>>>>> 719d7c8 (Delete all files)

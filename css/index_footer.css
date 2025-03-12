@@ -1,0 +1,25 @@
+/* 푸터 스타일 */
+.main-footer {background: url('../img/footer_bg.png') no-repeat center/cover;color: white;padding: 4vw 0 2vw;}
+.footer-container {max-width: 50%;margin: 0 auto;display: flex;flex-wrap: wrap;justify-content: space-between;padding: 0 20px;}
+.footer-info {flex: 1;margin-bottom: 20px;}
+.footer-info p {margin-bottom: 5px;font-size: 0.7vw;}
+
+.footer-contact {flex: 1;min-width: 250px;margin-bottom: 20px;}
+.contact-title {font-size: 0.7vw;margin-bottom: 10px;}
+.contact-phone {font-size: 1.4vw;font-weight: bold;margin-bottom: 5px;}
+
+.footer-links {flex: 1;margin-bottom: 20px;}
+.footer-links ul {display: flex;flex-wrap: wrap;}
+.footer-links li {margin-right: 20px;margin-bottom: 10px;}
+.footer-links a {font-size: 0.7vw;transition: color 0.3s;}
+
+.copyright {max-width: 50%;margin: 20px auto 0;padding: 20px;border-top: 1px solid rgba(255, 255, 255, 0.1);text-align: center;}
+.copyright p {font-size: 13px;color: #999;}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+	.footer-container {flex-direction: column;}
+	.footer-info, .footer-contact, .footer-links {width: 100%;margin-bottom: 30px;}
+	.footer-links ul {flex-direction: column;}
+	.footer-links li {margin-right: 0;margin-bottom: 15px;}
+}

@@ -1,0 +1,29 @@
+/* 리셋 스타일 */
+* {margin: 0;padding: 0;box-sizing: border-box;}
+body {font-family:'Pretendard';line-height: 1.6;}
+a {text-decoration: none;color: inherit;}
+ul, li {list-style: none;}
+
+/* 헤더 스타일 */
+.main-header {background: url('../img/header_bg.png') no-repeat center/cover;height:20vh;width: 100%;}
+.header-container {margin: 0 10vw;padding-top:5vh;display: flex;justify-content: space-between;align-items: center;}
+.logo img {height: 50px;}
+
+/* 네비게이션 스타일 */
+.main-nav ul {display: flex;}
+.main-nav li {margin-left: 3vw;font-weight: 700;}
+.main-nav a {color: #000;position: relative;padding-bottom: 5px;}
+.main-nav a:hover {color: rgba(255, 255, 255, 0.8);}
+.main-nav a:after {content: '';position: absolute;width: 0;height: 2px;bottom: 0;left: 0;background-color: white;transition: width 0.3s;}
+.main-nav a:hover:after {width: 100%;}
+
+/* 컨텐츠 래퍼 */
+.content-wrapper {margin: 0 auto;}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+	.header-container {flex-direction: column;}
+	.logo {margin-bottom: 10px;}
+	.main-nav ul {flex-wrap: wrap;justify-content: center;}
+	.main-nav li {margin: 5px 10px;}
+}

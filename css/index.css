@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Pretendard'}
 body{background-color:#fff}
 .top-menu{width:100%;border-bottom:1px solid #eee}
@@ -31,4 +32,40 @@ h2{font-size:24px;color:#333;margin-bottom:15px}
 .left-section{padding-right:0;text-align:center;margin-bottom:40px}
 .button-group{justify-content:center}
 .right-section{width:100%}
+=======
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Pretendard';color:#000;font-size:1vw;}
+body {background: url('../img/cover_page.png') no-repeat center/cover;}
+h1{font-size:2vw;color:#fff}
+.top-menu ul{display:flex;justify-content:right;list-style:none;height:18vh;margin-right:8.5vw;align-items:center;font-weight:700;}
+.top-menu li{margin:0 2vw}
+.top-menu a{text-decoration:none;font-size:0.8vw;}
+.login-container{display:flex;justify-content:center;align-items:center;height:82vh;max-width:80%;margin:0 auto;padding:0 20px}
+.left-section{flex:1;width:25vw;}
+.logo{width:21.5vw;margin:0.7vw 0 0 0}
+.subtitle{font-weight:400;margin-bottom:0.5vw;}
+h2{font-size:24px;color:#333;margin-bottom:1vw}
+.left-section p{font-size:1.1vw;line-height:1.2;font-weight:600;}
+.button-group{width:24vw;display:flex;gap:1.5vw;margin-top:30px;}
+.primary-btn{flex:1;padding:12px 24px;border-radius:5px;cursor:pointer;transition:all 0.3s ease;color:#6C6C6C;background:#00e6c3;border:none;font-size:0.8vw;}
+.primary-btn:hover{background:#00cca9}
+.outline-btn{background:transparent;border:1px solid #00e6c3;color:#00e6c3}
+.outline-btn:hover{background:#f8f8f8}
+.right-section{flex:1;margin-top:8vw;max-width:18vw}
+.login-form{width:100%}
+.input-group{margin-bottom:20px}
+.input-group input{width:100%;padding:12px;margin-bottom:10px;border:2px solid #ddd;border-radius:5px;background:transparent;}
+#username{background: transparent url('../img/person.png') no-repeat left center;background-size:1.3vw 1.3vw;background-position:0.8vw center;padding-left:3vw;}
+#password{background: transparent url('../img/lock.png') no-repeat left center;background-size:1.3vw 1.3vw;background-position:0.8vw center;padding-left:3vw;}
+.input-group input:focus{outline:none;border-color:#00e6c3}
+.login-btn{width:100%;padding:12px;background:#00e6c3;border:none;border-radius:5px;cursor:pointer;transition:background 0.3s ease;font-weight:600;}
+.login-btn:hover{background:#00cca9}
+.form-footer{display:flex;justify-content:space-between;gap:1vw;margin-top:15px}
+.form-footer a{flex:1;padding:12px 24px;border-radius:5px;cursor:pointer;font-size:0.7vw;transition:all 0.3s ease;background:#fff;border:none;text-decoration:none;text-align:center;font-weight:600;}
+
+@media screen and (max-width:768px){
+.login-container{flex-direction:column;padding:20px}
+.left-section{padding-right:0;text-align:center;margin-bottom:40px}
+.button-group{justify-content:center}
+.right-section{width:100%}
+>>>>>>> 719d7c8 (Delete all files)
 }

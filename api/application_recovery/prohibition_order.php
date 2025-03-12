@@ -217,6 +217,7 @@ $reason = $order_info['reason'] ?? $defaultReason;
             <div class="form-group-grid">
                 <div class="grid-row">
                     <div class="grid-label">사 건</div>
+<<<<<<< HEAD
                     <div class="grid-value">&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<?= htmlspecialchars($case_info['case_number']) ?> 개인회생</div>
                 </div>
                 <div class="grid-row">
@@ -226,17 +227,36 @@ $reason = $order_info['reason'] ?? $defaultReason;
                 <div class="grid-row">
                     <div class="grid-label">주 소 (채무자)</div>
                     <div class="grid-value">&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<?= $case_info['now_address'] ? htmlspecialchars($case_info['now_address']) : '' ?></div>
+=======
+                    <div class="grid-value">&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<?= htmlspecialchars($case_info['case_number'] ?? "") ?> 개인회생</div>
+                </div>
+                <div class="grid-row">
+                    <div class="grid-label">신 청 인</div>
+                    <div class="grid-value">&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<?= htmlspecialchars($case_info['name'] ?? "") ?></div>
+                </div>
+                <div class="grid-row">
+                    <div class="grid-label">주 소 (채무자)</div>
+                    <div class="grid-value">&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<?= htmlspecialchars($case_info['now_address'] ?? "") ?></div>
+>>>>>>> 719d7c8 (Delete all files)
                 </div>
             </div>
             
             <div class="form-group">
                 <div class="form-group-label">신청취지</div>
+<<<<<<< HEAD
                 <textarea name="purpose" required><?= htmlspecialchars($purpose) ?></textarea>
+=======
+                <textarea name="purpose" required><?= htmlspecialchars($purpose ?? "") ?></textarea>
+>>>>>>> 719d7c8 (Delete all files)
             </div>
             
             <div class="form-group">
                 <div class="form-group-label">신청원인</div>
+<<<<<<< HEAD
                 <textarea name="reason" required><?= htmlspecialchars($reason) ?></textarea>
+=======
+                <textarea name="reason" required><?= htmlspecialchars($reason ?? "") ?></textarea>
+>>>>>>> 719d7c8 (Delete all files)
             </div>
             
             <div class="btn-group no-print">

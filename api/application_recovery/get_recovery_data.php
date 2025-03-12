@@ -28,14 +28,35 @@ if (!isset($_GET['case_no'])) {
 }
 
 $case_no = intval($_GET['case_no']);
+<<<<<<< HEAD
+=======
+$employee_no = $_SESSION['employee_no'];
+>>>>>>> 719d7c8 (Delete all files)
 
 try {
     // PDO 연결 확인
     if (!isset($pdo) || !($pdo instanceof PDO)) {
         throw new Exception("Database connection not established");
     }
+<<<<<<< HEAD
 
     // 쿼리 준비
+=======
+    
+    // 직원의 권한 확인
+    $authQuery = "SELECT auth FROM employee WHERE employee_no = ?";
+    $authStmt = $pdo->prepare($authQuery);
+    $authStmt->execute([$employee_no]);
+    $authData = $authStmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$authData) {
+        throw new Exception("직원 정보를 찾을 수 없습니다.");
+    }
+    
+    $isAdmin = ($authData['auth'] == 10);
+    
+    // 쿼리 준비 - 관리자(auth=10)는 모든 사건을 볼 수 있고, 일반 직원은 자신의 사건만 볼 수 있도록 함
+>>>>>>> 719d7c8 (Delete all files)
     $query = "
         SELECT 
             cm.case_no,
@@ -69,6 +90,7 @@ try {
             ar.status as recovery_status,
             ar.assigned_employee,
             ar.created_at as recovery_created_at,
+<<<<<<< HEAD
 			ar.work_period,
 			ar.other_income,
 			ar.other_income_name,
@@ -79,11 +101,34 @@ try {
         LEFT JOIN application_recovery ar ON cm.case_no = ar.case_no
         WHERE cm.case_no = ? AND cm.paper = ?
     ";
+=======
+            ar.work_period,
+            ar.other_income,
+            ar.other_income_name,
+            ar.income_source,
+            ar.unspecified_date,
+            ar.repayment_start_date
+        FROM case_management cm
+        LEFT JOIN application_recovery ar ON cm.case_no = ar.case_no
+        WHERE cm.case_no = ? ";
+        
+    if (!$isAdmin) {
+        $query .= "AND cm.paper = ?";
+    }
+>>>>>>> 719d7c8 (Delete all files)
 
     $stmt = $pdo->prepare($query);
 
     // 쿼리 실행
+<<<<<<< HEAD
     $result = $stmt->execute([$case_no, $_SESSION['employee_no']]);
+=======
+    if ($isAdmin) {
+        $result = $stmt->execute([$case_no]);
+    } else {
+        $result = $stmt->execute([$case_no, $employee_no]);
+    }
+>>>>>>> 719d7c8 (Delete all files)
     
     if (!$result) {
         writeLog("Query execution failed: " . print_r($stmt->errorInfo(), true));
