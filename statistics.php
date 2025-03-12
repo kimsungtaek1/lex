@@ -233,110 +233,20 @@ include 'header.php';
         </div>
     </div>
 
-
 	<!-- 사무장 통계 탭 -->
 	<div id="managerStats" class="statistics-content" style="display: none;">
 		<div class="statistics-row">
 			<div class="manager-stats-container">
 				<div class="manager-stats-header">
 					<div class="date-column">1일 상담<span class="sort-icon">▼</span></div>
-					<div class="manager-column">
-						<div class="manager-header">에이 사무장</div>
-						<div class="stats-header">
-							<div class="stat-header">유입</div>
-							<div class="stat-header">계약</div>
-						</div>
-					</div>
-					<div class="manager-column">
-						<div class="manager-header">사무장</div>
-						<div class="stats-header">
-							<div class="stat-header">유입</div>
-							<div class="stat-header">계약</div>
-						</div>
-					</div>
-					<div class="manager-column">
-						<div class="manager-header">사무장</div>
-						<div class="stats-header">
-							<div class="stat-header">유입</div>
-							<div class="stat-header">계약</div>
-						</div>
-					</div>
-					<div class="manager-column">
-						<div class="manager-header">사무장</div>
-						<div class="stats-header">
-							<div class="stat-header">유입</div>
-							<div class="stat-header">계약</div>
-						</div>
-					</div>
-					<div class="manager-column">
-						<div class="manager-header">사무장</div>
-						<div class="stats-header">
-							<div class="stat-header">유입</div>
-							<div class="stat-header">계약</div>
-						</div>
-					</div>
-					<div class="manager-column">
-						<div class="manager-header">사무장</div>
-						<div class="stats-header">
-							<div class="stat-header">유입</div>
-							<div class="stat-header">계약</div>
-						</div>
-					</div>
-					<div class="manager-column">
-						<div class="manager-header">합계</div>
-						<div class="stats-header">
-							<div class="stat-header">유입</div>
-							<div class="stat-header">계약</div>
-						</div>
-					</div>
+					<!-- 여기에 사무장 칼럼이 동적으로 추가됩니다 -->
 				</div>
 				<div class="manager-stats-body" id="managerStatsBody">
 					<!-- 자바스크립트로 행을 동적으로 추가할 예정 -->
 				</div>
 				<div class="manager-stats-footer">
 					<div class="date-column">합계</div>
-					<div class="manager-column">
-						<div class="stats-footer">
-							<div class="stat-footer">124</div>
-							<div class="stat-footer">81</div>
-						</div>
-					</div>
-					<div class="manager-column">
-						<div class="stats-footer">
-							<div class="stat-footer">0</div>
-							<div class="stat-footer">0</div>
-						</div>
-					</div>
-					<div class="manager-column">
-						<div class="stats-footer">
-							<div class="stat-footer">0</div>
-							<div class="stat-footer">0</div>
-						</div>
-					</div>
-					<div class="manager-column">
-						<div class="stats-footer">
-							<div class="stat-footer">0</div>
-							<div class="stat-footer">0</div>
-						</div>
-					</div>
-					<div class="manager-column">
-						<div class="stats-footer">
-							<div class="stat-footer">0</div>
-							<div class="stat-footer">0</div>
-						</div>
-					</div>
-					<div class="manager-column">
-						<div class="stats-footer">
-							<div class="stat-footer">0</div>
-							<div class="stat-footer">0</div>
-						</div>
-					</div>
-					<div class="manager-column">
-						<div class="stats-footer">
-							<div class="stat-footer">124</div>
-							<div class="stat-footer">81</div>
-						</div>
-					</div>
+					<!-- 여기에 사무장 칼럼이 동적으로 추가됩니다 -->
 				</div>
 			</div>
 		</div>
