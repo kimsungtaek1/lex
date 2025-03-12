@@ -461,10 +461,7 @@ function updatemanagerDailyStatsFooter(monthlyTotals, columnsToShow) {
 }
 
 // 헤더 섹션 업데이트 함수 수정
-function updatemanagerDailyStatsHeader(managers) {
-    // 기존 헤더 컨테이너 비우기
-    $('.manager-stats-header').empty();
-    
+function updatemanagerDailyStatsHeader(managers) {	
     // 사무장 컬럼 영역 추가
     const headerScrollArea = $('<div class="managers-scroll-area"></div>');
     const headerColumnsContainer = $('<div class="manager-columns-container"></div>');
