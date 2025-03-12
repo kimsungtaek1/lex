@@ -294,24 +294,28 @@ function initDateFilterDropdown() {
 
 // 필터링된 사무장 일간 통계 로드 함수
 function loadFilteredManagerDailyStats(year, month) {
-	// API 호출 URL에 년도와 월 파라미터 추가
+	// 월을 두 자리 문자열로 변환
+	const formattedMonth = month.toString().padStart(2, '0');
+
 	$.ajax({
 		url: '../adm/api/stats/get_manager_daily_stats.php',
 		method: 'GET',
 		data: {
 			year: year,
-			month: month
+			month: formattedMonth
 		},
 		dataType: 'json',
 		success: function(response) {
-			if(response.success) {
+			if(response.success) {				
 				renderManagerDailyStats(response.data);
 			} else {
 				console.error('사무장 일별 통계를 불러오는데 실패했습니다:', response.message);
+				alert('해당 월의 데이터를 불러올 수 없습니다.');
 			}
 		},
 		error: function(xhr, status, error) {
 			console.error('사무장 일별 통계를 불러오는데 실패했습니다:', error);
+			alert('데이터를 불러오는 중 오류가 발생했습니다.');
 		}
 	});
 }
