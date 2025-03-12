@@ -209,6 +209,14 @@ function initDateFilterDropdown() {
 		monthSection.append(`<div class="dropdown-option month-option ${isCurrentMonth ? 'selected' : ''}" data-month="${month}">${month}월</div>`);
 	}
 	
+	// 이전 이벤트 핸들러 제거
+	$(document).off('click', '.year-option');
+	$(document).off('click', '.month-option');
+	$('.date-dropdown-toggle').off('click');
+	$('.apply-button').off('click');
+	$('.reset-button').off('click');
+	$(document).off('click.dateFilter');
+	
 	// 연도 선택 이벤트
 	$(document).on('click', '.year-option', function() {
 		$('.year-option').removeClass('selected');
@@ -222,7 +230,7 @@ function initDateFilterDropdown() {
 	});
 	
 	// 드롭다운 토글 이벤트
-	$('.date-dropdown-toggle').click(function(e) {
+	$('.date-dropdown-toggle').on('click', function(e) {
 		e.stopPropagation();
 		
 		// 드롭다운 위치 설정
@@ -236,7 +244,7 @@ function initDateFilterDropdown() {
 	});
 	
 	// 적용 버튼 클릭 이벤트
-	$('.apply-button').click(function() {
+	$('.apply-button').on('click', function() {
 		const selectedYear = $('.year-option.selected').data('year');
 		const selectedMonth = $('.month-option.selected').data('month');
 		
@@ -250,7 +258,7 @@ function initDateFilterDropdown() {
 	});
 	
 	// 초기화 버튼 클릭 이벤트
-	$('.reset-button').click(function() {
+	$('.reset-button').on('click', function() {
 		$('.dropdown-option').removeClass('selected');
 		// 현재 연도와 월 옵션 선택
 		$(`.year-option[data-year="${currentYear}"]`).addClass('selected');
@@ -261,7 +269,7 @@ function initDateFilterDropdown() {
 	});
 	
 	// 다른 곳 클릭 시 드롭다운 닫기
-	$(document).click(function(e) {
+	$(document).on('click.dateFilter', function(e) {
 		if(!$(e.target).closest('#dateFilterDropdown, .date-dropdown-toggle').length) {
 			$('#dateFilterDropdown').hide();
 		}
@@ -451,7 +459,12 @@ function updatemanagerDailyStatsFooter(monthlyTotals, columnsToShow) {
 }
 
 // 헤더 섹션 업데이트 함수 수정
-function updatemanagerDailyStatsHeader(managers) {	
+function updatemanagerDailyStatsHeader(managers) {
+	// 먼저 기존 헤더 내용을 비우기
+	$('.manager-stats-header').empty();
+	// date-column (날짜 헤더)를 다시 추가
+	$('.manager-stats-header').append(`<div class="date-column">1일 상담 통계&nbsp;&nbsp;<span class="sort-icon date-dropdown-toggle">▼</span></div>`);
+	
     // 사무장 컬럼 영역 추가
     const headerScrollArea = $('<div class="managers-scroll-area"></div>');
     const headerColumnsContainer = $('<div class="manager-columns-container"></div>');
