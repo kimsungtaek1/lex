@@ -9,13 +9,20 @@ include 'header.php';
                 <tr>
                     <th class="stat-tab active" data-type="bankruptcy">|&nbsp;&nbsp;개인회생 / 개인파산 통계</th>
                     <th class="stat-tab" data-type="case">|&nbsp;&nbsp;사건 통계</th>
-                    <th class="stat-tab" data-type="manager">|&nbsp;&nbsp;사무장 통계&nbsp;&nbsp;▼</th>
+                    <th class="stat-tab" data-type="manager" id="managerTab">|&nbsp;&nbsp;사무장 통계&nbsp;&nbsp;▼</th>
                     <th class="stat-tab" data-type="document">|&nbsp;&nbsp;서류담당 통계</th>
 					<th></th>
                 </tr>
             </thead>
         </table>
     </div>
+
+	<!-- 드롭다운 메뉴 추가 -->
+	<div id="managerDropdown" class="manager-dropdown">
+		<div class="dropdown-option" data-stat-type="daily">일간 통계</div>
+		<div class="dropdown-option" data-stat-type="weekly">주간 통계</div>
+		<div class="dropdown-option" data-stat-type="monthly">월간 통계</div>
+	</div>
 
     <div id="bankruptcyStats" class="statistics-content">
         <!-- 상단 통계 요약 -->
@@ -233,8 +240,8 @@ include 'header.php';
         </div>
     </div>
 
-	<!-- 사무장 통계 탭 -->
-	<div id="managerStats" class="statistics-content" style="display: none;">
+	<!-- 사무장 일간 통계 탭 -->
+	<div id="managerDailyStats" class="statistics-content" style="display: none;">
 		<div class="statistics-row">
 			<div class="manager-stats-container has-few-managers">
 				<div class="manager-stats-header">
@@ -245,6 +252,34 @@ include 'header.php';
 				</div>
 				<div class="manager-stats-footer">
 					<!-- JavaScript로 동적 생성 -->
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 사무장 주간 통계 탭 -->
+	<div id="managerWeeklyStats" class="statistics-content" style="display: none;">
+		<div class="statistics-row">
+			<div class="statistics-col">
+				<div class="statistics-box">
+					<h3 class="box-title">사무장 주간 통계</h3>
+					<div class="empty-stats-message">
+						<p>현재 주간 통계 데이터가 준비 중입니다.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 사무장 월간 통계 탭 -->
+	<div id="managerMonthlyStats" class="statistics-content" style="display: none;">
+		<div class="statistics-row">
+			<div class="statistics-col">
+				<div class="statistics-box">
+					<h3 class="box-title">사무장 월간 통계</h3>
+					<div class="empty-stats-message">
+						<p>현재 월간 통계 데이터가 준비 중입니다.</p>
+					</div>
 				</div>
 			</div>
 		</div>
