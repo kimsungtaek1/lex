@@ -247,7 +247,7 @@ include 'header.php';
 				<div class="manager-stats-header">
 					<!-- JavaScript로 동적 생성 -->
 				</div>
-				<div class="manager-stats-body" id="managerStatsBody">
+				<div class="manager-stats-body" id="managerDailyStatsBody">
 					<!-- JavaScript로 동적 생성 -->
 				</div>
 				<div class="manager-stats-footer">
