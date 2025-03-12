@@ -183,11 +183,7 @@ $(document).ready(function() {
 	});
 	
 	initDateFilterDropdown();
-	
-	// 날짜 드롭다운 토글 이벤트에 로깅 추가
-	$(document).on('click', '.date-dropdown-toggle', function(e) {
-		console.log('날짜 드롭다운 토글 클릭됨');
-	});
+
 });
 
 // 날짜 필터 드롭다운 초기화 함수 수정
