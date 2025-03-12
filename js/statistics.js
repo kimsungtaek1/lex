@@ -103,7 +103,7 @@ function loadManagerDailyStats() {
 	});
 }
 
-// 사무장 일별 통계 렌더링 함수
+// 사무장 일별 통계 렌더링 함수 수정
 function renderManagerDailyStats(data) {
 	const statsBody = $('#managerStatsBody');
 	statsBody.empty();
@@ -122,6 +122,11 @@ function renderManagerDailyStats(data) {
 				// 이제 일별 통계 데이터 표시
 				const displayData = data && data.length > 0 ? data : [];
 				
+				// 최소 컬럼 수 설정
+				const minColumns = 6;
+				const actualManagerCount = response.data.length;
+				const columnsToShow = Math.max(minColumns, actualManagerCount);
+				
 				displayData.forEach(item => {
 					const row = $('<div class="stats-row"></div>');
 					
@@ -132,14 +137,22 @@ function renderManagerDailyStats(data) {
 						</div>
 					`);
 					
-					// 각 사무장 데이터(실제 사무장 수만큼만 표시)
-					const managerCount = response.data.length;
-					for(let i = 0; i < managerCount; i++) {
-						if(i < item.managers.length) {
+					// 각 사무장 데이터(최소 6개 컬럼 또는 실제 사무장 수 중 큰 값만큼 표시)
+					for(let i = 0; i < columnsToShow; i++) {
+						if(i < item.managers.length && i < actualManagerCount) {
+							// 실제 사무장 데이터가 있는 경우
 							row.append(`
 								<div class="manager-stats">
 									<div class="stat-value">${item.managers[i].inflow}</div>
 									<div class="stat-value">${item.managers[i].contract}</div>
+								</div>
+							`);
+						} else {
+							// 빈 컬럼 추가
+							row.append(`
+								<div class="manager-stats">
+									<div class="stat-value">0</div>
+									<div class="stat-value">0</div>
 								</div>
 							`);
 						}
@@ -165,24 +178,31 @@ function renderManagerDailyStats(data) {
 	});
 }
 
-// 헤더 섹션 업데이트 함수 추가
+// 헤더 섹션 업데이트 함수 수정
 function updateManagerStatsHeader(managers) {
 	const header = $('.manager-stats-header');
 	// 날짜 칼럼 제외한 나머지 칼럼 제거
 	header.find('.manager-column').remove();
 	
-	// 실제 사무장 수에 따라 칼럼 추가
-	managers.forEach(manager => {
+	// 최소 컬럼 수 설정
+	const minColumns = 6;
+	const actualManagerCount = managers.length;
+	const columnsToShow = Math.max(minColumns, actualManagerCount);
+	
+	// 실제 사무장 수만큼 칼럼 추가
+	for (let i = 0; i < columnsToShow; i++) {
+		let managerName = i < actualManagerCount ? managers[i].name + ' 사무장' : '';
+		
 		header.append(`
 			<div class="manager-column">
-				<div class="manager-header">${manager.name} 사무장</div>
+				<div class="manager-header">${managerName}</div>
 				<div class="stats-header">
 					<div class="stat-header">유입</div>
 					<div class="stat-header">계약</div>
 				</div>
 			</div>
 		`);
-	});
+	}
 	
 	// 합계 칼럼 추가
 	header.append(`
@@ -200,7 +220,7 @@ function updateManagerStatsHeader(managers) {
 	footer.find('.manager-column').remove();
 	
 	// 각 사무장별 푸터 칼럼 추가
-	managers.forEach(manager => {
+	for (let i = 0; i < columnsToShow; i++) {
 		footer.append(`
 			<div class="manager-column">
 				<div class="stats-footer">
@@ -209,7 +229,7 @@ function updateManagerStatsHeader(managers) {
 				</div>
 			</div>
 		`);
-	});
+	}
 	
 	// 합계 칼럼 추가
 	footer.append(`
