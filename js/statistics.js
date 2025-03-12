@@ -142,77 +142,31 @@ $(document).ready(function() {
 	// 테이블 정렬 기능 활성화
 	enableTableSort();
 	
-	// manager-column에 hover 효과 - 세로 열 전체에 적용
-	$(document).on('mouseenter', '.manager-column', function() {
+		// 열에 마우스 올릴 때 효과 적용 (manager-column, manager-stats 둘 다)
+	$(document).on('mouseenter', '.manager-column, .manager-stats', function() {
 		let columnIndex = $(this).index();
 		
-		// 헤더의 모든 같은 인덱스의 열에 스타일 적용
+		// 헤더의 같은 인덱스 열의 배경색 변경
 		$('.manager-stats-header .manager-column').eq(columnIndex).css('background-color', '#6c6c6c');
 		
-		// 바디의 모든 행에서 같은 인덱스의 셀에 스타일 적용
-		$('.manager-stats-body .stats-row').each(function() {
-			$(this).find('.manager-stats').eq(columnIndex).css('background-color', '#6c6c6c');
-			$(this).find('.manager-stats').eq(columnIndex).find('.stat-value').css('color', 'white');
-		});
-		
-		// 푸터의 해당 열에 스타일 적용
-		$('.manager-stats-footer .manager-column').eq(columnIndex).css('background-color', '#6c6c6c');
-	});
-	
-	// manager-column에서 마우스 떠날 때 스타일 복원
-	$(document).on('mouseleave', '.manager-column', function() {
-		let columnIndex = $(this).index();
-		
-		// 헤더 스타일 복원 (마지막 열은 원래 #6c6c6c)
-		if(columnIndex === $('.manager-stats-header .manager-column').length - 1) {
-			$('.manager-stats-header .manager-column').eq(columnIndex).css('background-color', '#6c6c6c');
-		} else {
-			$('.manager-stats-header .manager-column').eq(columnIndex).css('background-color', '#b0b0b0');
-		}
-		
-		// 바디 스타일 복원
-		$('.manager-stats-body .stats-row').each(function() {
-			$(this).find('.manager-stats').eq(columnIndex).css('background-color', '');
-			$(this).find('.manager-stats').eq(columnIndex).find('.stat-value').css('color', '');
-		});
-		
-		// 푸터 스타일 복원 (마지막 열은 원래 #6c6c6c)
-		if(columnIndex === $('.manager-stats-footer .manager-column').length - 1) {
-			$('.manager-stats-footer .manager-column').eq(columnIndex).css('background-color', '#6c6c6c');
-		} else {
-			$('.manager-stats-footer .manager-column').eq(columnIndex).css('background-color', '#b0b0b0');
-		}
-	});
-	
-	// manager-stats(바디의 셀)에 hover 효과 - 세로 열 전체에 적용
-	$(document).on('mouseenter', '.manager-stats', function() {
-		let columnIndex = $(this).index();
-		
-		// 헤더의 모든 같은 인덱스의 열에 스타일 적용
-		$('.manager-stats-header .manager-column').eq(columnIndex).css('background-color', '#f9f9f9');
-		$('.manager-stats-header .manager-column').eq(columnIndex).find('.manager-header, .stat-header').css('color', '#333');
-		
-		// 바디의 모든 행에서 같은 인덱스의 셀에 스타일 적용
+		// 바디의 모든 행에서 같은 인덱스 열의 배경색 변경
 		$('.manager-stats-body .stats-row').each(function() {
 			$(this).find('.manager-stats').eq(columnIndex).css('background-color', '#f9f9f9');
 		});
 		
-		// 푸터의 해당 열에 스타일 적용
-		$('.manager-stats-footer .manager-column').eq(columnIndex).css('background-color', '#f9f9f9');
-		$('.manager-stats-footer .manager-column').eq(columnIndex).find('.stat-footer').css('color', '#333');
+		// 푸터의 해당 열 배경색 변경
+		$('.manager-stats-footer .manager-column').eq(columnIndex).css('background-color', '#6c6c6c');
 	});
 	
-	// manager-stats에서 마우스 떠날 때 스타일 복원
-	$(document).on('mouseleave', '.manager-stats', function() {
+	// 마우스가 떠날 때 스타일 복원
+	$(document).on('mouseleave', '.manager-column, .manager-stats', function() {
 		let columnIndex = $(this).index();
 		
 		// 헤더 스타일 복원 (마지막 열은 원래 #6c6c6c)
 		if(columnIndex === $('.manager-stats-header .manager-column').length - 1) {
 			$('.manager-stats-header .manager-column').eq(columnIndex).css('background-color', '#6c6c6c');
-			$('.manager-stats-header .manager-column').eq(columnIndex).find('.manager-header, .stat-header').css('color', 'white');
 		} else {
 			$('.manager-stats-header .manager-column').eq(columnIndex).css('background-color', '#b0b0b0');
-			$('.manager-stats-header .manager-column').eq(columnIndex).find('.manager-header, .stat-header').css('color', 'white');
 		}
 		
 		// 바디 스타일 복원
@@ -223,10 +177,8 @@ $(document).ready(function() {
 		// 푸터 스타일 복원 (마지막 열은 원래 #6c6c6c)
 		if(columnIndex === $('.manager-stats-footer .manager-column').length - 1) {
 			$('.manager-stats-footer .manager-column').eq(columnIndex).css('background-color', '#6c6c6c');
-			$('.manager-stats-footer .manager-column').eq(columnIndex).find('.stat-footer').css('color', 'white');
 		} else {
 			$('.manager-stats-footer .manager-column').eq(columnIndex).css('background-color', '#b0b0b0');
-			$('.manager-stats-footer .manager-column').eq(columnIndex).find('.stat-footer').css('color', 'white');
 		}
 	});
 });
