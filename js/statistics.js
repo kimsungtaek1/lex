@@ -207,7 +207,7 @@ function initDateFilterDropdown() {
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth() + 1; // JavaScript의 month는 0부터 시작
-    const startYear = currentYear - 10; // 10년 전부터 선택 가능
+    const startYear = currentYear - 20; // 10년 전부터 선택 가능
     
     // 연도 옵션 생성
     const yearSection = $('#dateFilterDropdown .dropdown-section:first-child .dropdown-scroll');
