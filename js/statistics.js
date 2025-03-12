@@ -183,6 +183,115 @@ $(document).ready(function() {
 	});
 });
 
+// 날짜 필터 드롭다운 초기화 함수
+function initDateFilterDropdown() {
+	// 현재 년도 구하기
+	const currentYear = new Date().getFullYear();
+	const startYear = currentYear - 10; // 10년 전부터 선택 가능
+	
+	// 연도 옵션 생성
+	const yearSection = $('#dateFilterDropdown .dropdown-section:first-child .dropdown-scroll');
+	yearSection.empty();
+	
+	for (let year = currentYear; year >= startYear; year--) {
+		yearSection.append(`<div class="dropdown-option year-option" data-year="${year}">${year}년</div>`);
+	}
+	
+	// 월 옵션 생성
+	const monthSection = $('#dateFilterDropdown .dropdown-section:last-of-type .dropdown-scroll');
+	monthSection.empty();
+	
+	for (let month = 1; month <= 12; month++) {
+		monthSection.append(`<div class="dropdown-option month-option" data-month="${month}">${month}월</div>`);
+	}
+	
+	// 연도 선택 이벤트
+	$(document).on('click', '.year-option', function() {
+		$('.year-option').removeClass('selected');
+		$(this).addClass('selected');
+	});
+	
+	// 월 선택 이벤트
+	$(document).on('click', '.month-option', function() {
+		$('.month-option').removeClass('selected');
+		$(this).addClass('selected');
+	});
+	
+	// 드롭다운 토글 이벤트
+	$('.date-dropdown-toggle').click(function(e) {
+		e.stopPropagation();
+		
+		// 드롭다운 위치 설정
+		const headerPosition = $(this).closest('.date-column').offset();
+		const headerHeight = $(this).closest('.date-column').outerHeight();
+		
+		$('#dateFilterDropdown').css({
+			top: headerPosition.top + headerHeight + 'px',
+			left: headerPosition.left + 'px'
+		}).toggle();
+	});
+	
+	// 적용 버튼 클릭 이벤트
+	$('.apply-button').click(function() {
+		const selectedYear = $('.year-option.selected').data('year');
+		const selectedMonth = $('.month-option.selected').data('month');
+		
+		if (selectedYear && selectedMonth) {
+			// 선택된 년도와 월로 데이터 로드
+			loadFilteredManagerDailyStats(selectedYear, selectedMonth);
+			$('#dateFilterDropdown').hide();
+		} else {
+			alert('연도와 월을 모두 선택해주세요.');
+		}
+	});
+	
+	// 초기화 버튼 클릭 이벤트
+	$('.reset-button').click(function() {
+		$('.dropdown-option').removeClass('selected');
+		// 현재 월 데이터 로드
+		loadManagerDailyStats();
+		$('#dateFilterDropdown').hide();
+	});
+	
+	// 다른 곳 클릭 시 드롭다운 닫기
+	$(document).click(function(e) {
+		if(!$(e.target).closest('#dateFilterDropdown, .date-dropdown-toggle').length) {
+			$('#dateFilterDropdown').hide();
+		}
+	});
+	
+	// 날짜 필터 드롭다운 초기화
+	initDateFilterDropdown();
+}
+
+// 필터링된 사무장 일간 통계 로드 함수
+function loadFilteredManagerDailyStats(year, month) {
+	// API 호출 URL에 년도와 월 파라미터 추가
+	$.ajax({
+		url: '../adm/api/stats/get_manager_daily_stats.php',
+		method: 'GET',
+		data: {
+			year: year,
+			month: month
+		},
+		dataType: 'json',
+		success: function(response) {
+			if(response.success) {
+				renderManagerDailyStats(response.data);
+				// 필터 적용 표시
+				$('.date-column').html(`${year}년 ${month}월 통계&nbsp;&nbsp;<span class="sort-icon date-dropdown-toggle">▼</span>`);
+			} else {
+				console.error('사무장 일별 통계를 불러오는데 실패했습니다:', response.message);
+				$('#managerDailyStatsBody').html('<div class="error-message">데이터를 불러오는데 실패했습니다.</div>');
+			}
+		},
+		error: function(xhr, status, error) {
+			console.error('사무장 일별 통계를 불러오는데 실패했습니다:', error);
+			$('#managerDailyStatsBody').html('<div class="error-message">데이터를 불러오는데 실패했습니다.</div>');
+		}
+	});
+}
+
 // 사무장 일별 통계 데이터 로드 함수
 function loadManagerDailyStats() {
 	$.ajax({
@@ -355,11 +464,6 @@ function updatemanagerDailyStatsFooter(monthlyTotals, columnsToShow) {
 function updatemanagerDailyStatsHeader(managers) {
     // 기존 헤더 컨테이너 비우기
     $('.manager-stats-header').empty();
-    
-    // 날짜 열 추가
-    $('.manager-stats-header').append(`
-        <div class="date-column">1일 상담 통계&nbsp;&nbsp;<span class="sort-icon">▼</span></div>
-    `);
     
     // 사무장 컬럼 영역 추가
     const headerScrollArea = $('<div class="managers-scroll-area"></div>');
