@@ -250,7 +250,7 @@ function updateManagerStatsHeader(managers) {
     
     // 푸터 업데이트
     $('.manager-stats-footer').empty();
-    $('.manager-stats-footer').append(`<div class="date-column">합계</div>`);
+    $('.manager-stats-footer').append(`<div class="date-column-total">합계</div>`);
     
     const footerScrollArea = $('<div class="managers-scroll-area"></div>');
     const footerColumnsContainer = $('<div class="manager-columns-container"></div>');
