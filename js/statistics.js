@@ -32,12 +32,17 @@ function vhToPx(vh) {
 $(document).ready(function() {
 	// 탭 클릭 이벤트 핸들러
 	$('.stat-tab').click(function() {
+		// 사무장 탭이면 드롭다운만 표시하고 return
+		if($(this).attr('id') === 'managerTab') {
+			return;
+		}
+		
 		// 모든 탭에서 active 클래스 제거 후 현재 탭에만 추가
 		$('.stat-tab').removeClass('active');
 		$(this).addClass('active');
 		
 		// 모든 통계 컨텐츠 영역 숨김
-		$('#bankruptcyStats, #caseStats, #managerDailyStats, #documentStats').hide();
+		$('#bankruptcyStats, #caseStats, #managerDailyStats, #managerWeeklyStats, #managerMonthlyStats, #documentStats').hide();
 		
 		// 클릭한 탭에 해당하는 컨텐츠만 표시
 		const type = $(this).data('type');
@@ -48,16 +53,72 @@ $(document).ready(function() {
 			loadManagersData();
 		} else if(type === 'bankruptcy') {
 			loadAllStats();
-		} else if(type === 'manager') {
-			loadManagerDailyStats();
 		}
 	});
+	
+	// 사무장 탭 클릭 이벤트 처리
+	$('#managerTab').click(function(e) {
+		e.stopPropagation(); // 상위 이벤트 전파 방지
+		
+		// 드롭다운 위치 설정
+		const tabPosition = $(this).offset();
+		const tabWidth = $(this).outerWidth();
+		const tabHeight = $(this).outerHeight();
+		
+		$('#managerDropdown').css({
+			top: tabPosition.top + tabHeight - 50 + 'px',
+			left: tabPosition.left + tabWidth - 150 + 'px'
+		}).toggle();
+	});
+	
+	// 드롭다운 옵션 클릭 이벤트
+	$('.dropdown-option').click(function() {
+		// 모든 통계 컨텐츠 영역 숨김
+		$('#bankruptcyStats, #caseStats, #managerDailyStats, #managerWeeklyStats, #managerMonthlyStats, #documentStats').hide();
+		
+		// 드롭다운 메뉴 닫기
+		$('#managerDropdown').hide();
+		
+		// 모든 탭에서 active 클래스 제거 후 사무장 탭에만 추가
+		$('.stat-tab').removeClass('active');
+		$('#managerTab').addClass('active');
+		
+		// 클릭한 옵션에 active 클래스 추가
+		$('.dropdown-option').removeClass('active');
+		$(this).addClass('active');
+		
+		// 클릭한 옵션에 따라 컨텐츠 표시
+		const statType = $(this).data('stat-type');
+		
+		if(statType === 'daily') {
+			$('#managerDailyStats').show();
+			loadManagerDailyStats();
+		} else if(statType === 'weekly') {
+			$('#managerWeeklyStats').show();
+			// 주간 통계 로드 함수 (필요시 구현)
+			// loadManagerWeeklyStats();
+		} else if(statType === 'monthly') {
+			$('#managerMonthlyStats').show();
+			// 월간 통계 로드 함수 (필요시 구현)
+			// loadManagerMonthlyStats();
+		}
+	});
+	
+	// 다른 곳 클릭 시 드롭다운 닫기
+	$(document).click(function(e) {
+		if(!$(e.target).closest('#managerTab, #managerDropdown').length) {
+			$('#managerDropdown').hide();
+		}
+	});
+	
+	// 기본값으로 일간 통계 옵션 설정
+	$('.dropdown-option[data-stat-type="daily"]').addClass('active');
 	
 	// 초기 페이지 로드 시 기본 탭 내용만 표시
 	const activeTabType = $('.stat-tab.active').data('type');
 	
 	// 모든 통계 컨텐츠 영역 숨김
-	$('#bankruptcyStats, #caseStats, #managerDailyStats, #documentStats').hide();
+	$('#bankruptcyStats, #caseStats, #managerDailyStats, #managerWeeklyStats, #managerMonthlyStats, #documentStats').hide();
 	
 	// 활성 탭에 해당하는 컨텐츠만 표시
 	$(`#${activeTabType}Stats`).show();
