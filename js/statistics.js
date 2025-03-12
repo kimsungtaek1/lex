@@ -184,27 +184,9 @@ $(document).ready(function() {
 	
 	initDateFilterDropdown();
 	
-	// 사무장 일간 통계 탭에서 드롭다운 토글 이벤트 직접 바인딩
-    $(document).on('click', '.date-column .date-dropdown-toggle', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log("드롭다운 토글 클릭됨"); // 디버깅용
-        
-        // 드롭다운 위치 설정
-        const headerPosition = $(this).closest('.date-column').offset();
-        const headerHeight = $(this).closest('.date-column').outerHeight();
-        
-        $('#dateFilterDropdown').css({
-            top: headerPosition.top + headerHeight + 'px',
-            left: headerPosition.left + 'px'
-        }).toggle();
-    });
-	
-		// 문서 클릭 이벤트를 추가하여 드롭다운 닫기
-	$(document).on('click', function(e) {
-		if(!$(e.target).closest('#dateFilterDropdown, .date-dropdown-toggle').length) {
-			$('#dateFilterDropdown').hide();
-		}
+	// 날짜 드롭다운 토글 이벤트에 로깅 추가
+	$(document).on('click', '.date-dropdown-toggle', function(e) {
+		console.log('날짜 드롭다운 토글 클릭됨');
 	});
 });
 
@@ -234,13 +216,30 @@ function initDateFilterDropdown() {
 		monthSection.append(`<div class="dropdown-option month-option ${isCurrentMonth ? 'selected' : ''}" data-month="${month}">${month}월</div>`);
 	}
 	
-	// 이벤트 핸들러 모두 제거 후 다시 바인딩
-	$(document).off('click', '.year-option');
-	$(document).off('click', '.month-option');
-	$(document).off('click', '.date-dropdown-toggle');
-	$(document).off('click', '.apply-button');
-	$(document).off('click', '.reset-button');
-	$(document).off('click.dateFilter');
+	// 이벤트 핸들러 추가
+	$(document).on('click', '.date-column .date-dropdown-toggle', function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		
+		// 드롭다운 위치 설정
+		const $dateColumn = $(this).closest('.date-column');
+		const headerPosition = $dateColumn.offset();
+		const headerHeight = $dateColumn.outerHeight();
+		
+		// 디버깅 로그 추가
+		console.log('드롭다운 토글 클릭됨');
+		console.log('headerPosition:', headerPosition);
+		console.log('headerHeight:', headerHeight);
+		
+		$('#dateFilterDropdown').css({
+			display: 'block',
+			position: 'absolute',
+			top: (headerPosition.top + headerHeight) + 'px',
+			left: headerPosition.left + 'px',
+			zIndex: 1000,
+			visibility: 'visible' // 추가: 명시적 가시성 설정
+		});
+	});
 	
 	// 연도 선택 이벤트
 	$(document).on('click', '.year-option', function() {
@@ -254,34 +253,12 @@ function initDateFilterDropdown() {
 		$(this).addClass('selected');
 	});
 	
-	// 드롭다운 토글 이벤트 수정
-	$(document).on('click', '.date-dropdown-toggle', function(e) {
-		e.preventDefault();
-		e.stopPropagation();
-		
-		const $dateColumn = $(this).closest('.date-column');
-		
-		// 드롭다운 위치 설정
-		const headerPosition = $dateColumn.offset();
-		const headerHeight = $dateColumn.outerHeight();
-		
-		// 드롭다운 표시 위치 수정
-		$('#dateFilterDropdown').css({
-			display: 'block',
-			top: (headerPosition.top + headerHeight) + 'px',
-			left: headerPosition.left + 'px',
-			position: 'absolute',
-			zIndex: 1000
-		});
-	});
-	
 	// 적용 버튼 클릭 이벤트
 	$(document).on('click', '.apply-button', function() {
 		const selectedYear = $('.year-option.selected').data('year');
 		const selectedMonth = $('.month-option.selected').data('month');
 		
 		if (selectedYear && selectedMonth) {
-			// 선택된 년도와 월로 데이터 로드
 			loadFilteredManagerDailyStats(selectedYear, selectedMonth);
 			$('#dateFilterDropdown').hide();
 		} else {
@@ -292,17 +269,15 @@ function initDateFilterDropdown() {
 	// 초기화 버튼 클릭 이벤트
 	$(document).on('click', '.reset-button', function() {
 		$('.dropdown-option').removeClass('selected');
-		// 현재 연도와 월 옵션 선택
 		$(`.year-option[data-year="${currentYear}"]`).addClass('selected');
 		$(`.month-option[data-month="${currentMonth}"]`).addClass('selected');
-		// 현재 월 데이터 로드
 		loadFilteredManagerDailyStats(currentYear, currentMonth);
 		$('#dateFilterDropdown').hide();
 	});
 	
 	// 다른 곳 클릭 시 드롭다운 닫기
-	$(document).on('click.dateFilter', function(e) {
-		if(!$(e.target).closest('#dateFilterDropdown, .date-dropdown-toggle').length) {
+	$(document).on('click', function(e) {
+		if (!$(e.target).closest('#dateFilterDropdown, .date-dropdown-toggle').length) {
 			$('#dateFilterDropdown').hide();
 		}
 	});
