@@ -9,6 +9,7 @@
 .manager-dropdown{position:absolute;display:none;background-color:#fff;border-radius:0.3vw;box-shadow:0 2px 5px rgba(0,0,0,0.2);z-index:100;min-width:100px;}
 .dropdown-option{padding:10px 15px;cursor:pointer;color:#333;font-size:0.7vw;}
 .dropdown-option:hover{background-color:#f5f5f5;}
+.dropdown-option:first-child:hover{border-radius:0.3vw 0.3vw 0 0;}
 .dropdown-option.active{background-color:#00e6c3;color:#fff;}
 .dropdown-option:first-child.active{border-radius:0.3vw 0.3vw 0 0;}
 .dropdown-option:last-child.active{border-radius:0 0 0.3vw 0.3vw;}
