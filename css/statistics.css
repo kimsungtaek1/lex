@@ -43,7 +43,7 @@
 .manager-stats-container{width:100%;font-size:1.2vw;}
 .manager-stats-scroll-container{display:flex;width:100%;}
 .manager-stats-header{display:flex;color:white;font-weight:bold;width:100%;}
-.date-column{width:10%;background-color:#6c6c6c;min-width:120px;display:flex;align-items:center;justify-content:center;border-right:1px solid #ddd;padding:10px 5px;}
+.date-column{width:10%;background-color:#6c6c6c;min-width:120px;display:flex;align-items:center;justify-content:center;border-right:1px solid #ddd;padding:10px 5px;color:#00e6c3;font-size:1vw;}
 .date-column .sort-icon{color:#00e6c3;margin-left:5px;}
 .managers-scroll-area{display:flex;width:90%;overflow-x:auto;}
 .manager-columns-container{display:flex;width:100%;}
