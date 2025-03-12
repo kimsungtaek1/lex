@@ -4,7 +4,7 @@
 .tab th{width:15%;padding:0.7vw 0 0.7vw 3vw;text-align:left;background:#6c6c6c;color:#fff;font-weight:500;cursor:pointer;transition:background-color 0.3s ease}
 .tab th.active{color:#00e6c3}
 .tab th:last-child{width:40%;cursor:auto;}
-.statistics-content{margin-top:2vh;background:#f7f7f7}
+.statistics-content{margin-top:1vh;}
 .summary-stats{display:flex;gap:2vw;flex-wrap:wrap}
 .summary-box{flex:1 1;display:flex;flex-direction:row;justify-content:space-between;background:#6c6c6c;border-radius:0.3vw;padding:0.5vw 3vw;box-shadow:0 0.5vh 0.5vh rgba(0,0,0,0.4);}
 .total-label{color:#fff;align-content:center;}
