@@ -54,7 +54,7 @@
 .stat-header{flex:1;padding:5px;text-align:center;border-right:1px solid #ddd;}
 .stat-header:last-child{border-right:none;}
 .stats-row{display:flex;border-bottom:1px solid #ddd;width:100%;}
-.date-cell{width:10%;min-width:120px;display:flex;align-items:center;padding:8px 5px;border-right:1px solid #ddd;background-color:#f9f9f9;}
+.date-cell{width:10%;min-width:120px;display:flex;align-items:center;padding:8px 5px;border-right:1px solid #ddd;background-color:#f9f9f9;justify-content: space-around;}
 .day-name{margin-left:5px;color:#777;}
 .manager-stats{flex:1;min-width:120px;display:flex;border-right:1px solid #ddd;}
 .stat-value{flex:1;text-align:center;padding:8px 5px;border-right:1px solid #ddd;}
