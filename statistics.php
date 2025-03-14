@@ -328,11 +328,34 @@ include 'header.php';
 	</div>
 
     <!-- 서류담당 통계 탭 -->
-    <div id="documentStats" class="statistics-content" style="display: none;">
-        <div class="statistics-row">
-            <!-- 서류담당 통계 내용 -->
-        </div>
-    </div>
+	<div id="documentStats" class="statistics-content" style="display: none;">
+		<div class="document-stats-container">
+			<table class="document-stats-table">
+				<thead>
+					<tr>
+						<th rowspan="2" class="team-col">팀명</th>
+						<th rowspan="2" class="name-col">성명 / 직함</th>
+						<th colspan="5" class="section-header">담당사건</th>
+						<th colspan="5" class="section-header">개시 및 면책</th>
+					</tr>
+					<tr>
+						<th>접수전</th>
+						<th>신건접수</th>
+						<th>개시전</th>
+						<th>합계</th>
+						<th>담월</th>
+						<th>1개월전</th>
+						<th>2개월전</th>
+						<th>합계</th>
+						<th>평균</th>
+					</tr>
+				</thead>
+				<tbody id="documentStatsBody">
+					<!-- 데이터는 JavaScript로 동적으로 추가됩니다 -->
+				</tbody>
+			</table>
+		</div>
+	</div>
 </div>
 
 <!-- 필수 스크립트 -->
