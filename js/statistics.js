@@ -220,6 +220,8 @@ function handleTabClick() {
 		loadManagersData();
 	} else if(type === 'bankruptcy') {
 		loadAllStats();
+	} else if(type === 'document') {
+		loadDocumentStats(); // 서류담당 통계 로드 함수 호출
 	}
 }
 
@@ -1954,6 +1956,81 @@ function renderWeeklyTrendChart(trendData) {
 				}
 			}
 		}
+	});
+}
+
+// 서류담당 통계 로드 함수
+function loadDocumentStats() {
+	$.ajax({
+		url: '../adm/api/stats/get_document_stats.php',
+		method: 'GET',
+		dataType: 'json',
+		success: function(response) {
+			if(response.success) {
+				renderDocumentStats(response.data);
+			} else {
+				console.error('서류담당 통계 로드 실패:', response.message);
+				$('#documentStats').html('<div class="empty-stats-message">서류담당 통계 데이터를 불러올 수 없습니다.</div>');
+			}
+		},
+		error: function(xhr, status, error) {
+			console.error('서류담당 통계 로드 실패:', error);
+			$('#documentStats').html('<div class="empty-stats-message">서류담당 통계 데이터를 불러올 수 없습니다.</div>');
+		}
+	});
+}
+
+// 서류담당 통계 렌더링 함수
+function renderDocumentStats(data) {
+	const statsBody = $('#documentStatsBody');
+	statsBody.empty();
+	
+	if(data.length === 0) {
+		statsBody.html('<tr><td colspan="11" class="empty-stats-message">서류담당 통계 데이터가 없습니다.</td></tr>');
+		return;
+	}
+	
+	// 각 부서별 처리
+	data.forEach(department => {
+		// 부서 이름 행 추가 (팀명)
+		const teamName = department.name.replace(/팀.*/, '팀'); // '1팀'과 같은 형식으로 정리
+		
+		// 직원 데이터 추가
+		department.employees.forEach((employee, index) => {
+			const rowHtml = `
+				<tr>
+					${index === 0 ? `<td rowspan="${department.employees.length}">${teamName}</td>` : ''}
+					<td>${employee.name} ${employee.position}</td>
+					<td>${employee.pre_receipt}</td>
+					<td>${employee.new_receipt}</td>
+					<td>${employee.pre_start}</td>
+					<td>${employee.case_total}</td>
+					<td>${employee.current_month}</td>
+					<td>${employee.one_month_ago}</td>
+					<td>${employee.two_months_ago}</td>
+					<td>${employee.approval_total}</td>
+					<td>${employee.approval_avg}</td>
+				</tr>
+			`;
+			statsBody.append(rowHtml);
+		});
+		
+		// 팀 합계 행 추가
+		const totalRow = `
+			<tr class="team-total">
+				<td colspan="2">${teamName} 합계</td>
+				<td>${department.totals.pre_receipt}</td>
+				<td>${department.totals.new_receipt}</td>
+				<td>${department.totals.pre_start}</td>
+				<td>${department.totals.case_total}</td>
+				<td>${department.totals.current_month}</td>
+				<td>${department.totals.one_month_ago}</td>
+				<td>${department.totals.two_months_ago}</td>
+				<td>${department.totals.approval_total}</td>
+				<td>${department.totals.approval_avg}</td>
+			</tr>
+		`;
+		statsBody.append(totalRow);
 	});
 }
 
