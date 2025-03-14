@@ -8,6 +8,11 @@ class LivingStatusManager {
 	initialize() {
 		this.bindEvents();
 		this.loadData();
+		
+		// 가족 구성원 컨테이너가 비어있으면 빈 블록 추가
+		if ($('#family_members_container').children().length === 0) {
+			this.addFamilyMember();
+		}
 	}
 
 	bindEvents() {
@@ -149,6 +154,7 @@ class LivingStatusManager {
 			error: (xhr, status, error) => {
 				console.error('가족 구성원 정보 로드 실패:', error);
 				// 오류 시에도 빈 블록 추가
+				$('#family_members_container').empty();
 				this.addFamilyMember();
 			}
 		});
