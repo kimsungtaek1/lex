@@ -346,29 +346,6 @@ function initWeekFilterDropdown() {
 		`);
 	}
 	
-	// 주간 날짜 컬럼 클릭 이벤트
-	$(document).on('click', '.weekly-stats-header .date-column', function(e) {
-		e.preventDefault();
-		e.stopPropagation();
-		
-		// 모든 드롭다운 숨기기
-		$('#weekFilterDropdown').hide();
-		
-		// 현재 클릭된 컬럼의 위치 계산
-		const $this = $(this);
-		const headerPosition = $this.offset();
-		const headerHeight = $this.outerHeight();
-		
-		// 드롭다운 위치 설정
-		$('#weekFilterDropdown').css({
-			display: 'block',
-			position: 'absolute',
-			top: (headerPosition.top + headerHeight) + 'px',
-			left: headerPosition.left + 'px',
-			zIndex: 1000
-		});
-	});
-	
 	// 연도 선택 이벤트
 	$(document).on('click', '#weekFilterDropdown .year-option', function() {
 		$('#weekFilterDropdown .year-option').removeClass('selected');
@@ -424,9 +401,6 @@ function loadFilteredManagerWeeklyStats(year, month) {
 		dataType: 'json',
 		success: function(response) {
 			if(response.success) {
-				// 헤더 업데이트 - "주간 통계 ▼"로 표시
-				$('.weekly-stats-header .date-column').html(`주간 통계&nbsp;&nbsp;<span class="sort-icon date-dropdown-toggle">▼</span>`);
-				
 				// 월 정보 추가
 				const monthInfo = `${year}. ${month}월`;
 				
