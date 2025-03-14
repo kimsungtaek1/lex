@@ -543,9 +543,9 @@ class AssetManager {
 							<div class="form-content form-content-3">
 								- 은행 이외의 금융기관에 대한 것도 포함합니다.<br>
 								- 예금잔고가 소액이라도 반드시 기재하고 파산신청시의 잔고(정기예금분을 포함)와 최종 금융거래일로부터<br>
-								과거 1년간의 입출금이 기재된 통장 사본 또는 예금거래내역서를 첨부하여 주십시오.<br>
-								(공과금, 통신료, 카드사용, 급여이체 등이 기재된 통장 사본 또는 예금거래내역서를 제출,<br>
-								가족명의의 계좌로 거래하였다면 그 계좌에 관한 통장 사본 또는 예금거래내역서를 제출)
+								&nbsp;&nbsp;&nbsp;과거 1년간의 입출금이 기재된 통장 사본 또는 예금거래내역서를 첨부하여 주십시오.<br>
+								&nbsp;&nbsp;&nbsp;(공과금, 통신료, 카드사용, 급여이체 등이 기재된 통장 사본 또는 예금거래내역서를 제출,<br>
+								&nbsp;&nbsp;&nbsp;가족명의의 계좌로 거래하였다면 그 계좌에 관한 통장 사본 또는 예금거래내역서를 제출)
 							</div>
 						</div>
 						<div class="form">
@@ -570,17 +570,6 @@ class AssetManager {
 				<div class="content-wrapper">
 					<div class="left-section">
 						<div class="form">
-							<div class="form-title"><span>보장성 보험여부</span></div>
-							<div class="form-content">
-								<div class="radio">
-									<input type="radio" id="${blockId}_insurance_coverage_yes" name="insurance_coverage_${blockId}" value="Y" ${data.hasOwnProperty("is_coverage") && data.is_coverage==="Y" ? "checked" : ""}>
-									<label for="${blockId}_insurance_coverage_yes">네</label>
-									<input type="radio" id="${blockId}_insurance_coverage_no" name="insurance_coverage_${blockId}" value="N" ${data.hasOwnProperty("is_coverage") && data.is_coverage==="N" ? "checked" : ""}>
-									<label for="${blockId}_insurance_coverage_no">아니요</label>
-								</div>
-							</div>
-						</div>
-						<div class="form">
 							<div class="form-title"><span>보험사</span></div>
 							<div class="form-content">
 								<input type="text" class="insurance_company_name" value="${data.company_name || ""}" placeholder="삼성화재 외 n개">
@@ -593,49 +582,26 @@ class AssetManager {
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title form-notitle"><span>예상 환급 금액</span></div>
+							<div class="form-title"><span>해약반환금</span></div>
 							<div class="form-content">
 								<input type="text" class="insurance_refund_amount" data-type="money" value="${data.refund_amount || ""}" placeholder="총 합계액">원
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title form-notitle"><span></span></div>
-							<div class="form-content">
-								민사집행법 시행령 제6조(압류금지 보장성 보험금등의 범위) 참조
-							</div>
-						</div>
-						<div class="form">
 							<div class="form-title"><span></span></div>
-							<div class="form-content">
-								부연설명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="insurance_explanation" value="${data.explanation || ""}">
-							</div>
+							<div class="form-content"></div>
 						</div>
 					</div>
 					<div class="right-section">
 						<div class="form">
-							<div class="form-title"><span>압류 유무</span></div>
-							<div class="form-content">
-								<div class="radio">
-									<input type="radio" id="${blockId}_insurance_seizure_yes" name="insurance_seizure_${blockId}" value="Y" ${data.hasOwnProperty("is_seized") && data.is_seized==="Y" ? "checked" : ""}>
-									<label for="${blockId}_insurance_seizure_yes">유</label>
-									<input type="radio" id="${blockId}_insurance_seizure_no" name="insurance_seizure_${blockId}" value="N" ${data.hasOwnProperty("is_seized") && data.is_seized==="N" ? "checked" : ""}>
-									<label for="${blockId}_insurance_seizure_no">무</label>
-								</div>
-							</div>
-						</div>
-						<div class="form">
 							<div class="form-title form-title-3"><span>주의사항</span></div>
 							<div class="form-content form-content-3">
-								보험의 청산가치는 체크된 보장성보험 각각의 예상환급금을 합산한 금액에서<br>
-								압류금지보장성보험금 150만원을 공제한 값을 청산가치 합계란에 자동반영합니다.<br>
-								• 계산값이 음수인 경우 청산가치는 "0"원입니다. 보장성 보험이 아닌 경우에는 공제항목에서 제외됩니다.<br>
-								• 별지다운로드 후 계좌목록을 먼저 작성해 주십시오.<br>
-								• 작성한 별지 파일은 보험조회내역 파일 다음 순서로 제출해 주십시오.
+								- 파산신청 당시에 가입하고 있는 보험은 해약환급금 없는 경우에도 반드시 전부 기재하여 주십시오.<br>
+								- 생명보험협회에서 발급받는 채무자에 대한 생존자 보험가입내역조회를 첨부하여 주시고,<br>
+								&nbsp;&nbsp;&nbsp;그러한 보험가입내역조회에 기재된 생명보험(손해보험, 자동차보험, 운전자보험, 여행자ㆍ단체보험,<br> 
+								&nbsp;&nbsp;&nbsp;주말휴일상해보험은 제외)의 해지ㆍ실효ㆍ유지 여부 및 예상해약환급금 내역을 기재한<br>
+								&nbsp;&nbsp;&nbsp;각 보험회사 작성의 증명서도 첨부하여 주십시오.
 							</div>
-						</div>
-						<div class="form">
-							<div class="form-title form-notitle"><span></span></div>
-							<div class="form-content form-nocontent"></div>
 						</div>
 						<div class="form">
 							<div class="form-title form-notitle"><span></span></div>
