@@ -284,22 +284,7 @@ include 'header.php';
 						<div class="date-column">주간 상담 통계&nbsp;&nbsp;<span class="sort-icon date-dropdown-toggle">▼</span></div>
 					</div>
 					<div id="weekFilterDropdown" class="date-filter-dropdown">
-						<div class="dropdown-section">
-							<div class="dropdown-title">연도 선택</div>
-							<div class="dropdown-scroll">
-								<!-- 자바스크립트로 동적 생성될 연도 목록 -->
-							</div>
-						</div>
-						<div class="dropdown-section">
-							<div class="dropdown-title">월 선택</div>
-							<div class="dropdown-scroll">
-								<!-- 자바스크립트로 동적 생성될 월 목록 -->
-							</div>
-						</div>
-						<div class="dropdown-buttons">
-							<button class="apply-button">적용</button>
-							<button class="reset-button">초기화</button>
-						</div>
+						<!-- 필터 드롭다운 내용 -->
 					</div>
 					<div class="weekly-stats-body" id="managerWeeklyStatsBody">
 						<!-- JavaScript로 동적 생성 -->
