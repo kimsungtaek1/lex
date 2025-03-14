@@ -30,7 +30,10 @@ class BaseAssetApi {
 			}
 			
 			// 날짜 필드의 빈 문자열을 NULL로 변환
-            $dateFields = ['contract_date', 'lease_start_date', 'lease_end_date', 'fixed_date', 'registration_date'];
+            $dateFields = [
+                'contract_date', 'lease_start_date', 'lease_end_date', 'fixed_date', 'registration_date',
+                'disposal_date', 'receipt_date', 'divorce_date', 'inheritance_date'
+            ];
             foreach ($dateFields as $field) {
                 if (isset($data[$field]) && $data[$field] === '') {
                     $data[$field] = null;
