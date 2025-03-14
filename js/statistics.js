@@ -5,6 +5,7 @@ let charts = {
 	recoveryRates: null,
 	bankruptcyRates: null,
 	weeklyTrend: null,
+	monthlyTrend: null,
 };
 
 // 디바운스 함수 정의
@@ -72,6 +73,12 @@ function initializeApp() {
 	
 	// 날짜 필터 드롭다운 초기화
 	initDateFilterDropdown();
+	
+	// 주간 필터 드롭다운 초기화
+	initWeekFilterDropdown();
+	
+	// 월간 필터 드롭다운 초기화
+	initMonthFilterDropdown();
 }
 
 // 이벤트 리스너 설정
@@ -129,7 +136,6 @@ function loadInitialTabContent() {
 		loadAllStats();
 	} else if(activeTabType === 'manager') {
 		loadManagerDailyStats();
-		initWeekFilterDropdown();
 	}
 	
 		// 주간 통계 테이블 헤더 클릭 이벤트
@@ -230,8 +236,8 @@ function handleDropdownOptionClick() {
 		loadManagerWeeklyStats();
 	} else if(statType === 'monthly') {
 		$('#managerMonthlyStats').show();
-		// 월간 통계 로드 함수 (필요시 구현)
-		// loadManagerMonthlyStats();
+		loadManagerMonthlyStats();
+		initMonthFilterDropdown();
 	}
 }
 
