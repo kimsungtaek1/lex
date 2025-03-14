@@ -28,7 +28,13 @@ $assetMapping = [
     'severance_pay'           => 'application_recovery_asset_severance',
     'other_assets'            => 'application_recovery_asset_other',
     'exempt_property'         => 'application_recovery_asset_exemption1',
-    'exempt_property_special' => 'application_recovery_asset_exemption2'
+    'exempt_property_special' => 'application_recovery_asset_exemption2',
+    
+    // 새로 추가할 asset_type 매핑
+    'disposed_assets'         => 'application_recovery_asset_disposed',
+    'received_deposit'        => 'application_recovery_asset_received_deposit',
+    'divorce_property'        => 'application_recovery_asset_divorce',
+    'inherited_property'      => 'application_recovery_asset_inherited'
 ];
 
 $asset_type = $_GET['asset_type'] ?? $_POST['asset_type'] ?? $deleteData['asset_type'] ?? null;
