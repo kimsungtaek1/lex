@@ -125,8 +125,8 @@
 
 /* 주간 통계 테이블 스타일 */
 .weekly-stats-table{width:100%;border-collapse:collapse;}
-.weekly-stats-table th{padding:10px;background-color:#b0b0b0;color:white;font-weight:bold;text-align:center;}
-.weekly-stats-table th:first-child{background-color:#6c6c6c;color:#00e6c3;width:25%;}
+.weekly-stats-table th{width:25%;padding:10px;background-color:#b0b0b0;color:white;font-weight:bold;text-align:center;}
+.weekly-stats-table th:first-child{background-color:#6c6c6c;color:#00e6c3;}
 .weekly-stats-table th:last-child{background-color:#6c6c6c;}
 .weekly-stats-table td{padding:8px;text-align:center;border-bottom:1px solid #eee;}
 .weekly-stats-table td:first-child{background-color:#f9f9f9;font-weight:bold;text-align:left;padding-left:15px;}
@@ -139,8 +139,8 @@
 /* 주간 통계 푸터 스타일 */
 .weekly-stats-footer{margin-top:10px;}
 .weekly-stats-footer table{width:100%;border-collapse:collapse;}
-.weekly-stats-footer th{padding:10px;background-color:#6c6c6c;color:white;font-weight:bold;text-align:center;}
-.weekly-stats-footer th:first-child{width:25%;color:#00e6c3;}
+.weekly-stats-footer th{width:25%;padding:10px;background-color:#6c6c6c;color:white;font-weight:bold;text-align:center;}
+.weekly-stats-footer th:first-child{color:#00e6c3;}
 
 #weekFilterDropdown{position:absolute;display:none;background-color:#fff;border-radius:0.3vw;box-shadow:0 2px 5px rgba(0,0,0,0.2);z-index:1000;min-width:220px;top:auto;left:auto;}
 
