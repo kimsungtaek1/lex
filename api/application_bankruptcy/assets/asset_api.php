@@ -16,25 +16,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 }
 
 $assetMapping = [
-    'cash'                    => 'application_recovery_asset_cash',
-    'deposit'                 => 'application_recovery_asset_deposits',
-    'insurance'               => 'application_recovery_asset_insurance',
-    'vehicle'                 => 'application_recovery_asset_vehicles',
-    'rent_deposit'            => 'application_recovery_asset_rent_deposits',
-    'real_estate'             => 'application_recovery_asset_real_estate',
-    'business_equipment'      => 'application_recovery_asset_business',
-    'loan_receivables'        => 'application_recovery_asset_loan_receivables',
-    'sales_receivables'       => 'application_recovery_asset_sales_receivables',
-    'severance_pay'           => 'application_recovery_asset_severance',
-    'other_assets'            => 'application_recovery_asset_other',
-    'exempt_property'         => 'application_recovery_asset_exemption1',
-    'exempt_property_special' => 'application_recovery_asset_exemption2',
+    'cash'                    => 'application_bankruptcy_asset_cash',
+    'deposit'                 => 'application_bankruptcy_asset_deposits',
+    'insurance'               => 'application_bankruptcy_asset_insurance',
+    'vehicle'                 => 'application_bankruptcy_asset_vehicles',
+    'rent_deposit'            => 'application_bankruptcy_asset_rent_deposits',
+    'real_estate'             => 'application_bankruptcy_asset_real_estate',
+    'business_equipment'      => 'application_bankruptcy_asset_business',
+    'loan_receivables'        => 'application_bankruptcy_asset_loan_receivables',
+    'sales_receivables'       => 'application_bankruptcy_asset_sales_receivables',
+    'severance_pay'           => 'application_bankruptcy_asset_severance',
+    'other_assets'            => 'application_bankruptcy_asset_other',
+    'exempt_property'         => 'application_bankruptcy_asset_exemption1',
+    'exempt_property_special' => 'application_bankruptcy_asset_exemption2',
     
     // 새로 추가할 asset_type 매핑
-    'disposed_assets'         => 'application_recovery_asset_disposed',
-    'received_deposit'        => 'application_recovery_asset_received_deposit',
-    'divorce_property'        => 'application_recovery_asset_divorce',
-    'inherited_property'      => 'application_recovery_asset_inherited'
+    'disposed_assets'         => 'application_bankruptcy_asset_disposed',
+    'received_deposit'        => 'application_bankruptcy_asset_received_deposit',
+    'divorce_property'        => 'application_bankruptcy_asset_divorce',
+    'inherited_property'      => 'application_bankruptcy_asset_inherited'
 ];
 
 $asset_type = $_GET['asset_type'] ?? $_POST['asset_type'] ?? $deleteData['asset_type'] ?? null;
