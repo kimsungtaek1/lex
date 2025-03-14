@@ -847,37 +847,31 @@ class AssetManager {
 						<div class="form">
 							<div class="form-title"><span>소재지</span></div>
 							<div class="form-content">
-								소재지&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="property_location" value="${data.property_location || ""}">
+								소재지&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="form-control" value="">
 							</div>
 						</div>
 						<div class="form">
 							<div class="form-title"><span>등기된 담보권의<br>피담보채권 잔액</span></div>
 							<div class="form-content">
-								<input type="text" class="property_expected_value" data-type="money" value="${data.property_expected_value || ""}">원
+								<input type="text" class="property_expected_value" data-type="money" value="">원
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>(가)압류 등</span></div>
+							<div class="form-title form-notitle"><span>(가)압류 등</span></div>
 							<div class="form-content">
-								<div class="form-group">
-									내용&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="property_location" value="${data.property_location || ""}">
-								</div>
+								내용&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="form-control" value="">
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span></span></div>
+							<div class="form-title form-notitle"><span></span></div>
 							<div class="form-content">
-								<div class="form-group">
-									채권자&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="property_location" value="${data.property_location || ""}">
-								</div>
+								채권자&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="form-control" value="">
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span></span></div>
+							<div class="form-title form-notitle"><span></span></div>
 							<div class="form-content">
-								<div class="form-group">
 									가액&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="property_location" value="${data.property_location || ""}">
-								</div>
 							</div>
 						</div>
 					</div>
@@ -925,37 +919,26 @@ class AssetManager {
 				<div class="content-wrapper">
 					<div class="left-section">
 						<div class="form">
-							<div class="form-title"><span>차량 정보</span></div>
+							<div class="form-title"><span>차종/연식</span></div>
 							<div class="form-content">
 								<input type="text" class="vehicle_info input100" value="${data.vehicle_info || ""}" placeholder="차량번호, 연식, 모델(예:123가4567, 2020년형, 아반떼)">
 							</div>
-							<div class="form-content checkbox-right">
-								<input type="checkbox" id="${blockId}_vehicle_spouse_owned" class="vehicle_spouse_owned" ${data.is_spouse == 1 ? "checked" : ""}>
-								<label for="${blockId}_vehicle_spouse_owned">배우자명의</label>
-							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>담보권 종류</span></div>
+							<div class="form-title"><span>등록번호</span></div>
 							<div class="form-content">
 								<input type="text" class="vehicle_security_type" value="${data.security_type || ""}">
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>채권(최고)액</span></div>
+							<div class="form-title"><span>등록된 담보권의<br>피담보채권 잔액</span></div>
 							<div class="form-content">
 								<input type="text" class="vehicle_max_bond" data-type="money" value="${data.max_bond || ""}">원
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>환가 예상액</span></div>
+							<div class="form-title"><span></span></div>
 							<div class="form-content">
-								<input type="text" class="vehicle_expected_value" data-type="money" value="${data.expected_value || ""}">원
-							</div>
-						</div>
-						<div class="form">
-							<div class="form-title"><span>재무 잔액</span></div>
-							<div class="form-content">
-								<input type="text" class="vehicle_financial_balance" data-type="money" value="${data.financial_balance || ""}">원
 							</div>
 						</div>
 					</div>
@@ -963,33 +946,18 @@ class AssetManager {
 						<div class="form">
 							<div class="form-title form-notitle"><span>청산가치 판단금액</span></div>
 							<div class="form-content">
-								<input type="text" class="vehicle_liquidation_value input86" data-type="money" value="${data.liquidation_value || ""}">원
-							</div>
-							<div class="form-content checkbox-right">
-								<input type="checkbox" id="${blockId}_vehicle_manual_calc" class="vehicle_manual_calc" ${data.is_manual_calc==="Y" ? "checked" : ""}>
-								<label for="${blockId}_vehicle_manual_calc">수동계산</label>
+								시가&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="vehicle_liquidation_value" data-type="money" value="${data.liquidation_value || ""}">원
 							</div>
 						</div>
 						<div class="form">
 							<div class="form-title"><span></span></div>
 							<div class="form-content">
-								부연설명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="vehicle_liquidation_explain" value="${data.explanation || ""}">
+								부연설명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="vehicle_liquidation_explain input86" value="${data.explanation || ""}">
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>압류 유무</span></div>
-							<div class="form-content">
-								<div class="radio">
-									<input type="radio" id="${blockId}_vehicle_seizure_yes" name="vehicle_seizure_${blockId}" value="Y" ${data.hasOwnProperty("is_seized") && data.is_seized==="Y" ? "checked" : ""}>
-									<label for="${blockId}_vehicle_seizure_yes">유</label>
-									<input type="radio" id="${blockId}_vehicle_seizure_no" name="vehicle_seizure_${blockId}" value="N" ${data.hasOwnProperty("is_seized") && data.is_seized==="N" ? "checked" : ""}>
-									<label for="${blockId}_vehicle_seizure_no">무</label>
-								</div>
-							</div>
-						</div>
-						<div class="form">
-							<div class="form-title form-notitle"><span></span></div>
-							<div class="form-content form-nocontent"></div>
+							<div class="form-title"><span>주의사항</span></div>
+							<div class="form-content">자동차등록원부와 시가 증명자료를 첨부하여 주십시오.</div>
 						</div>
 						<div class="form">
 							<div class="form-title"></div>
@@ -1012,28 +980,22 @@ class AssetManager {
 				<div class="content-wrapper">
 					<div class="left-section">
 						<div class="form">
-							<div class="form-title"><span>재산 내용</span></div>
+							<div class="form-title"><span>품목명</span></div>
 							<div class="form-content">
 								<input type="text" class="other_asset_content" value="${data.asset_content || ""}" class="form-control">
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>청산가치 판단금액</span></div>
+							<div class="form-title"><span></span></div>
 							<div class="form-content">
-								<input type="text" class="other_liquidation_value" data-type="money" value="${data.liquidation_value || ""}">원
 							</div>
 						</div>
 					</div>
 					<div class="right-section">
 						<div class="form">
-							<div class="form-title"><span>압류 유무</span></div>
+							<div class="form-title"><span>청산가치 판단금액</span></div>
 							<div class="form-content">
-								<div class="radio">
-									<input type="radio" id="${blockId}_other_seizure_yes" name="other_seizure_${blockId}" value="Y" ${data.hasOwnProperty("is_seized") && data.is_seized==="Y" ? "checked" : ""}>
-									<label for="${blockId}_other_seizure_yes">유</label>
-									<input type="radio" id="${blockId}_other_seizure_no" name="other_seizure_${blockId}" value="N" ${data.hasOwnProperty("is_seized") && data.is_seized==="N" ? "checked" : ""}>
-									<label for="${blockId}_other_seizure_no">무</label>
-								</div>
+								시가&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="other_liquidation_value" data-type="money" value="${data.liquidation_value || ""}">원
 							</div>
 						</div>
 						<div class="form">
@@ -1057,35 +1019,39 @@ class AssetManager {
 				<div class="content-wrapper">
 					<div class="left-section">
 						<div class="form">
-							<div class="form-title"><span>처분일자</span></div>
+							<div class="form-title"><span>처분시기</span></div>
 							<div class="form-content">
 								<input type="date" class="disposed_date" value="${data.disposal_date || ""}">
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>재산의 종류</span></div>
+							<div class="form-title"><span>처분금액</span></div>
+							<div class="form-content">
+								<input type="text" class="disposed_amount" data-type="money" value="${data.disposal_amount || ""}">원
+							</div>
+						</div>
+						<div class="form">
+							<div class="form-title"><span>사용처</span></div>
 							<div class="form-content">
 								<input type="text" class="disposed_property_type" value="${data.property_type || ""}">
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>처분 가액</span></div>
+							<div class="form-title"><span></span></div>
 							<div class="form-content">
-								<input type="text" class="disposed_amount" data-type="money" value="${data.disposal_amount || ""}">원
 							</div>
 						</div>
 					</div>
 					<div class="right-section">
 						<div class="form">
-							<div class="form-title"><span>처분 사유</span></div>
-							<div class="form-content">
-								<input type="text" class="disposed_reason" value="${data.disposal_reason || ""}">
-							</div>
-						</div>
-						<div class="form">
-							<div class="form-title"><span>양수인</span></div>
-							<div class="form-content">
-								<input type="text" class="disposed_recipient" value="${data.recipient || ""}">
+							<div class="form-title form-title-3"><span>주의사항</span></div>
+							<div class="form-content form-content-3">
+								- 처분의 시기, 대가 및 대가의 사용처를 상세히 기재하여 주시기 바랍니다. 그리고 여기서 말하는<br>
+								&nbsp;&nbsp;&nbsp;재산의 처분에는 보험의 해약, 정기예금 등의 해약, 퇴직에 따른 퇴직금수령 등도 포함합니다.<br>
+								&nbsp;&nbsp;&nbsp;주거이전에 따른 임차보증금의 수령에 관하여는 다음의 12항에 기재하여 주시기 바랍니다.<br>
+								- 특히 부동산이나 하나의 재산의 가액이 1,000만원 이상의 재산을 처분한 경우에는 처분시기와 대가를<br>
+								&nbsp;&nbsp;&nbsp;증명할 수 있는 부동산등기사항전부증명서, 계약서사본, 영수증사본 등을 첨부하시기 바랍니다.<br>
+								&nbsp;&nbsp;&nbsp;(경매로 처분된 경우에는 배당표 및 사건별수불내역서를 제출하여 주십시오.)
 							</div>
 						</div>
 						<div class="form">
