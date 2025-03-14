@@ -280,9 +280,6 @@ include 'header.php';
 		<div class="weekly-stats">
 			<div class="weekly-stats-left">
 				<div class="weekly-stats-container has-few-managers">
-					<div class="weekly-stats-header">
-						<div class="date-column">주간 통계&nbsp;&nbsp;<span class="sort-icon date-dropdown-toggle">▼</span></div>
-					</div>
 					<div id="weekFilterDropdown" class="date-filter-dropdown">
 						<!-- 필터 드롭다운 내용 -->
 					</div>
