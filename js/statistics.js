@@ -3,7 +3,8 @@ let charts = {
 	recoveryTrend: null,
 	bankruptcyTrend: null,
 	recoveryRates: null,
-	bankruptcyRates: null
+	bankruptcyRates: null,
+	weeklyTrend: null,
 };
 
 // 디바운스 함수 정의
@@ -128,6 +129,7 @@ function loadInitialTabContent() {
 		loadAllStats();
 	} else if(activeTabType === 'manager') {
 		loadManagerDailyStats();
+		initWeekFilterDropdown();
 	}
 }
 
@@ -203,8 +205,7 @@ function handleDropdownOptionClick() {
 		loadManagerDailyStats();
 	} else if(statType === 'weekly') {
 		$('#managerWeeklyStats').show();
-		// 주간 통계 로드 함수 (필요시 구현)
-		// loadManagerWeeklyStats();
+		loadManagerWeeklyStats();
 	} else if(statType === 'monthly') {
 		$('#managerMonthlyStats').show();
 		// 월간 통계 로드 함수 (필요시 구현)
@@ -308,6 +309,246 @@ function initDateFilterDropdown() {
 			$('#dateFilterDropdown').hide();
 		}
 	});
+}
+
+// 주간 필터 드롭다운 초기화 함수
+function initWeekFilterDropdown() {
+	// 현재 년도와 월 구하기
+	const currentDate = new Date();
+	const currentYear = currentDate.getFullYear();
+	const currentMonth = currentDate.getMonth() + 1;
+	const startYear = currentYear - 5;
+	
+	// 연도 옵션 생성
+	const yearSection = $('#weekFilterDropdown .dropdown-section').first().find('.dropdown-scroll');
+	yearSection.empty();
+	
+	for (let year = currentYear; year >= startYear; year--) {
+		const isCurrentYear = year === currentYear;
+		yearSection.append(`
+			<div class="dropdown-option year-option ${isCurrentYear ? 'selected' : ''}" data-year="${year}">
+				${year}년
+			</div>
+		`);
+	}
+	
+	// 월 옵션 생성
+	const monthSection = $('#weekFilterDropdown .dropdown-section').last().find('.dropdown-scroll');
+	monthSection.empty();
+	
+	for (let month = 1; month <= 12; month++) {
+		const isCurrentMonth = month === currentMonth;
+		const paddedMonth = month.toString().padStart(2, '0');
+		monthSection.append(`
+			<div class="dropdown-option month-option ${isCurrentMonth ? 'selected' : ''}" data-month="${paddedMonth}">
+				${month}월
+			</div>
+		`);
+	}
+	
+	// 주간 날짜 컬럼 클릭 이벤트
+	$(document).on('click', '.weekly-stats-header .date-column', function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		
+		// 모든 드롭다운 숨기기
+		$('#weekFilterDropdown').hide();
+		
+		// 현재 클릭된 컬럼의 위치 계산
+		const $this = $(this);
+		const headerPosition = $this.offset();
+		const headerHeight = $this.outerHeight();
+		
+		// 드롭다운 위치 설정
+		$('#weekFilterDropdown').css({
+			display: 'block',
+			position: 'absolute',
+			top: (headerPosition.top + headerHeight) + 'px',
+			left: headerPosition.left + 'px',
+			zIndex: 1000
+		});
+	});
+	
+	// 연도 선택 이벤트
+	$(document).on('click', '#weekFilterDropdown .year-option', function() {
+		$('#weekFilterDropdown .year-option').removeClass('selected');
+		$(this).addClass('selected');
+	});
+	
+	// 월 선택 이벤트
+	$(document).on('click', '#weekFilterDropdown .month-option', function() {
+		$('#weekFilterDropdown .month-option').removeClass('selected');
+		$(this).addClass('selected');
+	});
+	
+	// 적용 버튼 클릭 이벤트
+	$(document).on('click', '#weekFilterDropdown .apply-button', function() {
+		const selectedYear = $('#weekFilterDropdown .year-option.selected').data('year');
+		const selectedMonth = $('#weekFilterDropdown .month-option.selected').data('month');
+		
+		if (selectedYear && selectedMonth) {
+			// 선택된 년도와 월로 데이터 로드
+			loadFilteredManagerWeeklyStats(selectedYear, selectedMonth);
+			$('#weekFilterDropdown').hide();
+		} else {
+			alert('연도와 월을 모두 선택해주세요.');
+		}
+	});
+	
+	// 초기화 버튼 클릭 이벤트
+	$(document).on('click', '#weekFilterDropdown .reset-button', function() {
+		// 모든 선택 해제
+		$('#weekFilterDropdown .dropdown-option').removeClass('selected');
+		
+		// 현재 년도와 월 다시 선택
+		$(`#weekFilterDropdown .year-option[data-year="${currentYear}"]`).addClass('selected');
+		$(`#weekFilterDropdown .month-option[data-month="${currentMonth.toString().padStart(2, '0')}"]`).addClass('selected');
+		
+		// 현재 월 데이터 로드
+		loadFilteredManagerWeeklyStats(currentYear, currentMonth);
+		$('#weekFilterDropdown').hide();
+	});
+}
+
+// 필터링된 사무장 주간 통계 로드 함수
+function loadFilteredManagerWeeklyStats(year, month) {
+	const formattedMonth = month.toString().padStart(2, '0');
+
+	$.ajax({
+		url: '../adm/api/stats/get_manager_weekly_stats.php',
+		method: 'GET',
+		data: {
+			year: year,
+			month: formattedMonth
+		},
+		dataType: 'json',
+		success: function(response) {
+			if(response.success) {
+				$('.weekly-stats-header .date-column').html(`${year}. ${month}월 주간 통계&nbsp;&nbsp;<span class="sort-icon date-dropdown-toggle">▼</span>`);
+				renderManagerWeeklyStats(response.data, response.managers);
+				renderWeeklyTrendChart(response.trend);
+			} else {
+				console.error('통계 로드 실패:', response);
+				alert('통계 데이터를 불러올 수 없습니다: ' + response.message);
+			}
+		},
+		error: function(xhr, status, error) {
+			try {
+				const errorResponse = JSON.parse(xhr.responseText);
+				console.error('서버 오류 상세 정보:', errorResponse);
+				alert('서버 오류: ' + errorResponse.message);
+			} catch(e) {
+				console.error('AJAX 오류:', status, error);
+				console.error('원시 응답:', xhr.responseText);
+				alert('데이터를 불러오는 중 심각한 오류가 발생했습니다.');
+			}
+		}
+	});
+}
+
+// 사무장 주간 통계 로드 함수
+function loadManagerWeeklyStats() {
+	// 현재 연도와 월 구하기
+	const currentDate = new Date();
+	const currentYear = currentDate.getFullYear();
+	const currentMonth = currentDate.getMonth() + 1;
+	
+	// 초기 로드 시 현재 연도와 월 데이터 사용
+	loadFilteredManagerWeeklyStats(currentYear, currentMonth);
+}
+
+// 주간 통계 데이터 렌더링 함수
+function renderManagerWeeklyStats(weeklyData, managers) {
+	const statsBody = $('#managerWeeklyStatsBody');
+	statsBody.empty();
+
+	// HTML 테이블 생성
+	let tableHtml = '<table class="weekly-stats-table">';
+	
+	// 테이블 헤더
+	tableHtml += '<thead><tr>';
+	tableHtml += '<th>주차</th>';
+	
+	// 사무장 이름 헤더
+	managers.forEach(manager => {
+		tableHtml += `<th colspan="2">${manager.name} 사무장</th>`;
+	});
+	
+	tableHtml += '<th colspan="2">합계</th>';
+	tableHtml += '</tr>';
+	
+	// 유입/계약 서브헤더
+	tableHtml += '<tr><th></th>';
+	
+	managers.forEach(() => {
+		tableHtml += '<th>유입</th><th>계약</th>';
+	});
+	
+	tableHtml += '<th>유입</th><th>계약</th>';
+	tableHtml += '</tr></thead>';
+	
+	// 테이블 바디
+	tableHtml += '<tbody>';
+	
+	// 월별 합계 계산을 위한 변수 초기화
+	let monthlyTotals = {
+		managers: Array(managers.length).fill().map(() => ({ inflow: 0, contract: 0 })),
+		total: { inflow: 0, contract: 0 }
+	};
+	
+	// 각 주차별 데이터
+	weeklyData.forEach(item => {
+		tableHtml += '<tr>';
+		tableHtml += `<td>${item.date_range}<br>(${item.week}주차)</td>`;
+		
+		// 각 사무장별 데이터
+		item.managers.forEach((manager, index) => {
+			tableHtml += `<td>${manager.inflow}</td><td>${manager.contract}</td>`;
+			
+			// 월별 합계에 추가
+			monthlyTotals.managers[index].inflow += manager.inflow;
+			monthlyTotals.managers[index].contract += manager.contract;
+		});
+		
+		// 주간 합계
+		tableHtml += `<td>${item.total.inflow}</td><td>${item.total.contract}</td>`;
+		
+		// 월 합계에 추가
+		monthlyTotals.total.inflow += item.total.inflow;
+		monthlyTotals.total.contract += item.total.contract;
+		
+		tableHtml += '</tr>';
+	});
+	
+	tableHtml += '</tbody></table>';
+	
+	// 테이블 렌더링
+	statsBody.html(tableHtml);
+	
+	// 푸터 업데이트 (월간 합계)
+	updateWeeklyStatsFooter(monthlyTotals, managers);
+}
+
+// 주간 통계 푸터 업데이트 함수
+function updateWeeklyStatsFooter(monthlyTotals, managers) {
+	const footer = $('.weekly-stats-footer');
+	footer.empty();
+	
+	let footerHtml = '<table>';
+	footerHtml += '<tr>';
+	footerHtml += '<th>월별 합계</th>';
+	
+	// 각 사무장별 월간 합계
+	monthlyTotals.managers.forEach(managerTotal => {
+		footerHtml += `<th>${managerTotal.inflow}</th><th>${managerTotal.contract}</th>`;
+	});
+	
+	// 전체 월간 합계
+	footerHtml += `<th>${monthlyTotals.total.inflow}</th><th>${monthlyTotals.total.contract}</th>`;
+	footerHtml += '</tr>';
+	footerHtml += '</table>';
+	
+	footer.html(footerHtml);
 }
 
 // 날짜 컬럼 클릭 핸들러
@@ -1236,6 +1477,89 @@ function enableTableSort() {
 		
 		table.find('tr:gt(0)').remove();
 		table.append(rows);
+	});
+}
+
+// 주간 트렌드 차트 렌더링 함수
+function renderWeeklyTrendChart(trendData) {
+	// 기존 차트 제거
+	if (charts.weeklyTrend) {
+		charts.weeklyTrend.destroy();
+	}
+	
+	const ctx = document.getElementById('weeklyTrendChart').getContext('2d');
+	
+	charts.weeklyTrend = new Chart(ctx, {
+		type: 'line',
+		data: {
+			labels: trendData.map(item => item.week),
+			datasets: [
+				{
+					label: '유입 건수',
+					data: trendData.map(item => item.inflow),
+					borderColor: '#00e6c3',
+					backgroundColor: 'rgba(0, 230, 195, 0.1)',
+					borderWidth: 2,
+					tension: 0.4,
+					fill: true
+				},
+				{
+					label: '계약 건수',
+					data: trendData.map(item => item.contract),
+					borderColor: '#6c6c6c',
+					backgroundColor: 'rgba(108, 108, 108, 0.1)',
+					borderWidth: 2,
+					tension: 0.4,
+					fill: true
+				}
+			]
+		},
+		options: {
+			responsive: true,
+			maintainAspectRatio: false,
+			plugins: {
+				legend: {
+					position: 'top',
+					align: 'end',
+					labels: {
+						boxWidth: 12,
+						padding: 15
+					}
+				},
+				tooltip: {
+					backgroundColor: 'rgba(255, 255, 255, 0.9)',
+					titleColor: '#000',
+					bodyColor: '#000',
+					borderColor: '#ddd',
+					borderWidth: 1,
+					padding: 10,
+					displayColors: false,
+					callbacks: {
+						label: function(context) {
+							const label = context.dataset.label || '';
+							const value = context.parsed.y;
+							return `${label}: ${value}건`;
+						}
+					}
+				}
+			},
+			scales: {
+				y: {
+					beginAtZero: true,
+					grid: {
+						color: '#f0f0f0'
+					},
+					ticks: {
+						precision: 0
+					}
+				},
+				x: {
+					grid: {
+						display: false
+					}
+				}
+			}
+		}
 	});
 }
 
