@@ -67,7 +67,7 @@ class AssetManager {
 	  
 	  // 소액임차인 최우선 변제금 기준 팝업 이벤트 추가
 	  $('#exempt_rent_criteria').on('click', function() {
-		window.open('/adm/api/application_recovery/assets/exempt_rent_criteria.php', 
+		window.open('/adm/api/application_bankruptcy/assets/exempt_rent_criteria.php', 
 		  '소액임차인 최우선 변제금의 범위와 기준', 
 		  'width=1000,height=500,scrollbars=yes');
 	  });
@@ -114,7 +114,7 @@ class AssetManager {
       }
     }
     $.ajax({
-      url: "/adm/api/application_recovery/assets/asset_api.php",
+      url: "/adm/api/application_bankruptcy/assets/asset_api.php",
       type: "GET",
       data: { case_no: window.currentCaseNo, asset_type: type },
       dataType: "json",
@@ -324,7 +324,7 @@ class AssetManager {
     };
     if (assetNo) data.asset_no = assetNo;
     $.ajax({
-      url: "/adm/api/application_recovery/assets/asset_api.php",
+      url: "/adm/api/application_bankruptcy/assets/asset_api.php",
       type: "POST",
       data: data,
       dataType: "json",
@@ -353,7 +353,7 @@ class AssetManager {
     const caseNo = window.currentCaseNo;
     const propertyNo = block.find(".cash_property_no").val();
     $.ajax({
-      url: "/adm/api/application_recovery/assets/asset_api.php",
+      url: "/adm/api/application_bankruptcy/assets/asset_api.php",
       type: "DELETE",
       data: { asset_type: "cash", case_no: caseNo, property_no: propertyNo },
       processData: true,
@@ -478,7 +478,7 @@ class AssetManager {
     };
     if (assetNo) data.asset_no = assetNo;
     $.ajax({
-      url: "/adm/api/application_recovery/assets/asset_api.php",
+      url: "/adm/api/application_bankruptcy/assets/asset_api.php",
       type: "POST",
       data: data,
       dataType: "json",
@@ -507,7 +507,7 @@ class AssetManager {
     const caseNo = window.currentCaseNo;
     const propertyNo = block.find(".deposit_property_no").val();
     $.ajax({
-      url: "/adm/api/application_recovery/assets/asset_api.php",
+      url: "/adm/api/application_bankruptcy/assets/asset_api.php",
       type: "DELETE",
       data: { asset_type: "deposit", case_no: caseNo, property_no: propertyNo },
       processData: true,
@@ -645,7 +645,7 @@ class AssetManager {
     };
     if (assetNo) data.asset_no = assetNo;
     $.ajax({
-      url: "/adm/api/application_recovery/assets/asset_api.php",
+      url: "/adm/api/application_bankruptcy/assets/asset_api.php",
       type: "POST",
       data: data,
       dataType: "json",
@@ -674,7 +674,7 @@ class AssetManager {
     const caseNo = window.currentCaseNo;
     const propertyNo = block.find(".insurance_property_no").val();
     $.ajax({
-      url: "/adm/api/application_recovery/assets/asset_api.php",
+      url: "/adm/api/application_bankruptcy/assets/asset_api.php",
       type: "DELETE",
       data: { asset_type: "insurance", case_no: caseNo, property_no: propertyNo },
       processData: true,
@@ -815,7 +815,7 @@ class AssetManager {
     };
     if (assetNo) data.asset_no = assetNo;
     $.ajax({
-      url: "/adm/api/application_recovery/assets/asset_api.php",
+      url: "/adm/api/application_bankruptcy/assets/asset_api.php",
       type: "POST",
       data: data,
       dataType: "json",
@@ -843,7 +843,7 @@ class AssetManager {
     const caseNo = window.currentCaseNo;
     const propertyNo = block.find(".vehicle_property_no").val();
     $.ajax({
-      url: "/adm/api/application_recovery/assets/asset_api.php",
+      url: "/adm/api/application_bankruptcy/assets/asset_api.php",
       type: "DELETE",
       data: { asset_type: "vehicle", case_no: caseNo, property_no: propertyNo },
       processData: true,
@@ -992,7 +992,7 @@ class AssetManager {
     };
     if (assetNo) data.asset_no = assetNo;
     $.ajax({
-      url: "/adm/api/application_recovery/assets/asset_api.php",
+      url: "/adm/api/application_bankruptcy/assets/asset_api.php",
       type: "POST",
       data: data,
       dataType: "json",
@@ -1021,7 +1021,7 @@ class AssetManager {
     const caseNo = window.currentCaseNo;
     const propertyNo = block.find(".rent_deposit_property_no").val();
     $.ajax({
-      url: "/adm/api/application_recovery/assets/asset_api.php",
+      url: "/adm/api/application_bankruptcy/assets/asset_api.php",
       type: "DELETE",
       data: { asset_type: "rent_deposit", case_no: caseNo, property_no: propertyNo },
       processData: true,
@@ -1203,7 +1203,7 @@ class AssetManager {
     };
     if (assetNo) data.asset_no = assetNo;
     $.ajax({
-      url: "/adm/api/application_recovery/assets/asset_api.php",
+      url: "/adm/api/application_bankruptcy/assets/asset_api.php",
       type: "POST",
       data: data,
       dataType: "json",
@@ -1232,7 +1232,7 @@ class AssetManager {
     const caseNo = window.currentCaseNo;
     const propertyNo = block.find(".real_estate_property_no").val();
     $.ajax({
-      url: "/adm/api/application_recovery/assets/asset_api.php",
+      url: "/adm/api/application_bankruptcy/assets/asset_api.php",
       type: "DELETE",
       data: { asset_type: "real_estate", case_no: caseNo, property_no: propertyNo },
       processData: true,
@@ -1347,7 +1347,7 @@ class AssetManager {
     };
     if (assetNo) data.asset_no = assetNo;
     $.ajax({
-      url: "/adm/api/application_recovery/assets/asset_api.php",
+      url: "/adm/api/application_bankruptcy/assets/asset_api.php",
       type: "POST",
       data: data,
       dataType: "json",
@@ -1375,7 +1375,7 @@ class AssetManager {
     const caseNo = window.currentCaseNo;
     const propertyNo = block.find(".business_equipment_property_no").val();
     $.ajax({
-      url: "/adm/api/application_recovery/assets/asset_api.php",
+      url: "/adm/api/application_bankruptcy/assets/asset_api.php",
       type: "DELETE",
       data: { asset_type: "business_equipment", case_no: caseNo, property_no: propertyNo },
       processData: true,
@@ -1467,7 +1467,7 @@ class AssetManager {
     };
     if (assetNo) data.asset_no = assetNo;
     $.ajax({
-      url: "/adm/api/application_recovery/assets/asset_api.php",
+      url: "/adm/api/application_bankruptcy/assets/asset_api.php",
       type: "POST",
       data: data,
       dataType: "json",
@@ -1495,7 +1495,7 @@ class AssetManager {
     const caseNo = window.currentCaseNo;
     const propertyNo = block.find(".loan_receivables_property_no").val();
     $.ajax({
-      url: "/adm/api/application_recovery/assets/asset_api.php",
+      url: "/adm/api/application_bankruptcy/assets/asset_api.php",
       type: "DELETE",
       data: { asset_type: "loan_receivables", case_no: caseNo, property_no: propertyNo },
       processData: true,
@@ -1587,7 +1587,7 @@ class AssetManager {
 	  };
 	  if (assetNo) data.asset_no = assetNo;
 	  $.ajax({
-		url: "/adm/api/application_recovery/assets/asset_api.php",
+		url: "/adm/api/application_bankruptcy/assets/asset_api.php",
 		type: "POST",
 		data: data,
 		dataType: "json",
@@ -1615,7 +1615,7 @@ class AssetManager {
 	  const caseNo = window.currentCaseNo;
 	  const propertyNo = block.find(".sales_receivables_property_no").val();
 	  $.ajax({
-		url: "/adm/api/application_recovery/assets/asset_api.php",
+		url: "/adm/api/application_bankruptcy/assets/asset_api.php",
 		type: "DELETE",
 		data: { asset_type: "sales_receivables", case_no: caseNo, property_no: propertyNo },
 		processData: true,
@@ -1747,7 +1747,7 @@ class AssetManager {
     };
     if (assetNo) data.asset_no = assetNo;
     $.ajax({
-      url: "/adm/api/application_recovery/assets/asset_api.php",
+      url: "/adm/api/application_bankruptcy/assets/asset_api.php",
       type: "POST",
       data: data,
       dataType: "json",
@@ -1775,7 +1775,7 @@ class AssetManager {
     const caseNo = window.currentCaseNo;
     const propertyNo = block.find(".severance_pay_property_no").val();
     $.ajax({
-      url: "/adm/api/application_recovery/assets/asset_api.php",
+      url: "/adm/api/application_bankruptcy/assets/asset_api.php",
       type: "DELETE",
       data: { asset_type: "severance_pay", case_no: caseNo, property_no: propertyNo },
       processData: true,
@@ -1861,7 +1861,7 @@ class AssetManager {
     };
     if (assetNo) data.asset_no = assetNo;
     $.ajax({
-      url: "/adm/api/application_recovery/assets/asset_api.php",
+      url: "/adm/api/application_bankruptcy/assets/asset_api.php",
       type: "POST",
       data: data,
       dataType: "json",
@@ -1890,7 +1890,7 @@ class AssetManager {
     const caseNo = window.currentCaseNo;
     const propertyNo = block.find(".other_asset_property_no").val();
     $.ajax({
-      url: "/adm/api/application_recovery/assets/asset_api.php",
+      url: "/adm/api/application_bankruptcy/assets/asset_api.php",
       type: "DELETE",
       data: { asset_type: "other_assets", case_no: caseNo, property_no: propertyNo },
       processData: true,
@@ -2064,7 +2064,7 @@ class AssetManager {
 		if (assetNo) data.asset_no = assetNo;
 		
 		$.ajax({
-			url: "/adm/api/application_recovery/assets/asset_api.php",
+			url: "/adm/api/application_bankruptcy/assets/asset_api.php",
 			type: "POST",
 			data: data,
 			dataType: "json",
@@ -2093,7 +2093,7 @@ class AssetManager {
     const caseNo = window.currentCaseNo;
     const propertyNo = block.find(".exempt_property_property_no").val();
     $.ajax({
-      url: "/adm/api/application_recovery/assets/asset_api.php",
+      url: "/adm/api/application_bankruptcy/assets/asset_api.php",
       type: "DELETE",
       data: { asset_type: "exempt_property", case_no: caseNo, property_no: propertyNo },
       processData: true,
@@ -2185,7 +2185,7 @@ class AssetManager {
     };
     if (assetNo) data.asset_no = assetNo;
     $.ajax({
-      url: "/adm/api/application_recovery/assets/asset_api.php",
+      url: "/adm/api/application_bankruptcy/assets/asset_api.php",
       type: "POST",
       data: data,
       dataType: "json",
@@ -2214,7 +2214,7 @@ class AssetManager {
     const caseNo = window.currentCaseNo;
     const propertyNo = block.find(".exempt_property_special_property_no").val();
     $.ajax({
-      url: "/adm/api/application_recovery/assets/asset_api.php",
+      url: "/adm/api/application_bankruptcy/assets/asset_api.php",
       type: "DELETE",
       data: { asset_type: "exempt_property_special", case_no: caseNo, property_no: propertyNo },
       processData: true,
@@ -2314,7 +2314,7 @@ saveDisposedAssetBlock(block) {
   };
   if (assetNo) data.asset_no = assetNo;
   $.ajax({
-    url: "/adm/api/application_recovery/assets/asset_api.php",
+    url: "/adm/api/application_bankruptcy/assets/asset_api.php",
     type: "POST",
     data: data,
     dataType: "json",
@@ -2342,7 +2342,7 @@ deleteDisposedAssetBlock(block) {
   const caseNo = window.currentCaseNo;
   const propertyNo = block.find(".disposed_property_no").val();
   $.ajax({
-    url: "/adm/api/application_recovery/assets/asset_api.php",
+    url: "/adm/api/application_bankruptcy/assets/asset_api.php",
     type: "DELETE",
     data: { asset_type: "disposed_assets", case_no: caseNo, property_no: propertyNo },
     processData: true,
@@ -2441,7 +2441,7 @@ saveReceivedDepositBlock(block) {
   };
   if (assetNo) data.asset_no = assetNo;
   $.ajax({
-    url: "/adm/api/application_recovery/assets/asset_api.php",
+    url: "/adm/api/application_bankruptcy/assets/asset_api.php",
     type: "POST",
     data: data,
     dataType: "json",
@@ -2469,7 +2469,7 @@ deleteReceivedDepositBlock(block) {
   const caseNo = window.currentCaseNo;
   const propertyNo = block.find(".received_deposit_property_no").val();
   $.ajax({
-    url: "/adm/api/application_recovery/assets/asset_api.php",
+    url: "/adm/api/application_bankruptcy/assets/asset_api.php",
     type: "DELETE",
     data: { asset_type: "received_deposit", case_no: caseNo, property_no: propertyNo },
     processData: true,
@@ -2569,7 +2569,7 @@ saveDivorcePropertyBlock(block) {
   };
   if (assetNo) data.asset_no = assetNo;
   $.ajax({
-    url: "/adm/api/application_recovery/assets/asset_api.php",
+    url: "/adm/api/application_bankruptcy/assets/asset_api.php",
     type: "POST",
     data: data,
     dataType: "json",
@@ -2597,7 +2597,7 @@ deleteDivorcePropertyBlock(block) {
   const caseNo = window.currentCaseNo;
   const propertyNo = block.find(".divorce_property_property_no").val();
   $.ajax({
-    url: "/adm/api/application_recovery/assets/asset_api.php",
+    url: "/adm/api/application_bankruptcy/assets/asset_api.php",
     type: "DELETE",
     data: { asset_type: "divorce_property", case_no: caseNo, property_no: propertyNo },
     processData: true,
@@ -2697,7 +2697,7 @@ saveInheritedPropertyBlock(block) {
   };
   if (assetNo) data.asset_no = assetNo;
   $.ajax({
-    url: "/adm/api/application_recovery/assets/asset_api.php",
+    url: "/adm/api/application_bankruptcy/assets/asset_api.php",
     type: "POST",
     data: data,
     dataType: "json",
@@ -2725,7 +2725,7 @@ deleteInheritedPropertyBlock(block) {
   const caseNo = window.currentCaseNo;
   const propertyNo = block.find(".inherited_property_property_no").val();
   $.ajax({
-    url: "/adm/api/application_recovery/assets/asset_api.php",
+    url: "/adm/api/application_bankruptcy/assets/asset_api.php",
     type: "DELETE",
     data: { asset_type: "inherited_property", case_no: caseNo, property_no: propertyNo },
     processData: true,
