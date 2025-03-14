@@ -277,12 +277,43 @@ include 'header.php';
 
 	<!-- 사무장 주간 통계 탭 -->
 	<div id="managerWeeklyStats" class="statistics-content" style="display: none;">
-		<div class="statistics-row">
-			<div class="statistics-col">
+		<div class="weekly-stats">
+			<div class="weekly-stats-left">
+				<div class="weekly-stats-container has-few-managers">
+					<div class="weekly-stats-header">
+						<div class="date-column">주간 상담 통계&nbsp;&nbsp;<span class="sort-icon date-dropdown-toggle">▼</span></div>
+					</div>
+					<div id="weekFilterDropdown" class="date-filter-dropdown">
+						<div class="dropdown-section">
+							<div class="dropdown-title">연도 선택</div>
+							<div class="dropdown-scroll">
+								<!-- 자바스크립트로 동적 생성될 연도 목록 -->
+							</div>
+						</div>
+						<div class="dropdown-section">
+							<div class="dropdown-title">월 선택</div>
+							<div class="dropdown-scroll">
+								<!-- 자바스크립트로 동적 생성될 월 목록 -->
+							</div>
+						</div>
+						<div class="dropdown-buttons">
+							<button class="apply-button">적용</button>
+							<button class="reset-button">초기화</button>
+						</div>
+					</div>
+					<div class="weekly-stats-body" id="managerWeeklyStatsBody">
+						<!-- JavaScript로 동적 생성 -->
+					</div>
+					<div class="weekly-stats-footer">
+						<!-- JavaScript로 동적 생성 -->
+					</div>
+				</div>
+			</div>
+			<div class="weekly-stats-right">
 				<div class="statistics-box">
-					<h3 class="box-title">사무장 주간 통계</h3>
-					<div class="empty-stats-message">
-						<p>현재 주간 통계 데이터가 준비 중입니다.</p>
+					<h3 class="box-title">주간 상담 현황</h3>
+					<div class="chart-container">
+						<canvas id="weeklyTrendChart"></canvas>
 					</div>
 				</div>
 			</div>
