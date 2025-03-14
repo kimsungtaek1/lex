@@ -42,11 +42,6 @@ class LivingStatusManager {
 			$('input[name="job_type"]').not(this).prop('checked', false);
 		});
 
-		// 거주관계선택 라디오 버튼 이벤트
-		$('input[name="family_status"]').on('change', function() {
-			// 라디오 버튼이므로 자동으로 하나만 선택됨
-		});
-
 		// 세금 미납 체크박스 이벤트
 		$('input[name$="_tax_status"]').on('change', function() {
 			const name = $(this).attr('name');
@@ -133,12 +128,12 @@ class LivingStatusManager {
 			data: { case_no: window.currentCaseNo },
 			dataType: 'json',
 			success: (response) => {
-				if (response.success) {
+				if (response.success && response.data) {
 					// 컨테이너 초기화
 					$('#family_members_container').empty();
 					
 					// 데이터가 있으면 표시
-					if (response.data && response.data.length > 0) {
+					if (response.data.length > 0) {
 						response.data.forEach(member => {
 							this.addFamilyMember(member);
 						});
@@ -146,15 +141,10 @@ class LivingStatusManager {
 						// 없으면 빈 블록 추가
 						this.addFamilyMember();
 					}
-				} else {
-					// API 호출 실패 시에도 빈 블록 추가
-					this.addFamilyMember();
 				}
 			},
 			error: (xhr, status, error) => {
 				console.error('가족 구성원 정보 로드 실패:', error);
-				// 에러 시에도 빈 블록 추가
-				this.addFamilyMember();
 			}
 		});
 	}
@@ -172,9 +162,12 @@ class LivingStatusManager {
 					
 					$('#basic_facts').val(data.basic_facts || '');
 					
-					// 거주관계선택 라디오 버튼 설정
+					// 가족관계사항 체크박스 설정
 					if (data.family_status) {
-						$(`input[name="family_status"][value="${data.family_status}"]`).prop('checked', true);
+						const statuses = data.family_status.split(',');
+						statuses.forEach(status => {
+							$(`input[name="family_status[]"][value="${status.trim()}"]`).prop('checked', true);
+						});
 					}
 					
 					$('#monthly_rent').val(this.formatMoney(data.monthly_rent || 0));
@@ -280,10 +273,15 @@ class LivingStatusManager {
 
 	// 추가 정보 저장
 	saveAdditionalInfo() {
+		const selectedStatuses = [];
+		$('input[name="family_status[]"]:checked').each(function() {
+			selectedStatuses.push($(this).val());
+		});
+
 		const data = {
 			case_no: window.currentCaseNo,
 			basic_facts: $('#basic_facts').val(),
-			family_status: $('input[name="family_status"]:checked').val() || '',
+			family_status: selectedStatuses.join(','),
 			monthly_rent: this.unformatMoney($('#monthly_rent').val()),
 			rent_deposit: this.unformatMoney($('#rent_deposit').val()),
 			applicant_relation: $('#applicant_relation').val()
@@ -386,7 +384,7 @@ class LivingStatusManager {
 			success: (response) => {
 				if (response.success) {
 					alert('가족 구성원 정보가 저장되었습니다.');
-					if (response.data && response.data.member_id) {
+					if (response.data.member_id) {
 						block.find('.family_member_id').val(response.data.member_id);
 					}
 				} else {
@@ -407,10 +405,6 @@ class LivingStatusManager {
 		// 저장되지 않은 블록인 경우 바로 삭제
 		if (!memberId) {
 			block.remove();
-			// 가족 구성원이 없으면 빈 블록 추가
-			if ($('#family_members_container').children().length === 0) {
-				this.addFamilyMember();
-			}
 			return;
 		}
 		
