@@ -434,6 +434,13 @@ $(document).ready(function() {
 		if (type === 'creditors') {
 			window.loadCreditors(currentCaseNo);
 		}
+		
+		// AssetManager 초기화 또는 재로드
+        if (!window.assetManager) {
+            window.assetManager = new AssetManager();
+        } else {
+            window.assetManager.loadAllAssets();
+        }
 	}
 
 
