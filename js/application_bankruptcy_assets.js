@@ -66,18 +66,11 @@ class AssetManager {
 			$(`#add_${type}_asset`).on("click", () => this.addAssetBlock(type));
 		});
 		
-		// 소액임차인 최우선 변제금 기준 팝업 이벤트
-		$('#exempt_rent_criteria').on('click', () => {
-			window.open('/adm/api/application_bankruptcy/assets/exempt_rent_criteria.php', 
-				'소액임차인 최우선 변제금의 범위와 기준', 
-				'width=1000,height=500,scrollbars=yes');
-		});
-		
 		// 이벤트 위임을 사용하여 저장 및 삭제 버튼 이벤트 처리
 		$(document).on('click', '.btn-save', (e) => {
 			const block = $(e.target).closest('.asset-block');
-			const type = this.getAssetTypeFromBlock(block);
-			if (type) this.saveAssetBlock(type, block);
+			const type = window.assetManager.getAssetTypeFromBlock(block);
+			if (type) window.assetManager.saveAssetBlock(type, block);
 		});
 		
 		$(document).on('click', '.btn-delete', (e) => {
@@ -104,11 +97,22 @@ class AssetManager {
 	getAssetTypeFromBlock(block) {
 		// CSS 클래스에서 자산 유형 추출
 		const classes = block.attr('class').split(' ');
+		
 		for (let cls of classes) {
-			if (cls.endsWith('-block')) {
-				const type = cls.replace('-block', '');
-				return Object.keys(this.containerMap).find(key => key.replace('_', '-') === type);
-			}
+			if (cls === 'cash-block') return 'cash';
+			if (cls === 'deposit-block') return 'deposit';
+			if (cls === 'insurance-block') return 'insurance';
+			if (cls === 'rent-deposit-block') return 'rent_deposit';
+			if (cls === 'loan-receivables-block') return 'loan_receivables';
+			if (cls === 'sales-receivables-block') return 'sales_receivables';
+			if (cls === 'severance-pay-block') return 'severance_pay';
+			if (cls === 'real-estate-block') return 'real_estate';
+			if (cls === 'vehicle-block') return 'vehicle';
+			if (cls === 'other-asset-block' || cls === 'other-assets-block') return 'other_assets';
+			if (cls === 'disposed-assets-block') return 'disposed_assets';
+			if (cls === 'received-deposit-block') return 'received_deposit';
+			if (cls === 'divorce-property-block') return 'divorce_property';
+			if (cls === 'inherited-property-block') return 'inherited_property';
 		}
 		return null;
 	}
