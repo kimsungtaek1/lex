@@ -76,7 +76,7 @@ class LivingStatusManager {
 	// 기본 정보 로드
 	loadBasicInfo() {
 		$.ajax({
-			url: '/adm/api/application_bankruptcy/living_status/get_basic_info.php',
+			url: '/adm/api/application_bankruptcy/living_status/living_status_api.php',
 			type: 'GET',
 			data: { case_no: window.currentCaseNo },
 			dataType: 'json',
@@ -105,7 +105,7 @@ class LivingStatusManager {
 	// 수입 정보 로드
 	loadIncomeInfo() {
 		$.ajax({
-			url: '/adm/api/application_bankruptcy/living_status/get_income_info.php',
+			url: '/adm/api/application_bankruptcy/living_status/living_status_api.php',
 			type: 'GET',
 			data: { case_no: window.currentCaseNo },
 			dataType: 'json',
@@ -129,7 +129,7 @@ class LivingStatusManager {
 	// 가족 구성원 정보 로드
 	loadFamilyMembers() {
 		$.ajax({
-			url: '/adm/api/application_bankruptcy/living_status/get_family_members.php',
+			url: '/adm/api/application_bankruptcy/living_status/living_status_api.php',
 			type: 'GET',
 			data: { case_no: window.currentCaseNo },
 			dataType: 'json',
@@ -164,7 +164,7 @@ class LivingStatusManager {
 	// 추가 정보 로드
 	loadAdditionalInfo() {
 		$.ajax({
-			url: '/adm/api/application_bankruptcy/living_status/get_additional_info.php',
+			url: '/adm/api/application_bankruptcy/living_status/living_status_api.php',
 			type: 'GET',
 			data: { case_no: window.currentCaseNo },
 			dataType: 'json',
@@ -199,7 +199,7 @@ class LivingStatusManager {
 	// 세금 정보 로드
 	loadTaxInfo() {
 		$.ajax({
-			url: '/adm/api/application_bankruptcy/living_status/get_tax_info.php',
+			url: '/adm/api/application_bankruptcy/living_status/living_status_api.php',
 			type: 'GET',
 			data: { case_no: window.currentCaseNo },
 			dataType: 'json',
@@ -239,7 +239,7 @@ class LivingStatusManager {
 		};
 
 		$.ajax({
-			url: '/adm/api/application_bankruptcy/living_status/save_basic_info.php',
+			url: '/adm/api/application_bankruptcy/living_status/living_status_api.php',
 			type: 'POST',
 			data: data,
 			dataType: 'json',
@@ -269,7 +269,7 @@ class LivingStatusManager {
 		};
 
 		$.ajax({
-			url: '/adm/api/application_bankruptcy/living_status/save_income_info.php',
+			url: '/adm/api/application_bankruptcy/living_status/living_status_api.php',
 			type: 'POST',
 			data: data,
 			dataType: 'json',
@@ -307,7 +307,7 @@ class LivingStatusManager {
 		};
 
 		$.ajax({
-			url: '/adm/api/application_bankruptcy/living_status/save_additional_info.php',
+			url: '/adm/api/application_bankruptcy/living_status/living_status_api.php',
 			type: 'POST',
 			data: data,
 			dataType: 'json',
@@ -340,7 +340,7 @@ class LivingStatusManager {
 		});
 
 		$.ajax({
-			url: '/adm/api/application_bankruptcy/living_status/save_tax_info.php',
+			url: '/adm/api/application_bankruptcy/living_status/living_status_api.php',
 			type: 'POST',
 			data: data,
 			dataType: 'json',
@@ -396,7 +396,7 @@ class LivingStatusManager {
 		};
 
 		$.ajax({
-			url: '/adm/api/application_bankruptcy/living_status/save_family_member.php',
+			url: '/adm/api/application_bankruptcy/living_status/living_status_api.php',
 			type: 'POST',
 			data: data,
 			dataType: 'json',
@@ -432,7 +432,7 @@ class LivingStatusManager {
 		}
 
 		$.ajax({
-			url: '/adm/api/application_bankruptcy/living_status/delete_family_member.php',
+			url: '/adm/api/application_bankruptcy/living_status/living_status_api.php',
 			type: 'POST',
 			data: {
 				case_no: window.currentCaseNo,
