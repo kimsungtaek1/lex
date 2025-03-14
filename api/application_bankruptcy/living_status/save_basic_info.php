@@ -27,7 +27,8 @@ try {
 		'job_type' => $_POST['job_type'] ?? '',
 		'job_industry' => $_POST['job_industry'] ?? '',
 		'company_name' => $_POST['company_name'] ?? '',
-		'employment_period' => $_POST['employment_period'] ?? ''
+		'employment_period' => $_POST['employment_period'] ?? '',
+		'job_position' => $_POST['job_position'] ?? ''
 	];
 	
 	if ($existingData) {
@@ -36,20 +37,26 @@ try {
 				SET job_type = :job_type, 
 					job_industry = :job_industry, 
 					company_name = :company_name, 
-					employment_period = :employment_period 
+					employment_period = :employment_period,
+					job_position = :job_position 
 				WHERE case_no = :case_no";
 	} else {
 		// INSERT
 		$sql = "INSERT INTO application_bankruptcy_living_status_basic 
-				(case_no, job_type, job_industry, company_name, employment_period) 
-				VALUES (:case_no, :job_type, :job_industry, :company_name, :employment_period)";
+				(case_no, job_type, job_industry, company_name, employment_period, job_position) 
+				VALUES (:case_no, :job_type, :job_industry, :company_name, :employment_period, :job_position)";
 	}
 	
 	$stmt = $pdo->prepare($sql);
-	$stmt->execute($data);
+	$result = $stmt->execute($data);
 	
-	echo json_encode(['success' => true, 'message' => '저장되었습니다.']);
+	if ($result) {
+		echo json_encode(['success' => true, 'message' => '저장되었습니다.']);
+	} else {
+		echo json_encode(['success' => false, 'message' => '저장 중 오류가 발생했습니다.']);
+	}
 } catch (PDOException $e) {
-	echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+	error_log('Database error: ' . $e->getMessage());
+	echo json_encode(['success' => false, 'message' => '데이터베이스 오류가 발생했습니다: ' . $e->getMessage()]);
 }
 ?>
