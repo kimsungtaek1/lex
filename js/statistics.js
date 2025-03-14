@@ -424,8 +424,8 @@ function loadFilteredManagerWeeklyStats(year, month) {
 		dataType: 'json',
 		success: function(response) {
 			if(response.success) {
-				// 헤더 업데이트
-				$('.weekly-stats-header .date-column').html(`${year}. ${month}월 주간 통계&nbsp;&nbsp;<span class="sort-icon date-dropdown-toggle">▼</span>`);
+				// 헤더 업데이트 - "주간 통계 ▼"로 표시
+				$('.weekly-stats-header .date-column').html(`주간 통계&nbsp;&nbsp;<span class="sort-icon date-dropdown-toggle">▼</span>`);
 				
 				// 월 정보 추가
 				const monthInfo = `${year}. ${month}월`;
