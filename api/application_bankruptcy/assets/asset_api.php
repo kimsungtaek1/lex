@@ -22,13 +22,10 @@ $assetMapping = [
     'vehicle'                 => 'application_bankruptcy_asset_vehicles',
     'rent_deposit'            => 'application_bankruptcy_asset_rent_deposits',
     'real_estate'             => 'application_bankruptcy_asset_real_estate',
-    'business_equipment'      => 'application_bankruptcy_asset_business',
     'loan_receivables'        => 'application_bankruptcy_asset_loan_receivables',
     'sales_receivables'       => 'application_bankruptcy_asset_sales_receivables',
     'severance_pay'           => 'application_bankruptcy_asset_severance',
     'other_assets'            => 'application_bankruptcy_asset_other',
-    'exempt_property'         => 'application_bankruptcy_asset_exemption1',
-    'exempt_property_special' => 'application_bankruptcy_asset_exemption2',
     
     // 새로 추가할 asset_type 매핑
     'disposed_assets'         => 'application_bankruptcy_asset_disposed',
