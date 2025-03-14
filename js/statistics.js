@@ -1,4 +1,4 @@
-// 전역 변수로 차트 인스턴스들을 저장
+// 전역 변수 및 유틸리티 함수
 let charts = {
 	recoveryTrend: null,
 	bankruptcyTrend: null,
@@ -9,13 +9,9 @@ let charts = {
 // 디바운스 함수 정의
 function debounce(func, wait) {
 	let timeout;
-	return function executedFunction(...args) {
-		const later = () => {
-			clearTimeout(timeout);
-			func(...args);
-		};
+	return function(...args) {
 		clearTimeout(timeout);
-		timeout = setTimeout(later, wait);
+		timeout = setTimeout(() => func(...args), wait);
 	};
 }
 
@@ -28,81 +24,65 @@ function vhToPx(vh) {
 	return Math.round((window.innerHeight * vh) / 100);
 }
 
+// 데이터 포맷팅 유틸리티 함수
+const formatUtils = {
+	// 숫자 포맷팅 (천단위 구분기호)
+	formatNumber: (number) => number.toLocaleString('ko-KR'),
+	
+	// 날짜 포맷팅
+	formatDate: (dateString) => {
+		const date = new Date(dateString);
+		return new Intl.DateTimeFormat('ko-KR', {
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric'
+		}).format(date);
+	}
+};
+
+// 차트 컬러 테마 설정
+const chartColors = {
+	primary: '#00e6c3',
+	secondary: '#b5b5b5',
+	background: '#ffffff',
+	grid: '#f0f0f0',
+	border: '#b5b5b5',
+	text: '#000000'
+};
+
 // 문서 로드 완료 시 초기화
-$(document).ready(function() {
+$(document).ready(initializeApp);
+
+function initializeApp() {
+	// 이벤트 리스너 설정
+	setupEventListeners();
+	
+	// 차트 전역 설정
+	setupGlobalChartSettings();
+	
+	// 초기 페이지 로드 시 기본 탭 내용 표시
+	loadInitialTabContent();
+	
+	// 윈도우 리사이즈 이벤트 처리
+	$(window).resize(debounce(handleWindowResize, 250));
+	
+	// 테이블 정렬 기능 활성화
+	enableTableSort();
+	
+	// 날짜 필터 드롭다운 초기화
+	initDateFilterDropdown();
+}
+
+// 이벤트 리스너 설정
+function setupEventListeners() {
 	// 탭 클릭 이벤트 핸들러
-	$('.stat-tab').click(function() {
-		// 사무장 탭이면 드롭다운만 표시하고 return
-		if($(this).attr('id') === 'managerTab') {
-			return;
-		}
-		
-		// 모든 탭에서 active 클래스 제거 후 현재 탭에만 추가
-		$('.stat-tab').removeClass('active');
-		$(this).addClass('active');
-		
-		// 모든 통계 컨텐츠 영역 숨김
-		$('#bankruptcyStats, #caseStats, #managerDailyStats, #managerWeeklyStats, #managerMonthlyStats, #documentStats').hide();
-		
-		// 클릭한 탭에 해당하는 컨텐츠만 표시
-		const type = $(this).data('type');
-		$(`#${type}Stats`).show();
-		
-		// 각 탭에 맞는 데이터 로드
-		if(type === 'case') {
-			loadManagersData();
-		} else if(type === 'bankruptcy') {
-			loadAllStats();
-		}
-	});
+	$('.stat-tab').click(handleTabClick);
 	
 	// 사무장 탭 클릭 이벤트 처리
-	$('#managerTab').click(function(e) {
-		e.stopPropagation(); // 상위 이벤트 전파 방지
-		
-		// 드롭다운 위치 설정
-		const tabPosition = $(this).offset();
-		const tabWidth = $(this).outerWidth();
-		const tabHeight = $(this).outerHeight();
-		
-		$('#managerDropdown').css({
-			top: tabPosition.top + tabHeight - 40 + 'px',
-			left: tabPosition.left + tabWidth - 110 + 'px'
-		}).toggle();
-	});
+	$('#managerTab').click(handleManagerTabClick);
 	
 	// 드롭다운 옵션 클릭 이벤트
-	$('.dropdown-option').click(function() {
-		// 모든 통계 컨텐츠 영역 숨김
-		$('#bankruptcyStats, #caseStats, #managerDailyStats, #managerWeeklyStats, #managerMonthlyStats, #documentStats').hide();
-		
-		// 드롭다운 메뉴 닫기
-		$('#managerDropdown').hide();
-		
-		// 모든 탭에서 active 클래스 제거 후 사무장 탭에만 추가
-		$('.stat-tab').removeClass('active');
-		$('#managerTab').addClass('active');
-		
-		// 클릭한 옵션에 active 클래스 추가
-		$('.dropdown-option').removeClass('active');
-		$(this).addClass('active');
-		
-		// 클릭한 옵션에 따라 컨텐츠 표시
-		const statType = $(this).data('stat-type');
-		
-		if(statType === 'daily') {
-			$('#managerDailyStats').show();
-			loadManagerDailyStats();
-		} else if(statType === 'weekly') {
-			$('#managerWeeklyStats').show();
-			// 주간 통계 로드 함수 (필요시 구현)
-			// loadManagerWeeklyStats();
-		} else if(statType === 'monthly') {
-			$('#managerMonthlyStats').show();
-			// 월간 통계 로드 함수 (필요시 구현)
-			// loadManagerMonthlyStats();
-		}
-	});
+	$('.dropdown-option').click(handleDropdownOptionClick);
 	
 	// 다른 곳 클릭 시 드롭다운 닫기
 	$(document).click(function(e) {
@@ -111,6 +91,24 @@ $(document).ready(function() {
 		}
 	});
 	
+	// 열에 마우스 올릴 때 효과 적용
+	$(document).on('mouseenter', '.manager-column, .manager-stats', handleColumnHover);
+	
+	// 마우스가 떠날 때 스타일 복원
+	$(document).on('mouseleave', '.manager-column, .manager-stats', handleColumnUnhover);
+}
+
+// 전역 차트 설정
+function setupGlobalChartSettings() {
+	Chart.defaults.set('plugins.tooltip.backgroundColor', 'rgba(255, 255, 255, 0.9)');
+	Chart.defaults.set('plugins.tooltip.titleColor', chartColors.text);
+	Chart.defaults.set('plugins.tooltip.bodyColor', chartColors.text);
+	Chart.defaults.set('plugins.tooltip.borderColor', chartColors.border);
+	Chart.defaults.set('plugins.tooltip.borderWidth', 1);
+}
+
+// 초기 탭 내용 로드
+function loadInitialTabContent() {
 	// 기본값으로 일간 통계 옵션 설정
 	$('.dropdown-option[data-stat-type="daily"]').addClass('active');
 	
@@ -131,60 +129,128 @@ $(document).ready(function() {
 	} else if(activeTabType === 'manager') {
 		loadManagerDailyStats();
 	}
-	
-	// 윈도우 리사이즈 이벤트 처리
-	$(window).resize(debounce(function() {
-		if($('.stat-tab.active').data('type') === 'bankruptcy') {
-			loadAllStats();
-		}
-	}, 250));
-	
-	// 테이블 정렬 기능 활성화
-	enableTableSort();
-	
-		// 열에 마우스 올릴 때 효과 적용 (manager-column, manager-stats 둘 다)
-	$(document).on('mouseenter', '.manager-column, .manager-stats', function() {
-		let columnIndex = $(this).index();
-		
-		// 헤더의 같은 인덱스 열의 배경색 변경
-		$('.manager-stats-header .manager-column').eq(columnIndex).css('background-color', '#6c6c6c');
-		
-		// 바디의 모든 행에서 같은 인덱스 열의 배경색 변경
-		$('.manager-stats-body .stats-row').each(function() {
-			$(this).find('.manager-stats').eq(columnIndex).css('background-color', '#f9f9f9');
-		});
-		
-		// 푸터의 해당 열 배경색 변경
-		$('.manager-stats-footer .manager-column').eq(columnIndex).css('background-color', '#6c6c6c');
-	});
-	
-	// 마우스가 떠날 때 스타일 복원
-	$(document).on('mouseleave', '.manager-column, .manager-stats', function() {
-		let columnIndex = $(this).index();
-		
-		// 헤더 스타일 복원 (마지막 열은 원래 #6c6c6c)
-		if(columnIndex === $('.manager-stats-header .manager-column').length - 1) {
-			$('.manager-stats-header .manager-column').eq(columnIndex).css('background-color', '#6c6c6c');
-		} else {
-			$('.manager-stats-header .manager-column').eq(columnIndex).css('background-color', '#b0b0b0');
-		}
-		
-		// 바디 스타일 복원
-		$('.manager-stats-body .stats-row').each(function() {
-			$(this).find('.manager-stats').eq(columnIndex).css('background-color', '');
-		});
-		
-		// 푸터 스타일 복원 (마지막 열은 원래 #6c6c6c)
-		if(columnIndex === $('.manager-stats-footer .manager-column').length - 1) {
-			$('.manager-stats-footer .manager-column').eq(columnIndex).css('background-color', '#6c6c6c');
-		} else {
-			$('.manager-stats-footer .manager-column').eq(columnIndex).css('background-color', '#b0b0b0');
-		}
-	});
-	
-	initDateFilterDropdown();
+}
 
-});
+// 윈도우 리사이즈 핸들러
+function handleWindowResize() {
+	if($('.stat-tab.active').data('type') === 'bankruptcy') {
+		loadAllStats();
+	}
+}
+
+// 탭 클릭 핸들러
+function handleTabClick() {
+	// 사무장 탭이면 드롭다운만 표시하고 return
+	if($(this).attr('id') === 'managerTab') {
+		return;
+	}
+	
+	// 모든 탭에서 active 클래스 제거 후 현재 탭에만 추가
+	$('.stat-tab').removeClass('active');
+	$(this).addClass('active');
+	
+	// 모든 통계 컨텐츠 영역 숨김
+	$('#bankruptcyStats, #caseStats, #managerDailyStats, #managerWeeklyStats, #managerMonthlyStats, #documentStats').hide();
+	
+	// 클릭한 탭에 해당하는 컨텐츠만 표시
+	const type = $(this).data('type');
+	$(`#${type}Stats`).show();
+	
+	// 각 탭에 맞는 데이터 로드
+	if(type === 'case') {
+		loadManagersData();
+	} else if(type === 'bankruptcy') {
+		loadAllStats();
+	}
+}
+
+// 사무장 탭 클릭 핸들러
+function handleManagerTabClick(e) {
+	e.stopPropagation(); // 상위 이벤트 전파 방지
+	
+	// 드롭다운 위치 설정
+	const tabPosition = $(this).offset();
+	const tabWidth = $(this).outerWidth();
+	const tabHeight = $(this).outerHeight();
+	
+	$('#managerDropdown').css({
+		top: tabPosition.top + tabHeight - 40 + 'px',
+		left: tabPosition.left + tabWidth - 110 + 'px'
+	}).toggle();
+}
+
+// 드롭다운 옵션 클릭 핸들러
+function handleDropdownOptionClick() {
+	// 모든 통계 컨텐츠 영역 숨김
+	$('#bankruptcyStats, #caseStats, #managerDailyStats, #managerWeeklyStats, #managerMonthlyStats, #documentStats').hide();
+	
+	// 드롭다운 메뉴 닫기
+	$('#managerDropdown').hide();
+	
+	// 모든 탭에서 active 클래스 제거 후 사무장 탭에만 추가
+	$('.stat-tab').removeClass('active');
+	$('#managerTab').addClass('active');
+	
+	// 클릭한 옵션에 active 클래스 추가
+	$('.dropdown-option').removeClass('active');
+	$(this).addClass('active');
+	
+	// 클릭한 옵션에 따라 컨텐츠 표시
+	const statType = $(this).data('stat-type');
+	
+	if(statType === 'daily') {
+		$('#managerDailyStats').show();
+		loadManagerDailyStats();
+	} else if(statType === 'weekly') {
+		$('#managerWeeklyStats').show();
+		// 주간 통계 로드 함수 (필요시 구현)
+		// loadManagerWeeklyStats();
+	} else if(statType === 'monthly') {
+		$('#managerMonthlyStats').show();
+		// 월간 통계 로드 함수 (필요시 구현)
+		// loadManagerMonthlyStats();
+	}
+}
+
+// 컬럼 호버 효과 핸들러
+function handleColumnHover() {
+	let columnIndex = $(this).index();
+	
+	// 헤더의 같은 인덱스 열의 배경색 변경
+	$('.manager-stats-header .manager-column').eq(columnIndex).css('background-color', '#6c6c6c');
+	
+	// 바디의 모든 행에서 같은 인덱스 열의 배경색 변경
+	$('.manager-stats-body .stats-row').each(function() {
+		$(this).find('.manager-stats').eq(columnIndex).css('background-color', '#f9f9f9');
+	});
+	
+	// 푸터의 해당 열 배경색 변경
+	$('.manager-stats-footer .manager-column').eq(columnIndex).css('background-color', '#6c6c6c');
+}
+
+// 컬럼 언호버 효과 핸들러
+function handleColumnUnhover() {
+	let columnIndex = $(this).index();
+	
+	// 헤더 스타일 복원 (마지막 열은 원래 #6c6c6c)
+	if(columnIndex === $('.manager-stats-header .manager-column').length - 1) {
+		$('.manager-stats-header .manager-column').eq(columnIndex).css('background-color', '#6c6c6c');
+	} else {
+		$('.manager-stats-header .manager-column').eq(columnIndex).css('background-color', '#b0b0b0');
+	}
+	
+	// 바디 스타일 복원
+	$('.manager-stats-body .stats-row').each(function() {
+		$(this).find('.manager-stats').eq(columnIndex).css('background-color', '');
+	});
+	
+	// 푸터 스타일 복원 (마지막 열은 원래 #6c6c6c)
+	if(columnIndex === $('.manager-stats-footer .manager-column').length - 1) {
+		$('.manager-stats-footer .manager-column').eq(columnIndex).css('background-color', '#6c6c6c');
+	} else {
+		$('.manager-stats-footer .manager-column').eq(columnIndex).css('background-color', '#b0b0b0');
+	}
+}
 
 // 날짜 필터 드롭다운 초기화 함수
 function initDateFilterDropdown() {
@@ -222,67 +288,19 @@ function initDateFilterDropdown() {
 	}
 	
 	// 날짜 컬럼 클릭 이벤트
-	$(document).on('click', '.date-column', function(e) {
-		e.preventDefault();
-		e.stopPropagation();
-		
-		// 모든 드롭다운 숨기기
-		$('#dateFilterDropdown').hide();
-		
-		// 현재 클릭된 컬럼의 위치 계산
-		const $this = $(this);
-		const headerPosition = $this.offset();
-		const headerHeight = $this.outerHeight();
-		
-		// 드롭다운 위치 설정
-		$('#dateFilterDropdown').css({
-			display: 'block',
-			position: 'absolute',
-			top: (headerPosition.top + headerHeight) + 'px',
-			left: headerPosition.left + 'px',
-			zIndex: 1000
-		});
-	});
+	$(document).on('click', '.date-column', handleDateColumnClick);
 	
 	// 연도 선택 이벤트
-	$(document).on('click', '.year-option', function() {
-		$('.year-option').removeClass('selected');
-		$(this).addClass('selected');
-	});
+	$(document).on('click', '.year-option', handleYearOptionClick);
 	
 	// 월 선택 이벤트
-	$(document).on('click', '.month-option', function() {
-		$('.month-option').removeClass('selected');
-		$(this).addClass('selected');
-	});
+	$(document).on('click', '.month-option', handleMonthOptionClick);
 	
 	// 적용 버튼 클릭 이벤트
-	$(document).on('click', '.apply-button', function() {
-		const selectedYear = $('.year-option.selected').data('year');
-		const selectedMonth = $('.month-option.selected').data('month');
-		
-		if (selectedYear && selectedMonth) {
-			// 선택된 년도와 월로 데이터 로드
-			loadFilteredManagerDailyStats(selectedYear, selectedMonth);
-			$('#dateFilterDropdown').hide();
-		} else {
-			alert('연도와 월을 모두 선택해주세요.');
-		}
-	});
+	$(document).on('click', '.apply-button', handleApplyButtonClick);
 	
 	// 초기화 버튼 클릭 이벤트
-	$(document).on('click', '.reset-button', function() {
-		// 모든 선택 해제
-		$('.dropdown-option').removeClass('selected');
-		
-		// 현재 년도와 월 다시 선택
-		$(`.year-option[data-year="${currentYear}"]`).addClass('selected');
-		$(`.month-option[data-month="${currentMonth.toString().padStart(2, '0')}"]`).addClass('selected');
-		
-		// 현재 월 데이터 로드
-		loadFilteredManagerDailyStats(currentYear, currentMonth);
-		$('#dateFilterDropdown').hide();
-	});
+	$(document).on('click', '.reset-button', handleResetButtonClick);
 	
 	// 다른 곳 클릭 시 드롭다운 닫기
 	$(document).on('click', function(e) {
@@ -290,6 +308,73 @@ function initDateFilterDropdown() {
 			$('#dateFilterDropdown').hide();
 		}
 	});
+}
+
+// 날짜 컬럼 클릭 핸들러
+function handleDateColumnClick(e) {
+	e.preventDefault();
+	e.stopPropagation();
+	
+	// 모든 드롭다운 숨기기
+	$('#dateFilterDropdown').hide();
+	
+	// 현재 클릭된 컬럼의 위치 계산
+	const $this = $(this);
+	const headerPosition = $this.offset();
+	const headerHeight = $this.outerHeight();
+	
+	// 드롭다운 위치 설정
+	$('#dateFilterDropdown').css({
+		display: 'block',
+		position: 'absolute',
+		top: (headerPosition.top + headerHeight) + 'px',
+		left: headerPosition.left + 'px',
+		zIndex: 1000
+	});
+}
+
+// 연도 옵션 클릭 핸들러
+function handleYearOptionClick() {
+	$('.year-option').removeClass('selected');
+	$(this).addClass('selected');
+}
+
+// 월 옵션 클릭 핸들러
+function handleMonthOptionClick() {
+	$('.month-option').removeClass('selected');
+	$(this).addClass('selected');
+}
+
+// 적용 버튼 클릭 핸들러
+function handleApplyButtonClick() {
+	const selectedYear = $('.year-option.selected').data('year');
+	const selectedMonth = $('.month-option.selected').data('month');
+	
+	if (selectedYear && selectedMonth) {
+		// 선택된 년도와 월로 데이터 로드
+		loadFilteredManagerDailyStats(selectedYear, selectedMonth);
+		$('#dateFilterDropdown').hide();
+	} else {
+		alert('연도와 월을 모두 선택해주세요.');
+	}
+}
+
+// 초기화 버튼 클릭 핸들러
+function handleResetButtonClick() {
+	const currentDate = new Date();
+	const currentYear = currentDate.getFullYear();
+	const currentMonth = currentDate.getMonth() + 1;
+	
+	// 모든 선택 해제
+	$('.dropdown-option').removeClass('selected');
+	
+	// 현재 년도와 월 다시 선택
+	$(`.year-option[data-year="${currentYear}"]`).addClass('selected');
+	$(`.month-option[data-month="${currentMonth.toString().padStart(2, '0')}"]`).addClass('selected');
+	
+	// 현재 월 데이터 로드
+	loadFilteredManagerDailyStats(currentYear, currentMonth);
+	$('#dateFilterDropdown').hide();
 }
 
 // 필터링된 사무장 일간 통계 로드 함수
@@ -314,18 +399,22 @@ function loadFilteredManagerDailyStats(year, month) {
 			}
 		},
 		error: function(xhr, status, error) {
-			// 500 에러 시 상세 오류 정보 출력
-			try {
-				const errorResponse = JSON.parse(xhr.responseText);
-				console.error('서버 오류 상세 정보:', errorResponse);
-				alert('서버 오류: ' + errorResponse.message);
-			} catch(e) {
-				console.error('AJAX 오류:', status, error);
-				console.error('원시 응답:', xhr.responseText);
-				alert('데이터를 불러오는 중 심각한 오류가 발생했습니다.');
-			}
+			handleAjaxError(xhr, status, error);
 		}
 	});
+}
+
+// AJAX 에러 핸들러
+function handleAjaxError(xhr, status, error) {
+	try {
+		const errorResponse = JSON.parse(xhr.responseText);
+		console.error('서버 오류 상세 정보:', errorResponse);
+		alert('서버 오류: ' + errorResponse.message);
+	} catch(e) {
+		console.error('AJAX 오류:', status, error);
+		console.error('원시 응답:', xhr.responseText);
+		alert('데이터를 불러오는 중 심각한 오류가 발생했습니다.');
+	}
 }
 
 // 사무장 일별 통계 데이터 로드 함수
@@ -339,7 +428,7 @@ function loadManagerDailyStats() {
 	loadFilteredManagerDailyStats(currentYear, currentMonth);
 }
 
-// 사무장 일별 통계 렌더링 함수 수정
+// 사무장 일별 통계 렌더링 함수
 function renderManagerDailyStats(data) {
 	const statsBody = $('#managerDailyStatsBody');
 	statsBody.empty();
@@ -366,74 +455,7 @@ function renderManagerDailyStats(data) {
 				updatemanagerDailyStatsHeader(response.data);
 				
 				// 이제 일별 통계 데이터 표시
-				const displayData = data && data.length > 0 ? data : [];
-				
-				// 최소 컬럼 수 설정 (6명)
-				const minColumns = 6;
-				const actualManagerCount = response.data.length;
-				const columnsToShow = Math.max(minColumns, actualManagerCount);
-				
-				// 월별 합계 계산을 위한 변수 초기화
-				let monthlyTotals = {
-					managers: Array(columnsToShow).fill().map(() => ({ inflow: 0, contract: 0 })),
-					total: { inflow: 0, contract: 0 }
-				};
-				
-				displayData.forEach(item => {
-					const row = $('<div class="stats-row"></div>');
-					
-					// 날짜 열
-					row.append(`
-						<div class="date-cell">
-							${item.date} <span class="day-name">${item.day}</span>
-						</div>
-					`);
-					
-					// 스크롤 영역을 위한 컨테이너
-					const managersArea = $('<div class="managers-scroll-area"></div>');
-					const managersContainer = $('<div class="manager-columns-container"></div>');
-					
-					// 각 사무장 데이터
-					for(let i = 0; i < columnsToShow; i++) {
-						let inflowValue = 0;
-						let contractValue = 0;
-						
-						if(i < item.managers.length && i < actualManagerCount) {
-							// 실제 사무장 데이터가 있는 경우
-							inflowValue = item.managers[i].inflow;
-							contractValue = item.managers[i].contract;
-							
-							// 월별 합계에 더함
-							monthlyTotals.managers[i].inflow += inflowValue;
-							monthlyTotals.managers[i].contract += contractValue;
-						}
-						
-						managersContainer.append(`
-							<div class="manager-stats">
-								<div class="stat-value">${inflowValue}</div>
-								<div class="stat-value">${contractValue}</div>
-							</div>
-						`);
-					}
-					
-					// 합계 열
-					monthlyTotals.total.inflow += item.total.inflow;
-					monthlyTotals.total.contract += item.total.contract;
-					
-					managersContainer.append(`
-						<div class="manager-stats">
-							<div class="stat-value">${item.total.inflow}</div>
-							<div class="stat-value">${item.total.contract}</div>
-						</div>
-					`);
-					
-					managersArea.append(managersContainer);
-					row.append(managersArea);
-					statsBody.append(row);
-				});
-				
-				// 푸터 업데이트 - 월간 총합 표시
-				updatemanagerDailyStatsFooter(monthlyTotals, columnsToShow);
+				renderDailyStatsData(data, response.data);
 				
 				// 각 스크롤 영역 동기화를 위한 이벤트 처리
 				$('.managers-scroll-area').on('scroll', function() {
@@ -450,7 +472,81 @@ function renderManagerDailyStats(data) {
 	});
 }
 
-// 푸터 업데이트 함수 추가
+// 일별 통계 데이터 렌더링 함수 (renderManagerDailyStats에서 분리)
+function renderDailyStatsData(data, managers) {
+	const statsBody = $('#managerDailyStatsBody');
+	
+	// 최소 컬럼 수 설정 (6명)
+	const minColumns = 6;
+	const actualManagerCount = managers.length;
+	const columnsToShow = Math.max(minColumns, actualManagerCount);
+	
+	// 월별 합계 계산을 위한 변수 초기화
+	let monthlyTotals = {
+		managers: Array(columnsToShow).fill().map(() => ({ inflow: 0, contract: 0 })),
+		total: { inflow: 0, contract: 0 }
+	};
+	
+	const displayData = data && data.length > 0 ? data : [];
+	
+	displayData.forEach(item => {
+		const row = $('<div class="stats-row"></div>');
+		
+		// 날짜 열
+		row.append(`
+			<div class="date-cell">
+				${item.date} <span class="day-name">${item.day}</span>
+			</div>
+		`);
+		
+		// 스크롤 영역을 위한 컨테이너
+		const managersArea = $('<div class="managers-scroll-area"></div>');
+		const managersContainer = $('<div class="manager-columns-container"></div>');
+		
+		// 각 사무장 데이터
+		for(let i = 0; i < columnsToShow; i++) {
+			let inflowValue = 0;
+			let contractValue = 0;
+			
+			if(i < item.managers.length && i < actualManagerCount) {
+				// 실제 사무장 데이터가 있는 경우
+				inflowValue = item.managers[i].inflow;
+				contractValue = item.managers[i].contract;
+				
+				// 월별 합계에 더함
+				monthlyTotals.managers[i].inflow += inflowValue;
+				monthlyTotals.managers[i].contract += contractValue;
+			}
+			
+			managersContainer.append(`
+				<div class="manager-stats">
+					<div class="stat-value">${inflowValue}</div>
+					<div class="stat-value">${contractValue}</div>
+				</div>
+			`);
+		}
+		
+		// 합계 열
+		monthlyTotals.total.inflow += item.total.inflow;
+		monthlyTotals.total.contract += item.total.contract;
+		
+		managersContainer.append(`
+			<div class="manager-stats">
+				<div class="stat-value">${item.total.inflow}</div>
+				<div class="stat-value">${item.total.contract}</div>
+			</div>
+		`);
+		
+		managersArea.append(managersContainer);
+		row.append(managersArea);
+		statsBody.append(row);
+	});
+	
+	// 푸터 업데이트 - 월간 총합 표시
+	updatemanagerDailyStatsFooter(monthlyTotals, columnsToShow);
+}
+
+// 푸터 업데이트 함수
 function updatemanagerDailyStatsFooter(monthlyTotals, columnsToShow) {
 	$('.manager-stats-footer').empty();
 	$('.manager-stats-footer').append(`<div class="date-column-total">합계</div>`);
@@ -486,82 +582,82 @@ function updatemanagerDailyStatsFooter(monthlyTotals, columnsToShow) {
 	$('.manager-stats-footer').append(footerScrollArea);
 }
 
-// 헤더 섹션 업데이트 함수 수정
+// 헤더 섹션 업데이트 함수
 function updatemanagerDailyStatsHeader(managers) {
 	// 먼저 기존 헤더 내용을 비우기
 	$('.manager-stats-header').empty();
 	// date-column (날짜 헤더)를 다시 추가
 	$('.manager-stats-header').append(`<div class="date-column">1일 상담 통계&nbsp;&nbsp;<span class="sort-icon date-dropdown-toggle">▼</span></div>`);
 	
-    // 사무장 컬럼 영역 추가
-    const headerScrollArea = $('<div class="managers-scroll-area"></div>');
-    const headerColumnsContainer = $('<div class="manager-columns-container"></div>');
-    
-    // 최소 컬럼 수 설정
-    const minColumns = 6;
-    const actualManagerCount = managers.length;
-    const columnsToShow = Math.max(minColumns, actualManagerCount);
-    
-    // 실제 사무장 수만큼 칼럼 추가
-    for (let i = 0; i < columnsToShow; i++) {
-        let managerName = i < actualManagerCount ? managers[i].name + ' 사무장' : '사무장';
-        
-        headerColumnsContainer.append(`
-            <div class="manager-column">
-                <div class="manager-header">${managerName}</div>
-                <div class="stats-header">
-                    <div class="stat-header">유입</div>
-                    <div class="stat-header">계약</div>
-                </div>
-            </div>
-        `);
-    }
-    
-    // 합계 칼럼 추가
-    headerColumnsContainer.append(`
-        <div class="manager-column">
-            <div class="manager-header">합계</div>
-            <div class="stats-header">
-                <div class="stat-header">유입</div>
-                <div class="stat-header">계약</div>
-            </div>
-        </div>
-    `);
-    
-    headerScrollArea.append(headerColumnsContainer);
-    $('.manager-stats-header').append(headerScrollArea);
-    
-    // 푸터 업데이트
-    $('.manager-stats-footer').empty();
-    $('.manager-stats-footer').append(`<div class="date-column-total">합계</div>`);
-    
-    const footerScrollArea = $('<div class="managers-scroll-area"></div>');
-    const footerColumnsContainer = $('<div class="manager-columns-container"></div>');
-    
-    // 사무장 푸터 추가
-    for (let i = 0; i < columnsToShow; i++) {
-        footerColumnsContainer.append(`
-            <div class="manager-column">
-                <div class="stats-footer">
-                    <div class="stat-footer">0</div>
-                    <div class="stat-footer">0</div>
-                </div>
-            </div>
-        `);
-    }
-    
-    // 합계 칼럼 추가
-    footerColumnsContainer.append(`
-        <div class="manager-column">
-            <div class="stats-footer">
-                <div class="stat-footer">0</div>
-                <div class="stat-footer">0</div>
-            </div>
-        </div>
-    `);
-    
-    footerScrollArea.append(footerColumnsContainer);
-    $('.manager-stats-footer').append(footerScrollArea);
+	// 사무장 컬럼 영역 추가
+	const headerScrollArea = $('<div class="managers-scroll-area"></div>');
+	const headerColumnsContainer = $('<div class="manager-columns-container"></div>');
+	
+	// 최소 컬럼 수 설정
+	const minColumns = 6;
+	const actualManagerCount = managers.length;
+	const columnsToShow = Math.max(minColumns, actualManagerCount);
+	
+	// 실제 사무장 수만큼 칼럼 추가
+	for (let i = 0; i < columnsToShow; i++) {
+		let managerName = i < actualManagerCount ? managers[i].name + ' 사무장' : '사무장';
+		
+		headerColumnsContainer.append(`
+			<div class="manager-column">
+				<div class="manager-header">${managerName}</div>
+				<div class="stats-header">
+					<div class="stat-header">유입</div>
+					<div class="stat-header">계약</div>
+				</div>
+			</div>
+		`);
+	}
+	
+	// 합계 칼럼 추가
+	headerColumnsContainer.append(`
+		<div class="manager-column">
+			<div class="manager-header">합계</div>
+			<div class="stats-header">
+				<div class="stat-header">유입</div>
+				<div class="stat-header">계약</div>
+			</div>
+		</div>
+	`);
+	
+	headerScrollArea.append(headerColumnsContainer);
+	$('.manager-stats-header').append(headerScrollArea);
+	
+	// 푸터 초기화
+	$('.manager-stats-footer').empty();
+	$('.manager-stats-footer').append(`<div class="date-column-total">합계</div>`);
+	
+	const footerScrollArea = $('<div class="managers-scroll-area"></div>');
+	const footerColumnsContainer = $('<div class="manager-columns-container"></div>');
+	
+	// 사무장 푸터 추가
+	for (let i = 0; i < columnsToShow; i++) {
+		footerColumnsContainer.append(`
+			<div class="manager-column">
+				<div class="stats-footer">
+					<div class="stat-footer">0</div>
+					<div class="stat-footer">0</div>
+				</div>
+			</div>
+		`);
+	}
+	
+	// 합계 칼럼 추가
+	footerColumnsContainer.append(`
+		<div class="manager-column">
+			<div class="stats-footer">
+				<div class="stat-footer">0</div>
+				<div class="stat-footer">0</div>
+			</div>
+		</div>
+	`);
+	
+	footerScrollArea.append(footerColumnsContainer);
+	$('.manager-stats-footer').append(footerScrollArea);
 }
 
 // 사무장 데이터 로드 함수
@@ -571,7 +667,6 @@ function loadManagersData() {
 		method: 'GET',
 		dataType: 'json',
 		success: function(response) {
-			console.log('사무장 데이터:', response);
 			if(response.success) {
 				updatemanagerDailyStatsUI(response.data);
 			} else {
@@ -588,7 +683,7 @@ function loadManagersData() {
 	});
 }
 
-// 사무장 통계 UI 업데이트 함수
+// 사무장 통계 UI 업데이트 함수 (이어서)
 function updatemanagerDailyStatsUI(data) {
 	const $nameColumn = $('.name-column');
 	const $dataColumns = $('.data-column');
@@ -696,8 +791,30 @@ function loadAllStats() {
 		}
 	}).catch(error => {
 		console.error('데이터 로드 중 오류 발생:', error);
-		handleAjaxError(error);
+		handleDataLoadError(error);
 	});
+}
+
+// 데이터 로드 에러 처리
+function handleDataLoadError(error) {
+	console.error('API 요청 실패:', error);
+	
+	// 사용자에게 에러 메시지 표시
+	const errorMessage = `
+		<div class="error-message" style="
+			padding: 20px;
+			margin: 10px 0;
+			background-color: #fff3f3;
+			border: 1px solid #ffcdd2;
+			border-radius: 4px;
+			color: #b71c1c;
+		">
+			<h4 style="margin: 0 0 10px 0;">데이터 로드 실패</h4>
+			<p style="margin: 0;">통계 데이터를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.</p>
+		</div>
+	`;
+	
+	$('.statistics-content').prepend(errorMessage);
 }
 
 // 총계 통계 업데이트
@@ -779,16 +896,9 @@ function renderCourtTables(data) {
 	});
 }
 
-// 연간 차트 렌더링
-function renderYearlyCharts(data) {
-	const sortedData = [...data].sort((a, b) => a.year - b.year);
-	const years = sortedData.map(item => item.year);
-	
-	// Chart.js 기본 설정
-	Chart.defaults.color = '#000000';
-	Chart.defaults.font.family = "'Noto Sans KR', sans-serif";
-	
-	const commonOptions = {
+// Chart.js 공통 옵션 생성 함수
+function createCommonChartOptions() {
+	return {
 		responsive: true,
 		maintainAspectRatio: false,
 		scales: {
@@ -864,6 +974,18 @@ function renderYearlyCharts(data) {
 			}
 		}
 	};
+}
+
+// 연간 차트 렌더링
+function renderYearlyCharts(data) {
+	const sortedData = [...data].sort((a, b) => a.year - b.year);
+	const years = sortedData.map(item => item.year);
+	
+	// Chart.js 기본 설정
+	Chart.defaults.color = '#000000';
+	Chart.defaults.font.family = "'Noto Sans KR', sans-serif";
+	
+	const commonOptions = createCommonChartOptions();
 
 	// 기존 차트 제거
 	if (charts.recoveryTrend) {
@@ -908,15 +1030,15 @@ function renderYearlyCharts(data) {
 	});
 }
 
+// 법원 이름 정리 함수
+function getRegionName(courtName) {
+	if (courtName.includes('강릉지원')) return '강릉';
+	if (courtName.includes('원주지원')) return '원주';
+	return courtName.replace(/회생법원|지방법원/g, '').trim();
+}
+
 // 법원별 차트 렌더링
 function renderCourtCharts(data) {
-	// 법원 이름 정리 함수
-	const getRegionName = (courtName) => {
-		if (courtName.includes('강릉지원')) return '강릉';
-		if (courtName.includes('원주지원')) return '원주';
-		return courtName.replace(/회생법원|지방법원/g, '').trim();
-	};
-	
 	const courts = data.map(item => getRegionName(item.court_name));
 	
 	// Chart.js 기본 설정
@@ -977,6 +1099,27 @@ function renderCourtCharts(data) {
 		}
 	};
 
+	const barChartOptions = {
+		...commonOptions,
+		barPercentage: 1,
+		categoryPercentage: 0.8,
+		plugins: {
+			...commonOptions.plugins,
+			tooltip: {
+				callbacks: {
+					label: function(context) {
+						return `${context.dataset.label}: ${context.formattedValue}%`;
+					}
+				},
+				titleColor: '#000000',
+				bodyColor: '#000000',
+				backgroundColor: 'rgba(255, 255, 255, 0.9)',
+				borderColor: '#b5b5b5',
+				borderWidth: 1
+			}
+		}
+	};
+
 	// 기존 차트 제거
 	if (charts.recoveryRates) {
 		charts.recoveryRates.destroy();
@@ -1009,26 +1152,7 @@ function renderCourtCharts(data) {
 				}
 			]
 		},
-		options: {
-			...commonOptions,
-			barPercentage: 1,
-			categoryPercentage: 0.8,
-			plugins: {
-				...commonOptions.plugins,
-				tooltip: {
-					callbacks: {
-						label: function(context) {
-							return `${context.dataset.label}: ${context.formattedValue}%`;
-						}
-					},
-					titleColor: '#000000',
-					bodyColor: '#000000',
-					backgroundColor: 'rgba(255, 255, 255, 0.9)',
-					borderColor: '#b5b5b5',
-					borderWidth: 1
-				}
-			}
-		}
+		options: barChartOptions
 	});
 
 	// 파산 비율 차트
@@ -1055,49 +1179,8 @@ function renderCourtCharts(data) {
 				}
 			]
 		},
-		options: {
-			...commonOptions,
-			barPercentage: 1,
-			categoryPercentage: 0.8,
-			plugins: {
-				...commonOptions.plugins,
-				tooltip: {
-					callbacks: {
-						label: function(context) {
-							return `${context.dataset.label}: ${context.formattedValue}%`;
-						}
-					},
-					titleColor: '#000000',
-					bodyColor: '#000000',
-					backgroundColor: 'rgba(255, 255, 255, 0.9)',
-					borderColor: '#b5b5b5',
-					borderWidth: 1
-				}
-			}
-		}
+		options: barChartOptions
 	});
-}
-
-// 데이터 요청 실패 시 에러 처리 함수
-function handleAjaxError(error) {
-	console.error('API 요청 실패:', error);
-	
-	// 사용자에게 에러 메시지 표시
-	const errorMessage = `
-		<div class="error-message" style="
-			padding: 20px;
-			margin: 10px 0;
-			background-color: #fff3f3;
-			border: 1px solid #ffcdd2;
-			border-radius: 4px;
-			color: #b71c1c;
-		">
-			<h4 style="margin: 0 0 10px 0;">데이터 로드 실패</h4>
-			<p style="margin: 0;">통계 데이터를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.</p>
-		</div>
-	`;
-	
-	$('.statistics-content').prepend(errorMessage);
 }
 
 // 차트 생성 실패 시 에러 처리 함수
@@ -1156,24 +1239,6 @@ function enableTableSort() {
 	});
 }
 
-// 데이터 포맷팅 유틸리티 함수들
-const formatUtils = {
-	// 숫자 포맷팅 (천단위 구분기호)
-	formatNumber: (number) => {
-		return number.toLocaleString('ko-KR');
-	},
-	
-	// 날짜 포맷팅
-	formatDate: (dateString) => {
-		const date = new Date(dateString);
-		return new Intl.DateTimeFormat('ko-KR', {
-			year: 'numeric',
-			month: 'long',
-			day: 'numeric'
-		}).format(date);
-	}
-};
-
 // 데이터 내보내기 기능
 function exportTableToExcel(tableId, fileName) {
 	const table = document.getElementById(tableId);
@@ -1191,20 +1256,3 @@ function resizeCharts() {
 		}
 	});
 }
-
-// 차트 컬러 테마 설정
-const chartColors = {
-	primary: '#00e6c3',
-	secondary: '#b5b5b5',
-	background: '#ffffff',
-	grid: '#f0f0f0',
-	border: '#b5b5b5',
-	text: '#000000'
-};
-
-// 전역 차트 설정
-Chart.defaults.set('plugins.tooltip.backgroundColor', 'rgba(255, 255, 255, 0.9)');
-Chart.defaults.set('plugins.tooltip.titleColor', chartColors.text);
-Chart.defaults.set('plugins.tooltip.bodyColor', chartColors.text);
-Chart.defaults.set('plugins.tooltip.borderColor', chartColors.border);
-Chart.defaults.set('plugins.tooltip.borderWidth', 1);
