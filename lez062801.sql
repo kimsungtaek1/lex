@@ -1,10 +1,3 @@
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
 
 
 CREATE TABLE application_bankruptcy (
@@ -46,12 +39,12 @@ CREATE TABLE application_bankruptcy_asset_cash (
   asset_no int(11) NOT NULL,
   case_no int(11) NOT NULL,
   property_no int(11) NOT NULL,
-  property_detail varchar(255) DEFAULT NULL,
-  liquidation_value int(11) DEFAULT 0,
-  is_seized enum('Y','N') DEFAULT 'N',
-  created_at datetime DEFAULT current_timestamp(),
-  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  property_detail text DEFAULT NULL,
+  liquidation_value bigint(20) DEFAULT 0,
+  is_seized char(1) DEFAULT 'N',
+  created_at timestamp NOT NULL DEFAULT current_timestamp(),
+  updated_at timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 CREATE TABLE application_bankruptcy_asset_deposits (
   asset_no int(11) NOT NULL,
@@ -59,51 +52,50 @@ CREATE TABLE application_bankruptcy_asset_deposits (
   property_no int(11) NOT NULL,
   bank_name varchar(255) DEFAULT NULL,
   account_number varchar(255) DEFAULT NULL,
-  deposit_amount int(11) DEFAULT 0,
-  deduction_amount int(11) DEFAULT 0,
-  is_seized enum('Y','N') DEFAULT 'N',
-  created_at datetime DEFAULT current_timestamp(),
-  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  deposit_amount bigint(20) DEFAULT 0,
+  deduction_amount bigint(20) DEFAULT 0,
+  is_seized char(1) DEFAULT 'N',
+  created_at timestamp NOT NULL DEFAULT current_timestamp(),
+  updated_at timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 CREATE TABLE application_bankruptcy_asset_disposed (
   asset_no int(11) NOT NULL,
   case_no int(11) NOT NULL,
   property_no int(11) NOT NULL,
   disposal_date date DEFAULT NULL,
-  property_type varchar(100) DEFAULT NULL,
-  disposal_amount int(11) DEFAULT 0,
-  disposal_reason text DEFAULT NULL,
-  recipient varchar(100) DEFAULT NULL,
-  created_at datetime DEFAULT current_timestamp(),
-  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  disposal_amount bigint(20) DEFAULT 0,
+  disposal_usage text DEFAULT NULL,
+  is_seized char(1) DEFAULT 'N',
+  created_at timestamp NOT NULL DEFAULT current_timestamp(),
+  updated_at timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 CREATE TABLE application_bankruptcy_asset_divorce (
   asset_no int(11) NOT NULL,
   case_no int(11) NOT NULL,
   property_no int(11) NOT NULL,
   divorce_date date DEFAULT NULL,
-  spouse_name varchar(100) DEFAULT NULL,
-  settlement_date date DEFAULT NULL,
-  property_type varchar(100) DEFAULT NULL,
-  property_amount int(11) DEFAULT 0,
-  created_at datetime DEFAULT current_timestamp(),
-  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  settlement_property text DEFAULT NULL,
+  divorce_timing varchar(255) DEFAULT NULL,
+  is_seized char(1) DEFAULT 'N',
+  created_at timestamp NOT NULL DEFAULT current_timestamp(),
+  updated_at timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 CREATE TABLE application_bankruptcy_asset_inherited (
   asset_no int(11) NOT NULL,
   case_no int(11) NOT NULL,
   property_no int(11) NOT NULL,
-  heir_name varchar(100) DEFAULT NULL,
-  deceased_name varchar(100) DEFAULT NULL,
   inheritance_date date DEFAULT NULL,
-  property_type varchar(100) DEFAULT NULL,
-  property_amount int(11) DEFAULT 0,
-  created_at datetime DEFAULT current_timestamp(),
-  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  deceased_type varchar(255) DEFAULT NULL,
+  inheritance_status text DEFAULT NULL,
+  main_inheritance_property text DEFAULT NULL,
+  acquisition_process text DEFAULT NULL,
+  is_seized char(1) DEFAULT 'N',
+  created_at timestamp NOT NULL DEFAULT current_timestamp(),
+  updated_at timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 CREATE TABLE application_bankruptcy_asset_insurance (
   asset_no int(11) NOT NULL,
@@ -111,135 +103,122 @@ CREATE TABLE application_bankruptcy_asset_insurance (
   property_no int(11) NOT NULL,
   company_name varchar(255) DEFAULT NULL,
   securities_number varchar(255) DEFAULT NULL,
-  refund_amount int(11) DEFAULT 0,
-  is_coverage enum('Y','N') DEFAULT 'N',
+  refund_amount bigint(20) DEFAULT 0,
+  is_coverage char(1) DEFAULT 'N',
   explanation text DEFAULT NULL,
-  is_seized enum('Y','N') DEFAULT 'N',
-  created_at datetime DEFAULT current_timestamp(),
-  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  is_seized char(1) DEFAULT 'N',
+  created_at timestamp NOT NULL DEFAULT current_timestamp(),
+  updated_at timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 CREATE TABLE application_bankruptcy_asset_loan_receivables (
   asset_no int(11) NOT NULL,
   case_no int(11) NOT NULL,
   property_no int(11) NOT NULL,
-  debtor_name varchar(100) DEFAULT NULL,
-  has_evidence enum('Y','N') DEFAULT 'N',
-  liquidation_value int(11) DEFAULT 0,
-  is_seized enum('Y','N') DEFAULT 'N',
-  created_at datetime DEFAULT current_timestamp(),
-  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  debtor_name varchar(255) DEFAULT NULL,
+  claim_amount bigint(20) DEFAULT 0,
+  collectible_amount bigint(20) DEFAULT 0,
+  is_seized char(1) DEFAULT 'N',
+  created_at timestamp NOT NULL DEFAULT current_timestamp(),
+  updated_at timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 CREATE TABLE application_bankruptcy_asset_other (
   asset_no int(11) NOT NULL,
   case_no int(11) NOT NULL,
   property_no int(11) NOT NULL,
   asset_content text DEFAULT NULL,
-  liquidation_value int(11) DEFAULT 0,
-  is_seized enum('Y','N') DEFAULT 'N',
-  created_at datetime DEFAULT current_timestamp(),
-  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  liquidation_value bigint(20) DEFAULT 0,
+  is_seized char(1) DEFAULT 'N',
+  created_at timestamp NOT NULL DEFAULT current_timestamp(),
+  updated_at timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 CREATE TABLE application_bankruptcy_asset_real_estate (
   asset_no int(11) NOT NULL,
   case_no int(11) NOT NULL,
   property_no int(11) NOT NULL,
-  property_right_type varchar(50) DEFAULT NULL,
-  property_type varchar(50) DEFAULT NULL,
-  property_area int(11) DEFAULT 0,
-  property_location varchar(255) DEFAULT NULL,
-  is_spouse tinyint(1) DEFAULT 0,
-  property_expected_value int(11) DEFAULT 0,
-  property_security_type varchar(100) DEFAULT NULL,
-  property_security_details text DEFAULT NULL,
-  property_secured_debt int(11) DEFAULT 0,
-  property_deposit_debt int(11) DEFAULT 0,
-  property_liquidation_value int(11) DEFAULT 0,
-  property_liquidation_explain text DEFAULT NULL,
-  is_seized enum('Y','N') DEFAULT 'N',
-  created_at datetime DEFAULT current_timestamp(),
-  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  property_type varchar(255) DEFAULT NULL,
+  property_area varchar(255) DEFAULT NULL,
+  property_location text DEFAULT NULL,
+  secured_debt_balance bigint(20) DEFAULT 0,
+  seizure_details text DEFAULT NULL,
+  seizure_creditor varchar(255) DEFAULT NULL,
+  seizure_amount bigint(20) DEFAULT 0,
+  market_value bigint(20) DEFAULT 0,
+  liquidation_explanation text DEFAULT NULL,
+  is_seized char(1) DEFAULT 'N',
+  created_at timestamp NOT NULL DEFAULT current_timestamp(),
+  updated_at timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 CREATE TABLE application_bankruptcy_asset_received_deposit (
   asset_no int(11) NOT NULL,
   case_no int(11) NOT NULL,
   property_no int(11) NOT NULL,
   receipt_date date DEFAULT NULL,
-  lessor varchar(100) DEFAULT NULL,
-  location varchar(255) DEFAULT NULL,
-  deposit_amount int(11) DEFAULT 0,
-  note text DEFAULT NULL,
-  created_at datetime DEFAULT current_timestamp(),
-  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  rental_property text DEFAULT NULL,
+  contract_deposit bigint(20) DEFAULT 0,
+  received_deposit bigint(20) DEFAULT 0,
+  deposit_usage text DEFAULT NULL,
+  is_seized char(1) DEFAULT 'N',
+  created_at timestamp NOT NULL DEFAULT current_timestamp(),
+  updated_at timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 CREATE TABLE application_bankruptcy_asset_rent_deposits (
   asset_no int(11) NOT NULL,
   case_no int(11) NOT NULL,
   property_no int(11) NOT NULL,
-  rent_location varchar(255) DEFAULT NULL,
-  is_business_place enum('Y','N') DEFAULT 'N',
-  contract_deposit int(11) DEFAULT 0,
-  is_deposit_spouse tinyint(1) DEFAULT 0,
-  monthly_rent int(11) DEFAULT 0,
-  is_monthly_spouse tinyint(1) DEFAULT 0,
-  refund_deposit int(11) DEFAULT 0,
-  difference_reason text DEFAULT NULL,
-  priority_deposit int(11) DEFAULT 0,
-  liquidation_value int(11) DEFAULT 0,
+  rent_location text DEFAULT NULL,
+  rent_deposit bigint(20) DEFAULT 0,
+  key_money bigint(20) DEFAULT 0,
+  expected_refund bigint(20) DEFAULT 0,
   explanation text DEFAULT NULL,
-  is_seized enum('Y','N') DEFAULT 'N',
-  created_at datetime DEFAULT current_timestamp(),
-  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  is_seized char(1) DEFAULT 'N',
+  created_at timestamp NOT NULL DEFAULT current_timestamp(),
+  updated_at timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 CREATE TABLE application_bankruptcy_asset_sales_receivables (
   asset_no int(11) NOT NULL,
   case_no int(11) NOT NULL,
   property_no int(11) NOT NULL,
-  debtor_name varchar(100) DEFAULT NULL,
-  has_evidence enum('Y','N') DEFAULT 'N',
-  liquidation_value int(11) DEFAULT 0,
-  is_seized enum('Y','N') DEFAULT 'N',
-  created_at datetime DEFAULT current_timestamp(),
-  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  debtor_name varchar(255) DEFAULT NULL,
+  claim_amount bigint(20) DEFAULT 0,
+  collectible_amount bigint(20) DEFAULT 0,
+  is_seized char(1) DEFAULT 'N',
+  created_at timestamp NOT NULL DEFAULT current_timestamp(),
+  updated_at timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 CREATE TABLE application_bankruptcy_asset_severance (
   asset_no int(11) NOT NULL,
   case_no int(11) NOT NULL,
   property_no int(11) NOT NULL,
-  is_public enum('Y','N') DEFAULT 'N',
-  has_pension enum('Y','N') DEFAULT 'N',
   workplace varchar(255) DEFAULT NULL,
-  expected_severance int(11) DEFAULT 0,
-  deduction_amount int(11) DEFAULT 0,
-  liquidation_value int(11) DEFAULT 0,
-  is_seized enum('Y','N') DEFAULT 'N',
-  created_at datetime DEFAULT current_timestamp(),
-  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  expected_amount bigint(20) DEFAULT 0,
+  deduction_amount bigint(20) DEFAULT 0,
+  liquidation_value bigint(20) DEFAULT 0,
+  is_seized char(1) DEFAULT 'N',
+  created_at timestamp NOT NULL DEFAULT current_timestamp(),
+  updated_at timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 CREATE TABLE application_bankruptcy_asset_vehicles (
   asset_no int(11) NOT NULL,
   case_no int(11) NOT NULL,
   property_no int(11) NOT NULL,
-  vehicle_info varchar(255) DEFAULT NULL,
-  is_spouse tinyint(1) DEFAULT 0,
-  security_type varchar(255) DEFAULT NULL,
-  max_bond int(11) DEFAULT 0,
-  expected_value int(11) DEFAULT 0,
-  financial_balance int(11) DEFAULT 0,
-  liquidation_value int(11) DEFAULT 0,
-  explanation text DEFAULT NULL,
-  is_manual_calc enum('Y','N') DEFAULT 'N',
-  is_seized enum('Y','N') DEFAULT 'N',
-  created_at datetime DEFAULT current_timestamp(),
-  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  vehicle_info text DEFAULT NULL,
+  registration_number varchar(255) DEFAULT NULL,
+  security_debt_balance bigint(20) DEFAULT 0,
+  market_value bigint(20) DEFAULT 0,
+  liquidation_value bigint(20) DEFAULT 0,
+  liquidation_explanation text DEFAULT NULL,
+  is_seized char(1) DEFAULT 'N',
+  created_at timestamp NOT NULL DEFAULT current_timestamp(),
+  updated_at timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 CREATE TABLE application_bankruptcy_creditor (
   creditor_no int(11) NOT NULL,
@@ -1283,73 +1262,59 @@ ALTER TABLE application_bankruptcy_assets
 
 ALTER TABLE application_bankruptcy_asset_cash
   ADD PRIMARY KEY (asset_no),
-  ADD KEY case_no (case_no),
-  ADD KEY property_no (property_no);
+  ADD KEY case_no (case_no,property_no);
 
 ALTER TABLE application_bankruptcy_asset_deposits
   ADD PRIMARY KEY (asset_no),
-  ADD KEY case_no (case_no),
-  ADD KEY property_no (property_no);
+  ADD KEY case_no (case_no,property_no);
 
 ALTER TABLE application_bankruptcy_asset_disposed
   ADD PRIMARY KEY (asset_no),
-  ADD KEY case_no (case_no),
-  ADD KEY property_no (property_no);
+  ADD KEY case_no (case_no,property_no);
 
 ALTER TABLE application_bankruptcy_asset_divorce
   ADD PRIMARY KEY (asset_no),
-  ADD KEY case_no (case_no),
-  ADD KEY property_no (property_no);
+  ADD KEY case_no (case_no,property_no);
 
 ALTER TABLE application_bankruptcy_asset_inherited
   ADD PRIMARY KEY (asset_no),
-  ADD KEY case_no (case_no),
-  ADD KEY property_no (property_no);
+  ADD KEY case_no (case_no,property_no);
 
 ALTER TABLE application_bankruptcy_asset_insurance
   ADD PRIMARY KEY (asset_no),
-  ADD KEY case_no (case_no),
-  ADD KEY property_no (property_no);
+  ADD KEY case_no (case_no,property_no);
 
 ALTER TABLE application_bankruptcy_asset_loan_receivables
   ADD PRIMARY KEY (asset_no),
-  ADD KEY case_no (case_no),
-  ADD KEY property_no (property_no);
+  ADD KEY case_no (case_no,property_no);
 
 ALTER TABLE application_bankruptcy_asset_other
   ADD PRIMARY KEY (asset_no),
-  ADD KEY case_no (case_no),
-  ADD KEY property_no (property_no);
+  ADD KEY case_no (case_no,property_no);
 
 ALTER TABLE application_bankruptcy_asset_real_estate
   ADD PRIMARY KEY (asset_no),
-  ADD KEY case_no (case_no),
-  ADD KEY property_no (property_no);
+  ADD KEY case_no (case_no,property_no);
 
 ALTER TABLE application_bankruptcy_asset_received_deposit
   ADD PRIMARY KEY (asset_no),
-  ADD KEY case_no (case_no),
-  ADD KEY property_no (property_no);
+  ADD KEY case_no (case_no,property_no);
 
 ALTER TABLE application_bankruptcy_asset_rent_deposits
   ADD PRIMARY KEY (asset_no),
-  ADD KEY case_no (case_no),
-  ADD KEY property_no (property_no);
+  ADD KEY case_no (case_no,property_no);
 
 ALTER TABLE application_bankruptcy_asset_sales_receivables
   ADD PRIMARY KEY (asset_no),
-  ADD KEY case_no (case_no),
-  ADD KEY property_no (property_no);
+  ADD KEY case_no (case_no,property_no);
 
 ALTER TABLE application_bankruptcy_asset_severance
   ADD PRIMARY KEY (asset_no),
-  ADD KEY case_no (case_no),
-  ADD KEY property_no (property_no);
+  ADD KEY case_no (case_no,property_no);
 
 ALTER TABLE application_bankruptcy_asset_vehicles
   ADD PRIMARY KEY (asset_no),
-  ADD KEY case_no (case_no),
-  ADD KEY property_no (property_no);
+  ADD KEY case_no (case_no,property_no);
 
 ALTER TABLE application_bankruptcy_creditor
   ADD PRIMARY KEY (creditor_no),
