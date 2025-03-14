@@ -35,9 +35,9 @@
   <div class="right-section">
 	<div class="form">
       <div class="form-title"><span>지위</span></div>
-      <div class="form-content">
-        <input type="text" id="" name="" class="form-control">
-      </div>
+		<div class="form-content">
+		  <input type="text" id="job_position" name="job_position" class="form-control">
+		</div>
     </div>
     <div class="form">
       <div class="form-title"><span>취직시기</span></div>
@@ -135,9 +135,9 @@
   <div class="left-section">
     <div class="form">
       <div class="form-title"><span>거주 시작점</span></div>
-      <div class="form-content">
-		<input type="text" id="" name="">
-      </div>
+		<div class="form-content">
+		  <input type="text" id="living_start_date" name="living_start_date">
+		</div>
     </div>
 	<div class="form">
       <div class="form-title form-notitle"><span>거주관계선택</span></div>
@@ -181,8 +181,8 @@
 	<div class="form">
 	  <div class="form-title"><span></span></div>
 	  <div class="form-content">
-		기타 내용&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" id="" name="">
-	  </div>
+		  기타 내용&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" id="family_status_etc" name="family_status_etc">
+		</div>
 	</div>
 	<div class="form">
       <div class="form-title form-notitle"><span></span></div>
@@ -210,28 +210,28 @@
 	<div class="form">
       <div class="form-title form-notitle"><span></span></div>
       <div class="form-content">
-          임대보증금&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" id="" name="" data-type="money"> 원
-      </div>
+		  임대보증금&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" id="rent_deposit" name="rent_deposit" data-type="money"> 원
+		</div>
     </div>
 	<div class="form">
       <div class="form-title form-notitle"><span></span></div>
       <div class="form-content">
-          연체액&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" id="" name="" data-type="money"> 원
-      </div>
+		  연체액&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" id="rent_arrears" name="rent_arrears" data-type="money"> 원
+		</div>
     </div>
 	<div class="form">
       <div class="form-title"><span></span></div>
       <div class="form-content">
-          신청인 이외의 자가 임차인인 경우 임차인 성명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" id="" name="" class="form-content-short15">&nbsp;&nbsp;
-		  신청인과의 관계&nbsp;&nbsp;|&nbsp;&nbsp; <input type="text" id="" name="" class="form-content-short15">
-      </div>
+		  신청인 이외의 자가 임차인인 경우 임차인 성명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" id="tenant_name" name="tenant_name" class="form-content-short15">&nbsp;&nbsp;
+		  신청인과의 관계&nbsp;&nbsp;|&nbsp;&nbsp; <input type="text" id="tenant_relation" name="tenant_relation" class="form-content-short15">
+		</div>
     </div>
     <div class="form">
       <div class="form-title form-notitle"><span>㉣또는 ㉤선택시</span></div>
       <div class="form-content">
-        소유자 성명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" id="" name="" class="form-content-short15">&nbsp;&nbsp;
-		신청인과의 관계&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" id="" name="" class="form-content-short15">&nbsp;&nbsp;
-      </div>
+		  소유자 성명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" id="owner_name" name="owner_name" class="form-content-short15">&nbsp;&nbsp;
+		  신청인과의 관계&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" id="owner_relation" name="owner_relation" class="form-content-short15">&nbsp;&nbsp;
+		</div>
     </div>
 	<div class="form">
       <div class="form-title form-notitle"><span></span></div>
@@ -242,8 +242,8 @@
 	<div class="form">
       <div class="form-title"><span></span></div>
       <div class="form-content">
-        <input type="text" id="" name="" placeholder="이곳에 경위를 입력하십시오.">
-      </div>
+		  <input type="text" id="residence_reason" name="residence_reason" placeholder="이곳에 경위를 입력하십시오.">
+		</div>
     </div>
     <div class="form">
       <div class="form-title"></div>
@@ -296,13 +296,13 @@
     </div>
     <div class="form">
       <div class="form-title"><span>의료보험료</span></div>
-      <div class="form-content">
-        <input type="checkbox" id="" name="" value="미납액 없음">
-        <label for="">미납액 없음</label>
-        <input type="checkbox" id="" name="" value="미납액 있음">
-        <label for="">미납액 있음</label>
-        &nbsp;&nbsp;미납액&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" id="" name="" data-type="money"> 원
-      </div>
+		<div class="form-content">
+		  <input type="checkbox" id="health_insurance_none" name="health_insurance_status" value="미납액 없음">
+		  <label for="health_insurance_none">미납액 없음</label>
+		  <input type="checkbox" id="health_insurance_exist" name="health_insurance_status" value="미납액 있음">
+		  <label for="health_insurance_exist">미납액 있음</label>
+		  &nbsp;&nbsp;미납액&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" id="health_insurance_amount" name="health_insurance_amount" data-type="money"> 원
+		</div>
     </div>
 	<div class="form">
       <div class="form-title"></div>
