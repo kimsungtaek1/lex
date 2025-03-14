@@ -6,8 +6,18 @@ class LivingStatusManager {
 	}
 
 	initialize() {
+		// 현재 사건 번호 확인 및 설정
+		if (!window.currentCaseNo && window.currentCaseNo !== 0) {
+			if (typeof currentCaseNo !== 'undefined') {
+				window.currentCaseNo = currentCaseNo;
+			}
+		}
+
 		this.bindEvents();
-		this.loadData();
+		
+		if (window.currentCaseNo) {
+			this.loadData();
+		}
 		
 		// 가족 구성원 컨테이너가 비어있으면 빈 블록 추가
 		if ($('#family_members_container').children().length === 0) {
@@ -55,28 +65,45 @@ class LivingStatusManager {
 	}
 
 	loadData() {
-		if (!window.currentCaseNo) return;
+		if (!window.currentCaseNo) {
+			console.log('currentCaseNo가 없습니다.');
+			return;
+		}
+		
+		console.log('생활상황 데이터 로드 시작: case_no =', window.currentCaseNo);
+		
 		$.ajax({
 			url: '/adm/api/application_bankruptcy/living_status/living_status_api.php',
 			type: 'GET',
 			data: { case_no: window.currentCaseNo },
 			dataType: 'json',
 			success: (response) => {
-				if (response.success && response.data) {
-					alert('test');
-					console.log(response.data);
-					// 모든 데이터를 한 번에 받아와서 각 섹션에 적용
-					this.populateBasicInfo(response.data);
-					this.populateIncomeInfo(response.data);
-					this.populateAdditionalInfo(response.data);
-					this.populateTaxInfo(response.data);
-					
-					// 가족 정보는 배열이므로 따로 처리
-					this.populateFamilyMembers(response.data.family_members || []);
+				console.log('생활상황 데이터 응답:', response);
+				
+				if (response.success) {
+					if (response.data) {
+						console.log('데이터 로드 성공:', response.data);
+						// alert('test'); // 여기서 alert가 실행되지 않는 문제
+						
+						// 모든 데이터를 한 번에 받아와서 각 섹션에 적용
+						this.populateBasicInfo(response.data);
+						this.populateIncomeInfo(response.data);
+						this.populateAdditionalInfo(response.data);
+						this.populateTaxInfo(response.data);
+						
+						// 가족 정보는 배열이므로 따로 처리
+						this.populateFamilyMembers(response.data.family_members || []);
+					} else {
+						console.log('데이터가 비어있습니다.');
+					}
+				} else {
+					console.error('데이터 로드 실패:', response.message);
 				}
 			},
 			error: (xhr, status, error) => {
-				console.error('데이터 로드 실패:', error);
+				console.error('Ajax 에러:', error);
+				console.log('상태:', status);
+				console.log('응답 텍스트:', xhr.responseText);
 			}
 		});
 	}
@@ -549,5 +576,9 @@ class LivingStatusManager {
 
 // 생활상황 탭이 활성화될 때 초기화
 $(document).ready(function() {
+	if (typeof currentCaseNo !== 'undefined' && currentCaseNo !== null) {
+        window.currentCaseNo = currentCaseNo;
+        console.log('생활상황 매니저 초기화 시 currentCaseNo 설정:', window.currentCaseNo);
+    }
 	window.livingStatusManager = new LivingStatusManager();
 });
