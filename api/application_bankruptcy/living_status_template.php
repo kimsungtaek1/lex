@@ -295,13 +295,13 @@
       </div>
     </div>
     <div class="form">
-      <div class="form-title"><span>이혼위자료</span></div>
+      <div class="form-title"><span>의료보험료</span></div>
       <div class="form-content">
-        <input type="checkbox" id="alimony_none" name="alimony_status" value="미납액 없음">
-        <label for="alimony_none">미납액 없음</label>
-        <input type="checkbox" id="alimony_exist" name="alimony_status" value="미납액 있음">
-        <label for="alimony_exist">미납액 있음</label>
-        &nbsp;&nbsp;미납액&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" id="alimony_amount" name="alimony_amount" data-type="money"> 원
+        <input type="checkbox" id="" name="" value="미납액 없음">
+        <label for="">미납액 없음</label>
+        <input type="checkbox" id="" name="" value="미납액 있음">
+        <label for="">미납액 있음</label>
+        &nbsp;&nbsp;미납액&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" id="" name="" data-type="money"> 원
       </div>
     </div>
 	<div class="form">
