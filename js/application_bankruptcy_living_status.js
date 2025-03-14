@@ -55,22 +55,100 @@ class LivingStatusManager {
 	}
 
 	loadData() {
+		alert('test');
 		if (!window.currentCaseNo) return;
 
-		// 기본 정보 로드
-		this.loadBasicInfo();
+		$.ajax({
+			url: '/adm/api/application_bankruptcy/living_status/living_status_api.php',
+			type: 'GET',
+			data: { case_no: window.currentCaseNo },
+			dataType: 'json',
+			success: (response) => {
+				if (response.success && response.data) {
+					console.log(response.data);
+					// 모든 데이터를 한 번에 받아와서 각 섹션에 적용
+					this.populateBasicInfo(response.data);
+					this.populateIncomeInfo(response.data);
+					this.populateAdditionalInfo(response.data);
+					this.populateTaxInfo(response.data);
+					
+					// 가족 정보는 배열이므로 따로 처리
+					this.populateFamilyMembers(response.data.family_members || []);
+				}
+			},
+			error: (xhr, status, error) => {
+				console.error('데이터 로드 실패:', error);
+			}
+		});
+	}
+
+	populateBasicInfo(data) {
+		// 체크박스 설정
+		if (data.job_type) {
+			$(`input[name="job_type"][value="${data.job_type}"]`).prop('checked', true);
+		}
 		
-		// 수입 정보 로드
-		this.loadIncomeInfo();
+		// 텍스트 필드 설정
+		$('#job_industry').val(data.job_industry || '');
+		$('#company_name').val(data.company_name || '');
+		$('#employment_period').val(data.employment_period || '');
+		$('#job_position').val(data.job_position || '');
+	}
+
+	populateIncomeInfo(data) {
+		$('#self_income').val(this.formatMoney(data.self_income || 0));
+		$('#monthly_salary').val(this.formatMoney(data.monthly_salary || 0));
+		$('#pension').val(this.formatMoney(data.pension || 0));
+		$('#living_support').val(this.formatMoney(data.living_support || 0));
+		$('#other_income').val(this.formatMoney(data.other_income || 0));
+	}
+
+	populateAdditionalInfo(data) {
+		$('#living_start_date').val(data.living_start_date || '');
 		
-		// 가족 구성원 정보 로드
-		this.loadFamilyMembers();
+		// 가족관계사항 라디오 버튼
+		if (data.family_status) {
+			$(`input[name="family_status"][value="${data.family_status}"]`).prop('checked', true);
+		}
 		
-		// 추가 정보 로드
-		this.loadAdditionalInfo();
+		$('#family_status_etc').val(data.family_status_etc || '');
+		$('#monthly_rent').val(this.formatMoney(data.monthly_rent || 0));
+		$('#rent_deposit').val(this.formatMoney(data.rent_deposit || 0));
+		$('#rent_arrears').val(this.formatMoney(data.rent_arrears || 0));
+		$('#tenant_name').val(data.tenant_name || '');
+		$('#tenant_relation').val(data.tenant_relation || '');
+		$('#owner_name').val(data.owner_name || '');
+		$('#owner_relation').val(data.owner_relation || '');
+		$('#residence_reason').val(data.residence_reason || '');
+	}
+
+	populateTaxInfo(data) {
+		// 각 세금 상태 설정
+		const taxTypes = ['income_tax', 'residence_tax', 'property_tax', 'pension_tax', 'car_tax', 'other_tax', 'health_insurance'];
 		
-		// 세금 정보 로드
-		this.loadTaxInfo();
+		taxTypes.forEach(type => {
+			if (data[`${type}_status`]) {
+				$(`input[name="${type}_status"][value="${data[`${type}_status`]}"]`).prop('checked', true);
+			}
+			
+			if (data[`${type}_amount`]) {
+				$(`#${type}_amount`).val(this.formatMoney(data[`${type}_amount`]));
+			}
+		});
+	}
+
+	populateFamilyMembers(membersData) {
+		// 컨테이너 초기화
+		$('#family_members_container').empty();
+		
+		if (membersData && membersData.length > 0) {
+			membersData.forEach(member => {
+				this.addFamilyMember(member);
+			});
+		} else {
+			// 데이터가 없으면 빈 블록 추가
+			this.addFamilyMember();
+		}
 	}
 
 	// 기본 정보 로드
@@ -126,7 +204,6 @@ class LivingStatusManager {
 		});
 	}
 
-	// 가족 구성원 정보 로드
 	loadFamilyMembers() {
 		$.ajax({
 			url: '/adm/api/application_bankruptcy/living_status/living_status_api.php',
@@ -139,8 +216,8 @@ class LivingStatusManager {
 				
 				if (response.success) {
 					// 데이터가 있으면 표시
-					if (response.data && response.data.length > 0) {
-						response.data.forEach(member => {
+					if (response.data && response.data.family_members && response.data.family_members.length > 0) {
+						response.data.family_members.forEach(member => {
 							this.addFamilyMember(member);
 						});
 					} else {
