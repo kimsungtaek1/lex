@@ -19,11 +19,9 @@
 			</div>
 			<nav class="main-nav">
 				<ul>
-					<li><a href="bankruptcy.php">사건목록</a></li>
-					<li><a href="recovery.php">채권소개</a></li>
-					<li><a href="mypage.php">마이페이지</a></li>
-					<li><a href="financial.php">금융사항</a></li>
-					<li><a href="contact.php">고객지원</a></li>
+					<li><a href="/adm/page/index_products.php">제품소개</a></li>
+					<li><a href="/adm/page/index_notice.php">공지사항</a></li>
+					<li><a href="/adm/page/index_contact.php">고객지원</a></li>
 				</ul>
 			</nav>
 		</div>
