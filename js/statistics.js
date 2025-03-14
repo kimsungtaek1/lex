@@ -499,7 +499,8 @@ function renderManagerWeeklyStats(weeklyData, managers) {
 	// 각 주차별 데이터
 	weeklyData.forEach(item => {
 		tableHtml += '<tr>';
-		tableHtml += `<td>${item.date_range}<br>(${item.week}주차)</td>`;
+		// 여기서 수정: 주차 정보 표시 방식 변경
+		tableHtml += `<td>${item.date_range}<br>(${$('.weekly-stats-header .date-column').text().split('주간')[0]} ${item.week}주차)</td>`;
 		
 		// 각 사무장별 데이터
 		item.managers.forEach((manager, index) => {
