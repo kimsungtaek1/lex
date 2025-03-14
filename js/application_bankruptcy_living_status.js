@@ -48,7 +48,7 @@ class LivingStatusManager {
 		});
 
 		// 세금 미납 체크박스 이벤트
-		$('input[name$="_tax_status"]').on('change', function() {
+		$('input[name$="_tax_status"], input[name="health_insurance_status"]').on('change', function() {
 			const name = $(this).attr('name');
 			$(`input[name="${name}"]`).not(this).prop('checked', false);
 		});
@@ -93,6 +93,7 @@ class LivingStatusManager {
 					$('#job_industry').val(data.job_industry || '');
 					$('#company_name').val(data.company_name || '');
 					$('#employment_period').val(data.employment_period || '');
+					$('#job_position').val(data.job_position || '');
 				}
 			},
 			error: (xhr, status, error) => {
@@ -171,16 +172,22 @@ class LivingStatusManager {
 				if (response.success && response.data) {
 					const data = response.data;
 					
-					$('#basic_facts').val(data.basic_facts || '');
+					$('#living_start_date').val(data.living_start_date || '');
 					
 					// 가족관계사항 라디오 버튼 설정
 					if (data.family_status) {
 						$(`input[name="family_status"][value="${data.family_status}"]`).prop('checked', true);
 					}
 					
+					$('#family_status_etc').val(data.family_status_etc || '');
 					$('#monthly_rent').val(this.formatMoney(data.monthly_rent || 0));
 					$('#rent_deposit').val(this.formatMoney(data.rent_deposit || 0));
-					$('#applicant_relation').val(data.applicant_relation || '');
+					$('#rent_arrears').val(this.formatMoney(data.rent_arrears || 0));
+					$('#tenant_name').val(data.tenant_name || '');
+					$('#tenant_relation').val(data.tenant_relation || '');
+					$('#owner_name').val(data.owner_name || '');
+					$('#owner_relation').val(data.owner_relation || '');
+					$('#residence_reason').val(data.residence_reason || '');
 				}
 			},
 			error: (xhr, status, error) => {
@@ -201,7 +208,7 @@ class LivingStatusManager {
 					const data = response.data;
 					
 					// 각 세금 상태 설정
-					const taxTypes = ['income_tax', 'residence_tax', 'property_tax', 'alimony', 'pension_tax', 'car_tax', 'other_tax'];
+					const taxTypes = ['income_tax', 'residence_tax', 'property_tax', 'pension_tax', 'car_tax', 'other_tax', 'health_insurance'];
 					
 					taxTypes.forEach(type => {
 						if (data[`${type}_status`]) {
@@ -227,7 +234,8 @@ class LivingStatusManager {
 			job_type: $('input[name="job_type"]:checked').val() || '',
 			job_industry: $('#job_industry').val(),
 			company_name: $('#company_name').val(),
-			employment_period: $('#employment_period').val()
+			employment_period: $('#employment_period').val(),
+			job_position: $('#job_position').val()
 		};
 
 		$.ajax({
@@ -285,11 +293,17 @@ class LivingStatusManager {
 
 		const data = {
 			case_no: window.currentCaseNo,
-			basic_facts: $('#basic_facts').val(),
+			living_start_date: $('#living_start_date').val(),
 			family_status: selectedStatus,
+			family_status_etc: $('#family_status_etc').val(),
 			monthly_rent: this.unformatMoney($('#monthly_rent').val()),
 			rent_deposit: this.unformatMoney($('#rent_deposit').val()),
-			applicant_relation: $('#applicant_relation').val()
+			rent_arrears: this.unformatMoney($('#rent_arrears').val()),
+			tenant_name: $('#tenant_name').val(),
+			tenant_relation: $('#tenant_relation').val(),
+			owner_name: $('#owner_name').val(),
+			owner_relation: $('#owner_relation').val(),
+			residence_reason: $('#residence_reason').val()
 		};
 
 		$.ajax({
@@ -318,7 +332,7 @@ class LivingStatusManager {
 		};
 
 		// 각 세금 유형별 데이터 수집
-		const taxTypes = ['income_tax', 'residence_tax', 'property_tax', 'alimony', 'pension_tax', 'car_tax', 'other_tax'];
+		const taxTypes = ['income_tax', 'residence_tax', 'property_tax', 'pension_tax', 'car_tax', 'other_tax', 'health_insurance'];
 		
 		taxTypes.forEach(type => {
 			data[`${type}_status`] = $(`input[name="${type}_status"]:checked`).val() || '';
@@ -389,7 +403,7 @@ class LivingStatusManager {
 			success: (response) => {
 				if (response.success) {
 					alert('가족 구성원 정보가 저장되었습니다.');
-					if (response.data.member_id) {
+					if (response.data && response.data.member_id) {
 						block.find('.family_member_id').val(response.data.member_id);
 					}
 				} else {
