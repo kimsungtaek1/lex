@@ -474,23 +474,9 @@ function renderManagerWeeklyStats(weeklyData, managers, monthInfo) {
 	// 테이블 헤더
 	tableHtml += '<thead><tr>';
 	tableHtml += '<th>주차</th>';
-	
-	// 사무장 이름 헤더
-	managers.forEach(manager => {
-		tableHtml += `<th colspan="2">${manager.name} 사무장</th>`;
-	});
-	
-	tableHtml += '<th colspan="2">합계</th>';
-	tableHtml += '</tr>';
-	
-	// 유입/계약 서브헤더
-	tableHtml += '<tr><th></th>';
-	
-	managers.forEach(() => {
-		tableHtml += '<th>유입</th><th>계약</th>';
-	});
-	
-	tableHtml += '<th>유입</th><th>계약</th>';
+	tableHtml += '<th>상담건수</th>';
+	tableHtml += '<th>계약체결건수</th>';
+	tableHtml += '<th>계약체결률</th>';
 	tableHtml += '</tr></thead>';
 	
 	// 테이블 바디
@@ -498,31 +484,30 @@ function renderManagerWeeklyStats(weeklyData, managers, monthInfo) {
 	
 	// 월별 합계 계산을 위한 변수 초기화
 	let monthlyTotals = {
-		managers: Array(managers.length).fill().map(() => ({ inflow: 0, contract: 0 })),
-		total: { inflow: 0, contract: 0 }
+		inflow: 0,
+		contract: 0
 	};
 	
 	// 각 주차별 데이터
 	weeklyData.forEach(item => {
 		tableHtml += '<tr>';
-		// 여기서 수정: 월 정보와 주차 정보 표시
-		tableHtml += `<td>${item.date_range}<br>(${monthInfo} ${item.week}주차)</td>`;
+		// 주차 정보에 월 정보 포함하여 표시
+		tableHtml += `<td>${monthInfo} ${item.week}주차<br>(${item.date_range})</td>`;
 		
-		// 각 사무장별 데이터
-		item.managers.forEach((manager, index) => {
-			tableHtml += `<td>${manager.inflow}</td><td>${manager.contract}</td>`;
-			
-			// 월별 합계에 추가
-			monthlyTotals.managers[index].inflow += manager.inflow;
-			monthlyTotals.managers[index].contract += manager.contract;
-		});
+		// 상담건수(유입)
+		tableHtml += `<td>${item.total.inflow}</td>`;
 		
-		// 주간 합계
-		tableHtml += `<td>${item.total.inflow}</td><td>${item.total.contract}</td>`;
+		// 계약체결건수
+		tableHtml += `<td>${item.total.contract}</td>`;
+		
+		// 계약체결률 계산
+		const contractRate = item.total.inflow > 0 ? 
+			Math.round((item.total.contract / item.total.inflow) * 100) : 0;
+		tableHtml += `<td>${contractRate}%</td>`;
 		
 		// 월 합계에 추가
-		monthlyTotals.total.inflow += item.total.inflow;
-		monthlyTotals.total.contract += item.total.contract;
+		monthlyTotals.inflow += item.total.inflow;
+		monthlyTotals.contract += item.total.contract;
 		
 		tableHtml += '</tr>';
 	});
@@ -533,25 +518,24 @@ function renderManagerWeeklyStats(weeklyData, managers, monthInfo) {
 	statsBody.html(tableHtml);
 	
 	// 푸터 업데이트 (월간 합계)
-	updateWeeklyStatsFooter(monthlyTotals, managers);
+	updateWeeklyStatsFooter(monthlyTotals);
 }
 
 // 주간 통계 푸터 업데이트 함수
-function updateWeeklyStatsFooter(monthlyTotals, managers) {
+function updateWeeklyStatsFooter(monthlyTotals) {
 	const footer = $('.weekly-stats-footer');
 	footer.empty();
+	
+	// 월 전체 계약체결률 계산
+	const monthlyContractRate = monthlyTotals.inflow > 0 ? 
+		Math.round((monthlyTotals.contract / monthlyTotals.inflow) * 100) : 0;
 	
 	let footerHtml = '<table>';
 	footerHtml += '<tr>';
 	footerHtml += '<th>월별 합계</th>';
-	
-	// 각 사무장별 월간 합계
-	monthlyTotals.managers.forEach(managerTotal => {
-		footerHtml += `<th>${managerTotal.inflow}</th><th>${managerTotal.contract}</th>`;
-	});
-	
-	// 전체 월간 합계
-	footerHtml += `<th>${monthlyTotals.total.inflow}</th><th>${monthlyTotals.total.contract}</th>`;
+	footerHtml += `<th>${monthlyTotals.inflow}</th>`;
+	footerHtml += `<th>${monthlyTotals.contract}</th>`;
+	footerHtml += `<th>${monthlyContractRate}%</th>`;
 	footerHtml += '</tr>';
 	footerHtml += '</table>';
 	
