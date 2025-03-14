@@ -491,15 +491,15 @@ function renderManagerWeeklyStats(weeklyData, managers, monthInfo) {
 		tableHtml += `<td>${monthInfo} ${item.week}주차<br>(${item.date_range})</td>`;
 		
 		// 상담건수(유입)
-		tableHtml += `<td>${item.total.inflow}</td>`;
+		tableHtml += `<td>${item.total.inflow} 건</td>`;
 		
 		// 계약체결건수
-		tableHtml += `<td>${item.total.contract}</td>`;
+		tableHtml += `<td>${item.total.contract} 건</td>`;
 		
 		// 계약체결률 계산
 		const contractRate = item.total.inflow > 0 ? 
 			Math.round((item.total.contract / item.total.inflow) * 100) : 0;
-		tableHtml += `<td>${contractRate}%</td>`;
+		tableHtml += `<td>${contractRate} %</td>`;
 		
 		// 월 합계에 추가
 		monthlyTotals.inflow += item.total.inflow;
