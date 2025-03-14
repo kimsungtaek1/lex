@@ -417,12 +417,11 @@ class LivingStatusManager {
 		});
 	}
 
-	// 가족 구성원 삭제
 	deleteFamilyMember(block) {
 		const memberId = block.find('.family_member_id').val();
 		
 		// 저장되지 않은 블록인 경우 바로 삭제
-		if (!memberId) {
+		if (!memberId || memberId === this.familyCounter.toString()) {
 			block.remove();
 			return;
 		}
@@ -436,7 +435,8 @@ class LivingStatusManager {
 			type: 'POST',
 			data: {
 				case_no: window.currentCaseNo,
-				member_id: memberId
+				member_id: memberId,
+				action: 'delete_family_member'  // action 파라미터 추가
 			},
 			dataType: 'json',
 			success: (response) => {
