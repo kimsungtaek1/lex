@@ -98,6 +98,34 @@
 .stat-footer{flex:1;padding:10px 5px;text-align:center;border-right:1px solid #ddd;}
 .stat-footer:last-child{border-right:none;}
 
+/* 주간 통계 스타일 */
+.weekly-stats-left{flex:1 1 60%;display:flex;flex-direction:column;gap:2vh;}
+.weekly-stats-right{flex:1 1 40%;display:flex;flex-direction:column;gap:2vh;}
+.weekly-stats-container{width:100%;font-size:1.2vw;cursor:pointer;}
+.weekly-stats-header{display:flex;color:white;font-weight:bold;width:100%;}
+.weekly-stats-body{border:1px solid #eee;border-radius:5px;overflow:hidden;}
+
+/* 주간 통계 테이블 스타일 */
+.weekly-stats-table{width:100%;border-collapse:collapse;}
+.weekly-stats-table th{padding:10px;background-color:#b0b0b0;color:white;font-weight:bold;text-align:center;}
+.weekly-stats-table th:first-child{background-color:#6c6c6c;color:#00e6c3;width:25%;}
+.weekly-stats-table th:last-child{background-color:#6c6c6c;}
+.weekly-stats-table td{padding:8px;text-align:center;border-bottom:1px solid #eee;}
+.weekly-stats-table td:first-child{background-color:#f9f9f9;font-weight:bold;text-align:left;padding-left:15px;}
+.weekly-stats-table td:last-child{background-color:#f9f9f9;font-weight:bold;}
+.weekly-stats-table tr:last-child td{border-bottom:none;}
+.weekly-stats-table tr:hover td{background-color:#f5f5f5;}
+.weekly-stats-table tr:hover td:first-child{background-color:#eee;}
+.weekly-stats-table tr:hover td:last-child{background-color:#eee;}
+
+/* 주간 통계 푸터 스타일 */
+.weekly-stats-footer{margin-top:10px;}
+.weekly-stats-footer table{width:100%;border-collapse:collapse;}
+.weekly-stats-footer th{padding:10px;background-color:#6c6c6c;color:white;font-weight:bold;text-align:center;}
+.weekly-stats-footer th:first-child{color:#00e6c3;}
+
+#weekFilterDropdown{position:absolute;display:none;background-color:#fff;border-radius:0.3vw;box-shadow:0 2px 5px rgba(0,0,0,0.2);z-index:1000;min-width:220px;top:auto;left:auto;}
+
 /* 6명 이하일 때 스크롤 없이 표시 */
 @media screen and (min-width: 1200px) {
     .manager-stats-container.has-few-managers .managers-scroll-area {
