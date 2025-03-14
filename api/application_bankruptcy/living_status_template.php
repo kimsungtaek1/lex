@@ -48,7 +48,7 @@
     <div class="form">
       <div class="form-title"><span></span></div>
       <div class="form-content btn-right">
-        <button type="button" id="save_living_status_basic" class="btn-save">저장</button>
+        <button type="button" id="save_living_status_basic" class="btn-save-living">저장</button>
       </div>
     </div>
   </div>
@@ -104,7 +104,7 @@
     <div class="form">
       <div class="form-title"></div>
       <div class="form-content btn-right">
-        <button type="button" id="save_living_status_income" class="btn-save">저장</button>
+        <button type="button" id="save_living_status_income" class="btn-save-living">저장</button>
       </div>
     </div>
   </div>
@@ -248,7 +248,7 @@
     <div class="form">
       <div class="form-title"></div>
       <div class="form-content btn-right">
-        <button type="button" id="save_living_status_additional" class="btn-save">저장</button>
+        <button type="button" id="save_living_status_additional" class="btn-save-living">저장</button>
       </div>
     </div>
   </div>
@@ -350,7 +350,7 @@
     <div class="form">
       <div class="form-title"></div>
       <div class="form-content btn-right">
-        <button type="button" id="save_living_status_tax" class="btn-save">저장</button>
+        <button type="button" id="save_living_status_tax" class="btn-save-living">저장</button>
       </div>
     </div>
   </div>
@@ -398,7 +398,7 @@
           <div class="form-title"></div>
           <div class="form-content btn-right">
             <button type="button" class="btn-delete family_delete_btn">삭제</button>
-            <button type="button" class="btn-save family_save_btn">저장</button>
+            <button type="button" class="btn-save-living family_save_btn">저장</button>
           </div>
         </div>
       </div>
