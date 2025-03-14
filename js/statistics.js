@@ -159,6 +159,35 @@ function loadInitialTabContent() {
 		// 드롭다운 초기화
 		initWeekFilterDropdown();
 	});
+	
+	// 월간 통계 테이블 헤더 클릭 이벤트
+	$(document).on('click', '.monthly-stats-table th:first-child', function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		
+		// 현재 클릭된 헤더의 위치 계산
+		const headerPosition = $(this).offset();
+		const headerHeight = $(this).outerHeight();
+		
+		// 드롭다운 위치 설정
+		$('#monthFilterDropdown').css({
+			display: 'block',
+			position: 'absolute',
+			top: (headerPosition.top + headerHeight) + 'px',
+			left: headerPosition.left + 'px',
+			zIndex: 1000
+		}).show();
+		
+		// 드롭다운 초기화
+		initMonthFilterDropdown();
+	});
+	
+	// 다른 곳 클릭 시 드롭다운 닫기
+	$(document).on('click', function(e) {
+		if (!$(e.target).closest('#monthFilterDropdown, .monthly-stats-table th:first-child').length) {
+			$('#monthFilterDropdown').hide();
+		}
+	});
 }
 
 // 윈도우 리사이즈 핸들러
