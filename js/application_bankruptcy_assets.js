@@ -906,7 +906,7 @@ class AssetManager {
 						<div class="form">
 							<div class="form-title"><span>차종/연식</span></div>
 							<div class="form-content">
-								<input type="text" class="vehicle_info" value="${data.vehicle_info || ""}" placeholder="차량번호, 연식, 모델(예:123가4567, 2020년형, 아반떼)">
+								<input type="text" class="vehicle_info form-content-long" value="${data.vehicle_info || ""}" placeholder="차량번호, 연식, 모델(예:123가4567, 2020년형, 아반떼)">
 							</div>
 						</div>
 						<div class="form">
@@ -932,12 +932,6 @@ class AssetManager {
 							<div class="form-title form-notitle"><span>청산가치 판단금액</span></div>
 							<div class="form-content">
 								시가&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="vehicle_market_value" data-type="money" value="${data.market_value || ""}">원
-							</div>
-						</div>
-						<div class="form">
-							<div class="form-title"><span></span></div>
-							<div class="form-content">
-								<input type="text" class="vehicle_liquidation_value" data-type="money" value="${data.liquidation_value || ""}">원
 							</div>
 						</div>
 						<div class="form">
@@ -1214,7 +1208,7 @@ class AssetManager {
 						<div class="form">
 							<div class="form-title"><span>상속상황</span></div>
 							<div class="form-content">
-								<select class="inheritance_status" name="inheritance_status">
+								<select class="inheritance_status form-content-long" name="inheritance_status">
 									<option value="㉠ 상속재산이 전혀 없음" ${(data.inheritance_status==="㉠ 상속재산이 전혀 없음") ? "selected" : ""}>㉠ 상속재산이 전혀 없음</option>
 									<option value="㉡ 신청인의 상속포기 또는 상속재산 분할에 의하여 다른 상속인이 모두 취득하였음" ${(data.inheritance_status==="㉡ 신청인의 상속포기 또는 상속재산 분할에 의하여 다른 상속인이 모두 취득하였음") ? "selected" : ""}>㉡ 신청인의 상속포기 또는 상속재산 분할에 의하여 다른 상속인이 모두 취득하였음</option>
 									<option value="㉢ 신청인이 전부 또는 일부를 상속하였음" ${(data.inheritance_status==="㉢ 신청인이 전부 또는 일부를 상속하였음") ? "selected" : ""}>㉢ 신청인이 전부 또는 일부를 상속하였음</option>
