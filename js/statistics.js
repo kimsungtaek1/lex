@@ -410,40 +410,77 @@ function initWeekFilterDropdown() {
 	});
 }
 
-// 필터링된 사무장 주간 통계 로드 함수
-function loadFilteredManagerWeeklyStats(year, month) {
-	const formattedMonth = month.toString().padStart(2, '0');
+// 주간 통계 데이터 렌더링 함수
+function renderManagerWeeklyStats(weeklyData, managers, monthInfo) {
+	const statsBody = $('#managerWeeklyStatsBody');
+	statsBody.empty();
 
-	$.ajax({
-		url: '../adm/api/stats/get_manager_weekly_stats.php',
-		method: 'GET',
-		data: {
-			year: year,
-			month: formattedMonth
-		},
-		dataType: 'json',
-		success: function(response) {
-			if(response.success) {
-				$('.weekly-stats-header .date-column').html(`${year}. ${month}월 주간 통계&nbsp;&nbsp;<span class="sort-icon date-dropdown-toggle">▼</span>`);
-				renderManagerWeeklyStats(response.data, response.managers);
-				renderWeeklyTrendChart(response.trend);
-			} else {
-				console.error('통계 로드 실패:', response);
-				alert('통계 데이터를 불러올 수 없습니다: ' + response.message);
-			}
-		},
-		error: function(xhr, status, error) {
-			try {
-				const errorResponse = JSON.parse(xhr.responseText);
-				console.error('서버 오류 상세 정보:', errorResponse);
-				alert('서버 오류: ' + errorResponse.message);
-			} catch(e) {
-				console.error('AJAX 오류:', status, error);
-				console.error('원시 응답:', xhr.responseText);
-				alert('데이터를 불러오는 중 심각한 오류가 발생했습니다.');
-			}
-		}
+	// HTML 테이블 생성
+	let tableHtml = '<table class="weekly-stats-table">';
+	
+	// 테이블 헤더
+	tableHtml += '<thead><tr>';
+	tableHtml += '<th>주차</th>';
+	
+	// 사무장 이름 헤더
+	managers.forEach(manager => {
+		tableHtml += `<th colspan="2">${manager.name} 사무장</th>`;
 	});
+	
+	tableHtml += '<th colspan="2">합계</th>';
+	tableHtml += '</tr>';
+	
+	// 유입/계약 서브헤더
+	tableHtml += '<tr><th></th>';
+	
+	managers.forEach(() => {
+		tableHtml += '<th>유입</th><th>계약</th>';
+	});
+	
+	tableHtml += '<th>유입</th><th>계약</th>';
+	tableHtml += '</tr></thead>';
+	
+	// 테이블 바디
+	tableHtml += '<tbody>';
+	
+	// 월별 합계 계산을 위한 변수 초기화
+	let monthlyTotals = {
+		managers: Array(managers.length).fill().map(() => ({ inflow: 0, contract: 0 })),
+		total: { inflow: 0, contract: 0 }
+	};
+	
+	// 각 주차별 데이터
+	weeklyData.forEach(item => {
+		tableHtml += '<tr>';
+		// 여기서 수정: 월 정보와 주차 정보 표시
+		tableHtml += `<td>${item.date_range}<br>(${monthInfo} ${item.week}주차)</td>`;
+		
+		// 각 사무장별 데이터
+		item.managers.forEach((manager, index) => {
+			tableHtml += `<td>${manager.inflow}</td><td>${manager.contract}</td>`;
+			
+			// 월별 합계에 추가
+			monthlyTotals.managers[index].inflow += manager.inflow;
+			monthlyTotals.managers[index].contract += manager.contract;
+		});
+		
+		// 주간 합계
+		tableHtml += `<td>${item.total.inflow}</td><td>${item.total.contract}</td>`;
+		
+		// 월 합계에 추가
+		monthlyTotals.total.inflow += item.total.inflow;
+		monthlyTotals.total.contract += item.total.contract;
+		
+		tableHtml += '</tr>';
+	});
+	
+	tableHtml += '</tbody></table>';
+	
+	// 테이블 렌더링
+	statsBody.html(tableHtml);
+	
+	// 푸터 업데이트 (월간 합계)
+	updateWeeklyStatsFooter(monthlyTotals, managers);
 }
 
 // 사무장 주간 통계 로드 함수
