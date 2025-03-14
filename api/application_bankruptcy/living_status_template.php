@@ -110,7 +110,7 @@
   </div>
 </div>
 
-<!-- 가족/주거지 상황 -->
+<!-- 가족/동거인 상황 -->
 <div class="section-header">
   <div class="creditor-title">
     <div class="checkbox-group">
@@ -131,6 +131,74 @@
     </div>
   </div>
 </div>
+<div class="content-wrapper">
+  <div class="left-section">
+    <div class="form">
+      <div class="form-title"><span>거주 시작점</span></div>
+      <div class="form-content form-content-3">
+        
+      </div>
+    </div>
+    <div class="form">
+      <div class="form-title"><span>거주관계선택</span></div>
+      <div class="form-content">
+        <div class="checkbox-group">
+          <input type="radio" id="family_status_1" name="family_status" value="① 일반적 이혼의 자녀 부양">
+          <label for="family_status_1">① 일반적 이혼의 자녀 부양</label>
+        </div>
+        <div class="checkbox-group">
+          <input type="radio" id="family_status_2" name="family_status" value="② 시제 보존 가수의 부양">
+          <label for="family_status_2">② 시제 보존 가수의 부양</label>
+        </div>
+        <div class="checkbox-group">
+          <input type="radio" id="family_status_3" name="family_status" value="③ 신청인 소유의 주택">
+          <label for="family_status_3">③ 신청인 소유의 주택</label>
+        </div>
+        <div class="checkbox-group">
+          <input type="radio" id="family_status_4" name="family_status" value="④ 친족 소유 주택에 무상거주">
+          <label for="family_status_4">④ 친족 소유 주택에 무상거주</label>
+        </div>
+        <div class="checkbox-group">
+          <input type="radio" id="family_status_5" name="family_status" value="⑤ 월세 및 소유 주택 무상거주">
+          <label for="family_status_5">⑤ 월세 및 소유 주택 무상거주</label>
+        </div>
+        <div class="checkbox-group">
+          <input type="radio" id="family_status_6" name="family_status" value="⑥ 기타">
+          <label for="family_status_6">⑥ 기타</label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="right-section">
+    <div class="form">
+      <div class="form-title form-notitle"><span>㉠또는 ㉡선택시</span></div>
+      <div class="form-content">
+        <div class="form-row">
+          <span>임대료(월차임) :</span> <input type="text" id="monthly_rent" name="monthly_rent" data-type="money"> 원
+        </div>
+      </div>
+    </div>
+    <div class="form">
+      <div class="form-title"><span>임대보증금 :</span></div>
+      <div class="form-content">
+        <input type="text" id="rent_deposit" name="rent_deposit" data-type="money"> 원
+      </div>
+    </div>
+    <div class="form">
+      <div class="form-title"><span>㉣또는 ㉤선택시</span></div>
+      <div class="form-content">
+        <input type="text" id="applicant_relation" name="applicant_relation">
+      </div>
+    </div>
+    <div class="form">
+      <div class="form-title"></div>
+      <div class="form-content btn-right">
+        <button type="button" id="save_living_status_additional" class="btn-save">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="content-wrapper">
   <div class="left-section">
     <div class="form">
