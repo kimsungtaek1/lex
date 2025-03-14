@@ -473,7 +473,7 @@ function renderManagerWeeklyStats(weeklyData, managers, monthInfo) {
 	
 	// 테이블 헤더
 	tableHtml += '<thead><tr>';
-	tableHtml += '<th>주차</th>';
+	tableHtml += '<th>주간 통계 ▼</th>'; // 여기를 "주간 통계 ▼"로 변경
 	tableHtml += '<th>상담건수</th>';
 	tableHtml += '<th>계약체결건수</th>';
 	tableHtml += '<th>계약체결률</th>';
