@@ -1,11 +1,16 @@
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
 SET time_zone = "+00:00";
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
+--
+-- 데이터베이스: `lez062801`
+--
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_bankruptcy`
+--
 
 CREATE TABLE `application_bankruptcy` (
   `bankruptcy_no` int(11) NOT NULL,
@@ -28,6 +33,12 @@ CREATE TABLE `application_bankruptcy` (
   `support_details` text DEFAULT NULL COMMENT '지원내역과 지원금액'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_bankruptcy_assets`
+--
+
 CREATE TABLE `application_bankruptcy_assets` (
   `asset_no` int(11) NOT NULL,
   `case_no` int(11) NOT NULL,
@@ -41,6 +52,12 @@ CREATE TABLE `application_bankruptcy_assets` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_bankruptcy_creditor`
+--
 
 CREATE TABLE `application_bankruptcy_creditor` (
   `creditor_no` int(11) NOT NULL,
@@ -60,6 +77,12 @@ CREATE TABLE `application_bankruptcy_creditor` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_bankruptcy_income_expenditure`
+--
+
 CREATE TABLE `application_bankruptcy_income_expenditure` (
   `income_no` int(11) NOT NULL,
   `case_no` int(11) NOT NULL,
@@ -71,6 +94,12 @@ CREATE TABLE `application_bankruptcy_income_expenditure` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_bankruptcy_prohibition_orders`
+--
+
 CREATE TABLE `application_bankruptcy_prohibition_orders` (
   `order_no` int(11) NOT NULL,
   `case_no` int(11) NOT NULL,
@@ -81,6 +110,12 @@ CREATE TABLE `application_bankruptcy_prohibition_orders` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_bankruptcy_statement`
+--
+
 CREATE TABLE `application_bankruptcy_statement` (
   `statement_no` int(11) NOT NULL,
   `case_no` int(11) NOT NULL,
@@ -89,6 +124,12 @@ CREATE TABLE `application_bankruptcy_statement` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_bankruptcy_statement_bankruptcy_history`
+--
 
 CREATE TABLE `application_bankruptcy_statement_bankruptcy_history` (
   `id` int(11) NOT NULL,
@@ -99,6 +140,12 @@ CREATE TABLE `application_bankruptcy_statement_bankruptcy_history` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_bankruptcy_statement_bankruptcy_reason`
+--
 
 CREATE TABLE `application_bankruptcy_statement_bankruptcy_reason` (
   `id` int(11) NOT NULL,
@@ -125,6 +172,12 @@ CREATE TABLE `application_bankruptcy_statement_bankruptcy_reason` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_bankruptcy_statement_career`
+--
+
 CREATE TABLE `application_bankruptcy_statement_career` (
   `career_id` int(11) NOT NULL,
   `case_no` int(11) NOT NULL,
@@ -137,6 +190,12 @@ CREATE TABLE `application_bankruptcy_statement_career` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_bankruptcy_statement_creditor_status`
+--
 
 CREATE TABLE `application_bankruptcy_statement_creditor_status` (
   `id` int(11) NOT NULL,
@@ -152,6 +211,12 @@ CREATE TABLE `application_bankruptcy_statement_creditor_status` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_bankruptcy_statement_debt_after_insolvency`
+--
+
 CREATE TABLE `application_bankruptcy_statement_debt_after_insolvency` (
   `id` int(11) NOT NULL,
   `case_no` int(11) NOT NULL,
@@ -164,6 +229,12 @@ CREATE TABLE `application_bankruptcy_statement_debt_after_insolvency` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_bankruptcy_statement_domestic_court`
+--
+
 CREATE TABLE `application_bankruptcy_statement_domestic_court` (
   `id` int(11) NOT NULL,
   `case_no` int(11) NOT NULL,
@@ -173,6 +244,12 @@ CREATE TABLE `application_bankruptcy_statement_domestic_court` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_bankruptcy_statement_education`
+--
 
 CREATE TABLE `application_bankruptcy_statement_education` (
   `education_id` int(11) NOT NULL,
@@ -184,6 +261,12 @@ CREATE TABLE `application_bankruptcy_statement_education` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_bankruptcy_statement_legal_action`
+--
+
 CREATE TABLE `application_bankruptcy_statement_legal_action` (
   `id` int(11) NOT NULL,
   `case_no` int(11) NOT NULL,
@@ -193,6 +276,12 @@ CREATE TABLE `application_bankruptcy_statement_legal_action` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_bankruptcy_statement_life_history`
+--
 
 CREATE TABLE `application_bankruptcy_statement_life_history` (
   `id` int(11) NOT NULL,
@@ -233,6 +322,12 @@ CREATE TABLE `application_bankruptcy_statement_life_history` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_bankruptcy_statement_partial_repayment`
+--
+
 CREATE TABLE `application_bankruptcy_statement_partial_repayment` (
   `id` int(11) NOT NULL,
   `case_no` int(11) NOT NULL,
@@ -244,6 +339,12 @@ CREATE TABLE `application_bankruptcy_statement_partial_repayment` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_bankruptcy_stay_orders`
+--
+
 CREATE TABLE `application_bankruptcy_stay_orders` (
   `order_no` int(11) NOT NULL,
   `case_no` int(11) NOT NULL,
@@ -254,6 +355,12 @@ CREATE TABLE `application_bankruptcy_stay_orders` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery`
+--
 
 CREATE TABLE `application_recovery` (
   `recovery_no` int(11) NOT NULL,
@@ -290,6 +397,12 @@ CREATE TABLE `application_recovery` (
   `income_source` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_additional_claims`
+--
+
 CREATE TABLE `application_recovery_additional_claims` (
   `claim_no` int(11) NOT NULL,
   `case_no` int(11) NOT NULL,
@@ -301,6 +414,12 @@ CREATE TABLE `application_recovery_additional_claims` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_asset_attached_deposits`
+--
 
 CREATE TABLE `application_recovery_asset_attached_deposits` (
   `asset_no` int(11) NOT NULL,
@@ -315,6 +434,12 @@ CREATE TABLE `application_recovery_asset_attached_deposits` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_asset_business`
+--
+
 CREATE TABLE `application_recovery_asset_business` (
   `asset_no` int(11) NOT NULL,
   `property_no` int(11) NOT NULL,
@@ -328,6 +453,12 @@ CREATE TABLE `application_recovery_asset_business` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_asset_cash`
+--
+
 CREATE TABLE `application_recovery_asset_cash` (
   `asset_no` int(11) NOT NULL,
   `property_no` int(11) NOT NULL,
@@ -338,6 +469,12 @@ CREATE TABLE `application_recovery_asset_cash` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_asset_court_deposits`
+--
 
 CREATE TABLE `application_recovery_asset_court_deposits` (
   `asset_no` int(11) NOT NULL,
@@ -352,6 +489,12 @@ CREATE TABLE `application_recovery_asset_court_deposits` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_asset_deposits`
+--
+
 CREATE TABLE `application_recovery_asset_deposits` (
   `asset_no` int(11) NOT NULL,
   `property_no` int(11) NOT NULL,
@@ -364,6 +507,12 @@ CREATE TABLE `application_recovery_asset_deposits` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_asset_disposed`
+--
 
 CREATE TABLE `application_recovery_asset_disposed` (
   `asset_no` int(11) NOT NULL,
@@ -379,6 +528,12 @@ CREATE TABLE `application_recovery_asset_disposed` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_asset_divorce`
+--
+
 CREATE TABLE `application_recovery_asset_divorce` (
   `asset_no` int(11) NOT NULL,
   `case_no` varchar(50) NOT NULL,
@@ -392,6 +547,12 @@ CREATE TABLE `application_recovery_asset_divorce` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_asset_exemption1`
+--
 
 CREATE TABLE `application_recovery_asset_exemption1` (
   `asset_no` int(11) NOT NULL,
@@ -417,6 +578,12 @@ CREATE TABLE `application_recovery_asset_exemption1` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_asset_exemption2`
+--
+
 CREATE TABLE `application_recovery_asset_exemption2` (
   `asset_no` int(11) NOT NULL,
   `property_no` int(11) NOT NULL,
@@ -429,6 +596,12 @@ CREATE TABLE `application_recovery_asset_exemption2` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_asset_inherited`
+--
 
 CREATE TABLE `application_recovery_asset_inherited` (
   `asset_no` int(11) NOT NULL,
@@ -444,6 +617,12 @@ CREATE TABLE `application_recovery_asset_inherited` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_asset_insurance`
+--
+
 CREATE TABLE `application_recovery_asset_insurance` (
   `asset_no` int(11) NOT NULL,
   `property_no` int(11) NOT NULL,
@@ -458,6 +637,12 @@ CREATE TABLE `application_recovery_asset_insurance` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_asset_loan_receivables`
+--
+
 CREATE TABLE `application_recovery_asset_loan_receivables` (
   `asset_no` int(11) NOT NULL,
   `property_no` int(11) NOT NULL,
@@ -470,6 +655,12 @@ CREATE TABLE `application_recovery_asset_loan_receivables` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_asset_other`
+--
+
 CREATE TABLE `application_recovery_asset_other` (
   `asset_no` int(11) NOT NULL,
   `property_no` int(11) NOT NULL,
@@ -480,6 +671,12 @@ CREATE TABLE `application_recovery_asset_other` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_asset_real_estate`
+--
 
 CREATE TABLE `application_recovery_asset_real_estate` (
   `asset_no` int(11) NOT NULL,
@@ -502,6 +699,12 @@ CREATE TABLE `application_recovery_asset_real_estate` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_asset_received_deposit`
+--
+
 CREATE TABLE `application_recovery_asset_received_deposit` (
   `asset_no` int(11) NOT NULL,
   `case_no` varchar(50) NOT NULL,
@@ -515,6 +718,12 @@ CREATE TABLE `application_recovery_asset_received_deposit` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_asset_rent_deposits`
+--
 
 CREATE TABLE `application_recovery_asset_rent_deposits` (
   `asset_no` int(11) NOT NULL,
@@ -536,6 +745,12 @@ CREATE TABLE `application_recovery_asset_rent_deposits` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_asset_sales_receivables`
+--
+
 CREATE TABLE `application_recovery_asset_sales_receivables` (
   `asset_no` int(11) NOT NULL,
   `property_no` int(11) NOT NULL,
@@ -547,6 +762,12 @@ CREATE TABLE `application_recovery_asset_sales_receivables` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_asset_severance`
+--
 
 CREATE TABLE `application_recovery_asset_severance` (
   `asset_no` int(11) NOT NULL,
@@ -562,6 +783,12 @@ CREATE TABLE `application_recovery_asset_severance` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_asset_vehicles`
+--
 
 CREATE TABLE `application_recovery_asset_vehicles` (
   `asset_no` int(11) NOT NULL,
@@ -580,6 +807,12 @@ CREATE TABLE `application_recovery_asset_vehicles` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_creditor`
+--
 
 CREATE TABLE `application_recovery_creditor` (
   `creditor_no` int(11) NOT NULL,
@@ -606,6 +839,12 @@ CREATE TABLE `application_recovery_creditor` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_creditor_appendix`
+--
+
 CREATE TABLE `application_recovery_creditor_appendix` (
   `appendix_no` int(11) NOT NULL,
   `case_no` int(11) NOT NULL,
@@ -615,6 +854,12 @@ CREATE TABLE `application_recovery_creditor_appendix` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_creditor_guaranteed_debts`
+--
 
 CREATE TABLE `application_recovery_creditor_guaranteed_debts` (
   `debt_no` int(11) NOT NULL,
@@ -628,6 +873,12 @@ CREATE TABLE `application_recovery_creditor_guaranteed_debts` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_creditor_settings`
+--
+
 CREATE TABLE `application_recovery_creditor_settings` (
   `setting_no` int(11) NOT NULL,
   `case_no` int(11) NOT NULL,
@@ -637,6 +888,12 @@ CREATE TABLE `application_recovery_creditor_settings` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_family_members`
+--
 
 CREATE TABLE `application_recovery_family_members` (
   `member_no` int(11) NOT NULL,
@@ -654,6 +911,12 @@ CREATE TABLE `application_recovery_family_members` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_financial_institutions`
+--
+
 CREATE TABLE `application_recovery_financial_institutions` (
   `institution_no` int(11) NOT NULL,
   `name` varchar(100) NOT NULL COMMENT '금융기관명',
@@ -664,6 +927,12 @@ CREATE TABLE `application_recovery_financial_institutions` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_financial_institution_requests`
+--
 
 CREATE TABLE `application_recovery_financial_institution_requests` (
   `request_no` int(11) NOT NULL,
@@ -681,6 +950,12 @@ CREATE TABLE `application_recovery_financial_institution_requests` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_income_business`
+--
+
 CREATE TABLE `application_recovery_income_business` (
   `business_no` int(11) NOT NULL,
   `case_no` int(11) NOT NULL,
@@ -694,6 +969,12 @@ CREATE TABLE `application_recovery_income_business` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_income_expenditure`
+--
 
 CREATE TABLE `application_recovery_income_expenditure` (
   `income_no` int(11) NOT NULL,
@@ -711,6 +992,12 @@ CREATE TABLE `application_recovery_income_expenditure` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT '수정일시'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='회생 소득/지출 관리';
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_income_living_expense_standard`
+--
+
 CREATE TABLE `application_recovery_income_living_expense_standard` (
   `id` int(11) NOT NULL,
   `year` int(4) NOT NULL COMMENT '적용 연도',
@@ -719,6 +1006,12 @@ CREATE TABLE `application_recovery_income_living_expense_standard` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='개인회생 생계비 기준액 테이블';
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_income_salary`
+--
 
 CREATE TABLE `application_recovery_income_salary` (
   `salary_no` int(11) NOT NULL,
@@ -733,6 +1026,12 @@ CREATE TABLE `application_recovery_income_salary` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_living_expenses`
+--
+
 CREATE TABLE `application_recovery_living_expenses` (
   `expense_no` int(11) NOT NULL,
   `case_no` int(11) NOT NULL,
@@ -743,6 +1042,12 @@ CREATE TABLE `application_recovery_living_expenses` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_mortgage`
+--
 
 CREATE TABLE `application_recovery_mortgage` (
   `mortgage_no` int(11) NOT NULL,
@@ -760,6 +1065,12 @@ CREATE TABLE `application_recovery_mortgage` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_plan10`
+--
+
 CREATE TABLE `application_recovery_plan10` (
   `plan_no` int(11) NOT NULL,
   `case_no` int(11) NOT NULL,
@@ -768,6 +1079,12 @@ CREATE TABLE `application_recovery_plan10` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_prohibition_orders`
+--
 
 CREATE TABLE `application_recovery_prohibition_orders` (
   `order_no` int(11) NOT NULL,
@@ -778,6 +1095,12 @@ CREATE TABLE `application_recovery_prohibition_orders` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_statement_career`
+--
 
 CREATE TABLE `application_recovery_statement_career` (
   `career_id` int(11) NOT NULL,
@@ -792,6 +1115,12 @@ CREATE TABLE `application_recovery_statement_career` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_statement_education`
+--
+
 CREATE TABLE `application_recovery_statement_education` (
   `education_id` int(11) NOT NULL,
   `case_no` int(11) NOT NULL,
@@ -801,6 +1130,12 @@ CREATE TABLE `application_recovery_statement_education` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_statement_marriage`
+--
 
 CREATE TABLE `application_recovery_statement_marriage` (
   `marriage_id` int(11) NOT NULL,
@@ -812,6 +1147,12 @@ CREATE TABLE `application_recovery_statement_marriage` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='회생 신청서 결혼/이혼 경력';
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `application_recovery_stay_orders`
+--
+
 CREATE TABLE `application_recovery_stay_orders` (
   `order_no` int(11) NOT NULL,
   `case_no` int(11) NOT NULL,
@@ -822,6 +1163,12 @@ CREATE TABLE `application_recovery_stay_orders` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `case_management`
+--
 
 CREATE TABLE `case_management` (
   `case_no` int(11) NOT NULL,
@@ -849,6 +1196,12 @@ CREATE TABLE `case_management` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `case_management_content`
+--
+
 CREATE TABLE `case_management_content` (
   `content_no` int(11) NOT NULL,
   `case_no` int(11) NOT NULL,
@@ -858,6 +1211,12 @@ CREATE TABLE `case_management_content` (
   `bank` varchar(50) DEFAULT NULL,
   `checker_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `chatbot`
+--
 
 CREATE TABLE `chatbot` (
   `no` int(11) NOT NULL,
@@ -871,6 +1230,12 @@ CREATE TABLE `chatbot` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `chatbot_files`
+--
+
 CREATE TABLE `chatbot_files` (
   `file_id` int(11) NOT NULL,
   `chat_no` int(11) NOT NULL,
@@ -881,6 +1246,12 @@ CREATE TABLE `chatbot_files` (
   `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `chatbot_settings`
+--
+
 CREATE TABLE `chatbot_settings` (
   `setting_id` int(11) NOT NULL,
   `member` int(11) NOT NULL,
@@ -890,12 +1261,24 @@ CREATE TABLE `chatbot_settings` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `config`
+--
+
 CREATE TABLE `config` (
   `no` int(11) NOT NULL,
   `customer_id` varchar(255) NOT NULL,
   `customer_number` varchar(255) NOT NULL,
   `icode_key` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `consult_manager`
+--
 
 CREATE TABLE `consult_manager` (
   `consult_no` int(11) NOT NULL,
@@ -919,6 +1302,12 @@ CREATE TABLE `consult_manager` (
   `paper` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `consult_manager_content`
+--
+
 CREATE TABLE `consult_manager_content` (
   `content_no` int(11) NOT NULL,
   `consult_no` int(11) NOT NULL,
@@ -927,6 +1316,12 @@ CREATE TABLE `consult_manager_content` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `consult_paper`
+--
 
 CREATE TABLE `consult_paper` (
   `paper_no` int(11) NOT NULL,
@@ -946,6 +1341,12 @@ CREATE TABLE `consult_paper` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `consult_paper_content`
+--
+
 CREATE TABLE `consult_paper_content` (
   `content_no` int(11) NOT NULL,
   `paper_no` int(11) NOT NULL,
@@ -954,6 +1355,12 @@ CREATE TABLE `consult_paper_content` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `employee`
+--
 
 CREATE TABLE `employee` (
   `employee_no` int(11) NOT NULL,
@@ -981,6 +1388,12 @@ CREATE TABLE `employee` (
   `representative` varchar(100) DEFAULT NULL COMMENT '대표자명'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `employee_department`
+--
+
 CREATE TABLE `employee_department` (
   `dept_id` int(11) NOT NULL,
   `dept_name` varchar(50) NOT NULL,
@@ -990,6 +1403,12 @@ CREATE TABLE `employee_department` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `employee_position`
+--
+
 CREATE TABLE `employee_position` (
   `position_id` int(11) NOT NULL,
   `position_name` varchar(50) NOT NULL,
@@ -998,6 +1417,12 @@ CREATE TABLE `employee_position` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `inflow`
+--
 
 CREATE TABLE `inflow` (
   `no` int(11) NOT NULL,
@@ -1022,6 +1447,12 @@ CREATE TABLE `inflow` (
   `status` varchar(20) DEFAULT '신규'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `sapplication_recovery_creditor_other_claims`
+--
+
 CREATE TABLE `sapplication_recovery_creditor_other_claims` (
   `claim_no` int(11) NOT NULL,
   `case_no` int(11) NOT NULL,
@@ -1033,6 +1464,12 @@ CREATE TABLE `sapplication_recovery_creditor_other_claims` (
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `schedule`
+--
 
 CREATE TABLE `schedule` (
   `schedule_no` int(11) NOT NULL,
@@ -1047,6 +1484,12 @@ CREATE TABLE `schedule` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `statistics_court`
+--
+
 CREATE TABLE `statistics_court` (
   `id` int(11) NOT NULL,
   `court_name` varchar(50) NOT NULL,
@@ -1058,12 +1501,24 @@ CREATE TABLE `statistics_court` (
   `bankruptcy_reject_rate` decimal(5,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `statistics_yearly`
+--
+
 CREATE TABLE `statistics_yearly` (
   `id` int(11) NOT NULL,
   `year` int(4) NOT NULL,
   `recovery_count` int(11) NOT NULL,
   `bankruptcy_count` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 테이블 구조 `stay_orders`
+--
 
 CREATE TABLE `stay_orders` (
   `order_no` int(11) NOT NULL,
@@ -1073,233 +1528,410 @@ CREATE TABLE `stay_orders` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- 덤프된 테이블의 인덱스
+--
 
+--
+-- 테이블의 인덱스 `application_bankruptcy`
+--
 ALTER TABLE `application_bankruptcy`
   ADD PRIMARY KEY (`bankruptcy_no`),
   ADD KEY `idx_case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_bankruptcy_assets`
+--
 ALTER TABLE `application_bankruptcy_assets`
   ADD PRIMARY KEY (`asset_no`),
   ADD KEY `fk_bankruptcy_assets_case` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_bankruptcy_creditor`
+--
 ALTER TABLE `application_bankruptcy_creditor`
   ADD PRIMARY KEY (`creditor_no`),
   ADD UNIQUE KEY `case_creditor_unique` (`case_no`,`creditor_count`),
   ADD KEY `idx_case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_bankruptcy_income_expenditure`
+--
 ALTER TABLE `application_bankruptcy_income_expenditure`
   ADD PRIMARY KEY (`income_no`),
   ADD KEY `fk_bankruptcy_income_case` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_bankruptcy_prohibition_orders`
+--
 ALTER TABLE `application_bankruptcy_prohibition_orders`
   ADD PRIMARY KEY (`order_no`),
   ADD KEY `fk_bankruptcy_prohibition_orders_case` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_bankruptcy_statement`
+--
 ALTER TABLE `application_bankruptcy_statement`
   ADD PRIMARY KEY (`statement_no`),
   ADD KEY `fk_bankruptcy_statement_case` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_bankruptcy_statement_bankruptcy_history`
+--
 ALTER TABLE `application_bankruptcy_statement_bankruptcy_history`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_bankruptcy_statement_bankruptcy_reason`
+--
 ALTER TABLE `application_bankruptcy_statement_bankruptcy_reason`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_bankruptcy_statement_career`
+--
 ALTER TABLE `application_bankruptcy_statement_career`
   ADD PRIMARY KEY (`career_id`),
   ADD KEY `idx_case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_bankruptcy_statement_creditor_status`
+--
 ALTER TABLE `application_bankruptcy_statement_creditor_status`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_bankruptcy_statement_debt_after_insolvency`
+--
 ALTER TABLE `application_bankruptcy_statement_debt_after_insolvency`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_bankruptcy_statement_domestic_court`
+--
 ALTER TABLE `application_bankruptcy_statement_domestic_court`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_bankruptcy_statement_education`
+--
 ALTER TABLE `application_bankruptcy_statement_education`
   ADD PRIMARY KEY (`education_id`),
   ADD KEY `idx_case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_bankruptcy_statement_legal_action`
+--
 ALTER TABLE `application_bankruptcy_statement_legal_action`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_bankruptcy_statement_life_history`
+--
 ALTER TABLE `application_bankruptcy_statement_life_history`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_bankruptcy_statement_partial_repayment`
+--
 ALTER TABLE `application_bankruptcy_statement_partial_repayment`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_bankruptcy_stay_orders`
+--
 ALTER TABLE `application_bankruptcy_stay_orders`
   ADD PRIMARY KEY (`order_no`),
   ADD KEY `fk_bankruptcy_stay_orders_case` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery`
+--
 ALTER TABLE `application_recovery`
   ADD PRIMARY KEY (`recovery_no`),
   ADD KEY `case_no` (`case_no`),
   ADD KEY `assigned_employee` (`assigned_employee`);
 
+--
+-- 테이블의 인덱스 `application_recovery_additional_claims`
+--
 ALTER TABLE `application_recovery_additional_claims`
   ADD PRIMARY KEY (`claim_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_asset_attached_deposits`
+--
 ALTER TABLE `application_recovery_asset_attached_deposits`
   ADD PRIMARY KEY (`asset_no`),
   ADD KEY `case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_asset_business`
+--
 ALTER TABLE `application_recovery_asset_business`
   ADD PRIMARY KEY (`asset_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_asset_cash`
+--
 ALTER TABLE `application_recovery_asset_cash`
   ADD PRIMARY KEY (`asset_no`),
   ADD KEY `case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_asset_court_deposits`
+--
 ALTER TABLE `application_recovery_asset_court_deposits`
   ADD PRIMARY KEY (`asset_no`),
   ADD KEY `case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_asset_deposits`
+--
 ALTER TABLE `application_recovery_asset_deposits`
   ADD PRIMARY KEY (`asset_no`),
   ADD KEY `case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_asset_disposed`
+--
 ALTER TABLE `application_recovery_asset_disposed`
   ADD PRIMARY KEY (`asset_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_asset_divorce`
+--
 ALTER TABLE `application_recovery_asset_divorce`
   ADD PRIMARY KEY (`asset_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_asset_exemption1`
+--
 ALTER TABLE `application_recovery_asset_exemption1`
   ADD PRIMARY KEY (`asset_no`),
   ADD KEY `case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_asset_exemption2`
+--
 ALTER TABLE `application_recovery_asset_exemption2`
   ADD PRIMARY KEY (`asset_no`),
   ADD KEY `case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_asset_inherited`
+--
 ALTER TABLE `application_recovery_asset_inherited`
   ADD PRIMARY KEY (`asset_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_asset_insurance`
+--
 ALTER TABLE `application_recovery_asset_insurance`
   ADD PRIMARY KEY (`asset_no`),
   ADD KEY `case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_asset_loan_receivables`
+--
 ALTER TABLE `application_recovery_asset_loan_receivables`
   ADD PRIMARY KEY (`asset_no`),
   ADD KEY `case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_asset_other`
+--
 ALTER TABLE `application_recovery_asset_other`
   ADD PRIMARY KEY (`asset_no`),
   ADD KEY `case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_asset_real_estate`
+--
 ALTER TABLE `application_recovery_asset_real_estate`
   ADD PRIMARY KEY (`asset_no`),
   ADD KEY `case_no` (`case_no`),
   ADD KEY `property_no` (`property_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_asset_received_deposit`
+--
 ALTER TABLE `application_recovery_asset_received_deposit`
   ADD PRIMARY KEY (`asset_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_asset_rent_deposits`
+--
 ALTER TABLE `application_recovery_asset_rent_deposits`
   ADD PRIMARY KEY (`asset_no`),
   ADD KEY `case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_asset_sales_receivables`
+--
 ALTER TABLE `application_recovery_asset_sales_receivables`
   ADD PRIMARY KEY (`asset_no`),
   ADD KEY `case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_asset_severance`
+--
 ALTER TABLE `application_recovery_asset_severance`
   ADD PRIMARY KEY (`asset_no`),
   ADD KEY `case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_asset_vehicles`
+--
 ALTER TABLE `application_recovery_asset_vehicles`
   ADD PRIMARY KEY (`asset_no`),
   ADD KEY `case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_creditor`
+--
 ALTER TABLE `application_recovery_creditor`
   ADD PRIMARY KEY (`creditor_no`),
   ADD UNIQUE KEY `case_creditor_unique` (`case_no`,`creditor_count`),
   ADD KEY `idx_case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_creditor_appendix`
+--
 ALTER TABLE `application_recovery_creditor_appendix`
   ADD PRIMARY KEY (`appendix_no`),
   ADD KEY `idx_case_creditor` (`case_no`,`creditor_count`);
 
+--
+-- 테이블의 인덱스 `application_recovery_creditor_guaranteed_debts`
+--
 ALTER TABLE `application_recovery_creditor_guaranteed_debts`
   ADD PRIMARY KEY (`debt_no`),
   ADD KEY `idx_case_creditor` (`case_no`,`creditor_count`);
 
+--
+-- 테이블의 인덱스 `application_recovery_creditor_settings`
+--
 ALTER TABLE `application_recovery_creditor_settings`
   ADD PRIMARY KEY (`setting_no`),
   ADD UNIQUE KEY `unique_case_setting` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_family_members`
+--
 ALTER TABLE `application_recovery_family_members`
   ADD PRIMARY KEY (`member_no`),
   ADD KEY `case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_financial_institutions`
+--
 ALTER TABLE `application_recovery_financial_institutions`
   ADD PRIMARY KEY (`institution_no`),
   ADD KEY `idx_name` (`name`);
 
+--
+-- 테이블의 인덱스 `application_recovery_financial_institution_requests`
+--
 ALTER TABLE `application_recovery_financial_institution_requests`
   ADD PRIMARY KEY (`request_no`),
   ADD KEY `original_institution_no` (`original_institution_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_income_business`
+--
 ALTER TABLE `application_recovery_income_business`
   ADD PRIMARY KEY (`business_no`),
   ADD KEY `case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_income_expenditure`
+--
 ALTER TABLE `application_recovery_income_expenditure`
   ADD PRIMARY KEY (`income_no`),
   ADD UNIQUE KEY `idx_case_year` (`case_no`,`year`);
 
+--
+-- 테이블의 인덱스 `application_recovery_income_living_expense_standard`
+--
 ALTER TABLE `application_recovery_income_living_expense_standard`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `unique_year_family_members` (`year`,`family_members`);
 
+--
+-- 테이블의 인덱스 `application_recovery_income_salary`
+--
 ALTER TABLE `application_recovery_income_salary`
   ADD PRIMARY KEY (`salary_no`),
   ADD KEY `case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_living_expenses`
+--
 ALTER TABLE `application_recovery_living_expenses`
   ADD PRIMARY KEY (`expense_no`),
   ADD KEY `case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_mortgage`
+--
 ALTER TABLE `application_recovery_mortgage`
   ADD PRIMARY KEY (`mortgage_no`),
   ADD KEY `idx_case_creditor` (`case_no`,`creditor_count`);
 
+--
+-- 테이블의 인덱스 `application_recovery_plan10`
+--
 ALTER TABLE `application_recovery_plan10`
   ADD PRIMARY KEY (`plan_no`),
   ADD UNIQUE KEY `case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_prohibition_orders`
+--
 ALTER TABLE `application_recovery_prohibition_orders`
   ADD PRIMARY KEY (`order_no`),
   ADD KEY `case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_statement_career`
+--
 ALTER TABLE `application_recovery_statement_career`
   ADD PRIMARY KEY (`career_id`),
   ADD KEY `idx_case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_statement_education`
+--
 ALTER TABLE `application_recovery_statement_education`
   ADD PRIMARY KEY (`education_id`),
   ADD KEY `idx_case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_statement_marriage`
+--
 ALTER TABLE `application_recovery_statement_marriage`
   ADD PRIMARY KEY (`marriage_id`),
   ADD KEY `idx_case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `application_recovery_stay_orders`
+--
 ALTER TABLE `application_recovery_stay_orders`
   ADD PRIMARY KEY (`order_no`),
   ADD KEY `case_no` (`case_no`);
 
+--
+-- 테이블의 인덱스 `case_management`
+--
 ALTER TABLE `case_management`
   ADD PRIMARY KEY (`case_no`),
   ADD KEY `consult_no` (`consult_no`),
@@ -1307,489 +1939,952 @@ ALTER TABLE `case_management`
   ADD KEY `manager_id` (`consultant`),
   ADD KEY `case_management_paper_fk` (`paper`);
 
+--
+-- 테이블의 인덱스 `case_management_content`
+--
 ALTER TABLE `case_management_content`
   ADD PRIMARY KEY (`content_no`),
   ADD KEY `case_no` (`case_no`),
   ADD KEY `checker_id` (`checker_id`);
 
+--
+-- 테이블의 인덱스 `chatbot`
+--
 ALTER TABLE `chatbot`
   ADD PRIMARY KEY (`no`),
   ADD KEY `member` (`member`),
   ADD KEY `conversation_id` (`conversation_id`);
 
+--
+-- 테이블의 인덱스 `chatbot_files`
+--
 ALTER TABLE `chatbot_files`
   ADD PRIMARY KEY (`file_id`),
   ADD KEY `chat_no` (`chat_no`);
 
+--
+-- 테이블의 인덱스 `chatbot_settings`
+--
 ALTER TABLE `chatbot_settings`
   ADD PRIMARY KEY (`setting_id`),
   ADD UNIQUE KEY `member_setting` (`member`,`setting_key`);
 
+--
+-- 테이블의 인덱스 `config`
+--
 ALTER TABLE `config`
   ADD PRIMARY KEY (`no`);
 
+--
+-- 테이블의 인덱스 `consult_manager`
+--
 ALTER TABLE `consult_manager`
   ADD PRIMARY KEY (`consult_no`),
   ADD KEY `consultant` (`consultant`),
   ADD KEY `inflow_no` (`inflow_no`),
   ADD KEY `paper` (`paper`);
 
+--
+-- 테이블의 인덱스 `consult_manager_content`
+--
 ALTER TABLE `consult_manager_content`
   ADD PRIMARY KEY (`content_no`),
   ADD KEY `consult_no` (`consult_no`),
   ADD KEY `manager_id` (`manager_id`);
 
+--
+-- 테이블의 인덱스 `consult_paper`
+--
 ALTER TABLE `consult_paper`
   ADD PRIMARY KEY (`paper_no`),
   ADD KEY `manager_id` (`manager_id`),
   ADD KEY `consult_no` (`consult_no`);
 
+--
+-- 테이블의 인덱스 `consult_paper_content`
+--
 ALTER TABLE `consult_paper_content`
   ADD PRIMARY KEY (`content_no`),
   ADD KEY `paper_no` (`paper_no`),
   ADD KEY `manager_id` (`manager_id`);
 
+--
+-- 테이블의 인덱스 `employee`
+--
 ALTER TABLE `employee`
   ADD PRIMARY KEY (`employee_no`),
   ADD UNIQUE KEY `member_id` (`employee_id`);
 
+--
+-- 테이블의 인덱스 `employee_department`
+--
 ALTER TABLE `employee_department`
   ADD PRIMARY KEY (`dept_id`);
 
+--
+-- 테이블의 인덱스 `employee_position`
+--
 ALTER TABLE `employee_position`
   ADD PRIMARY KEY (`position_id`);
 
+--
+-- 테이블의 인덱스 `inflow`
+--
 ALTER TABLE `inflow`
   ADD PRIMARY KEY (`no`),
   ADD KEY `manager` (`manager`);
 
+--
+-- 테이블의 인덱스 `sapplication_recovery_creditor_other_claims`
+--
 ALTER TABLE `sapplication_recovery_creditor_other_claims`
   ADD PRIMARY KEY (`claim_no`),
   ADD KEY `idx_case_creditor` (`case_no`,`creditor_count`);
 
+--
+-- 테이블의 인덱스 `schedule`
+--
 ALTER TABLE `schedule`
   ADD PRIMARY KEY (`schedule_no`);
 
+--
+-- 테이블의 인덱스 `statistics_court`
+--
 ALTER TABLE `statistics_court`
   ADD PRIMARY KEY (`id`);
 
+--
+-- 테이블의 인덱스 `statistics_yearly`
+--
 ALTER TABLE `statistics_yearly`
   ADD PRIMARY KEY (`id`);
 
+--
+-- 테이블의 인덱스 `stay_orders`
+--
 ALTER TABLE `stay_orders`
   ADD PRIMARY KEY (`order_no`),
   ADD KEY `case_no` (`case_no`);
 
+--
+-- 덤프된 테이블의 AUTO_INCREMENT
+--
 
+--
+-- 테이블의 AUTO_INCREMENT `application_bankruptcy`
+--
 ALTER TABLE `application_bankruptcy`
   MODIFY `bankruptcy_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_bankruptcy_assets`
+--
 ALTER TABLE `application_bankruptcy_assets`
   MODIFY `asset_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_bankruptcy_creditor`
+--
 ALTER TABLE `application_bankruptcy_creditor`
   MODIFY `creditor_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_bankruptcy_income_expenditure`
+--
 ALTER TABLE `application_bankruptcy_income_expenditure`
   MODIFY `income_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_bankruptcy_prohibition_orders`
+--
 ALTER TABLE `application_bankruptcy_prohibition_orders`
   MODIFY `order_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_bankruptcy_statement`
+--
 ALTER TABLE `application_bankruptcy_statement`
   MODIFY `statement_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_bankruptcy_statement_bankruptcy_history`
+--
 ALTER TABLE `application_bankruptcy_statement_bankruptcy_history`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_bankruptcy_statement_bankruptcy_reason`
+--
 ALTER TABLE `application_bankruptcy_statement_bankruptcy_reason`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_bankruptcy_statement_career`
+--
 ALTER TABLE `application_bankruptcy_statement_career`
   MODIFY `career_id` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_bankruptcy_statement_creditor_status`
+--
 ALTER TABLE `application_bankruptcy_statement_creditor_status`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_bankruptcy_statement_debt_after_insolvency`
+--
 ALTER TABLE `application_bankruptcy_statement_debt_after_insolvency`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_bankruptcy_statement_domestic_court`
+--
 ALTER TABLE `application_bankruptcy_statement_domestic_court`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_bankruptcy_statement_education`
+--
 ALTER TABLE `application_bankruptcy_statement_education`
   MODIFY `education_id` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_bankruptcy_statement_legal_action`
+--
 ALTER TABLE `application_bankruptcy_statement_legal_action`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_bankruptcy_statement_life_history`
+--
 ALTER TABLE `application_bankruptcy_statement_life_history`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_bankruptcy_statement_partial_repayment`
+--
 ALTER TABLE `application_bankruptcy_statement_partial_repayment`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_bankruptcy_stay_orders`
+--
 ALTER TABLE `application_bankruptcy_stay_orders`
   MODIFY `order_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery`
+--
 ALTER TABLE `application_recovery`
   MODIFY `recovery_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_additional_claims`
+--
 ALTER TABLE `application_recovery_additional_claims`
   MODIFY `claim_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_asset_attached_deposits`
+--
 ALTER TABLE `application_recovery_asset_attached_deposits`
   MODIFY `asset_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_asset_business`
+--
 ALTER TABLE `application_recovery_asset_business`
   MODIFY `asset_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_asset_cash`
+--
 ALTER TABLE `application_recovery_asset_cash`
   MODIFY `asset_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_asset_court_deposits`
+--
 ALTER TABLE `application_recovery_asset_court_deposits`
   MODIFY `asset_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_asset_deposits`
+--
 ALTER TABLE `application_recovery_asset_deposits`
   MODIFY `asset_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_asset_disposed`
+--
 ALTER TABLE `application_recovery_asset_disposed`
   MODIFY `asset_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_asset_divorce`
+--
 ALTER TABLE `application_recovery_asset_divorce`
   MODIFY `asset_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_asset_exemption1`
+--
 ALTER TABLE `application_recovery_asset_exemption1`
   MODIFY `asset_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_asset_exemption2`
+--
 ALTER TABLE `application_recovery_asset_exemption2`
   MODIFY `asset_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_asset_inherited`
+--
 ALTER TABLE `application_recovery_asset_inherited`
   MODIFY `asset_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_asset_insurance`
+--
 ALTER TABLE `application_recovery_asset_insurance`
   MODIFY `asset_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_asset_loan_receivables`
+--
 ALTER TABLE `application_recovery_asset_loan_receivables`
   MODIFY `asset_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_asset_other`
+--
 ALTER TABLE `application_recovery_asset_other`
   MODIFY `asset_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_asset_real_estate`
+--
 ALTER TABLE `application_recovery_asset_real_estate`
   MODIFY `asset_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_asset_received_deposit`
+--
 ALTER TABLE `application_recovery_asset_received_deposit`
   MODIFY `asset_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_asset_rent_deposits`
+--
 ALTER TABLE `application_recovery_asset_rent_deposits`
   MODIFY `asset_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_asset_sales_receivables`
+--
 ALTER TABLE `application_recovery_asset_sales_receivables`
   MODIFY `asset_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_asset_severance`
+--
 ALTER TABLE `application_recovery_asset_severance`
   MODIFY `asset_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_asset_vehicles`
+--
 ALTER TABLE `application_recovery_asset_vehicles`
   MODIFY `asset_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_creditor`
+--
 ALTER TABLE `application_recovery_creditor`
   MODIFY `creditor_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_creditor_appendix`
+--
 ALTER TABLE `application_recovery_creditor_appendix`
   MODIFY `appendix_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_creditor_guaranteed_debts`
+--
 ALTER TABLE `application_recovery_creditor_guaranteed_debts`
   MODIFY `debt_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_creditor_settings`
+--
 ALTER TABLE `application_recovery_creditor_settings`
   MODIFY `setting_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_family_members`
+--
 ALTER TABLE `application_recovery_family_members`
   MODIFY `member_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_financial_institutions`
+--
 ALTER TABLE `application_recovery_financial_institutions`
   MODIFY `institution_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_financial_institution_requests`
+--
 ALTER TABLE `application_recovery_financial_institution_requests`
   MODIFY `request_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_income_business`
+--
 ALTER TABLE `application_recovery_income_business`
   MODIFY `business_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_income_expenditure`
+--
 ALTER TABLE `application_recovery_income_expenditure`
   MODIFY `income_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_income_living_expense_standard`
+--
 ALTER TABLE `application_recovery_income_living_expense_standard`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_income_salary`
+--
 ALTER TABLE `application_recovery_income_salary`
   MODIFY `salary_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_living_expenses`
+--
 ALTER TABLE `application_recovery_living_expenses`
   MODIFY `expense_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_mortgage`
+--
 ALTER TABLE `application_recovery_mortgage`
   MODIFY `mortgage_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_plan10`
+--
 ALTER TABLE `application_recovery_plan10`
   MODIFY `plan_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_prohibition_orders`
+--
 ALTER TABLE `application_recovery_prohibition_orders`
   MODIFY `order_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_statement_career`
+--
 ALTER TABLE `application_recovery_statement_career`
   MODIFY `career_id` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_statement_education`
+--
 ALTER TABLE `application_recovery_statement_education`
   MODIFY `education_id` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_statement_marriage`
+--
 ALTER TABLE `application_recovery_statement_marriage`
   MODIFY `marriage_id` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `application_recovery_stay_orders`
+--
 ALTER TABLE `application_recovery_stay_orders`
   MODIFY `order_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `case_management`
+--
 ALTER TABLE `case_management`
   MODIFY `case_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `case_management_content`
+--
 ALTER TABLE `case_management_content`
   MODIFY `content_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `chatbot`
+--
 ALTER TABLE `chatbot`
   MODIFY `no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `chatbot_files`
+--
 ALTER TABLE `chatbot_files`
   MODIFY `file_id` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `chatbot_settings`
+--
 ALTER TABLE `chatbot_settings`
   MODIFY `setting_id` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `config`
+--
 ALTER TABLE `config`
   MODIFY `no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `consult_manager`
+--
 ALTER TABLE `consult_manager`
   MODIFY `consult_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `consult_manager_content`
+--
 ALTER TABLE `consult_manager_content`
   MODIFY `content_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `consult_paper`
+--
 ALTER TABLE `consult_paper`
   MODIFY `paper_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `consult_paper_content`
+--
 ALTER TABLE `consult_paper_content`
   MODIFY `content_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `employee`
+--
 ALTER TABLE `employee`
   MODIFY `employee_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `employee_department`
+--
 ALTER TABLE `employee_department`
   MODIFY `dept_id` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `employee_position`
+--
 ALTER TABLE `employee_position`
   MODIFY `position_id` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `inflow`
+--
 ALTER TABLE `inflow`
   MODIFY `no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `sapplication_recovery_creditor_other_claims`
+--
 ALTER TABLE `sapplication_recovery_creditor_other_claims`
   MODIFY `claim_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `schedule`
+--
 ALTER TABLE `schedule`
   MODIFY `schedule_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `statistics_court`
+--
 ALTER TABLE `statistics_court`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `statistics_yearly`
+--
 ALTER TABLE `statistics_yearly`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 테이블의 AUTO_INCREMENT `stay_orders`
+--
 ALTER TABLE `stay_orders`
   MODIFY `order_no` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- 덤프된 테이블의 제약사항
+--
 
+--
+-- 테이블의 제약사항 `application_bankruptcy_assets`
+--
 ALTER TABLE `application_bankruptcy_assets`
   ADD CONSTRAINT `fk_bankruptcy_assets_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_bankruptcy_creditor`
+--
 ALTER TABLE `application_bankruptcy_creditor`
   ADD CONSTRAINT `fk_bankruptcy_creditor_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_bankruptcy_income_expenditure`
+--
 ALTER TABLE `application_bankruptcy_income_expenditure`
   ADD CONSTRAINT `fk_bankruptcy_income_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_bankruptcy_prohibition_orders`
+--
 ALTER TABLE `application_bankruptcy_prohibition_orders`
   ADD CONSTRAINT `fk_bankruptcy_prohibition_orders_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_bankruptcy_statement`
+--
 ALTER TABLE `application_bankruptcy_statement`
   ADD CONSTRAINT `fk_bankruptcy_statement_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_bankruptcy_statement_bankruptcy_history`
+--
 ALTER TABLE `application_bankruptcy_statement_bankruptcy_history`
   ADD CONSTRAINT `fk_statement_bankruptcy_history_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_bankruptcy_statement_bankruptcy_reason`
+--
 ALTER TABLE `application_bankruptcy_statement_bankruptcy_reason`
   ADD CONSTRAINT `fk_statement_bankruptcy_reason_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_bankruptcy_statement_career`
+--
 ALTER TABLE `application_bankruptcy_statement_career`
   ADD CONSTRAINT `fk_statement_career_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_bankruptcy_statement_creditor_status`
+--
 ALTER TABLE `application_bankruptcy_statement_creditor_status`
   ADD CONSTRAINT `fk_statement_creditor_status_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_bankruptcy_statement_debt_after_insolvency`
+--
 ALTER TABLE `application_bankruptcy_statement_debt_after_insolvency`
   ADD CONSTRAINT `fk_statement_debt_after_insolvency_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_bankruptcy_statement_domestic_court`
+--
 ALTER TABLE `application_bankruptcy_statement_domestic_court`
   ADD CONSTRAINT `fk_statement_domestic_court_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_bankruptcy_statement_education`
+--
 ALTER TABLE `application_bankruptcy_statement_education`
   ADD CONSTRAINT `fk_statement_education_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_bankruptcy_statement_legal_action`
+--
 ALTER TABLE `application_bankruptcy_statement_legal_action`
   ADD CONSTRAINT `fk_statement_legal_action_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_bankruptcy_statement_life_history`
+--
 ALTER TABLE `application_bankruptcy_statement_life_history`
   ADD CONSTRAINT `fk_statement_life_history_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_bankruptcy_statement_partial_repayment`
+--
 ALTER TABLE `application_bankruptcy_statement_partial_repayment`
   ADD CONSTRAINT `fk_statement_partial_repayment_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_bankruptcy_stay_orders`
+--
 ALTER TABLE `application_bankruptcy_stay_orders`
   ADD CONSTRAINT `fk_bankruptcy_stay_orders_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery`
+--
 ALTER TABLE `application_recovery`
   ADD CONSTRAINT `application_recovery_ibfk_1` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`),
   ADD CONSTRAINT `application_recovery_ibfk_2` FOREIGN KEY (`assigned_employee`) REFERENCES `employee` (`employee_no`);
 
+--
+-- 테이블의 제약사항 `application_recovery_asset_attached_deposits`
+--
 ALTER TABLE `application_recovery_asset_attached_deposits`
   ADD CONSTRAINT `fk_attached_deposits_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_asset_cash`
+--
 ALTER TABLE `application_recovery_asset_cash`
   ADD CONSTRAINT `fk_cash_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_asset_court_deposits`
+--
 ALTER TABLE `application_recovery_asset_court_deposits`
   ADD CONSTRAINT `fk_court_deposits_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_asset_deposits`
+--
 ALTER TABLE `application_recovery_asset_deposits`
   ADD CONSTRAINT `fk_deposits_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_asset_exemption1`
+--
 ALTER TABLE `application_recovery_asset_exemption1`
   ADD CONSTRAINT `fk_exemption1_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_asset_exemption2`
+--
 ALTER TABLE `application_recovery_asset_exemption2`
   ADD CONSTRAINT `fk_exemption2_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_asset_insurance`
+--
 ALTER TABLE `application_recovery_asset_insurance`
   ADD CONSTRAINT `fk_insurance_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_asset_loan_receivables`
+--
 ALTER TABLE `application_recovery_asset_loan_receivables`
   ADD CONSTRAINT `fk_loan_receivables_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_asset_other`
+--
 ALTER TABLE `application_recovery_asset_other`
   ADD CONSTRAINT `fk_other_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_asset_real_estate`
+--
 ALTER TABLE `application_recovery_asset_real_estate`
   ADD CONSTRAINT `fk_real_estate_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_asset_rent_deposits`
+--
 ALTER TABLE `application_recovery_asset_rent_deposits`
   ADD CONSTRAINT `fk_lease_deposits_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_asset_sales_receivables`
+--
 ALTER TABLE `application_recovery_asset_sales_receivables`
   ADD CONSTRAINT `fk_sales_receivables_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_asset_severance`
+--
 ALTER TABLE `application_recovery_asset_severance`
   ADD CONSTRAINT `fk_severance_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_asset_vehicles`
+--
 ALTER TABLE `application_recovery_asset_vehicles`
   ADD CONSTRAINT `fk_vehicles_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_creditor`
+--
 ALTER TABLE `application_recovery_creditor`
   ADD CONSTRAINT `fk_creditor_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_creditor_appendix`
+--
 ALTER TABLE `application_recovery_creditor_appendix`
   ADD CONSTRAINT `fk_appendix_creditor` FOREIGN KEY (`case_no`,`creditor_count`) REFERENCES `application_recovery_creditor` (`case_no`, `creditor_count`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_creditor_guaranteed_debts`
+--
 ALTER TABLE `application_recovery_creditor_guaranteed_debts`
   ADD CONSTRAINT `fk_guaranteed_debts_creditor` FOREIGN KEY (`case_no`,`creditor_count`) REFERENCES `application_recovery_creditor` (`case_no`, `creditor_count`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_creditor_settings`
+--
 ALTER TABLE `application_recovery_creditor_settings`
   ADD CONSTRAINT `application_recovery_creditor_settings_ibfk_1` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_family_members`
+--
 ALTER TABLE `application_recovery_family_members`
   ADD CONSTRAINT `fk_family_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_financial_institution_requests`
+--
 ALTER TABLE `application_recovery_financial_institution_requests`
   ADD CONSTRAINT `institution_requests_original_fk` FOREIGN KEY (`original_institution_no`) REFERENCES `application_recovery_financial_institutions` (`institution_no`) ON DELETE SET NULL;
 
+--
+-- 테이블의 제약사항 `application_recovery_income_business`
+--
 ALTER TABLE `application_recovery_income_business`
   ADD CONSTRAINT `fk_business_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_income_salary`
+--
 ALTER TABLE `application_recovery_income_salary`
   ADD CONSTRAINT `fk_salary_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_living_expenses`
+--
 ALTER TABLE `application_recovery_living_expenses`
   ADD CONSTRAINT `fk_living_expenses_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_mortgage`
+--
 ALTER TABLE `application_recovery_mortgage`
   ADD CONSTRAINT `fk_mortgage_creditor` FOREIGN KEY (`case_no`,`creditor_count`) REFERENCES `application_recovery_creditor` (`case_no`, `creditor_count`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_plan10`
+--
 ALTER TABLE `application_recovery_plan10`
   ADD CONSTRAINT `fk_plan10_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_prohibition_orders`
+--
 ALTER TABLE `application_recovery_prohibition_orders`
   ADD CONSTRAINT `application_recovery_prohibition_orders_ibfk_1` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_statement_career`
+--
 ALTER TABLE `application_recovery_statement_career`
   ADD CONSTRAINT `fk_career_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_statement_education`
+--
 ALTER TABLE `application_recovery_statement_education`
   ADD CONSTRAINT `fk_education_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `application_recovery_stay_orders`
+--
 ALTER TABLE `application_recovery_stay_orders`
   ADD CONSTRAINT `application_recovery_stay_orders_ibfk_1` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`);
 
+--
+-- 테이블의 제약사항 `case_management`
+--
 ALTER TABLE `case_management`
   ADD CONSTRAINT `case_management_consultant_fk` FOREIGN KEY (`consultant`) REFERENCES `employee` (`employee_no`),
   ADD CONSTRAINT `case_management_paper_fk` FOREIGN KEY (`paper`) REFERENCES `employee` (`employee_no`);
 
+--
+-- 테이블의 제약사항 `case_management_content`
+--
 ALTER TABLE `case_management_content`
   ADD CONSTRAINT `case_content_case_fk` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE,
   ADD CONSTRAINT `case_management_content_ibfk_1` FOREIGN KEY (`checker_id`) REFERENCES `employee` (`employee_no`);
 
+--
+-- 테이블의 제약사항 `chatbot`
+--
 ALTER TABLE `chatbot`
   ADD CONSTRAINT `chatbot_ibfk_1` FOREIGN KEY (`member`) REFERENCES `employee` (`employee_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `chatbot_files`
+--
 ALTER TABLE `chatbot_files`
   ADD CONSTRAINT `chatbot_files_ibfk_1` FOREIGN KEY (`chat_no`) REFERENCES `chatbot` (`no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `chatbot_settings`
+--
 ALTER TABLE `chatbot_settings`
   ADD CONSTRAINT `chatbot_settings_ibfk_1` FOREIGN KEY (`member`) REFERENCES `employee` (`employee_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `consult_manager`
+--
 ALTER TABLE `consult_manager`
   ADD CONSTRAINT `consult_ibfk_1` FOREIGN KEY (`consultant`) REFERENCES `employee` (`employee_no`),
   ADD CONSTRAINT `consult_manager_ibfk_1` FOREIGN KEY (`paper`) REFERENCES `employee` (`employee_no`);
 
+--
+-- 테이블의 제약사항 `consult_manager_content`
+--
 ALTER TABLE `consult_manager_content`
   ADD CONSTRAINT `content_consult_fk` FOREIGN KEY (`consult_no`) REFERENCES `consult_manager` (`consult_no`) ON DELETE CASCADE,
   ADD CONSTRAINT `content_manager_fk` FOREIGN KEY (`manager_id`) REFERENCES `employee` (`employee_no`);
 
+--
+-- 테이블의 제약사항 `consult_paper`
+--
 ALTER TABLE `consult_paper`
   ADD CONSTRAINT `consult_paper_ibfk_1` FOREIGN KEY (`manager_id`) REFERENCES `employee` (`employee_no`),
   ADD CONSTRAINT `consult_paper_ibfk_2` FOREIGN KEY (`consult_no`) REFERENCES `consult_manager` (`consult_no`);
 
+--
+-- 테이블의 제약사항 `consult_paper_content`
+--
 ALTER TABLE `consult_paper_content`
   ADD CONSTRAINT `paper_content_manager_fk` FOREIGN KEY (`manager_id`) REFERENCES `employee` (`employee_no`),
   ADD CONSTRAINT `paper_content_paper_fk` FOREIGN KEY (`paper_no`) REFERENCES `consult_paper` (`paper_no`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `inflow`
+--
 ALTER TABLE `inflow`
   ADD CONSTRAINT `inflow_ibfk_1` FOREIGN KEY (`manager`) REFERENCES `employee` (`employee_no`);
 
+--
+-- 테이블의 제약사항 `sapplication_recovery_creditor_other_claims`
+--
 ALTER TABLE `sapplication_recovery_creditor_other_claims`
   ADD CONSTRAINT `fk_other_claims_creditor` FOREIGN KEY (`case_no`,`creditor_count`) REFERENCES `application_recovery_creditor` (`case_no`, `creditor_count`) ON DELETE CASCADE;
 
+--
+-- 테이블의 제약사항 `stay_orders`
+--
 ALTER TABLE `stay_orders`
   ADD CONSTRAINT `stay_orders_ibfk_1` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`);
+COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
