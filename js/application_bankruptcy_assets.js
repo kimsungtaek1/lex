@@ -41,6 +41,7 @@ class AssetManager {
 	}
   initialize() {
     try {
+		alert('test');
       this.initializeEventHandlers();
       this.loadAllAssets();
     } catch (error) {
