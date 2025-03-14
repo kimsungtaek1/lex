@@ -49,7 +49,6 @@
     <div class="creditor-title">
       <div class="checkbox-group">
         <span>임차보증금</span>
-        <button type="button" class="btn btn-add2" id="exempt_rent_criteria">소액임차인 최우선 변제금의 범위와 기준보기</button>
       </div>
       <div class="button-group">
         <button type="button" class="btn btn-add2" id="add_rent_deposit_asset">추가</button>
