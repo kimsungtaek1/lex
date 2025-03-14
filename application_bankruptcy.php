@@ -209,6 +209,11 @@ if (!isset($_SESSION['auth']) || $_SESSION['auth'] < 1) {
     <div id="assetsSection" class="section-content" style="display:none;">
         <?php require_once('./api/application_bankruptcy/asset_template.php'); ?>
     </div>
+	
+	<!-- 생활상황 섹션 -->
+	<div id="living-statusSection" class="section-content" style="display:none;">
+		<?php require_once('./api/application_bankruptcy/living_status_template.php'); ?>
+	</div>
 
     <!-- 수입지출목록 섹션 -->
     <div id="incomeSection" class="section-content" style="display:none;">
@@ -233,6 +238,7 @@ if (!isset($_SESSION['auth']) || $_SESSION['auth'] < 1) {
 <script src="js/application_bankruptcy_applicant.js"></script>
 <script src="js/application_bankruptcy_creditor.js"></script>
 <script src="js/application_bankruptcy_assets.js"></script>
+<script src="js/application_bankruptcy_living_status.js"></script>
 <script src="js/application_bankruptcy_income_expenditure.js"></script>
 <script src="js/application_bankruptcy_statement.js"></script>
 </body>
