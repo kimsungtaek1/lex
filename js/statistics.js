@@ -624,9 +624,9 @@ function updateWeeklyStatsFooter(monthlyTotals) {
 	let footerHtml = '<table>';
 	footerHtml += '<tr>';
 	footerHtml += '<th>월별 합계</th>';
-	footerHtml += `<th>${monthlyTotals.inflow}</th>`;
-	footerHtml += `<th>${monthlyTotals.contract}</th>`;
-	footerHtml += `<th>${monthlyContractRate}%</th>`;
+	footerHtml += `<th>${monthlyTotals.inflow} 건</th>`;
+	footerHtml += `<th>${monthlyTotals.contract} 건</th>`;
+	footerHtml += `<th>${monthlyContractRate} %</th>`;
 	footerHtml += '</tr>';
 	footerHtml += '</table>';
 	
