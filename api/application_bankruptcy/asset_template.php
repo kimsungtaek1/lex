@@ -1,7 +1,3 @@
-<div style="margin: 2vh 0;">
-  ※ 재산 정보의 금액이 변경된 경우 ㅣ수입지출목록 탭에서 예상생계비를 다시 계산 후 저장하셔야 합니다.
-</div>
-
 <!-- 현금 섹션 -->
 <div class="asset-box" data-type="cash">
   <div class="section-header">
