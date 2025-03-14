@@ -280,9 +280,8 @@ include 'header.php';
 		<div class="weekly-stats">
 			<div class="weekly-stats-left">
 				<div class="weekly-stats-container has-few-managers">
-					<div id="weekFilterDropdown" class="date-filter-dropdown">
-						<!-- 필터 드롭다운 내용 -->
-					</div>
+					<!-- 필터 드롭다운 요소 -->
+					<div id="weekFilterDropdown" class="date-filter-dropdown"></div>
 					<div class="weekly-stats-body" id="managerWeeklyStatsBody">
 						<!-- JavaScript로 동적 생성 -->
 					</div>
