@@ -303,12 +303,24 @@ include 'header.php';
 
 	<!-- 사무장 월간 통계 탭 -->
 	<div id="managerMonthlyStats" class="statistics-content" style="display: none;">
-		<div class="statistics-row">
-			<div class="statistics-col">
+		<div class="weekly-stats">
+			<div class="weekly-stats-left">
+				<div class="weekly-stats-container has-few-managers">
+					<!-- 필터 드롭다운 요소 -->
+					<div id="monthFilterDropdown" class="date-filter-dropdown"></div>
+					<div class="weekly-stats-body" id="managerMonthlyStatsBody">
+						<!-- JavaScript로 동적 생성 -->
+					</div>
+					<div class="monthly-stats-footer">
+						<!-- JavaScript로 동적 생성 -->
+					</div>
+				</div>
+			</div>
+			<div class="weekly-stats-right">
 				<div class="statistics-box">
-					<h3 class="box-title">사무장 월간 통계</h3>
-					<div class="empty-stats-message">
-						<p>현재 월간 통계 데이터가 준비 중입니다.</p>
+					<h3 class="box-title">월간 상담 현황</h3>
+					<div class="chart-container">
+						<canvas id="monthlyTrendChart"></canvas>
 					</div>
 				</div>
 			</div>
