@@ -1075,33 +1075,31 @@ class AssetManager {
 				<div class="content-wrapper">
 					<div class="left-section">
 						<div class="form">
-							<div class="form-title"><span>수령일자</span></div>
+							<div class="form-title"><span>임차물건</span></div>
 							<div class="form-content">
-								<input type="date" class="received_date" value="${data.receipt_date || ""}">
+								<input type="text" class="received_date" value="${data.receipt_date || ""}">
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>임대인</span></div>
+							<div class="form-title"><span>임대차계약상<br>임차보증금액</span></div>
 							<div class="form-content">
 								<input type="text" class="received_lessor" value="${data.lessor || ""}">
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>소재지</span></div>
-							<div class="form-content">
-								<input type="text" class="received_location" value="${data.location || ""}">
-							</div>
+							<div class="form-title"><span></span></div>
+							<div class="form-content"></div>
 						</div>
 					</div>
 					<div class="right-section">
 						<div class="form">
-							<div class="form-title"><span>임차보증금</span></div>
+							<div class="form-title"><span>실제수령<br>임차보증금액</span></div>
 							<div class="form-content">
 								<input type="text" class="received_deposit_amount" data-type="money" value="${data.deposit_amount || ""}">원
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>비고</span></div>
+							<div class="form-title"><span>임차보증금 사용처</span></div>
 							<div class="form-content">
 								<input type="text" class="received_note" value="${data.note || ""}">
 							</div>
@@ -1127,35 +1125,59 @@ class AssetManager {
 				<div class="content-wrapper">
 					<div class="left-section">
 						<div class="form">
-							<div class="form-title"><span>이혼일자</span></div>
-							<div class="form-content">
-								<input type="date" class="divorce_date" value="${data.divorce_date || ""}">
-							</div>
-						</div>
-						<div class="form">
-							<div class="form-title"><span>배우자</span></div>
+							<div class="form-title"><span>분여 재산</span></div>
 							<div class="form-content">
 								<input type="text" class="divorce_spouse" value="${data.spouse_name || ""}">
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>재산분할 합의일</span></div>
+							<div class="form-title"><span>시기</span></div>
 							<div class="form-content">
-								<input type="date" class="divorce_settlement_date" value="${data.settlement_date || ""}">
+								<input type="date" class="divorce_date" value="${data.divorce_date || ""}">
+							</div>
+						</div>
+						<div class="form">
+							<div class="form-title form-notitle"><span></span></div>
+							<div class="form-content form-nocontent">
+							</div>
+						</div>
+						<div class="form">
+							<div class="form-title form-notitle"><span></span></div>
+							<div class="form-content form-nocontent">
+							</div>
+						</div>
+						<div class="form">
+							<div class="form-title form-notitle"><span></span></div>
+							<div class="form-content form-nocontent">
+							</div>
+						</div>
+						<div class="form">
+							<div class="form-title form-notitle"><span></span></div>
+							<div class="form-content form-nocontent">
+							</div>
+						</div>
+						<div class="form">
+							<div class="form-title form-notitle"><span></span></div>
+							<div class="form-content form-nocontent">
 							</div>
 						</div>
 					</div>
 					<div class="right-section">
 						<div class="form">
-							<div class="form-title"><span>분할받은 재산종류</span></div>
-							<div class="form-content">
-								<input type="text" class="divorce_property_type" value="${data.property_type || ""}">
-							</div>
-						</div>
-						<div class="form">
-							<div class="form-title"><span>분할받은 재산가액</span></div>
-							<div class="form-content">
-								<input type="text" class="divorce_property_amount" data-type="money" value="${data.property_amount || ""}">원
+							<div class="form-title form-title-6"><span>주의사항</span></div>
+							<div class="form-content form-content-6">
+								- 제출 자료<br>
+								&nbsp;&nbsp;&nbsp;① 이혼에 따라 배우자에게 분여(할)한 모든 재산의 내역<br>
+								&nbsp;&nbsp;&nbsp;② 협의이혼 시 미성년 자녀가 있는 경우, 양육비부담조서 제출<br>
+								&nbsp;&nbsp;&nbsp;③ 재판상이혼의 경우, 판결서, 조정조서 등 재판서 및 확정증명 제출<br>
+								- 이혼을 증명할 소명자료 제출<br>
+								&nbsp;&nbsp;&nbsp;① 시, 구, 읍(면) 등 가족관계등록관서에 이혼신고를 하여 가족관계등록부에 기록된 경우 ㅣ<br>
+								&nbsp;&nbsp;&nbsp;혼인관계증명서(상세)<br>
+								&nbsp;&nbsp;&nbsp;② 최근 2년 이내에 재판상 이혼을 한 경우로 아직 시, 구, 읍(면)등 가족관계등록관서에 이혼신고를 하지 않은 경우 ㅣ<br>
+								&nbsp;&nbsp;&nbsp;재판상 이혼과 관련한 재판서의 등본(조정ㆍ화해가 성립된 경우에는 그에 대한 조서 등본) 및 확정증명을 제출<br>
+								&nbsp;&nbsp;&nbsp;③ 외국에서 유효한 신분행위를 하여 해당 국가의 증서 등본이 발행되었으나 아직 한국 시, 구, 읍(면) 등<br>
+								&nbsp;&nbsp;&nbsp;가족관계등록관서에 신고하지 않은 경우 :<br>
+								&nbsp;&nbsp;&nbsp;신분관계에 관한 외국의 증서 등본
 							</div>
 						</div>
 						<div class="form">
@@ -1179,35 +1201,56 @@ class AssetManager {
 				<div class="content-wrapper">
 					<div class="left-section">
 						<div class="form">
-							<div class="form-title"><span>상속인</span></div>
-							<div class="form-content">
-								<input type="text" class="inherited_heir" value="${data.heir_name || ""}">
-							</div>
-						</div>
-						<div class="form">
-							<div class="form-title"><span>피상속인</span></div>
-							<div class="form-content">
-								<input type="text" class="inherited_deceased" value="${data.deceased_name || ""}">
-							</div>
-						</div>
-						<div class="form">
-							<div class="form-title"><span>상속개시일</span></div>
+							<div class="form-title"><span>상속일자</span></div>
 							<div class="form-content">
 								<input type="date" class="inherited_start_date" value="${data.inheritance_date || ""}">
+							</div>
+						</div>
+						<div class="form">
+							<div class="form-title"><span>피상속인 구분</span></div>
+							<div class="form-content">
+								<select class="" name="">
+									<option value="부" ${(data.inherited==="부") ? "selected" : ""}>부</option>
+									<option value="모" ${(data.inherited==="모") ? "selected" : ""}>모</option>
+									<option value="기타" ${(data.inherited==="기타") ? "selected" : ""}>기타</option>
+								</select>
+								&nbsp;의 사망에 의한 상속
+							</div>
+						</div>
+						<div class="form">
+							<div class="form-title"><span>상속상황</span></div>
+							<div class="form-content">
+								<select class="form-content-long" name="">
+									<option value="㉠ 상속재산이 전혀 없음" ${(data.inherited_type==="㉠ 상속재산이 전혀 없음") ? "selected" : ""}>㉠ 상속재산이 전혀 없음</option>
+									<option value="㉡ 신청인의 상속포기 또는 상속재산 분할에 의하여 다른 상속인이 모두 취득하였음" ${(data.inherited_type==="㉡ 신청인의 상속포기 또는 상속재산 분할에 의하여 다른 상속인이 모두 취득하였음") ? "selected" : ""}>㉡ 신청인의 상속포기 또는 상속재산 분할에 의하여 다른 상속인이 모두 취득하였음</option>
+									<option value="㉢ 신청인이 전부 또는 일부를 상속하였음" ${(data.inherited_type==="㉢ 신청인이 전부 또는 일부를 상속하였음") ? "selected" : ""}>㉢ 신청인이 전부 또는 일부를 상속하였음</option>
+								</select>
+							</div>
+						</div>
+						<div class="form">
+							<div class="form-title"><span></span></div>
+							<div class="form-content">
 							</div>
 						</div>
 					</div>
 					<div class="right-section">
 						<div class="form">
-							<div class="form-title"><span>상속재산 종류</span></div>
+							<div class="form-title"><span>주된 상속재산</span></div>
 							<div class="form-content">
-								<input type="text" class="inherited_property_type" value="${data.property_type || ""}">
+								<input type="text" class="inherited_property_type" value="${data.property_type || ""}" placeholder="㉡ 또는 ㉢항 선택시 기재하여 주십시오.">
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>상속재산 가액</span></div>
+							<div class="form-title"><span>취득경위</span></div>
 							<div class="form-content">
-								<input type="text" class="inherited_property_amount" data-type="money" value="${data.property_amount || ""}">원
+								<input type="text" class="inherited_property_type" value="${data.property_type || ""}" placeholder="㉡항 선택시 다른 상속인이 주된 상속재산을 취득하게 된 경위를 기재하여 주십시오.">
+							</div>
+						</div>
+						<div class="form">
+							<div class="form-title"><span>주의사항</span></div>
+							<div class="form-content">
+								-  ㉡ 또는 ㉢항을 선택한 분은 주된 상속재산을 기재하여 주십시오.<br>
+								-  ㉡항을 선택한 분은 다른 상속인이 주된 상속재산을 취득하게 된 경위를 기재하여 주십시오.
 							</div>
 						</div>
 						<div class="form">
