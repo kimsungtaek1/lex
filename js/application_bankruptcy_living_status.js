@@ -128,23 +128,28 @@ class LivingStatusManager {
 			data: { case_no: window.currentCaseNo },
 			dataType: 'json',
 			success: (response) => {
-				if (response.success && response.data) {
-					// 컨테이너 초기화
-					$('#family_members_container').empty();
-					
+				// 컨테이너 초기화
+				$('#family_members_container').empty();
+				
+				if (response.success) {
 					// 데이터가 있으면 표시
-					if (response.data.length > 0) {
+					if (response.data && response.data.length > 0) {
 						response.data.forEach(member => {
 							this.addFamilyMember(member);
 						});
 					} else {
-						// 없으면 빈 블록 추가
+						// 데이터가 없으면 빈 블록 추가
 						this.addFamilyMember();
 					}
+				} else {
+					// 오류 발생 시에도 빈 블록 추가
+					this.addFamilyMember();
 				}
 			},
 			error: (xhr, status, error) => {
 				console.error('가족 구성원 정보 로드 실패:', error);
+				// 오류 시에도 빈 블록 추가
+				this.addFamilyMember();
 			}
 		});
 	}
@@ -162,12 +167,9 @@ class LivingStatusManager {
 					
 					$('#basic_facts').val(data.basic_facts || '');
 					
-					// 가족관계사항 체크박스 설정
+					// 가족관계사항 라디오 버튼 설정
 					if (data.family_status) {
-						const statuses = data.family_status.split(',');
-						statuses.forEach(status => {
-							$(`input[name="family_status[]"][value="${status.trim()}"]`).prop('checked', true);
-						});
+						$(`input[name="family_status"][value="${data.family_status}"]`).prop('checked', true);
 					}
 					
 					$('#monthly_rent').val(this.formatMoney(data.monthly_rent || 0));
@@ -273,15 +275,12 @@ class LivingStatusManager {
 
 	// 추가 정보 저장
 	saveAdditionalInfo() {
-		const selectedStatuses = [];
-		$('input[name="family_status[]"]:checked').each(function() {
-			selectedStatuses.push($(this).val());
-		});
+		const selectedStatus = $('input[name="family_status"]:checked').val() || '';
 
 		const data = {
 			case_no: window.currentCaseNo,
 			basic_facts: $('#basic_facts').val(),
-			family_status: selectedStatuses.join(','),
+			family_status: selectedStatus,
 			monthly_rent: this.unformatMoney($('#monthly_rent').val()),
 			rent_deposit: this.unformatMoney($('#rent_deposit').val()),
 			applicant_relation: $('#applicant_relation').val()
