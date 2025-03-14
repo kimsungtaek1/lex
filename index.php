@@ -13,10 +13,9 @@
     <header class="top-menu">
         <nav>
             <ul>
-                <li><a href="#">렉스솔루션</a></li>
-                <li><a href="#">제품소개</a></li>
-                <li><a href="#">공지사항</a></li>
-                <li><a href="#">고객지원</a></li>
+                <li><a href="/adm/page/index_products.php">제품소개</a></li>
+                <li><a href="/adm/page/index_notice.php">공지사항</a></li>
+                <li><a href="/adm/page/index_contact.php">고객지원</a></li>
             </ul>
         </nav>
     </header>
