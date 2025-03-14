@@ -652,8 +652,8 @@ class AssetManager {
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title form-nocontent"><span></span></div>
-							<div class="form-content form-nocontent"></div>
+							<div class="form-title"><span></span></div>
+							<div class="form-content"></div>
 						</div>
 						<div class="form">
 							<div class="form-title"></div>
@@ -864,7 +864,7 @@ class AssetManager {
 						<div class="form">
 							<div class="form-title form-notitle"><span>청산가치 판단금액</span></div>
 							<div class="form-content">
-								시가&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="market_value" data-type="money" value="${data.market_value || ""}">
+								시가&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="market_value" data-type="money" value="${data.market_value || ""}">원
 							</div>
 						</div>
 						<div class="form">
@@ -1060,12 +1060,6 @@ class AssetManager {
 				<div class="content-wrapper">
 					<div class="left-section">
 						<div class="form">
-							<div class="form-title"><span>수령일자</span></div>
-							<div class="form-content">
-								<input type="date" class="receipt_date" value="${data.receipt_date || ""}">
-							</div>
-						</div>
-						<div class="form">
 							<div class="form-title"><span>임차물건</span></div>
 							<div class="form-content">
 								<input type="text" class="rental_property" value="${data.rental_property || ""}">
@@ -1075,6 +1069,11 @@ class AssetManager {
 							<div class="form-title"><span>임대차계약상<br>임차보증금액</span></div>
 							<div class="form-content">
 								<input type="text" class="contract_deposit" data-type="money" value="${data.contract_deposit || ""}">원
+							</div>
+						</div>
+						<div class="form">
+							<div class="form-title"><span></span></div>
+							<div class="form-content">
 							</div>
 						</div>
 					</div>
@@ -1124,9 +1123,8 @@ class AssetManager {
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>이혼시기</span></div>
-							<div class="form-content">
-								<input type="date" class="divorce_timing" value="${data.divorce_timing || ""}">
+							<div class="form-title form-notitle"><span></span></div>
+							<div class="form-content form-nocontent">
 							</div>
 						</div>
 						<div class="form">
