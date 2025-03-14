@@ -131,6 +131,28 @@ function loadInitialTabContent() {
 		loadManagerDailyStats();
 		initWeekFilterDropdown();
 	}
+	
+		// 주간 통계 테이블 헤더 클릭 이벤트
+	$(document).on('click', '.weekly-stats-table th:first-child', function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		
+		// 현재 클릭된 헤더의 위치 계산
+		const headerPosition = $(this).offset();
+		const headerHeight = $(this).outerHeight();
+		
+		// 드롭다운 위치 설정
+		$('#weekFilterDropdown').css({
+			display: 'block',
+			position: 'absolute',
+			top: (headerPosition.top + headerHeight) + 'px',
+			left: headerPosition.left + 'px',
+			zIndex: 1000
+		}).show();
+		
+		// 드롭다운 초기화
+		initWeekFilterDropdown();
+	});
 }
 
 // 윈도우 리사이즈 핸들러
@@ -437,7 +459,7 @@ function loadManagerWeeklyStats() {
 	loadFilteredManagerWeeklyStats(currentYear, currentMonth);
 }
 
-// 주간 통계 데이터 렌더링 함수
+// 주간 통계 렌더링 함수 수정 - 테이블 헤더의 ID 추가
 function renderManagerWeeklyStats(weeklyData, managers, monthInfo) {
 	const statsBody = $('#managerWeeklyStatsBody');
 	statsBody.empty();
@@ -447,7 +469,7 @@ function renderManagerWeeklyStats(weeklyData, managers, monthInfo) {
 	
 	// 테이블 헤더
 	tableHtml += '<thead><tr>';
-	tableHtml += '<th>주간 통계 ▼</th>'; // 여기를 "주간 통계 ▼"로 변경
+	tableHtml += '<th id="weeklyStatsHeader">주간 통계 ▼</th>'; // id 추가
 	tableHtml += '<th>상담건수</th>';
 	tableHtml += '<th>계약체결건수</th>';
 	tableHtml += '<th>계약체결률</th>';
@@ -493,6 +515,101 @@ function renderManagerWeeklyStats(weeklyData, managers, monthInfo) {
 	
 	// 푸터 업데이트 (월간 합계)
 	updateWeeklyStatsFooter(monthlyTotals);
+}
+
+// 주간 필터 드롭다운 초기화 함수
+function initWeekFilterDropdown() {
+	// 현재 년도와 월 구하기
+	const currentDate = new Date();
+	const currentYear = currentDate.getFullYear();
+	const currentMonth = currentDate.getMonth() + 1;
+	const startYear = currentYear - 5;
+	
+	// weekFilterDropdown에 내용이 있는지 확인
+	if ($('#weekFilterDropdown .dropdown-section').length === 0) {
+		// 드롭다운 구조 생성
+		$('#weekFilterDropdown').html(`
+			<div class="dropdown-section">
+				<div class="dropdown-title">연도 선택</div>
+				<div class="dropdown-scroll year-scroll"></div>
+			</div>
+			<div class="dropdown-section">
+				<div class="dropdown-title">월 선택</div>
+				<div class="dropdown-scroll month-scroll"></div>
+			</div>
+			<div class="dropdown-buttons">
+				<button class="apply-button">적용</button>
+				<button class="reset-button">초기화</button>
+			</div>
+		`);
+	}
+	
+	// 연도 옵션 생성
+	const yearSection = $('#weekFilterDropdown .year-scroll');
+	yearSection.empty();
+	
+	for (let year = currentYear; year >= startYear; year--) {
+		const isCurrentYear = year === currentYear;
+		yearSection.append(`
+			<div class="dropdown-option year-option ${isCurrentYear ? 'selected' : ''}" data-year="${year}">
+				${year}년
+			</div>
+		`);
+	}
+	
+	// 월 옵션 생성
+	const monthSection = $('#weekFilterDropdown .month-scroll');
+	monthSection.empty();
+	
+	for (let month = 1; month <= 12; month++) {
+		const isCurrentMonth = month === currentMonth;
+		const paddedMonth = month.toString().padStart(2, '0');
+		monthSection.append(`
+			<div class="dropdown-option month-option ${isCurrentMonth ? 'selected' : ''}" data-month="${paddedMonth}">
+				${month}월
+			</div>
+		`);
+	}
+	
+	// 연도 선택 이벤트
+	$(document).off('click', '#weekFilterDropdown .year-option').on('click', '#weekFilterDropdown .year-option', function() {
+		$('#weekFilterDropdown .year-option').removeClass('selected');
+		$(this).addClass('selected');
+	});
+	
+	// 월 선택 이벤트
+	$(document).off('click', '#weekFilterDropdown .month-option').on('click', '#weekFilterDropdown .month-option', function() {
+		$('#weekFilterDropdown .month-option').removeClass('selected');
+		$(this).addClass('selected');
+	});
+	
+	// 적용 버튼 클릭 이벤트
+	$(document).off('click', '#weekFilterDropdown .apply-button').on('click', '#weekFilterDropdown .apply-button', function() {
+		const selectedYear = $('#weekFilterDropdown .year-option.selected').data('year');
+		const selectedMonth = $('#weekFilterDropdown .month-option.selected').data('month');
+		
+		if (selectedYear && selectedMonth) {
+			// 선택된 년도와 월로 데이터 로드
+			loadFilteredManagerWeeklyStats(selectedYear, selectedMonth);
+			$('#weekFilterDropdown').hide();
+		} else {
+			alert('연도와 월을 모두 선택해주세요.');
+		}
+	});
+	
+	// 초기화 버튼 클릭 이벤트
+	$(document).off('click', '#weekFilterDropdown .reset-button').on('click', '#weekFilterDropdown .reset-button', function() {
+		// 현재 날짜로 초기화
+		loadFilteredManagerWeeklyStats(currentYear, currentMonth);
+		$('#weekFilterDropdown').hide();
+	});
+	
+	// 다른 곳 클릭 시 드롭다운 닫기
+	$(document).on('click', function(e) {
+		if (!$(e.target).closest('#weekFilterDropdown, .weekly-stats-table th:first-child').length) {
+			$('#weekFilterDropdown').hide();
+		}
+	});
 }
 
 // 주간 통계 푸터 업데이트 함수
