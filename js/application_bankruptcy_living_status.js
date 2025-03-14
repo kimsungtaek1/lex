@@ -55,9 +55,7 @@ class LivingStatusManager {
 	}
 
 	loadData() {
-		alert('test');
 		if (!window.currentCaseNo) return;
-
 		$.ajax({
 			url: '/adm/api/application_bankruptcy/living_status/living_status_api.php',
 			type: 'GET',
@@ -65,6 +63,7 @@ class LivingStatusManager {
 			dataType: 'json',
 			success: (response) => {
 				if (response.success && response.data) {
+					alert('test');
 					console.log(response.data);
 					// 모든 데이터를 한 번에 받아와서 각 섹션에 적용
 					this.populateBasicInfo(response.data);
