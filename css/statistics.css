@@ -99,8 +99,9 @@
 .stat-footer:last-child{border-right:none;}
 
 /* 주간 통계 스타일 */
-.weekly-stats-left{flex:1 1 60%;display:flex;flex-direction:column;gap:2vh;}
-.weekly-stats-right{flex:1 1 40%;display:flex;flex-direction:column;gap:2vh;}
+.weekly-stats{display:flex;flex-direction:row;}
+.weekly-stats-left{flex:1;display:flex;flex-direction:column;gap:2vh;}
+.weekly-stats-right{flex:1;display:flex;flex-direction:column;gap:2vh;}
 .weekly-stats-container{width:100%;font-size:1.2vw;cursor:pointer;}
 .weekly-stats-header{display:flex;color:white;font-weight:bold;width:100%;}
 .weekly-stats-body{border:1px solid #eee;border-radius:5px;overflow:hidden;}
