@@ -68,26 +68,79 @@ if ($method === 'GET') {
             $pdo->beginTransaction();
 
             foreach ($update_list as $data) {
-                $stmt = $pdo->prepare("
-                    UPDATE $tableName 
-                    SET property_no = :property_no, 
-                        item_name = :item_name, 
-                        purchase_date = :purchase_date, 
-                        quantity = :quantity, 
-                        used_price = :used_price, 
-                        total = :total 
-                    WHERE case_no = :case_no
-                ");
-
-                $stmt->execute([
-                    ':property_no' => $data['property_no'],
-                    ':item_name' => $data['item_name'],
-                    ':purchase_date' => $data['purchase_date'],
-                    ':quantity' => $data['quantity'],
-                    ':used_price' => $data['used_price'],
-                    ':total' => $data['total'],
-                    ':case_no' => $case_no
-                ]);
+                // 각 자산 타입에 맞는 필드로 UPDATE 문 구성
+                switch ($asset_type) {
+                    case 'cash':
+                        $stmt = $pdo->prepare("
+                            UPDATE $tableName 
+                            SET property_no = :property_no,
+                                property_detail = :property_detail,
+                                liquidation_value = :liquidation_value,
+                                is_seized = :is_seized
+                            WHERE case_no = :case_no AND asset_no = :asset_no
+                        ");
+                        $stmt->execute([
+                            ':property_no' => $data['property_no'],
+                            ':property_detail' => $data['property_detail'] ?? '',
+                            ':liquidation_value' => $data['liquidation_value'] ?? 0,
+                            ':is_seized' => $data['is_seized'] ?? 'N',
+                            ':case_no' => $case_no,
+                            ':asset_no' => $data['asset_no']
+                        ]);
+                        break;
+                    
+                    case 'deposit':
+                        $stmt = $pdo->prepare("
+                            UPDATE $tableName 
+                            SET property_no = :property_no,
+                                bank_name = :bank_name,
+                                account_number = :account_number,
+                                deposit_amount = :deposit_amount,
+                                deduction_amount = :deduction_amount,
+                                is_seized = :is_seized
+                            WHERE case_no = :case_no AND asset_no = :asset_no
+                        ");
+                        $stmt->execute([
+                            ':property_no' => $data['property_no'],
+                            ':bank_name' => $data['bank_name'] ?? '',
+                            ':account_number' => $data['account_number'] ?? '',
+                            ':deposit_amount' => $data['deposit_amount'] ?? 0,
+                            ':deduction_amount' => $data['deduction_amount'] ?? 0,
+                            ':is_seized' => $data['is_seized'] ?? 'N',
+                            ':case_no' => $case_no,
+                            ':asset_no' => $data['asset_no']
+                        ]);
+                        break;
+                    
+                    // 다른 자산 타입에 대한 케이스 추가...
+                    
+                    default:
+                        // 기본 처리 - 더 간단한 방식으로 진행
+                        $fields = [];
+                        $params = [':case_no' => $case_no, ':property_no' => $data['property_no']];
+                        
+                        if (isset($data['asset_no'])) {
+                            $params[':asset_no'] = $data['asset_no'];
+                            $whereClause = "case_no = :case_no AND asset_no = :asset_no";
+                        } else {
+                            $whereClause = "case_no = :case_no AND property_no = :old_property_no";
+                            $params[':old_property_no'] = $data['old_property_no'] ?? $data['property_no'];
+                        }
+                        
+                        $fields[] = "property_no = :property_no";
+                        
+                        foreach ($data as $key => $value) {
+                            if ($key !== 'property_no' && $key !== 'case_no' && $key !== 'asset_no' && $key !== 'old_property_no') {
+                                $fields[] = "$key = :$key";
+                                $params[":$key"] = $value;
+                            }
+                        }
+                        
+                        $sql = "UPDATE $tableName SET " . implode(', ', $fields) . " WHERE $whereClause";
+                        $stmt = $pdo->prepare($sql);
+                        $stmt->execute($params);
+                        break;
+                }
             }
 
             $pdo->commit();
