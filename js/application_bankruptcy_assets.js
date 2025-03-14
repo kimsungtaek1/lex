@@ -774,6 +774,11 @@ class AssetManager {
 							</div>
 						</div>
 						<div class="form">
+							<div class="form-title"><span></span></div>
+							<div class="form-content">
+							</div>
+						</div>
+						<div class="form">
 							<div class="form-title"></div>
 							<div class="form-content btn-right">
 								<button type="button" class="btn-delete sales_receivables_delete_btn">삭제</button>
@@ -812,6 +817,11 @@ class AssetManager {
 								<label for="severance_seizure_y_${propertyNo}">예</label>
 								<input type="radio" id="severance_seizure_n_${propertyNo}" name="severance_seizure_${propertyNo}" value="N" ${data.is_seized !== 'Y' ? 'checked' : ''}>
 								<label for="severance_seizure_n_${propertyNo}">아니오</label>
+							</div>
+						</div>
+						<div class="form">
+							<div class="form-title"><span></span></div>
+							<div class="form-content">
 							</div>
 						</div>
 					</div>
@@ -881,6 +891,16 @@ class AssetManager {
 								<label for="property_seizure_y_${propertyNo}">예</label>
 								<input type="radio" id="property_seizure_n_${propertyNo}" name="property_seizure_${propertyNo}" value="N" ${data.is_seized !== 'Y' ? 'checked' : ''}>
 								<label for="property_seizure_n_${propertyNo}">아니오</label>
+							</div>
+						</div>
+						<div class="form">
+							<div class="form-title"><span></span></div>
+							<div class="form-content">
+							</div>
+						</div>
+						<div class="form">
+							<div class="form-title"><span></span></div>
+							<div class="form-content">
 							</div>
 						</div>
 					</div>
@@ -1053,6 +1073,11 @@ class AssetManager {
 								<input type="text" class="disposed_property_type" value="${data.property_type || ""}">
 							</div>
 						</div>
+						<div class="form">
+							<div class="form-title"><span></span></div>
+							<div class="form-content">
+							</div>
+						</div>
 					</div>
 					<div class="right-section">
 						<div class="form">
@@ -1168,6 +1193,16 @@ class AssetManager {
 								<input type="text" class="divorce_property_amount" data-type="money" value="${data.property_amount || ""}">원
 							</div>
 						</div>
+						<div class="form">
+							<div class="form-title"><span></span></div>
+							<div class="form-content">
+							</div>
+						</div>
+						<div class="form">
+							<div class="form-title"><span></span></div>
+							<div class="form-content">
+							</div>
+						</div>
 					</div>
 					<div class="right-section">
 						<div class="form">
@@ -1227,11 +1262,16 @@ class AssetManager {
 						<div class="form">
 							<div class="form-title"><span>상속상황</span></div>
 							<div class="form-content">
-								<select class="inherited_status form-content-long" name="inherited_status">
+								<select class="inherited_status form-content" name="inherited_status">
 									<option value="㉠ 상속재산이 전혀 없음" ${(data.inheritance_status==="㉠ 상속재산이 전혀 없음") ? "selected" : ""}>㉠ 상속재산이 전혀 없음</option>
 									<option value="㉡ 신청인의 상속포기 또는 상속재산 분할에 의하여 다른 상속인이 모두 취득하였음" ${(data.inheritance_status==="㉡ 신청인의 상속포기 또는 상속재산 분할에 의하여 다른 상속인이 모두 취득하였음") ? "selected" : ""}>㉡ 신청인의 상속포기 또는 상속재산 분할에 의하여 다른 상속인이 모두 취득하였음</option>
 									<option value="㉢ 신청인이 전부 또는 일부를 상속하였음" ${(data.inheritance_status==="㉢ 신청인이 전부 또는 일부를 상속하였음") ? "selected" : ""}>㉢ 신청인이 전부 또는 일부를 상속하였음</option>
 								</select>
+							</div>
+						</div>
+						<div class="form">
+							<div class="form-title"><span></span></div>
+							<div class="form-content">
 							</div>
 						</div>
 					</div>
