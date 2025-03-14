@@ -639,6 +639,283 @@ function updateWeeklyStatsFooter(monthlyTotals) {
 	footer.html(footerHtml);
 }
 
+// 월간 필터 드롭다운 초기화 함수
+function initMonthFilterDropdown() {
+	// 현재 년도 구하기
+	const currentDate = new Date();
+	const currentYear = currentDate.getFullYear();
+	const startYear = currentYear - 5;
+	
+	// monthFilterDropdown에 내용이 있는지 확인
+	if ($('#monthFilterDropdown .dropdown-section').length === 0) {
+		// 드롭다운 구조 생성
+		$('#monthFilterDropdown').html(`
+			<div class="dropdown-section">
+				<div class="dropdown-title">연도 선택</div>
+				<div class="dropdown-scroll year-scroll"></div>
+			</div>
+			<div class="dropdown-buttons">
+				<button class="apply-button">적용</button>
+				<button class="reset-button">초기화</button>
+			</div>
+		`);
+	}
+	
+	// 연도 옵션 생성
+	const yearSection = $('#monthFilterDropdown .year-scroll');
+	yearSection.empty();
+	
+	for (let year = currentYear; year >= startYear; year--) {
+		const isCurrentYear = year === currentYear;
+		yearSection.append(`
+			<div class="dropdown-option year-option ${isCurrentYear ? 'selected' : ''}" data-year="${year}">
+				${year}년
+			</div>
+		`);
+	}
+	
+	// 연도 선택 이벤트
+	$(document).off('click', '#monthFilterDropdown .year-option').on('click', '#monthFilterDropdown .year-option', function() {
+		$('#monthFilterDropdown .year-option').removeClass('selected');
+		$(this).addClass('selected');
+	});
+	
+	// 적용 버튼 클릭 이벤트
+	$(document).off('click', '#monthFilterDropdown .apply-button').on('click', '#monthFilterDropdown .apply-button', function() {
+		const selectedYear = $('#monthFilterDropdown .year-option.selected').data('year');
+		
+		if (selectedYear) {
+			// 선택된 년도로 데이터 로드
+			loadFilteredManagerMonthlyStats(selectedYear);
+			$('#monthFilterDropdown').hide();
+		} else {
+			alert('연도를 선택해주세요.');
+		}
+	});
+	
+	// 초기화 버튼 클릭 이벤트
+	$(document).off('click', '#monthFilterDropdown .reset-button').on('click', '#monthFilterDropdown .reset-button', function() {
+		// 현재 날짜로 초기화
+		loadFilteredManagerMonthlyStats(currentYear);
+		$('#monthFilterDropdown').hide();
+	});
+	
+	// 다른 곳 클릭 시 드롭다운 닫기
+	$(document).on('click', function(e) {
+		if (!$(e.target).closest('#monthFilterDropdown, .monthly-stats-table th:first-child').length) {
+			$('#monthFilterDropdown').hide();
+		}
+	});
+}
+
+// 필터링된 사무장 월간 통계 로드 함수
+function loadFilteredManagerMonthlyStats(year) {
+	$.ajax({
+		url: '../adm/api/stats/get_manager_monthly_stats.php',
+		method: 'GET',
+		data: {
+			year: year
+		},
+		dataType: 'json',
+		success: function(response) {
+			if(response.success) {
+				// 연도 정보 전달
+				const yearInfo = `${year}년`;
+				
+				// 렌더링 함수 호출 시 연도 정보 전달
+				renderManagerMonthlyStats(response.data, response.managers, yearInfo);
+				renderMonthlyTrendChart(response.trend);
+			} else {
+				console.error('통계 로드 실패:', response);
+				alert('통계 데이터를 불러올 수 없습니다: ' + response.message);
+			}
+		},
+		error: function(xhr, status, error) {
+			try {
+				const errorResponse = JSON.parse(xhr.responseText);
+				console.error('서버 오류 상세 정보:', errorResponse);
+				alert('서버 오류: ' + errorResponse.message);
+			} catch(e) {
+				console.error('AJAX 오류:', status, error);
+				console.error('원시 응답:', xhr.responseText);
+				alert('데이터를 불러오는 중 심각한 오류가 발생했습니다.');
+			}
+		}
+	});
+}
+
+// 사무장 월간 통계 로드 함수
+function loadManagerMonthlyStats() {
+	// 현재 연도 구하기
+	const currentDate = new Date();
+	const currentYear = currentDate.getFullYear();
+	
+	// 초기 로드 시 현재 연도 데이터 사용
+	loadFilteredManagerMonthlyStats(currentYear);
+}
+
+// 월간 통계 렌더링 함수
+function renderManagerMonthlyStats(monthlyData, managers, yearInfo) {
+	const statsBody = $('#managerMonthlyStatsBody');
+	statsBody.empty();
+
+	// HTML 테이블 생성
+	let tableHtml = '<table class="monthly-stats-table">';
+	
+	// 테이블 헤더
+	tableHtml += '<thead><tr>';
+	tableHtml += '<th id="monthlyStatsHeader">월간 통계 ▼</th>'; // id 추가
+	tableHtml += '<th>상담건수</th>';
+	tableHtml += '<th>계약체결건수</th>';
+	tableHtml += '<th>계약체결률</th>';
+	tableHtml += '</tr></thead>';
+	
+	// 테이블 바디
+	tableHtml += '<tbody>';
+	
+	// 연간 합계 계산을 위한 변수 초기화
+	let yearlyTotals = {
+		inflow: 0,
+		contract: 0
+	};
+	
+	// 각 월별 데이터
+	monthlyData.forEach(item => {
+		tableHtml += '<tr>';
+		// 월 정보에 연도 정보 포함하여 표시
+		tableHtml += `<td>${yearInfo} ${item.month}월</td>`;
+		
+		// 상담건수(유입)
+		tableHtml += `<td>${item.total.inflow} 건</td>`;
+		
+		// 계약체결건수
+		tableHtml += `<td>${item.total.contract} 건</td>`;
+		
+		// 계약체결률 계산
+		const contractRate = item.total.inflow > 0 ? 
+			Math.round((item.total.contract / item.total.inflow) * 100) : 0;
+		tableHtml += `<td>${contractRate} %</td>`;
+		
+		// 연간 합계에 추가
+		yearlyTotals.inflow += item.total.inflow;
+		yearlyTotals.contract += item.total.contract;
+		
+		tableHtml += '</tr>';
+	});
+	
+	tableHtml += '</tbody></table>';
+	
+	// 테이블 렌더링
+	statsBody.html(tableHtml);
+	
+	// 푸터 업데이트 (연간 합계)
+	updateMonthlyStatsFooter(yearlyTotals);
+}
+
+// 월간 통계 푸터 업데이트 함수
+function updateMonthlyStatsFooter(yearlyTotals) {
+	const footer = $('.monthly-stats-footer');
+	footer.empty();
+	
+	// 연간 전체 계약체결률 계산
+	const yearlyContractRate = yearlyTotals.inflow > 0 ? 
+		Math.round((yearlyTotals.contract / yearlyTotals.inflow) * 100) : 0;
+	
+	let footerHtml = '<table>';
+	footerHtml += '<tr>';
+	footerHtml += '<th>연간 합계</th>';
+	footerHtml += `<th>${yearlyTotals.inflow} 건</th>`;
+	footerHtml += `<th>${yearlyTotals.contract} 건</th>`;
+	footerHtml += `<th>${yearlyContractRate} %</th>`;
+	footerHtml += '</tr>';
+	footerHtml += '</table>';
+	
+	footer.html(footerHtml);
+}
+
+// 월간 트렌드 차트 렌더링 함수
+function renderMonthlyTrendChart(trendData) {
+	// 기존 차트 제거
+	if (charts.monthlyTrend) {
+		charts.monthlyTrend.destroy();
+	}
+	
+	const ctx = document.getElementById('monthlyTrendChart').getContext('2d');
+	
+	charts.monthlyTrend = new Chart(ctx, {
+		type: 'line',
+		data: {
+			labels: trendData.map(item => item.month),
+			datasets: [
+				{
+					label: '유입 건수',
+					data: trendData.map(item => item.inflow),
+					borderColor: '#00e6c3',
+					backgroundColor: 'rgba(0, 230, 195, 0.1)',
+					borderWidth: 2,
+					tension: 0.4,
+					fill: true
+				},
+				{
+					label: '계약 건수',
+					data: trendData.map(item => item.contract),
+					borderColor: '#6c6c6c',
+					backgroundColor: 'rgba(108, 108, 108, 0.1)',
+					borderWidth: 2,
+					tension: 0.4,
+					fill: true
+				}
+			]
+		},
+		options: {
+			responsive: true,
+			maintainAspectRatio: false,
+			plugins: {
+				legend: {
+					position: 'top',
+					align: 'end',
+					labels: {
+						boxWidth: 12,
+						padding: 15
+					}
+				},
+				tooltip: {
+					backgroundColor: 'rgba(255, 255, 255, 0.9)',
+					titleColor: '#000',
+					bodyColor: '#000',
+					borderColor: '#ddd',
+					borderWidth: 1,
+					padding: 10,
+					displayColors: false,
+					callbacks: {
+						label: function(context) {
+							const label = context.dataset.label || '';
+							const value = context.parsed.y;
+							return `${label}: ${value}건`;
+						}
+					}
+				}
+			},
+			scales: {
+				y: {
+					beginAtZero: true,
+					grid: {
+						color: '#f0f0f0'
+					},
+					ticks: {
+						precision: 0
+					}
+				},
+				x: {
+					grid: {
+						display: false
+					}
+				}
+			}
+		}
+	});
+}
+
 // 날짜 컬럼 클릭 핸들러
 function handleDateColumnClick(e) {
 	e.preventDefault();
