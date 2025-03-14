@@ -883,7 +883,7 @@ class AssetManager {
 					</div>
 					<div class="right-section">
 						<div class="form">
-							<div class="form-title"><span>청산가치 판단금액</span></div>
+							<div class="form-title form-notitle"><span>청산가치 판단금액</span></div>
 							<div class="form-content">
 								시가&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="property_liquidation_value" data-type="money" value="${data.property_liquidation_value || ""}">
 							</div>
