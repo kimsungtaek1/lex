@@ -140,7 +140,7 @@
 .weekly-stats-footer{margin-top:10px;}
 .weekly-stats-footer table{width:100%;border-collapse:collapse;}
 .weekly-stats-footer th{padding:10px;background-color:#6c6c6c;color:white;font-weight:bold;text-align:center;}
-.weekly-stats-footer th:first-child{color:#00e6c3;}
+.weekly-stats-footer th:first-child{width:25%;color:#00e6c3;}
 
 #weekFilterDropdown{position:absolute;display:none;background-color:#fff;border-radius:0.3vw;box-shadow:0 2px 5px rgba(0,0,0,0.2);z-index:1000;min-width:220px;top:auto;left:auto;}
 
