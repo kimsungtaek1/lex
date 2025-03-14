@@ -196,11 +196,6 @@ class AssetManager {
 
 	saveAssetBlock(type, block) {
 		const caseNo = window.currentCaseNo;
-		if (!caseNo) {
-			alert('사건을 먼저 선택해주세요.');
-			return;
-		}
-		
 		const assetNo = block.find(`.${type}_asset_no`).val();
 		
 		// 기본 데이터 세팅
@@ -224,7 +219,7 @@ class AssetManager {
 					bank_name: block.find(".deposit_bank_name").val().trim(),
 					account_number: block.find(".deposit_account_number").val().trim(),
 					deposit_amount: this.unformatMoney(block.find(".deposit_amount").val()),
-					liquidation_value: this.unformatMoney(block.find(".deposit_amount").val()), // 예금의 경우 잔고가 청산가치
+					deduction_amount: this.unformatMoney(block.find(".deposit_deduction_amount").val()),
 					is_seized: block.find(`input[name^="deposit_seizure_"]:checked`).val() || "N"
 				});
 				break;
@@ -233,7 +228,6 @@ class AssetManager {
 					company_name: block.find(".insurance_company_name").val().trim(),
 					securities_number: block.find(".insurance_securities_number").val().trim(),
 					refund_amount: this.unformatMoney(block.find(".insurance_refund_amount").val()),
-					liquidation_value: this.unformatMoney(block.find(".insurance_refund_amount").val()), // 보험의 경우 해약반환금이 청산가치
 					is_coverage: block.find(`input[name^="insurance_coverage_"]:checked`).val() || "N",
 					explanation: block.find(".insurance_explanation").val().trim(),
 					is_seized: block.find(`input[name^="insurance_seizure_"]:checked`).val() || "N"
@@ -242,51 +236,59 @@ class AssetManager {
 			case 'vehicle':
 				Object.assign(data, {
 					vehicle_info: block.find(".vehicle_info").val().trim(),
-					registration_number: block.find(".vehicle_security_type").val().trim(), // 등록번호 필드명 수정
-					secured_debt: this.unformatMoney(block.find(".vehicle_max_bond").val()),
+					registration_number: block.find(".vehicle_registration_number").val().trim(),
+					security_debt_balance: this.unformatMoney(block.find(".vehicle_security_debt_balance").val()),
+					market_value: this.unformatMoney(block.find(".vehicle_market_value").val()),
 					liquidation_value: this.unformatMoney(block.find(".vehicle_liquidation_value").val()),
-					explanation: block.find(".vehicle_liquidation_explain").val().trim(),
+					liquidation_explanation: block.find(".vehicle_liquidation_explanation").val().trim(),
 					is_seized: block.find(`input[name^="vehicle_seizure_"]:checked`).val() || "N"
 				});
 				break;
 			case 'rent_deposit':
 				Object.assign(data, {
 					rent_location: block.find(".rent_location").val().trim(),
-					contract_deposit: this.unformatMoney(block.find(".rent_contract_deposit").val()),
-					premium: this.unformatMoney(block.find(".rent_monthly_rent").val()), // 권리금 필드명 수정
-					refund_deposit: this.unformatMoney(block.find(".rent_refund_deposit").val()),
-					difference_reason: block.find(".rent_difference_reason").val().trim(),
+					rent_deposit: this.unformatMoney(block.find(".rent_deposit").val()),
+					key_money: this.unformatMoney(block.find(".key_money").val()),
+					expected_refund: this.unformatMoney(block.find(".expected_refund").val()),
+					explanation: block.find(".rent_explanation").val().trim(),
 					is_seized: block.find(`input[name^="rent_seizure_"]:checked`).val() || "N"
 				});
 				break;
 			case 'real_estate':
 				Object.assign(data, {
 					property_type: block.find(".property_type").val().trim(),
+					property_area: block.find(".property_area").val().trim(),
 					property_location: block.find(".property_location").val().trim(),
-					secured_debt: this.unformatMoney(block.find(".property_expected_value").val()), // 담보권 피담보채권 잔액
-					liquidation_value: this.unformatMoney(block.find(".property_liquidation_value").val()),
-					explanation: block.find(".property_liquidation_explain").val().trim(),
+					secured_debt_balance: this.unformatMoney(block.find(".secured_debt_balance").val()),
+					seizure_details: block.find(".seizure_details").val().trim(),
+					seizure_creditor: block.find(".seizure_creditor").val().trim(),
+					seizure_amount: this.unformatMoney(block.find(".seizure_amount").val()),
+					market_value: this.unformatMoney(block.find(".market_value").val()),
+					liquidation_explanation: block.find(".liquidation_explanation").val().trim(),
 					is_seized: block.find(`input[name^="property_seizure_"]:checked`).val() || "N"
 				});
 				break;
 			case 'loan_receivables':
 				Object.assign(data, {
 					debtor_name: block.find(".loan_debtor_name").val().trim(),
-					liquidation_value: this.unformatMoney(block.find(".loan_liquidation_value").val()),
+					claim_amount: this.unformatMoney(block.find(".loan_claim_amount").val()),
+					collectible_amount: this.unformatMoney(block.find(".loan_collectible_amount").val()),
 					is_seized: block.find(`input[name^="loan_seizure_"]:checked`).val() || "N"
 				});
 				break;
 			case 'sales_receivables':
 				Object.assign(data, {
 					debtor_name: block.find(".sales_debtor_name").val().trim(),
-					liquidation_value: this.unformatMoney(block.find(".sales_liquidation_value").val()),
+					claim_amount: this.unformatMoney(block.find(".sales_claim_amount").val()),
+					collectible_amount: this.unformatMoney(block.find(".sales_collectible_amount").val()),
 					is_seized: block.find(`input[name^="sales_seizure_"]:checked`).val() || "N"
 				});
 				break;
 			case 'severance_pay':
 				Object.assign(data, {
 					workplace: block.find(".severance_workplace").val().trim(),
-					expected_severance: this.unformatMoney(block.find(".severance_expected_amount").val()),
+					expected_amount: this.unformatMoney(block.find(".severance_expected_amount").val()),
+					deduction_amount: this.unformatMoney(block.find(".severance_deduction_amount").val()),
 					liquidation_value: this.unformatMoney(block.find(".severance_liquidation_value").val()),
 					is_seized: block.find(`input[name^="severance_seizure_"]:checked`).val() || "N"
 				});
@@ -300,33 +302,38 @@ class AssetManager {
 				break;
 			case 'disposed_assets':
 				Object.assign(data, {
-					disposal_date: block.find(".disposed_date").val(),
-					property_type: block.find(".disposed_property_type").val().trim(), // 사용처 필드
-					disposal_amount: this.unformatMoney(block.find(".disposed_amount").val()),
+					disposal_date: block.find(".disposal_date").val(),
+					disposal_amount: this.unformatMoney(block.find(".disposal_amount").val()),
+					disposal_usage: block.find(".disposal_usage").val().trim(),
+					is_seized: block.find(`input[name^="disposed_seizure_"]:checked`).val() || "N"
 				});
 				break;
 			case 'received_deposit':
 				Object.assign(data, {
-					receipt_date: block.find(".received_date").val(),
-					lessor: block.find(".received_lessor").val().trim(),
-					deposit_amount: this.unformatMoney(block.find(".received_deposit_amount").val()),
-					note: block.find(".received_note").val().trim() // 임차보증금 사용처
+					receipt_date: block.find(".receipt_date").val(),
+					rental_property: block.find(".rental_property").val().trim(),
+					contract_deposit: this.unformatMoney(block.find(".contract_deposit").val()),
+					received_deposit: this.unformatMoney(block.find(".received_deposit").val()),
+					deposit_usage: block.find(".deposit_usage").val().trim(),
+					is_seized: block.find(`input[name^="received_seizure_"]:checked`).val() || "N"
 				});
 				break;
 			case 'divorce_property':
 				Object.assign(data, {
 					divorce_date: block.find(".divorce_date").val(),
-					spouse_name: block.find(".divorce_spouse").val().trim(), // 분여 재산 필드
-					property_amount: this.unformatMoney(block.find(".divorce_property_amount").val() || 0)
+					settlement_property: block.find(".settlement_property").val().trim(),
+					divorce_timing: block.find(".divorce_timing").val(),
+					is_seized: block.find(`input[name^="divorce_seizure_"]:checked`).val() || "N"
 				});
 				break;
 			case 'inherited_property':
 				Object.assign(data, {
-					inheritance_date: block.find(".inherited_start_date").val(),
-					heir_type: block.find(".inherited_heir_type").val() || '부', // 피상속인 구분
-					inheritance_status: block.find(".inherited_status").val() || '', // 상속상황
-					property_type: block.find(".inherited_property_type").val().trim(), // 주된 상속재산
-					acquisition_reason: block.find(".inherited_acquisition_reason").val().trim() // 취득경위
+					inheritance_date: block.find(".inheritance_date").val(),
+					deceased_type: block.find(".deceased_type").val().trim(),
+					inheritance_status: block.find(".inheritance_status").val().trim(),
+					main_inheritance_property: block.find(".main_inheritance_property").val().trim(),
+					acquisition_process: block.find(".acquisition_process").val().trim(),
+					is_seized: block.find(`input[name^="inherited_seizure_"]:checked`).val() || "N"
 				});
 				break;
 		}
@@ -461,12 +468,8 @@ class AssetManager {
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>압류여부</span></div>
+							<div class="form-title"></div>
 							<div class="form-content">
-								<input type="radio" id="cash_seizure_y_${propertyNo}" name="cash_seizure_${propertyNo}" value="Y" ${data.is_seized === 'Y' ? 'checked' : ''}>
-								<label for="cash_seizure_y_${propertyNo}">예</label>
-								<input type="radio" id="cash_seizure_n_${propertyNo}" name="cash_seizure_${propertyNo}" value="N" ${data.is_seized !== 'Y' ? 'checked' : ''}>
-								<label for="cash_seizure_n_${propertyNo}">아니오</label>
 							</div>
 						</div>
 					</div>
@@ -516,13 +519,8 @@ class AssetManager {
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>압류여부</span></div>
-							<div class="form-content">
-								<input type="radio" id="deposit_seizure_y_${propertyNo}" name="deposit_seizure_${propertyNo}" value="Y" ${data.is_seized === 'Y' ? 'checked' : ''}>
-								<label for="deposit_seizure_y_${propertyNo}">예</label>
-								<input type="radio" id="deposit_seizure_n_${propertyNo}" name="deposit_seizure_${propertyNo}" value="N" ${data.is_seized !== 'Y' ? 'checked' : ''}>
-								<label for="deposit_seizure_n_${propertyNo}">아니오</label>
-							</div>
+							<div class="form-title form-notitle"><span></span></div>
+							<div class="form-content form-nocontent"></div>
 						</div>
 					</div>
 					<div class="right-section">
@@ -576,13 +574,8 @@ class AssetManager {
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>압류여부</span></div>
-							<div class="form-content">
-								<input type="radio" id="insurance_seizure_y_${propertyNo}" name="insurance_seizure_${propertyNo}" value="Y" ${data.is_seized === 'Y' ? 'checked' : ''}>
-								<label for="insurance_seizure_y_${propertyNo}">예</label>
-								<input type="radio" id="insurance_seizure_n_${propertyNo}" name="insurance_seizure_${propertyNo}" value="N" ${data.is_seized !== 'Y' ? 'checked' : ''}>
-								<label for="insurance_seizure_n_${propertyNo}">아니오</label>
-							</div>
+							<div class="form-title"><span></span></div>
+							<div class="form-content"></div>
 						</div>
 					</div>
 					<div class="right-section">
@@ -620,31 +613,31 @@ class AssetManager {
 						<div class="form">
 							<div class="form-title"><span>임차물건</span></div>
 							<div class="form-content">
-								<input type="text" class="rent_location" value="${data.rent_location || ""}" class="input100">
+								<input type="text" class="rent_location" value="${data.rent_location || ""}" class="form-control form-content-long">
 							</div>
 						</div>
 						<div class="form">
 							<div class="form-title"><span>임차보증금</span></div>
 							<div class="form-content">
-								<input type="text" class="rent_contract_deposit input86" data-type="money" value="${data.contract_deposit || ""}">원
+								<input type="text" class="rent_deposit" data-type="money" value="${data.rent_deposit || ""}" class="form-control form-content-justify">원
 							</div>
 						</div>
 						<div class="form">
 							<div class="form-title"><span>권리금</span></div>
 							<div class="form-content">
-								<input type="text" class="rent_monthly_rent input86" data-type="money" value="${data.premium || ""}">원
+								<input type="text" class="key_money" data-type="money" value="${data.key_money || ""}" class="form-control form-content-justify">원
 							</div>
 						</div>
 						<div class="form">
 							<div class="form-title"><span>반환예상금</span></div>
 							<div class="form-content">
-								<input type="text" class="rent_refund_deposit" data-type="money" value="${data.refund_deposit || ""}">원
+								<input type="text" class="expected_refund" data-type="money" value="${data.expected_refund || ""}">원
 							</div>
 						</div>
 						<div class="form">
 							<div class="form-title"><span>부연설명</span></div>
 							<div class="form-content">
-								<input type="text" class="rent_difference_reason input100" value="${data.difference_reason || ""}">
+								<input type="text" class="rent_explanation" value="${data.explanation || ""}" class="form-control form-content-long">
 							</div>
 						</div>
 					</div>
@@ -659,20 +652,14 @@ class AssetManager {
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>압류여부</span></div>
-							<div class="form-content">
-								<input type="radio" id="rent_seizure_y_${propertyNo}" name="rent_seizure_${propertyNo}" value="Y" ${data.is_seized === 'Y' ? 'checked' : ''}>
-								<label for="rent_seizure_y_${propertyNo}">예</label>
-								<input type="radio" id="rent_seizure_n_${propertyNo}" name="rent_seizure_${propertyNo}" value="N" ${data.is_seized !== 'Y' ? 'checked' : ''}>
-								<label for="rent_seizure_n_${propertyNo}">아니오</label>
-							</div>
+							<div class="form-title form-nocontent"><span></span></div>
+							<div class="form-content form-nocontent"></div>
 						</div>
 						<div class="form">
 							<div class="form-title"></div>
 							<div class="form-content btn-right">
 								<button type="button" class="btn-delete rent_deposit_delete_btn">삭제</button>
 								<button type="button" class="btn-save rent_deposit_save_btn">저장</button>
-								<button type="button" class="btn-file" id="exempt_rent_criteria">소액임차인 최우선 변제금 기준</button>
 							</div>
 						</div>
 					</div>
@@ -691,38 +678,33 @@ class AssetManager {
 						<div class="form">
 							<div class="form-title"><span>채무자명</span></div>
 							<div class="form-content">
-								<input type="text" class="loan_debtor_name" value="${data.debtor_name || ""}" class="input100">
+								<input type="text" class="loan_debtor_name" value="${data.debtor_name || ""}" class="form-control form-content-long">
 							</div>
 						</div>
 						<div class="form">
 							<div class="form-title"><span>채권금액</span></div>
 							<div class="form-content">
-								<input type="text" class="loan_liquidation_value" data-type="money" value="${data.liquidation_value || ""}">원
+								<input type="text" class="loan_claim_amount" data-type="money" value="${data.claim_amount || ""}" class="form-control">원
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>압류여부</span></div>
+							<div class="form-title"><span>회수가능금액</span></div>
 							<div class="form-content">
-								<input type="radio" id="loan_seizure_y_${propertyNo}" name="loan_seizure_${propertyNo}" value="Y" ${data.is_seized === 'Y' ? 'checked' : ''}>
-								<label for="loan_seizure_y_${propertyNo}">예</label>
-								<input type="radio" id="loan_seizure_n_${propertyNo}" name="loan_seizure_${propertyNo}" value="N" ${data.is_seized !== 'Y' ? 'checked' : ''}>
-								<label for="loan_seizure_n_${propertyNo}">아니오</label>
+								<input type="text" class="loan_collectible_amount" data-type="money" value="${data.collectible_amount || ""}" class="form-control">원
 							</div>
 						</div>
 					</div>
 					<div class="right-section">
-						<div class="form">
-							<div class="form-title"><span>회수가능금액</span></div>
-							<div class="form-content">
-								<input type="text" class="loan_recovery_amount" data-type="money" value="${data.recovery_amount || ""}">원
-							</div>
-						</div>
 						<div class="form">
 							<div class="form-title"><span>주의사항</span></div>
 							<div class="form-content">
 								회수가 어렵다고 하더라도 반드시 기재하시고, 대여금뿐만 아니라 구상금, 손해배상금, 계금 등 <br>
 								어떠한 명목으로라도 제3자로부터 받아야 할 돈이 있으면 기재하시기 바랍니다.
 							</div>
+						</div>
+						<div class="form">
+							<div class="form-title form-nocontent"><span></span></div>
+							<div class="form-content form-nocontent"></div>
 						</div>
 						<div class="form">
 							<div class="form-title"></div>
@@ -747,22 +729,13 @@ class AssetManager {
 						<div class="form">
 							<div class="form-title"><span>채무자명</span></div>
 							<div class="form-content">
-								<input type="text" class="sales_debtor_name" value="${data.debtor_name || ""}" class="input100">
+								<input type="text" class="sales_debtor_name" value="${data.debtor_name || ""}" class="form-control form-content-long">
 							</div>
 						</div>
 						<div class="form">
 							<div class="form-title"><span>채권금액</span></div>
 							<div class="form-content">
-								<input type="text" class="sales_liquidation_value" data-type="money" value="${data.liquidation_value || ""}">원
-							</div>
-						</div>
-						<div class="form">
-							<div class="form-title"><span>압류여부</span></div>
-							<div class="form-content">
-								<input type="radio" id="sales_seizure_y_${propertyNo}" name="sales_seizure_${propertyNo}" value="Y" ${data.is_seized === 'Y' ? 'checked' : ''}>
-								<label for="sales_seizure_y_${propertyNo}">예</label>
-								<input type="radio" id="sales_seizure_n_${propertyNo}" name="sales_seizure_${propertyNo}" value="N" ${data.is_seized !== 'Y' ? 'checked' : ''}>
-								<label for="sales_seizure_n_${propertyNo}">아니오</label>
+								<input type="text" class="sales_claim_amount" data-type="money" value="${data.claim_amount || ""}" class="form-control">원
 							</div>
 						</div>
 					</div>
@@ -770,12 +743,7 @@ class AssetManager {
 						<div class="form">
 							<div class="form-title"><span>회수가능금액</span></div>
 							<div class="form-content">
-								<input type="text" class="sales_recovery_amount" data-type="money" value="${data.recovery_amount || ""}">원
-							</div>
-						</div>
-						<div class="form">
-							<div class="form-title"><span></span></div>
-							<div class="form-content">
+								<input type="text" class="sales_collectible_amount" data-type="money" value="${data.collectible_amount || ""}" class="form-control">원
 							</div>
 						</div>
 						<div class="form">
@@ -801,37 +769,23 @@ class AssetManager {
 						<div class="form">
 							<div class="form-title"><span>근무처</span></div>
 							<div class="form-content">
-								<input type="text" class="severance_workplace" value="${data.workplace || ""}" class="input100">
+								<input type="text" class="severance_workplace" value="${data.workplace || ""}" class="form-control form-content-long">
 							</div>
 						</div>
 						<div class="form">
 							<div class="form-title"><span>퇴직금예상액</span></div>
 							<div class="form-content">
-								<input type="text" class="severance_expected_amount" data-type="money" value="${data.expected_severance || ""}">원
+								<input type="text" class="severance_expected_amount" data-type="money" value="${data.expected_amount || ""}">원
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>압류여부</span></div>
+							<div class="form-title form-notitle"><span>취지</span></div>
 							<div class="form-content">
-								<input type="radio" id="severance_seizure_y_${propertyNo}" name="severance_seizure_${propertyNo}" value="Y" ${data.is_seized === 'Y' ? 'checked' : ''}>
-								<label for="severance_seizure_y_${propertyNo}">예</label>
-								<input type="radio" id="severance_seizure_n_${propertyNo}" name="severance_seizure_${propertyNo}" value="N" ${data.is_seized !== 'Y' ? 'checked' : ''}>
-								<label for="severance_seizure_n_${propertyNo}">아니오</label>
-							</div>
-						</div>
-						<div class="form">
-							<div class="form-title"><span></span></div>
-							<div class="form-content">
+								<input type="text" class="severance_liquidation_value" data-type="money" value="${data.liquidation_value || ""}">
 							</div>
 						</div>
 					</div>
 					<div class="right-section">
-						<div class="form">
-							<div class="form-title"><span>청산가치 판단금액</span></div>
-							<div class="form-content">
-								<input type="text" class="severance_liquidation_value" data-type="money" value="${data.liquidation_value || ""}">원
-							</div>
-						</div>
 						<div class="form">
 							<div class="form-title form-title-2"><span>주의사항</span></div>
 							<div class="form-content form-content-2">
@@ -869,52 +823,54 @@ class AssetManager {
 										<option value="건물" ${(data.property_type==="건물") ? "selected" : ""}>건물</option>
 										<option value="토지, 건물" ${(data.property_type==="토지, 건물") ? "selected" : ""}>토지, 건물</option>
 									</select>
+									<div class="form-content">
+										<input type="text" class="property_area" value="${data.property_area || ""}" class="form-control">
+									</div>
 								</div>
 							</div>
 						</div>
 						<div class="form">
 							<div class="form-title"><span>소재지</span></div>
 							<div class="form-content">
-								<input type="text" class="property_location" value="${data.property_location || ""}" class="input100">
+								소재지&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="property_location" value="${data.property_location || ""}" class="form-control">
 							</div>
 						</div>
 						<div class="form">
 							<div class="form-title"><span>등기된 담보권의<br>피담보채권 잔액</span></div>
 							<div class="form-content">
-								<input type="text" class="property_expected_value" data-type="money" value="${data.secured_debt || ""}">원
+								<input type="text" class="secured_debt_balance" data-type="money" value="${data.secured_debt_balance || ""}">원
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>압류여부</span></div>
+							<div class="form-title form-notitle"><span>(가)압류 등</span></div>
 							<div class="form-content">
-								<input type="radio" id="property_seizure_y_${propertyNo}" name="property_seizure_${propertyNo}" value="Y" ${data.is_seized === 'Y' ? 'checked' : ''}>
-								<label for="property_seizure_y_${propertyNo}">예</label>
-								<input type="radio" id="property_seizure_n_${propertyNo}" name="property_seizure_${propertyNo}" value="N" ${data.is_seized !== 'Y' ? 'checked' : ''}>
-								<label for="property_seizure_n_${propertyNo}">아니오</label>
+								내용&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="seizure_details" value="${data.seizure_details || ""}" class="form-control">
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span></span></div>
+							<div class="form-title form-notitle"><span></span></div>
 							<div class="form-content">
+								채권자&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="seizure_creditor" value="${data.seizure_creditor || ""}" class="form-control">
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span></span></div>
+							<div class="form-title form-notitle"><span></span></div>
 							<div class="form-content">
+									가액&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="seizure_amount" data-type="money" value="${data.seizure_amount || ""}">
 							</div>
 						</div>
 					</div>
 					<div class="right-section">
 						<div class="form">
-							<div class="form-title"><span>청산가치 판단금액</span></div>
+							<div class="form-title form-notitle"><span>청산가치 판단금액</span></div>
 							<div class="form-content">
-								<input type="text" class="property_liquidation_value" data-type="money" value="${data.liquidation_value || ""}">원
+								시가&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="market_value" data-type="money" value="${data.market_value || ""}">
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>부연설명</span></div>
+							<div class="form-title"><span></span></div>
 							<div class="form-content">
-								<input type="text" class="property_liquidation_explain" value="${data.explanation || ""}" class="input100">
+								부연설명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="liquidation_explanation" value="${data.liquidation_explanation || ""}">
 							</div>
 						</div>
 						<div class="form">
@@ -950,42 +906,44 @@ class AssetManager {
 						<div class="form">
 							<div class="form-title"><span>차종/연식</span></div>
 							<div class="form-content">
-								<input type="text" class="vehicle_info input100" value="${data.vehicle_info || ""}" placeholder="차량번호, 연식, 모델(예:123가4567, 2020년형, 아반떼)">
+								<input type="text" class="vehicle_info" value="${data.vehicle_info || ""}" placeholder="차량번호, 연식, 모델(예:123가4567, 2020년형, 아반떼)">
 							</div>
 						</div>
 						<div class="form">
 							<div class="form-title"><span>등록번호</span></div>
 							<div class="form-content">
-								<input type="text" class="vehicle_security_type" value="${data.registration_number || ""}">
+								<input type="text" class="vehicle_registration_number" value="${data.registration_number || ""}">
 							</div>
 						</div>
 						<div class="form">
 							<div class="form-title"><span>등록된 담보권의<br>피담보채권 잔액</span></div>
 							<div class="form-content">
-								<input type="text" class="vehicle_max_bond" data-type="money" value="${data.secured_debt || ""}">원
+								<input type="text" class="vehicle_security_debt_balance" data-type="money" value="${data.security_debt_balance || ""}">원
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>압류여부</span></div>
+							<div class="form-title"><span></span></div>
 							<div class="form-content">
-								<input type="radio" id="vehicle_seizure_y_${propertyNo}" name="vehicle_seizure_${propertyNo}" value="Y" ${data.is_seized === 'Y' ? 'checked' : ''}>
-								<label for="vehicle_seizure_y_${propertyNo}">예</label>
-								<input type="radio" id="vehicle_seizure_n_${propertyNo}" name="vehicle_seizure_${propertyNo}" value="N" ${data.is_seized !== 'Y' ? 'checked' : ''}>
-								<label for="vehicle_seizure_n_${propertyNo}">아니오</label>
 							</div>
 						</div>
 					</div>
 					<div class="right-section">
 						<div class="form">
-							<div class="form-title"><span>청산가치 판단금액</span></div>
+							<div class="form-title form-notitle"><span>청산가치 판단금액</span></div>
+							<div class="form-content">
+								시가&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="vehicle_market_value" data-type="money" value="${data.market_value || ""}">원
+							</div>
+						</div>
+						<div class="form">
+							<div class="form-title"><span></span></div>
 							<div class="form-content">
 								<input type="text" class="vehicle_liquidation_value" data-type="money" value="${data.liquidation_value || ""}">원
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>부연설명</span></div>
+							<div class="form-title"><span></span></div>
 							<div class="form-content">
-								<input type="text" class="vehicle_liquidation_explain input86" value="${data.explanation || ""}">
+								부연설명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="vehicle_liquidation_explanation" value="${data.liquidation_explanation || ""}">
 							</div>
 						</div>
 						<div class="form">
@@ -1015,16 +973,12 @@ class AssetManager {
 						<div class="form">
 							<div class="form-title"><span>품목명</span></div>
 							<div class="form-content">
-								<input type="text" class="other_asset_content" value="${data.asset_content || ""}">
+								<input type="text" class="other_asset_content" value="${data.asset_content || ""}" class="form-control">
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>압류여부</span></div>
+							<div class="form-title"><span></span></div>
 							<div class="form-content">
-								<input type="radio" id="other_seizure_y_${propertyNo}" name="other_seizure_${propertyNo}" value="Y" ${data.is_seized === 'Y' ? 'checked' : ''}>
-								<label for="other_seizure_y_${propertyNo}">예</label>
-								<input type="radio" id="other_seizure_n_${propertyNo}" name="other_seizure_${propertyNo}" value="N" ${data.is_seized !== 'Y' ? 'checked' : ''}>
-								<label for="other_seizure_n_${propertyNo}">아니오</label>
 							</div>
 						</div>
 					</div>
@@ -1032,7 +986,7 @@ class AssetManager {
 						<div class="form">
 							<div class="form-title"><span>청산가치 판단금액</span></div>
 							<div class="form-content">
-								<input type="text" class="other_liquidation_value" data-type="money" value="${data.liquidation_value || ""}">원
+								시가&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="other_liquidation_value" data-type="money" value="${data.liquidation_value || ""}">원
 							</div>
 						</div>
 						<div class="form">
@@ -1058,19 +1012,19 @@ class AssetManager {
 						<div class="form">
 							<div class="form-title"><span>처분시기</span></div>
 							<div class="form-content">
-								<input type="date" class="disposed_date" value="${data.disposal_date || ""}">
+								<input type="date" class="disposal_date" value="${data.disposal_date || ""}">
 							</div>
 						</div>
 						<div class="form">
 							<div class="form-title"><span>처분금액</span></div>
 							<div class="form-content">
-								<input type="text" class="disposed_amount" data-type="money" value="${data.disposal_amount || ""}">원
+								<input type="text" class="disposal_amount" data-type="money" value="${data.disposal_amount || ""}">원
 							</div>
 						</div>
 						<div class="form">
 							<div class="form-title"><span>사용처</span></div>
 							<div class="form-content">
-								<input type="text" class="disposed_property_type" value="${data.property_type || ""}">
+								<input type="text" class="disposal_usage" value="${data.disposal_usage || ""}">
 							</div>
 						</div>
 						<div class="form">
@@ -1114,33 +1068,33 @@ class AssetManager {
 						<div class="form">
 							<div class="form-title"><span>수령일자</span></div>
 							<div class="form-content">
-								<input type="date" class="received_date" value="${data.receipt_date || ""}">
-							</div>
-						</div>
-						<div class="form">
-							<div class="form-title"><span>임대인</span></div>
-							<div class="form-content">
-								<input type="text" class="received_lessor" value="${data.lessor || ""}">
+								<input type="date" class="receipt_date" value="${data.receipt_date || ""}">
 							</div>
 						</div>
 						<div class="form">
 							<div class="form-title"><span>임차물건</span></div>
 							<div class="form-content">
-								<input type="text" class="received_location" value="${data.location || ""}">
+								<input type="text" class="rental_property" value="${data.rental_property || ""}">
+							</div>
+						</div>
+						<div class="form">
+							<div class="form-title"><span>임대차계약상<br>임차보증금액</span></div>
+							<div class="form-content">
+								<input type="text" class="contract_deposit" data-type="money" value="${data.contract_deposit || ""}">원
 							</div>
 						</div>
 					</div>
 					<div class="right-section">
 						<div class="form">
-							<div class="form-title"><span>임차보증금액</span></div>
+							<div class="form-title"><span>실제수령<br>임차보증금액</span></div>
 							<div class="form-content">
-								<input type="text" class="received_deposit_amount" data-type="money" value="${data.deposit_amount || ""}">원
+								<input type="text" class="received_deposit" data-type="money" value="${data.received_deposit || ""}">원
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>사용처</span></div>
+							<div class="form-title"><span>임차보증금 사용처</span></div>
 							<div class="form-content">
-								<input type="text" class="received_note" value="${data.note || ""}">
+								<input type="text" class="deposit_usage" value="${data.deposit_usage || ""}">
 							</div>
 						</div>
 						<div class="form">
@@ -1166,41 +1120,39 @@ class AssetManager {
 						<div class="form">
 							<div class="form-title"><span>분여 재산</span></div>
 							<div class="form-content">
-								<input type="text" class="divorce_spouse" value="${data.spouse_name || ""}">
+								<input type="text" class="settlement_property" value="${data.settlement_property || ""}">
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>이혼일자</span></div>
+							<div class="form-title"><span>시기</span></div>
 							<div class="form-content">
 								<input type="date" class="divorce_date" value="${data.divorce_date || ""}">
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>재산분할일자</span></div>
+							<div class="form-title"><span>이혼시기</span></div>
 							<div class="form-content">
-								<input type="date" class="divorce_settlement_date" value="${data.settlement_date || ""}">
+								<input type="date" class="divorce_timing" value="${data.divorce_timing || ""}">
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>재산 종류</span></div>
-							<div class="form-content">
-								<input type="text" class="divorce_property_type" value="${data.property_type || ""}">
+							<div class="form-title form-notitle"><span></span></div>
+							<div class="form-content form-nocontent">
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span>재산 금액</span></div>
-							<div class="form-content">
-								<input type="text" class="divorce_property_amount" data-type="money" value="${data.property_amount || ""}">원
+							<div class="form-title form-notitle"><span></span></div>
+							<div class="form-content form-nocontent">
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span></span></div>
-							<div class="form-content">
+							<div class="form-title form-notitle"><span></span></div>
+							<div class="form-content form-nocontent">
 							</div>
 						</div>
 						<div class="form">
-							<div class="form-title"><span></span></div>
-							<div class="form-content">
+							<div class="form-title form-notitle"><span></span></div>
+							<div class="form-content form-nocontent">
 							</div>
 						</div>
 					</div>
@@ -1245,16 +1197,16 @@ class AssetManager {
 						<div class="form">
 							<div class="form-title"><span>상속일자</span></div>
 							<div class="form-content">
-								<input type="date" class="inherited_start_date" value="${data.inheritance_date || ""}">
+								<input type="date" class="inheritance_date" value="${data.inheritance_date || ""}">
 							</div>
 						</div>
 						<div class="form">
 							<div class="form-title"><span>피상속인 구분</span></div>
 							<div class="form-content">
-								<select class="inherited_heir_type" name="inherited_heir_type">
-									<option value="부" ${(data.heir_type==="부") ? "selected" : ""}>부</option>
-									<option value="모" ${(data.heir_type==="모") ? "selected" : ""}>모</option>
-									<option value="기타" ${(data.heir_type==="기타") ? "selected" : ""}>기타</option>
+								<select class="deceased_type" name="deceased_type">
+									<option value="부" ${(data.deceased_type==="부") ? "selected" : ""}>부</option>
+									<option value="모" ${(data.deceased_type==="모") ? "selected" : ""}>모</option>
+									<option value="기타" ${(data.deceased_type==="기타") ? "selected" : ""}>기타</option>
 								</select>
 								&nbsp;의 사망에 의한 상속
 							</div>
@@ -1262,7 +1214,7 @@ class AssetManager {
 						<div class="form">
 							<div class="form-title"><span>상속상황</span></div>
 							<div class="form-content">
-								<select class="inherited_status form-content" name="inherited_status">
+								<select class="inheritance_status" name="inheritance_status">
 									<option value="㉠ 상속재산이 전혀 없음" ${(data.inheritance_status==="㉠ 상속재산이 전혀 없음") ? "selected" : ""}>㉠ 상속재산이 전혀 없음</option>
 									<option value="㉡ 신청인의 상속포기 또는 상속재산 분할에 의하여 다른 상속인이 모두 취득하였음" ${(data.inheritance_status==="㉡ 신청인의 상속포기 또는 상속재산 분할에 의하여 다른 상속인이 모두 취득하였음") ? "selected" : ""}>㉡ 신청인의 상속포기 또는 상속재산 분할에 의하여 다른 상속인이 모두 취득하였음</option>
 									<option value="㉢ 신청인이 전부 또는 일부를 상속하였음" ${(data.inheritance_status==="㉢ 신청인이 전부 또는 일부를 상속하였음") ? "selected" : ""}>㉢ 신청인이 전부 또는 일부를 상속하였음</option>
@@ -1279,13 +1231,13 @@ class AssetManager {
 						<div class="form">
 							<div class="form-title"><span>주된 상속재산</span></div>
 							<div class="form-content">
-								<input type="text" class="inherited_property_type" value="${data.property_type || ""}" placeholder="㉡ 또는 ㉢항 선택시 기재하여 주십시오.">
+								<input type="text" class="main_inheritance_property" value="${data.main_inheritance_property || ""}" placeholder="㉡ 또는 ㉢항 선택시 기재하여 주십시오.">
 							</div>
 						</div>
 						<div class="form">
 							<div class="form-title"><span>취득경위</span></div>
 							<div class="form-content">
-								<input type="text" class="inherited_acquisition_reason" value="${data.acquisition_reason || ""}" placeholder="㉡항 선택시 다른 상속인이 주된 상속재산을 취득하게 된 경위를 기재하여 주십시오.">
+								<input type="text" class="acquisition_process" value="${data.acquisition_process || ""}" placeholder="㉡항 선택시 다른 상속인이 주된 상속재산을 취득하게 된 경위를 기재하여 주십시오.">
 							</div>
 						</div>
 						<div class="form">
