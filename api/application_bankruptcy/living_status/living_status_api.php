@@ -5,6 +5,11 @@ require_once '../../../config.php';
 
 header('Content-Type: application/json');
 
+// 디버깅을 위한 오류 표시 설정
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 if (!isset($_SESSION['employee_no'])) {
    echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.']);
    exit;
@@ -46,8 +51,13 @@ try {
    	$familyData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
    	// 데이터 병합
-   	$data = array_merge($basicData, $incomeData, $additionalData, $taxData);
-   	$data['family_members'] = $familyData;
+   	$data = array_merge(
+		$basicData ?: [], 
+		$incomeData ?: [], 
+		$additionalData ?: [], 
+		$taxData ?: []
+	);
+   	$data['family_members'] = $familyData ?: [];
 
    	echo json_encode(['success' => true, 'data' => $data]);
    	exit;
@@ -56,7 +66,7 @@ try {
    // POST 요청 처리 - 데이터 저장 및 삭제
    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
    	// 가족 구성원 삭제 처리
-   	if (isset($_POST['member_id']) && isset($_POST['delete']) && $_POST['delete'] == 1) {
+   	if (isset($_POST['member_id']) && isset($_POST['action']) && $_POST['action'] == 'delete_family_member') {
    		$stmt = $pdo->prepare("DELETE FROM application_bankruptcy_living_status_family WHERE member_id = :member_id AND case_no = :case_no");
    		$result = $stmt->execute([
    			'member_id' => $_POST['member_id'],
