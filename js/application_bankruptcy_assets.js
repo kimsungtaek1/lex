@@ -90,6 +90,10 @@ class AssetManager {
 		$('#save_asset_summary').on('click', () => {
 			this.saveAssetSummary();
 		});
+
+		$('#delete_asset_summary').on('click', () => {
+			this.deleteAssetSummary();
+		});
 		
 		// 창 닫기 전 저장되지 않은 변경사항 확인
 		window.addEventListener("beforeunload", (e) => {
@@ -281,6 +285,51 @@ class AssetManager {
 			},
 			error: (xhr, status, error) => {
 				console.error('요약표 데이터 로드 오류:', error);
+			}
+		});
+	}
+
+	deleteAssetSummary() {
+		if (!confirm("재산목록 요약표를 초기화하시겠습니까?")) {
+			return;
+		}
+		
+		// 모든 라디오 버튼을 '없음'(N)으로 설정
+		$('input[name^="sum_"][value="N"]').prop('checked', true);
+		
+		// 서버에 변경사항 저장
+		const data = {
+			case_no: window.currentCaseNo,
+			cash_exists: 'N',
+			deposit_exists: 'N',
+			insurance_exists: 'N',
+			rent_deposit_exists: 'N',
+			loan_receivables_exists: 'N',
+			sales_receivables_exists: 'N',
+			severance_pay_exists: 'N',
+			real_estate_exists: 'N',
+			vehicle_exists: 'N',
+			other_assets_exists: 'N',
+			disposed_assets_exists: 'N',
+			received_deposit_exists: 'N',
+			divorce_property_exists: 'N',
+			inherited_property_exists: 'N'
+		};
+		
+		$.ajax({
+			url: '/adm/api/application_bankruptcy/assets/asset_summary_api.php',
+			type: 'POST',
+			data: data,
+			dataType: 'json',
+			success: (response) => {
+				if (response.success) {
+					alert('재산목록 요약표가 초기화되었습니다.');
+				} else {
+					alert(response.message || '재산목록 요약표 초기화 실패');
+				}
+			},
+			error: () => {
+				alert('재산목록 요약표 초기화 중 오류가 발생했습니다.');
 			}
 		});
 	}

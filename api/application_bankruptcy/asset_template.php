@@ -12,115 +12,171 @@
       <div class="form">
         <div class="form-title"><span>현금</span></div>
         <div class="form-content">
-          <label for="sum_cash_exists_y"><input type="radio" id="sum_cash_exists_y" name="sum_cash_exists" value="Y"><span>있음</span></label>
-          <label for="sum_cash_exists_n"><input type="radio" id="sum_cash_exists_n" name="sum_cash_exists" value="N" checked><span>없음</span></label>
+          <div class="radio">
+            <input type="radio" id="sum_cash_exists_y" name="sum_cash_exists" value="Y">
+            <label for="sum_cash_exists_y">있음</label>
+            <input type="radio" id="sum_cash_exists_n" name="sum_cash_exists" value="N" checked>
+            <label for="sum_cash_exists_n">없음</label>
+          </div>
         </div>
       </div>
       <div class="form">
         <div class="form-title"><span>예금</span></div>
         <div class="form-content">
-          <label for="sum_deposit_exists_y"><input type="radio" id="sum_deposit_exists_y" name="sum_deposit_exists" value="Y"><span>있음</span></label>
-          <label for="sum_deposit_exists_n"><input type="radio" id="sum_deposit_exists_n" name="sum_deposit_exists" value="N" checked><span>없음</span></label>
+          <div class="radio">
+            <input type="radio" id="sum_deposit_exists_y" name="sum_deposit_exists" value="Y">
+            <label for="sum_deposit_exists_y">있음</label>
+            <input type="radio" id="sum_deposit_exists_n" name="sum_deposit_exists" value="N" checked>
+            <label for="sum_deposit_exists_n">없음</label>
+          </div>
         </div>
       </div>
       <div class="form">
         <div class="form-title"><span>보험</span></div>
         <div class="form-content">
-          <label for="sum_insurance_exists_y"><input type="radio" id="sum_insurance_exists_y" name="sum_insurance_exists" value="Y"><span>있음</span></label>
-          <label for="sum_insurance_exists_n"><input type="radio" id="sum_insurance_exists_n" name="sum_insurance_exists" value="N" checked><span>없음</span></label>
+          <div class="radio">
+            <input type="radio" id="sum_insurance_exists_y" name="sum_insurance_exists" value="Y">
+            <label for="sum_insurance_exists_y">있음</label>
+            <input type="radio" id="sum_insurance_exists_n" name="sum_insurance_exists" value="N" checked>
+            <label for="sum_insurance_exists_n">없음</label>
+          </div>
         </div>
       </div>
       <div class="form">
         <div class="form-title"><span>임차보증금</span></div>
         <div class="form-content">
-          <label for="sum_rent_deposit_exists_y"><input type="radio" id="sum_rent_deposit_exists_y" name="sum_rent_deposit_exists" value="Y"><span>있음</span></label>
-          <label for="sum_rent_deposit_exists_n"><input type="radio" id="sum_rent_deposit_exists_n" name="sum_rent_deposit_exists" value="N" checked><span>없음</span></label>
+          <div class="radio">
+            <input type="radio" id="sum_rent_deposit_exists_y" name="sum_rent_deposit_exists" value="Y">
+            <label for="sum_rent_deposit_exists_y">있음</label>
+            <input type="radio" id="sum_rent_deposit_exists_n" name="sum_rent_deposit_exists" value="N" checked>
+            <label for="sum_rent_deposit_exists_n">없음</label>
+          </div>
         </div>
       </div>
       <div class="form">
         <div class="form-title"><span>대여금</span></div>
         <div class="form-content">
-          <label for="sum_loan_receivables_exists_y"><input type="radio" id="sum_loan_receivables_exists_y" name="sum_loan_receivables_exists" value="Y"><span>있음</span></label>
-          <label for="sum_loan_receivables_exists_n"><input type="radio" id="sum_loan_receivables_exists_n" name="sum_loan_receivables_exists" value="N" checked><span>없음</span></label>
+          <div class="radio">
+            <input type="radio" id="sum_loan_receivables_exists_y" name="sum_loan_receivables_exists" value="Y">
+            <label for="sum_loan_receivables_exists_y">있음</label>
+            <input type="radio" id="sum_loan_receivables_exists_n" name="sum_loan_receivables_exists" value="N" checked>
+            <label for="sum_loan_receivables_exists_n">없음</label>
+          </div>
         </div>
       </div>
       <div class="form">
         <div class="form-title"><span>매출금</span></div>
         <div class="form-content">
-          <label for="sum_sales_receivables_exists_y"><input type="radio" id="sum_sales_receivables_exists_y" name="sum_sales_receivables_exists" value="Y"><span>있음</span></label>
-          <label for="sum_sales_receivables_exists_n"><input type="radio" id="sum_sales_receivables_exists_n" name="sum_sales_receivables_exists" value="N" checked><span>없음</span></label>
+          <div class="radio">
+            <input type="radio" id="sum_sales_receivables_exists_y" name="sum_sales_receivables_exists" value="Y">
+            <label for="sum_sales_receivables_exists_y">있음</label>
+            <input type="radio" id="sum_sales_receivables_exists_n" name="sum_sales_receivables_exists" value="N" checked>
+            <label for="sum_sales_receivables_exists_n">없음</label>
+          </div>
         </div>
       </div>
       <div class="form">
         <div class="form-title"><span>퇴직금</span></div>
         <div class="form-content">
-          <label for="sum_severance_pay_exists_y"><input type="radio" id="sum_severance_pay_exists_y" name="sum_severance_pay_exists" value="Y"><span>있음</span></label>
-          <label for="sum_severance_pay_exists_n"><input type="radio" id="sum_severance_pay_exists_n" name="sum_severance_pay_exists" value="N" checked><span>없음</span></label>
+          <div class="radio">
+            <input type="radio" id="sum_severance_pay_exists_y" name="sum_severance_pay_exists" value="Y">
+            <label for="sum_severance_pay_exists_y">있음</label>
+            <input type="radio" id="sum_severance_pay_exists_n" name="sum_severance_pay_exists" value="N" checked>
+            <label for="sum_severance_pay_exists_n">없음</label>
+          </div>
         </div>
       </div>
-		<div class="form">
-			<div class="form-title"><span></span></div>
-			<div class="form-content">
-			</div>
-		</div>
+      <div class="form">
+        <div class="form-title"><span></span></div>
+        <div class="form-content">
+        </div>
+      </div>
     </div>
     <div class="right-section">
       <div class="form">
         <div class="form-title"><span>부동산</span></div>
         <div class="form-content">
-          <label for="sum_real_estate_exists_y"><input type="radio" id="sum_real_estate_exists_y" name="sum_real_estate_exists" value="Y"><span>있음</span></label>
-          <label for="sum_real_estate_exists_n"><input type="radio" id="sum_real_estate_exists_n" name="sum_real_estate_exists" value="N" checked><span>없음</span></label>
+          <div class="radio">
+            <input type="radio" id="sum_real_estate_exists_y" name="sum_real_estate_exists" value="Y">
+            <label for="sum_real_estate_exists_y">있음</label>
+            <input type="radio" id="sum_real_estate_exists_n" name="sum_real_estate_exists" value="N" checked>
+            <label for="sum_real_estate_exists_n">없음</label>
+          </div>
         </div>
       </div>
       <div class="form">
         <div class="form-title"><span>자동차·오토바이</span></div>
         <div class="form-content">
-          <label for="sum_vehicle_exists_y"><input type="radio" id="sum_vehicle_exists_y" name="sum_vehicle_exists" value="Y"><span>있음</span></label>
-          <label for="sum_vehicle_exists_n"><input type="radio" id="sum_vehicle_exists_n" name="sum_vehicle_exists" value="N" checked><span>없음</span></label>
+          <div class="radio">
+            <input type="radio" id="sum_vehicle_exists_y" name="sum_vehicle_exists" value="Y">
+            <label for="sum_vehicle_exists_y">있음</label>
+            <input type="radio" id="sum_vehicle_exists_n" name="sum_vehicle_exists" value="N" checked>
+            <label for="sum_vehicle_exists_n">없음</label>
+          </div>
         </div>
       </div>
       <div class="form">
-        <div class="form-title"><span>기타 재산</span></div>
+        <div class="form-title"><span>기타 재산 (주식,<br>특허권, 귀금속 등)</span></div>
         <div class="form-content">
-          <label for="sum_other_assets_exists_y"><input type="radio" id="sum_other_assets_exists_y" name="sum_other_assets_exists" value="Y"><span>있음</span></label>
-          <label for="sum_other_assets_exists_n"><input type="radio" id="sum_other_assets_exists_n" name="sum_other_assets_exists" value="N" checked><span>없음</span></label>
+          <div class="radio">
+            <input type="radio" id="sum_other_assets_exists_y" name="sum_other_assets_exists" value="Y">
+            <label for="sum_other_assets_exists_y">있음</label>
+            <input type="radio" id="sum_other_assets_exists_n" name="sum_other_assets_exists" value="N" checked>
+            <label for="sum_other_assets_exists_n">없음</label>
+          </div>
         </div>
       </div>
       <div class="form">
-        <div class="form-title"><span>천만원 이상<br>재산 처분</span></div>
+        <div class="form-title"><span>지급불가능 시점의<br>1년 이전부터 현재까지 재산 처분 여부</span></div>
         <div class="form-content">
-          <label for="sum_disposed_assets_exists_y"><input type="radio" id="sum_disposed_assets_exists_y" name="sum_disposed_assets_exists" value="Y"><span>있음</span></label>
-          <label for="sum_disposed_assets_exists_n"><input type="radio" id="sum_disposed_assets_exists_n" name="sum_disposed_assets_exists" value="N" checked><span>없음</span></label>
+          <div class="radio">
+            <input type="radio" id="sum_disposed_assets_exists_y" name="sum_disposed_assets_exists" value="Y">
+            <label for="sum_disposed_assets_exists_y">있음</label>
+            <input type="radio" id="sum_disposed_assets_exists_n" name="sum_disposed_assets_exists" value="N" checked>
+            <label for="sum_disposed_assets_exists_n">없음</label>
+          </div>
         </div>
       </div>
       <div class="form">
-        <div class="form-title"><span>2년 내 수령한<br>임차보증금</span></div>
+        <div class="form-title"><span>최근 2년간 받은<br>임차보증금</span></div>
         <div class="form-content">
-          <label for="sum_received_deposit_exists_y"><input type="radio" id="sum_received_deposit_exists_y" name="sum_received_deposit_exists" value="Y"><span>있음</span></label>
-          <label for="sum_received_deposit_exists_n"><input type="radio" id="sum_received_deposit_exists_n" name="sum_received_deposit_exists" value="N" checked><span>없음</span></label>
+          <div class="radio">
+            <input type="radio" id="sum_received_deposit_exists_y" name="sum_received_deposit_exists" value="Y">
+            <label for="sum_received_deposit_exists_y">있음</label>
+            <input type="radio" id="sum_received_deposit_exists_n" name="sum_received_deposit_exists" value="N" checked>
+            <label for="sum_received_deposit_exists_n">없음</label>
+          </div>
         </div>
       </div>
       <div class="form">
-        <div class="form-title"><span>2년 내 이혼시<br>재산분할</span></div>
+        <div class="form-title"><span>이혼재산분할</span></div>
         <div class="form-content">
-          <label for="sum_divorce_property_exists_y"><input type="radio" id="sum_divorce_property_exists_y" name="sum_divorce_property_exists" value="Y"><span>있음</span></label>
-          <label for="sum_divorce_property_exists_n"><input type="radio" id="sum_divorce_property_exists_n" name="sum_divorce_property_exists" value="N" checked><span>없음</span></label>
+          <div class="radio">
+            <input type="radio" id="sum_divorce_property_exists_y" name="sum_divorce_property_exists" value="Y">
+            <label for="sum_divorce_property_exists_y">있음</label>
+            <input type="radio" id="sum_divorce_property_exists_n" name="sum_divorce_property_exists" value="N" checked>
+            <label for="sum_divorce_property_exists_n">없음</label>
+          </div>
         </div>
       </div>
       <div class="form">
         <div class="form-title"><span>상속재산</span></div>
         <div class="form-content">
-          <label for="sum_inherited_property_exists_y"><input type="radio" id="sum_inherited_property_exists_y" name="sum_inherited_property_exists" value="Y"><span>있음</span></label>
-          <label for="sum_inherited_property_exists_n"><input type="radio" id="sum_inherited_property_exists_n" name="sum_inherited_property_exists" value="N" checked><span>없음</span></label>
+          <div class="radio">
+            <input type="radio" id="sum_inherited_property_exists_y" name="sum_inherited_property_exists" value="Y">
+            <label for="sum_inherited_property_exists_y">있음</label>
+            <input type="radio" id="sum_inherited_property_exists_n" name="sum_inherited_property_exists" value="N" checked>
+            <label for="sum_inherited_property_exists_n">없음</label>
+          </div>
         </div>
       </div>
-		<div class="form">
-			<div class="form-title"><span></span></div>
-			<div class="form-content btn-right">
-				<button type="button" class="btn-delete delete_asset_summary">삭제</button>
-				<button type="button" class="btn-save save_asset_summary">저장</button>
-			</div>
-		</div>
+      <div class="form">
+        <div class="form-title"><span></span></div>
+        <div class="form-content btn-right">
+          <button type="button" class="btn-delete" id="delete_asset_summary">삭제</button>
+          <button type="button" class="btn-save" id="save_asset_summary">저장</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
