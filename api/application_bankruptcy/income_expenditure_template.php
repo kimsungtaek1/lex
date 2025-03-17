@@ -81,62 +81,62 @@
     <div class="form">
       <div class="form-title"><span>주거비(임대료, 관리비 등)</span></div>
       <div class="form-content">
-        <input type="text" id="expense_housing" name="expense_housing" data-type="money"> 원
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="expense_housing" name="expense_housing" data-type="money"> 원
       </div>
     </div>
     <div class="form">
       <div class="form-title"><span>식비 (외식비 포함)</span></div>
       <div class="form-content">
-        <input type="text" id="expense_food" name="expense_food" data-type="money"> 원
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="expense_food" name="expense_food" data-type="money"> 원
       </div>
     </div>
     <div class="form">
       <div class="form-title"><span>교육비</span></div>
       <div class="form-content">
-        <input type="text" id="expense_education" name="expense_education" data-type="money"> 원
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="expense_education" name="expense_education" data-type="money"> 원
       </div>
     </div>
     <div class="form">
       <div class="form-title"><span>전기, 가스, 수도료</span></div>
       <div class="form-content">
-        <input type="text" id="expense_utilities" name="expense_utilities" data-type="money"> 원
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="expense_utilities" name="expense_utilities" data-type="money"> 원
       </div>
     </div>
     <div class="form">
       <div class="form-title"><span>교통비 (차량유지비 포함)</span></div>
       <div class="form-content">
-        <input type="text" id="expense_transportation" name="expense_transportation" data-type="money"> 원
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="expense_transportation" name="expense_transportation" data-type="money"> 원
       </div>
     </div>
     <div class="form">
       <div class="form-title"><span>통신료</span></div>
       <div class="form-content">
-        <input type="text" id="expense_communication" name="expense_communication" data-type="money"> 원
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="expense_communication" name="expense_communication" data-type="money"> 원
       </div>
     </div>
     <div class="form">
       <div class="form-title"><span>의료비</span></div>
       <div class="form-content">
-        <input type="text" id="expense_medical" name="expense_medical" data-type="money"> 원
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="expense_medical" name="expense_medical" data-type="money"> 원
       </div>
     </div>
     <div class="form">
       <div class="form-title"><span>보험료</span></div>
       <div class="form-content">
-        <input type="text" id="expense_insurance" name="expense_insurance" data-type="money"> 원
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="expense_insurance" name="expense_insurance" data-type="money"> 원
       </div>
     </div>
     <div class="form">
       <div class="form-title"><span>기타</span></div>
       <div class="form-content">
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="expense_others" name="expense_others" data-type="money"> 원
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="expense_others" name="expense_others" data-type="money"> 원
       </div>
     </div>
     <div class="form">
       <div class="form-title form-notitle"><span>지출합계</span></div>
 	  <div class="form-content form-nocontent">
 		<div class="form-content-inner">
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="income_total" name="income_total" data-type="money" readonly>&nbsp;&nbsp;&nbsp;&nbsp;원
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="income_total" name="income_total" data-type="money" value="0" readonly>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;원
 		</div>
       </div>
     </div>
@@ -167,7 +167,7 @@
     </div>
     <div class="form">
       <div class="form-title form-notitle"><span>가구별 생계비<br>(중위기준소득의 60%)</span></div>
-      <div class="form-content form-nocontent">
+      <div class="form-content">
         <div class="checkbox-group" style="width:100%;">
 		  <input type="radio" id="household_size_1" name="household_size" value="1">
 		  <label for="household_size_1">1인</label>
@@ -199,6 +199,11 @@
 		<span id="household_expense6"></span>
 	  </div>
 	</div>
+	<div class="form">
+      <div class="form-title"><span></span></div>
+      <div class="form-content">
+      </div>
+    </div>
   </div>
   <div class="right-section">
 	<div class="form">

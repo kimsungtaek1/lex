@@ -28,7 +28,7 @@ p{font-size:0.53vw}
 .form-title-top{color:#f3f3f3;background:#a7a7a7;border-bottom:1px solid #f3f3f3;display:flex;align-items:center;position:relative;border-radius:0.3vw;height:2vw;padding-left:1vw;}
 .form-title-topw{color:#fff;background:#a7a7a7;border-bottom:1px solid #f3f3f3;display:flex;align-items:center;position:relative;border-radius:0.3vw;height:2vw;padding-left:1vw;}
 .form-title-top-sub{color:#f3f3f3;background:#6c6c6c;border-bottom:1px solid #f3f3f3;display:flex;align-items:center;position:relative;border-radius:0.3vw;height:2vw;padding-left:1vw;margin:0.7vw 0;}
-.form-title select{width:6vw;color:#f3f3f3;padding:6px 0;border:none;border-radius:3px;box-sizing:border-box;background:transparent;outline:none}
+.form-title select{width:6vw;color:#f3f3f3;padding:6px 0;border:none;border-radius:3px;box-sizing:border-box;background:#a7a7a7;outline:none}
 .form-content{flex:1;display:flex;flex-direction:row;align-items:center;padding:0 2.5%;position:relative;background:#f7f7f7;border-bottom:1px solid #d4d4d4;height:2vw}
 .form-content-inner{width:100%;background:#a7a7a7;color:white;display:flex;padding:0 2.5%;align-items: center; height:2vw}
 .form-header-long{background:#a7a7a7;color:white;display:flex;border-radius:0.3vw}

@@ -19,6 +19,8 @@ ul, li {list-style: none;}
 
 /* 컨텐츠 래퍼 */
 .content-wrapper {margin: 0 auto;}
+.container {margin: 0 10vw;}
+.container img {width: 100%;}
 
 /* 반응형 스타일 */
 @media (max-width: 768px) {
