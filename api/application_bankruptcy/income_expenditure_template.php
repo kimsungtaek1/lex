@@ -202,16 +202,10 @@
   </div>
   <div class="right-section">
 	<div class="form">
-      <div class="form-title form-notitle"><span>부양가족</span></div>
-      <div class="form-content form-nocontent">
+      <div class="form-title"><span>부양가족</span></div>
+      <div class="form-content">
         <div id="dependents_container"></div>
       </div>
-    </div>
-    <div class="form">
-		<div class="form-title"><span></span></div>
-		<div class="form-content btn-right">
-			<button type="button" id="add_dependent" class="btn-add2">추가</button>
-		</div>
     </div>
     <div class="form">
       <div class="form-title"><span>채무자 가용소득</span></div>
@@ -235,9 +229,9 @@
 <!-- 부양가족 템플릿 (JavaScript에서 사용) -->
 <div id="dependent_template" style="display:none;">
 	<input type="hidden" class="dependent_id" value="{id}">
-	이름 | <input type="text" class="dependent_name" style="width:15%;">
-	나이 | <input type="text" class="dependent_age" style="width:15%;">
-	관계 | <input type="text" class="dependent_relation" style="width:15%;">
+	이름&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="dependent_name" style="width:20.5%;">
+	나이&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="dependent_age" style="width:20.5%;">
+	관계&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="dependent_relation" style="width:20.5%;">
 	<button type="button" id="add_dependent" class="btn-add2">추가</button>
 	<button type="button" class="btn-delete dependent_delete_btn">삭제</button>
 </div>
