@@ -25,7 +25,7 @@ button,select{font-size:0.7vw}
 .menu-item.active{background:#00E2BD}
 
 input[type="checkbox"],input[type="radio"]{position:absolute;opacity:0;width:0;height:0}
-label:has(+ input[type="checkbox"]),label:has(+ input[type="radio"]),input[type="checkbox"]+label,input[type="radio"]+label{position:relative;padding-left:1.2vw;cursor:pointer;color:#333}
+label:has(+ input[type="checkbox"]),label:has(+ input[type="radio"]),input[type="checkbox"]+label,input[type="radio"]+label{position:relative;padding-left:1.2vw;cursor:pointer;color:#333;flex:1;}
 label:has(+ input[type="checkbox"]):before,label:has(+ input[type="radio"]):before,input[type="checkbox"]+label:before,input[type="radio"]+label:before{content:'';position:absolute;left:0;top:0;width:0.8vw;height:0.8vw;border:1px solid #ccc;background:#fff;border-radius:2px;transition:all 0.2s}
 label:has(+ input[type="checkbox"]):not(:first-of-type),label:has(+ input[type="radio"]):not(:first-of-type),input[type="checkbox"]+label:not(:first-of-type),input[type="radio"]+label:not(:first-of-type){margin-left:1vw}
 label:has(+ input[type="checkbox"]:checked):after,label:has(+ input[type="radio"]:checked):after,input[type="checkbox"]:checked+label:after,input[type="radio"]:checked+label:after{content:'';position:absolute;left:0.25vw;top:0.18vw;width:0.3vw;height:0.3vw;border:solid #000;border-width:0 0.1vw 0.1vw 0;transform:rotate(45deg)}
