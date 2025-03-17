@@ -241,5 +241,6 @@ if (!isset($_SESSION['auth']) || $_SESSION['auth'] < 1) {
 <script src="js/application_bankruptcy_living_status.js"></script>
 <script src="js/application_bankruptcy_income_expenditure.js"></script>
 <script src="js/application_bankruptcy_statement.js"></script>
+<script src="js/document_list_manager.js"></script>
 </body>
 </html>

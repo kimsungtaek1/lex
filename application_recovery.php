@@ -337,5 +337,6 @@ if (!isset($_SESSION['auth']) || $_SESSION['auth'] < 1) {
 <script src="js/application_recovery_assets.js"></script>
 <script src="js/application_recovery_income_expenditure.js"></script>
 <script src="js/application_recovery_statement.js"></script>
+<script src="js/document_list_manager.js"></script>
 </body>
 </html>
