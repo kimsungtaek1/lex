@@ -174,9 +174,9 @@
 		  <input type="radio" id="household_size_2" name="household_size" style="margin-left:2vw;" value="2">
 		  <label for="household_size_2" style="margin-left:1vw;">2인</label>
 		  <input type="radio" id="household_size_3" name="household_size" style="margin-left:2vw;"value="3">
-		  <label for="household_size_3" style="margin-left:1vw;">3인</label>
+		  <label for="household_size_3" style="margin-left:0.8vw;">3인</label>
 		  <input type="radio" id="household_size_4" name="household_size" style="margin-left:2vw;" value="4">
-		  <label for="household_size_4" style="margin-left:1vw;">4인</label>
+		  <label for="household_size_4" style="margin-left:0.8vw;">4인</label>
 		  <input type="radio" id="household_size_5" name="household_size" style="margin-left:2vw;" value="5">
 		  <label for="household_size_5" style="margin-left:0.8vw;">5인</label>
 		  <input type="radio" id="household_size_6" name="household_size" style="margin-left:2vw;" value="6">
