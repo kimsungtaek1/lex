@@ -136,7 +136,7 @@
       <div class="form-title form-notitle"><span>지출합계</span></div>
 	  <div class="form-content form-nocontent">
 		<div class="form-content-inner">
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="income_total" name="income_total" data-type="money" value="0" readonly>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;원
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="expense_total" name="expense_total" data-type="money" value="0" readonly>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;원
 		</div>
       </div>
     </div>
