@@ -24,7 +24,7 @@
     <div class="form">
       <div class="form-title"></div>
       <div class="form-content">
-        기타&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" id="income_salary_others" name="income_salary_others" data-type="money"> 원
+        기타&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" id="income_salary_others" name="income_salary_others" data-type="money"> 원
       </div>
     </div>
     <div class="form">
@@ -42,32 +42,42 @@
     <div class="form">
       <div class="form-title"></div>
       <div class="form-content">
-        기타&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" id="income_pension_others" name="income_pension_others" data-type="money"> 원
+        기타&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" id="income_pension_others" name="income_pension_others" data-type="money"> 원
       </div>
     </div>
     <div class="form">
       <div class="form-title"><span>생활보호</span></div>
       <div class="form-content">
-        <input type="text" id="income_support" name="income_support" data-type="money"> 원
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="income_support" name="income_support" data-type="money"> 원
       </div>
     </div>
     <div class="form">
       <div class="form-title"><span>기타</span></div>
       <div class="form-content">
-        <input type="text" id="income_others" name="income_others" data-type="money"> 원
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="income_others" name="income_others" data-type="money"> 원
       </div>
     </div>
     <div class="form">
-      <div class="form-title"><span>수입합계</span></div>
-      <div class="form-content">
+      <div class="form-title form-notitle"><span>수입합계</span></div>
+      <div class="form-content form-nocontent">
 		<div class="form-content-inner">
-			<input type="text" id="income_total" name="income_total" data-type="money" readonly> 원
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="income_total" name="income_total" data-type="money" readonly>&nbsp;&nbsp;원
 		</div>
+      </div>
+    </div>
+	<div class="form">
+      <div class="form-title form-notitle"><span></span></div>
+      <div class="form-content form-nocontent">
+      </div>
+    </div>
+	<div class="form">
+      <div class="form-title form-notitle"><span></span></div>
+      <div class="form-content form-nocontent">
       </div>
     </div>
   </div>
   <div class="right-section">
-    <div class="form-title-top">지출 항목</div>
+    <div class="form-title-topw">|&nbsp;&nbsp;지출 항목&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 금액&nbsp;&nbsp;</div>
     <div class="form">
       <div class="form-title"><span>주거비(임대료, 관리비 등)</span></div>
       <div class="form-content">
@@ -123,9 +133,11 @@
       </div>
     </div>
     <div class="form">
-      <div class="form-title"><span>지출합계</span></div>
-      <div class="form-content form-header-long">
-        <input type="text" id="expense_total" name="expense_total" data-type="money" readonly> 원
+      <div class="form-title form-notitle"><span>지출합계</span></div>
+	  <div class="form-content form-nocontent">
+		<div class="form-content-inner">
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="expense_total" name="expense_total" data-type="money" readonly>&nbsp;&nbsp;원
+		</div>
       </div>
     </div>
     <div class="form">
@@ -150,17 +162,11 @@
     <div class="form">
       <div class="form-title"><span>채무자 월 평균소득</span></div>
       <div class="form-content">
-        <input type="text" id="debtor_monthly_income" name="debtor_monthly_income" data-type="money"> 원
+        <input type="text" id="debtor_monthly_income" name="debtor_monthly_income" placeholder="최근 1년 동안의 대략적인 소득을 평균하여 기재하십시오." data-type="money"> 원
       </div>
     </div>
     <div class="form">
-      <div class="form-title"><span>가구별 생계비</span></div>
-      <div class="form-content">
-        <span>(중위기준소득의 60%)</span>
-      </div>
-    </div>
-    <div class="form">
-      <div class="form-title"></div>
+      <div class="form-title"><span>가구별 생계비<br>(중위기준소득의 60%)</span></div>
       <div class="form-content">
         <select id="household_size" name="household_size">
           <option value="1">1인</option>
@@ -170,7 +176,17 @@
           <option value="5">5인</option>
           <option value="6">6인</option>
         </select>
-        <span style="margin-left:2vw;" id="household_expense">1,337,067원</span>
+      </div>
+    </div>
+    <div class="form">
+      <div class="form-title"></div>
+      <div class="form-content">
+        <span style="" id="household_expense1">1,337,067원</span>
+		<span style="margin-left:2vw;" id="household_expense2">1,337,067원</span>
+		<span style="margin-left:2vw;" id="household_expense3">1,337,067원</span>
+		<span style="margin-left:2vw;" id="household_expense4">1,337,067원</span>
+		<span style="margin-left:2vw;" id="household_expense5">1,337,067원</span>
+		<span style="margin-left:2vw;" id="household_expense6">1,337,067원</span>
       </div>
     </div>
   </div>
