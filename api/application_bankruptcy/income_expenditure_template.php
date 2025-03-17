@@ -168,14 +168,20 @@
     <div class="form">
       <div class="form-title form-notitle"><span>가구별 생계비<br>(중위기준소득의 60%)</span></div>
       <div class="form-content form-nocontent">
-        <select id="household_size" name="household_size">
-          <option value="1">1인</option>
-          <option value="2">2인</option>
-          <option value="3">3인</option>
-          <option value="4">4인</option>
-          <option value="5">5인</option>
-          <option value="6">6인</option>
-        </select>
+        <div class="checkbox-group" style="width:100%;">
+		  <input type="radio" id="household_size_1" name="household_size" value="1">
+		  <label for="household_size_1">1인</label>
+		  <input type="radio" id="household_size_2" name="household_size" style="margin-left:2vw;" value="2">
+		  <label for="household_size_2" style="margin-left:1vw;">2인</label>
+		  <input type="radio" id="household_size_3" name="household_size" style="margin-left:2vw;"value="3">
+		  <label for="household_size_3" style="margin-left:1vw;">3인</label>
+		  <input type="radio" id="household_size_4" name="household_size" style="margin-left:2vw;" value="4">
+		  <label for="household_size_4" style="margin-left:1vw;">4인</label>
+		  <input type="radio" id="household_size_5" name="household_size" style="margin-left:2vw;" value="5">
+		  <label for="household_size_5" style="margin-left:0.8vw;">5인</label>
+		  <input type="radio" id="household_size_6" name="household_size" style="margin-left:2vw;" value="6">
+		  <label for="household_size_6" style="margin-left:0.8vw;">6인</label>
+		</div>
       </div>
     </div>
     <div class="form">
