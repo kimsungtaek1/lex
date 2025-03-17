@@ -61,7 +61,7 @@
       <div class="form-title form-notitle"><span>수입합계</span></div>
       <div class="form-content form-nocontent">
 		<div class="form-content-inner">
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="income_total" name="income_total" data-type="money" readonly>&nbsp;&nbsp;원
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="income_total" name="income_total" data-type="money" readonly>&nbsp;&nbsp;&nbsp;&nbsp;원
 		</div>
       </div>
     </div>
@@ -129,14 +129,14 @@
     <div class="form">
       <div class="form-title"><span>기타</span></div>
       <div class="form-content">
-        <input type="text" id="expense_others" name="expense_others" data-type="money"> 원
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="expense_others" name="expense_others" data-type="money"> 원
       </div>
     </div>
     <div class="form">
       <div class="form-title form-notitle"><span>지출합계</span></div>
 	  <div class="form-content form-nocontent">
 		<div class="form-content-inner">
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="expense_total" name="expense_total" data-type="money" readonly>&nbsp;&nbsp;원
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="income_total" name="income_total" data-type="money" readonly>&nbsp;&nbsp;&nbsp;&nbsp;원
 		</div>
       </div>
     </div>
@@ -214,12 +214,12 @@
       </div>
     </div>
     <div class="form">
-      <div class="form-title"></div>
-      <div class="form-content">※ 채무자 가용소득은 채무자 월 평균소득 - 가구별 생계비입니다.</div>
+      <div class="form-title form-notitle"></div>
+      <div class="form-content form-nocontent">※ 채무자 가용소득은 채무자 월 평균소득 - 가구별 생계비입니다.</div>
     </div>
     <div class="form">
-      <div class="form-title"></div>
-      <div class="form-content btn-right">
+      <div class="form-title form-notitle"></div>
+      <div class="form-content form-nocontent btn-right">
         <button type="button" id="save_disposable_income" class="btn-save">저장</button>
       </div>
     </div>
@@ -229,9 +229,9 @@
 <!-- 부양가족 템플릿 (JavaScript에서 사용) -->
 <div id="dependent_template" style="display:none;">
 	<input type="hidden" class="dependent_id" value="{id}">
-	이름&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="dependent_name" style="width:20.5%;">
-	나이&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="dependent_age" style="width:20.5%;">
-	관계&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="dependent_relation" style="width:20.5%;">
+	이름&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="dependent_name" style="width:20%;">
+	나이&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="dependent_age" style="width:20%;">
+	관계&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="dependent_relation" style="width:18%;">
 	<button type="button" id="add_dependent" class="btn-add2">추가</button>
 	<button type="button" class="btn-delete dependent_delete_btn">삭제</button>
 </div>
