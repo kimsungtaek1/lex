@@ -5,9 +5,6 @@
       <div class="checkbox-group">
         <span>재산목록 요약표</span>
       </div>
-      <div class="button-group">
-        <button type="button" class="btn btn-add2" id="save_asset_summary">저장</button>
-      </div>
     </div>
   </div>
   <div class="content-wrapper">
@@ -61,6 +58,11 @@
           <label for="sum_severance_pay_exists_n"><input type="radio" id="sum_severance_pay_exists_n" name="sum_severance_pay_exists" value="N" checked><span>없음</span></label>
         </div>
       </div>
+		<div class="form">
+			<div class="form-title"><span></span></div>
+			<div class="form-content">
+			</div>
+		</div>
     </div>
     <div class="right-section">
       <div class="form">
@@ -112,6 +114,13 @@
           <label for="sum_inherited_property_exists_n"><input type="radio" id="sum_inherited_property_exists_n" name="sum_inherited_property_exists" value="N" checked><span>없음</span></label>
         </div>
       </div>
+		<div class="form">
+			<div class="form-title"><span></span></div>
+			<div class="form-content btn-right">
+				<button type="button" class="btn-delete delete_asset_summary">삭제</button>
+				<button type="button" class="btn-save save_asset_summary">저장</button>
+			</div>
+		</div>
     </div>
   </div>
 </div>
