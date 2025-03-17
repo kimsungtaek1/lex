@@ -27,15 +27,7 @@
         </div>
         <div class="form">
           <div class="form-title">
-            <span><button class="btn-file btn-long6" d="filedown3">파일다운받기</button></span>
-          </div>
-          <div class="form-content">
-            대구
-          </div>
-        </div>
-		<div class="form">
-          <div class="form-title">
-            <span><button class="btn-file btn-long6" d="filedown4">파일다운받기</button></span>
+            <span><button class="btn-file btn-long6" id="filedown3">파일다운받기</button></span>
           </div>
           <div class="form-content">
             대전
@@ -43,25 +35,31 @@
         </div>
 		<div class="form">
           <div class="form-title">
-            <span><button class="btn-file btn-long6" id="filedown5">파일다운받기</button></span>
+            <span><button class="btn-file btn-long6" id="filedown4">파일다운받기</button></span>
           </div>
           <div class="form-content">
-            부산
+            청주
           </div>
         </div>
 		<div class="form">
           <div class="form-title">
-            <span><button class="btn-file btn-long6" id="filedown6">파일다운받기</button></span>
+            <span></span>
           </div>
           <div class="form-content">
-            청주
+          </div>
+        </div>
+		<div class="form">
+          <div class="form-title">
+            <span></span>
+          </div>
+          <div class="form-content">
           </div>
         </div>
       </div>
       <div class="right-section">
         <div class="form">
           <div class="form-title form-notitle">
-            <span>개인회생사건<br>
+            <span>개인파산사건<br>
 			처리지침<br>
 			(재민 2004-4)<br>
 			일부개정예규_<br>

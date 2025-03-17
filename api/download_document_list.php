@@ -13,6 +13,7 @@ if (!isset($_SESSION['auth']) || $_SESSION['auth'] < 1) {
 $region = isset($_GET['region']) ? $_GET['region'] : '';
 $filename = isset($_GET['filename']) ? $_GET['filename'] : '';
 $case_no = isset($_GET['case_no']) ? $_GET['case_no'] : '';
+$type = isset($_GET['type']) ? $_GET['type'] : 'recovery'; // 기본값은 회생
 
 if (empty($region) || empty($filename)) {
 	header('HTTP/1.1 400 Bad Request');
@@ -21,13 +22,15 @@ if (empty($region) || empty($filename)) {
 }
 
 // 허용된 파일 경로 설정 (보안을 위해 중요)
+$baseFolder = ($type == 'bankruptcy') ? 'file/bankruptcy_data_submission_list/' : 'file/recovery_data_submission_list/';
+
 $allowedFiles = [
-	'seoul_etc' => 'file/recovery_data_submission_list/seoul_etc.hwp',
-	'gangneung' => 'file/recovery_data_submission_list/gangneung.hwp',
-	'daegu' => 'file/recovery_data_submission_list/daegu.hwp',
-	'daejeon' => 'file/recovery_data_submission_list/daejeon.hwp',
-	'busan' => 'file/recovery_data_submission_list/busan.hwp',
-	'cheongju' => 'file/recovery_data_submission_list/cheongju.hwp'
+	'seoul_etc' => $baseFolder . 'seoul_etc.hwp',
+	'gangneung' => $baseFolder . 'gangneung.hwp',
+	'daegu' => $baseFolder . 'daegu.hwp',
+	'daejeon' => $baseFolder . 'daejeon.hwp',
+	'busan' => $baseFolder . 'busan.hwp',
+	'cheongju' => $baseFolder . 'cheongju.hwp'
 ];
 
 // 요청된 파일이 허용 목록에 있는지 확인
@@ -57,5 +60,4 @@ header('Pragma: public');
 header('Content-Length: ' . filesize($filePath));
 readfile($filePath);
 exit;
-
 ?>

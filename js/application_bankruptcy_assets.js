@@ -47,6 +47,7 @@ class AssetManager {
 			this.initializeAssetCounters();
 			this.initializeEventHandlers();
 			this.loadAllAssets();
+			this.loadAssetSummary();
 		} catch (error) {
 			console.error("초기화 실패:", error);
 			alert("초기화 중 오류가 발생했습니다.");
@@ -83,6 +84,11 @@ class AssetManager {
 		$(document).on('input', 'input[data-type="money"]', (e) => {
 			const val = e.target.value.replace(/[^\d]/g, "");
 			e.target.value = this.formatMoney(val);
+		});
+		
+		// 재산목록 요약표 저장 버튼 이벤트
+		$('#save_asset_summary').on('click', () => {
+			this.saveAssetSummary();
 		});
 		
 		// 창 닫기 전 저장되지 않은 변경사항 확인
@@ -194,6 +200,87 @@ class AssetManager {
 		block.find('input[data-type="money"]').each((i, el) => {
 			if ($(el).val()) {
 				$(el).val(this.formatMoney($(el).val()));
+			}
+		});
+	}
+
+	saveAssetSummary() {
+		const data = {
+			case_no: window.currentCaseNo,
+			cash_exists: $('input[name="sum_cash_exists"]:checked').val(),
+			deposit_exists: $('input[name="sum_deposit_exists"]:checked').val(),
+			insurance_exists: $('input[name="sum_insurance_exists"]:checked').val(),
+			rent_deposit_exists: $('input[name="sum_rent_deposit_exists"]:checked').val(),
+			loan_receivables_exists: $('input[name="sum_loan_receivables_exists"]:checked').val(),
+			sales_receivables_exists: $('input[name="sum_sales_receivables_exists"]:checked').val(),
+			severance_pay_exists: $('input[name="sum_severance_pay_exists"]:checked').val(),
+			real_estate_exists: $('input[name="sum_real_estate_exists"]:checked').val(),
+			vehicle_exists: $('input[name="sum_vehicle_exists"]:checked').val(),
+			other_assets_exists: $('input[name="sum_other_assets_exists"]:checked').val(),
+			disposed_assets_exists: $('input[name="sum_disposed_assets_exists"]:checked').val(),
+			received_deposit_exists: $('input[name="sum_received_deposit_exists"]:checked').val(),
+			divorce_property_exists: $('input[name="sum_divorce_property_exists"]:checked').val(),
+			inherited_property_exists: $('input[name="sum_inherited_property_exists"]:checked').val()
+		};
+		
+		$.ajax({
+			url: '/adm/api/application_bankruptcy/assets/asset_summary_api.php',
+			type: 'POST',
+			data: data,
+			dataType: 'json',
+			success: (response) => {
+				if (response.success) {
+					alert('재산목록 요약표가 저장되었습니다.');
+				} else {
+					alert(response.message || '재산목록 요약표 저장 실패');
+				}
+			},
+			error: () => {
+				alert('재산목록 요약표 저장 중 오류가 발생했습니다.');
+			}
+		});
+	}
+
+	updateAssetSummary(type) {
+		const cacheKey = `${type}_${window.currentCaseNo}`;
+		if (this.cache.has(cacheKey)) {
+			const cached = this.cache.get(cacheKey);
+			const exists = cached.data && cached.data.length > 0;
+			
+			// 해당 타입의 라디오 버튼 업데이트
+			$(`input[name="sum_${type}_exists"][value="${exists ? 'Y' : 'N'}"]`).prop('checked', true);
+		}
+	}
+
+	loadAssetSummary() {
+		$.ajax({
+			url: '/adm/api/application_bankruptcy/assets/asset_summary_api.php',
+			type: 'GET',
+			data: { case_no: window.currentCaseNo },
+			dataType: 'json',
+			success: (response) => {
+				if (response.success && response.data) {
+					const data = response.data;
+					
+					// 각 자산 유형의 라디오 버튼 설정
+					$(`input[name="sum_cash_exists"][value="${data.cash_exists || 'N'}"]`).prop('checked', true);
+					$(`input[name="sum_deposit_exists"][value="${data.deposit_exists || 'N'}"]`).prop('checked', true);
+					$(`input[name="sum_insurance_exists"][value="${data.insurance_exists || 'N'}"]`).prop('checked', true);
+					$(`input[name="sum_rent_deposit_exists"][value="${data.rent_deposit_exists || 'N'}"]`).prop('checked', true);
+					$(`input[name="sum_loan_receivables_exists"][value="${data.loan_receivables_exists || 'N'}"]`).prop('checked', true);
+					$(`input[name="sum_sales_receivables_exists"][value="${data.sales_receivables_exists || 'N'}"]`).prop('checked', true);
+					$(`input[name="sum_severance_pay_exists"][value="${data.severance_pay_exists || 'N'}"]`).prop('checked', true);
+					$(`input[name="sum_real_estate_exists"][value="${data.real_estate_exists || 'N'}"]`).prop('checked', true);
+					$(`input[name="sum_vehicle_exists"][value="${data.vehicle_exists || 'N'}"]`).prop('checked', true);
+					$(`input[name="sum_other_assets_exists"][value="${data.other_assets_exists || 'N'}"]`).prop('checked', true);
+					$(`input[name="sum_disposed_assets_exists"][value="${data.disposed_assets_exists || 'N'}"]`).prop('checked', true);
+					$(`input[name="sum_received_deposit_exists"][value="${data.received_deposit_exists || 'N'}"]`).prop('checked', true);
+					$(`input[name="sum_divorce_property_exists"][value="${data.divorce_property_exists || 'N'}"]`).prop('checked', true);
+					$(`input[name="sum_inherited_property_exists"][value="${data.inherited_property_exists || 'N'}"]`).prop('checked', true);
+				}
+			},
+			error: (xhr, status, error) => {
+				console.error('요약표 데이터 로드 오류:', error);
 			}
 		});
 	}
