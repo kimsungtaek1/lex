@@ -6,7 +6,7 @@ header('Content-Type: application/json');
 try {
     // 연도 목록 요청
     if (isset($_GET['action']) && $_GET['action'] === 'get_years') {
-        $yearQuery = "SELECT DISTINCT year FROM application_recovery_income_living_expense_standard ORDER BY year DESC";
+        $yearQuery = "SELECT DISTINCT year FROM application_income_living_expense_standard ORDER BY year DESC";
         $yearStmt = $pdo->query($yearQuery);
         $years = $yearStmt->fetchAll(PDO::FETCH_COLUMN);
 
@@ -21,7 +21,7 @@ try {
     $year = $_GET['year'] ?? date('Y');
 
     $query = "SELECT family_members, standard_amount 
-              FROM application_recovery_income_living_expense_standard 
+              FROM application_income_living_expense_standard 
               WHERE year = :year 
               ORDER BY family_members";
     $stmt = $pdo->prepare($query);
