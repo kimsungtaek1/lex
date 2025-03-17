@@ -27,7 +27,7 @@
         </div>
         <div class="form">
           <div class="form-title">
-            <span><button class="btn-file btn-long6" d="filedown3">파일다운받기</button></span>
+            <span><button class="btn-file btn-long6" id="filedown3">파일다운받기</button></span>
           </div>
           <div class="form-content">
             대구
@@ -35,7 +35,7 @@
         </div>
 		<div class="form">
           <div class="form-title">
-            <span><button class="btn-file btn-long6" d="filedown4">파일다운받기</button></span>
+            <span><button class="btn-file btn-long6" id="filedown4">파일다운받기</button></span>
           </div>
           <div class="form-content">
             대전

@@ -62,7 +62,6 @@ class IncomeExpenditureManager {
 		
 		// 가구 인원수 변경 이벤트
 		$('input[name="household_size"]').on('change', () => {
-			this.updateHouseholdExpense();
 			this.calculateDisposableIncome();
 		});
 		
@@ -87,21 +86,6 @@ class IncomeExpenditureManager {
 			expenseTotal += parseInt($(this).val().replace(/,/g, '') || 0);
 		});
 		$('#expense_total').val(this.formatMoney(expenseTotal));
-		
-		// 가용소득 계산도 함께 실행
-		this.calculateDisposableIncome();
-	}
-
-	// 가구별 생계비 업데이트
-	updateHouseholdExpense() {
-		const householdSize = $('input[name="household_size"]:checked').val() || '1';
-		const expenseValue = $('#living_expense_values').data('expense' + householdSize) || 0;
-		
-		// 모든 가구 규모별 생계비 정보 숨기기
-		$('[id^="household_expense"]').hide();
-		
-		// 현재 선택된 가구 규모에 대한 생계비 표시
-		$('#household_expense' + householdSize).show();
 		
 		// 가용소득 계산도 함께 실행
 		this.calculateDisposableIncome();
@@ -172,7 +156,7 @@ class IncomeExpenditureManager {
 		const householdSize = data.household_size || '1';
 		$(`#household_size_${householdSize}`).prop('checked', true);
 		
-		// 합계 계산 및 생계비 업데이트
+		// 합계 계산 및 가용소득 계산
 		this.calculateTotals();
 	}
 
@@ -278,7 +262,7 @@ class IncomeExpenditureManager {
 		const householdSize = Math.min(6, dependentCount + 1); // 본인 + 부양가족, 최대 6인
 		
 		$(`#household_size_${householdSize}`).prop('checked', true);
-		this.updateHouseholdExpense();
+		this.calculateDisposableIncome();
 	}
 
 	// 수입지출 정보 저장
@@ -378,8 +362,7 @@ class IncomeExpenditureManager {
 						$('#living_expense_values').data('expense' + i, expense);
 					}
 					
-					// 이후 가구 크기에 맞는 생계비 다시 계산
-					this.updateHouseholdExpense();
+					// 가용소득 계산
 					this.calculateDisposableIncome();
 				}
 			},
