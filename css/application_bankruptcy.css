@@ -1,6 +1,7 @@
 *{font-size:0.7vw}
 textarea{outline: none;resize:none;}
 p{font-size:0.53vw}
+.checbox-group label:has(+ input[type="checkbox"]):not(:first-of-type),.checbox-group  label:has(+ input[type="radio"]):not(:first-of-type),.checbox-group  input[type="checkbox"]+label:not(:first-of-type),.checbox-group  input[type="radio"]+label:not(:first-of-type) {margin-left: 0}
 .transparent{color:transparent}
 .container{margin:0 5vw}
 .tab{width:100%;overflow-x:auto;border:none;background:#6c6c6c;box-shadow:0 0.5vh 0.5vh rgba(0,0,0,0.4)}
@@ -58,7 +59,7 @@ p{font-size:0.53vw}
 .form-content input[type="number"]{padding:6px 0;width:37%;border:none;border-radius:3px;box-sizing:border-box;background:transparent;outline:none}
 .form-content input[type="date"]{padding:6px 0;width:40%;border:none;border-radius:3px;box-sizing:border-box;background:transparent;outline:none}
 .form-content select{width:6vw;padding:6px 0;border:none;border-radius:3px;box-sizing:border-box;background:transparent;outline:none}
-.form-content span{align-content:center;margin:0 0.2vw 0 0}
+.form-content span{flex:1;align-content:center;margin:0 0.2vw 0 0}
 .form-content button{padding:0;min-width:3.5vw;height:1.2vw;background:#a7a7a7;color:#000;border:none;border-radius:3px;cursor:pointer;margin:6px 0 6px auto;box-shadow:2px 2px 4px rgba(0,0,0,0.2)}
 .form-content .form-row{margin:6px 0;display:flex;align-items:center;width:fit-content;justify-content:center}
 .form-content .form-row:nth-child(2){margin-left:0.5vw}
