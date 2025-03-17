@@ -13,6 +13,11 @@ class IncomeExpenditureManager {
 			}
 		}
 
+		// 생계비 데이터를 저장할 객체 생성
+		if (!$('#living_expense_values').length) {
+			$('body').append('<div id="living_expense_values" style="display:none;"></div>');
+		}
+
 		this.bindEvents();
 		this.loadYearOptions();
 		
@@ -30,8 +35,8 @@ class IncomeExpenditureManager {
 	}
 
 	bindEvents() {
-		// 부양가족 추가 버튼 이벤트
-		$('#add_dependent').on('click', () => this.addDependent());
+		// 부양가족 추가 버튼 이벤트 (이벤트 위임 사용)
+		$(document).on('click', '#add_dependent', () => this.addDependent());
 
 		// 저장 버튼 이벤트
 		$('#save_income_expense').on('click', () => this.saveIncomeExpense());
@@ -56,7 +61,7 @@ class IncomeExpenditureManager {
 		});
 		
 		// 가구 인원수 변경 이벤트
-		$('#household_size').on('change', () => {
+		$('input[name="household_size"]').on('change', () => {
 			this.updateHouseholdExpense();
 			this.calculateDisposableIncome();
 		});
@@ -89,9 +94,14 @@ class IncomeExpenditureManager {
 
 	// 가구별 생계비 업데이트
 	updateHouseholdExpense() {
-		const householdSize = $('#household_size').val();
-		const expenseValue = $('#living_expense_values').data('expense' + householdSize);
-		$('#household_expense').text(this.formatMoney(expenseValue) + '원');
+		const householdSize = $('input[name="household_size"]:checked').val() || '1';
+		const expenseValue = $('#living_expense_values').data('expense' + householdSize) || 0;
+		
+		// 모든 가구 규모별 생계비 정보 숨기기
+		$('[id^="household_expense"]').hide();
+		
+		// 현재 선택된 가구 규모에 대한 생계비 표시
+		$('#household_expense' + householdSize).show();
 		
 		// 가용소득 계산도 함께 실행
 		this.calculateDisposableIncome();
@@ -100,8 +110,8 @@ class IncomeExpenditureManager {
 	// 가용소득 계산
 	calculateDisposableIncome() {
 		const monthlyIncome = this.unformatMoney($('#debtor_monthly_income').val());
-		const householdSize = $('#household_size').val();
-		const householdExpense = this.unformatMoney($('#living_expense_values').data('expense' + householdSize));
+		const householdSize = $('input[name="household_size"]:checked').val() || '1';
+		const householdExpense = $('#living_expense_values').data('expense' + householdSize) || 0;
 		
 		const disposableIncome = Math.max(0, monthlyIncome - householdExpense);
 		$('#disposable_income').val(this.formatMoney(disposableIncome));
@@ -157,11 +167,13 @@ class IncomeExpenditureManager {
 		
 		// 가용소득 관련 데이터 설정
 		$('#debtor_monthly_income').val(this.formatMoney(data.debtor_monthly_income || 0));
-		$('#household_size').val(data.household_size || '1');
+		
+		// 가구 규모 선택
+		const householdSize = data.household_size || '1';
+		$(`#household_size_${householdSize}`).prop('checked', true);
 		
 		// 합계 계산 및 생계비 업데이트
 		this.calculateTotals();
-		this.updateHouseholdExpense();
 	}
 
 	populateDependents(dependentsData) {
@@ -188,15 +200,21 @@ class IncomeExpenditureManager {
 			.replace(/{id}/g, id);
 		
 		// 컨테이너에 추가
-		$('#dependents_container').append(html);
+		$('#dependents_container').append(
+			`<div class="dependent-row">${html}</div>`
+		);
 		
 		// 데이터가 있으면 채우기
 		if (data.dependent_id) {
-			const block = $(`#dependent_${id}`);
-			block.find('.dependent_name').val(data.name || '');
-			block.find('.dependent_age').val(data.age || '');
-			block.find('.dependent_relation').val(data.relation || '');
+			const row = $('#dependents_container .dependent-row:last-child');
+			row.find('.dependent_id').val(data.dependent_id);
+			row.find('.dependent_name').val(data.name || '');
+			row.find('.dependent_age').val(data.age || '');
+			row.find('.dependent_relation').val(data.relation || '');
 		}
+		
+		// 이미 입력된 부양가족은 추가 버튼 숨기고 마지막 부양가족만 추가 버튼 표시
+		$('#dependents_container .dependent-row:not(:last-child) #add_dependent').hide();
 	}
 
 	deleteDependent(block) {
@@ -205,6 +223,12 @@ class IncomeExpenditureManager {
 		// 저장되지 않은 블록인 경우 바로 삭제
 		if (!dependentId || dependentId === this.dependentCounter.toString()) {
 			block.remove();
+			
+			// 부양가족이 없으면 빈 블록 추가
+			if ($('#dependents_container').children().length === 0) {
+				this.addDependent();
+			}
+			
 			return;
 		}
 		
@@ -231,6 +255,9 @@ class IncomeExpenditureManager {
 						this.addDependent();
 					}
 					
+					// 마지막 부양가족의 추가 버튼 표시
+					$('#dependents_container .dependent-row:last-child #add_dependent').show();
+					
 					// 가구 크기를 다시 계산하고 생계비 업데이트
 					this.updateHouseholdSize();
 				} else {
@@ -250,7 +277,7 @@ class IncomeExpenditureManager {
 		const dependentCount = $('#dependents_container').children().length;
 		const householdSize = Math.min(6, dependentCount + 1); // 본인 + 부양가족, 최대 6인
 		
-		$('#household_size').val(householdSize);
+		$(`#household_size_${householdSize}`).prop('checked', true);
 		this.updateHouseholdExpense();
 	}
 
@@ -329,6 +356,7 @@ class IncomeExpenditureManager {
 				}
 			},
 			error: () => {
+				console.error('연도 목록을 불러오는 중 오류가 발생했습니다.');
 			}
 		});
 	}
@@ -339,28 +367,24 @@ class IncomeExpenditureManager {
 		$.ajax({
 			url: '/adm/api/application_bankruptcy/income/living_expense_standard_api.php',
 			type: 'GET',
-			data: { 
-				action: 'get_standards',
-				year: year 
-			},
+			data: { year: year },
 			dataType: 'json',
 			success: (response) => {
-				console.log(response);
 				if (response.success && response.data) {
-					
 					// 각 가구별 생계비 업데이트
 					for (let i = 1; i <= 6; i++) {
-						const expense = response.data[i] || 0;
+						const expense = response.data[i.toString()] || 0;
 						$('#household_expense' + i).text(this.formatMoney(expense) + '원');
 						$('#living_expense_values').data('expense' + i, expense);
 					}
 					
 					// 이후 가구 크기에 맞는 생계비 다시 계산
 					this.updateHouseholdExpense();
+					this.calculateDisposableIncome();
 				}
 			},
 			error: () => {
-				alert('생계비 기준을 불러오는 중 오류가 발생했습니다.');
+				console.error('생계비 기준을 불러오는 중 오류가 발생했습니다.');
 			}
 		});
 	}
@@ -388,7 +412,7 @@ class IncomeExpenditureManager {
 		const data = {
 			case_no: window.currentCaseNo,
 			debtor_monthly_income: this.unformatMoney($('#debtor_monthly_income').val()),
-			household_size: $('#household_size').val(),
+			household_size: $('input[name="household_size"]:checked').val() || '1',
 			disposable_income: this.unformatMoney($('#disposable_income').val()),
 			dependents: JSON.stringify(dependents)
 		};
@@ -427,8 +451,8 @@ class IncomeExpenditureManager {
 // 수입지출목록 탭이 활성화될 때 초기화
 $(document).ready(function() {
 	if (typeof currentCaseNo !== 'undefined' && currentCaseNo !== null) {
-        window.currentCaseNo = currentCaseNo;
-        console.log('수입지출목록 매니저 초기화 시 currentCaseNo 설정:', window.currentCaseNo);
-    }
+		window.currentCaseNo = currentCaseNo;
+		console.log('수입지출목록 매니저 초기화 시 currentCaseNo 설정:', window.currentCaseNo);
+	}
 	window.incomeExpenditureManager = new IncomeExpenditureManager();
 });
