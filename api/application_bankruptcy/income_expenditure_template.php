@@ -171,30 +171,34 @@
         <div class="checkbox-group" style="width:100%;">
 		  <input type="radio" id="household_size_1" name="household_size" value="1">
 		  <label for="household_size_1">1인</label>
-		  <input type="radio" id="household_size_2" name="household_size" style="margin-left:2vw;" value="2">
-		  <label for="household_size_2" style="margin-left:1vw;">2인</label>
+		  <input type="radio" id="household_size_2" name="household_size" value="2">
+		  <label for="household_size_2">2인</label>
 		  <input type="radio" id="household_size_3" name="household_size" style="margin-left:2vw;"value="3">
-		  <label for="household_size_3" style="margin-left:0.8vw;">3인</label>
-		  <input type="radio" id="household_size_4" name="household_size" style="margin-left:2vw;" value="4">
-		  <label for="household_size_4" style="margin-left:0.8vw;">4인</label>
-		  <input type="radio" id="household_size_5" name="household_size" style="margin-left:2vw;" value="5">
-		  <label for="household_size_5" style="margin-left:0.8vw;">5인</label>
-		  <input type="radio" id="household_size_6" name="household_size" style="margin-left:2vw;" value="6">
-		  <label for="household_size_6" style="margin-left:0.8vw;">6인</label>
+		  <label for="household_size_3">3인</label>
+		  <input type="radio" id="household_size_4" name="household_size" value="4">
+		  <label for="household_size_4">4인</label>
+		  <input type="radio" id="household_size_5" name="household_size" value="5">
+		  <label for="household_size_5">5인</label>
+		  <input type="radio" id="household_size_6" name="household_size" value="6">
+		  <label for="household_size_6">6인</label>
 		</div>
       </div>
     </div>
-    <div class="form">
-      <div class="form-title"></div>
-      <div class="form-content">
-        <span style="" id="household_expense1">1,337,067원</span>
-		<span style="margin-left:2vw;" id="household_expense2">1,337,067원</span>
-		<span style="margin-left:2vw;" id="household_expense3">1,337,067원</span>
-		<span style="margin-left:2vw;" id="household_expense4">1,337,067원</span>
-		<span style="margin-left:2vw;" id="household_expense5">1,337,067원</span>
-		<span style="margin-left:2vw;" id="household_expense6">1,337,067원</span>
-      </div>
-    </div>
+	<div class="form">
+	  <div class="form-title">
+		<select id="standard_year" onchange="window.incomeExpenditureManager.updateLivingExpenseStandards(this.value)">
+		  <option value=""></option>
+		</select>
+	  </div>
+	  <div class="form-content">
+		<span id="household_expense1"></span>
+		<span id="household_expense2"></span>
+		<span id="household_expense3"></span>
+		<span id="household_expense4"></span>
+		<span id="household_expense5"></span>
+		<span id="household_expense6"></span>
+	  </div>
+	</div>
   </div>
   <div class="right-section">
     <div class="form-title-top">부양가족</div>
@@ -232,7 +236,7 @@
       이름 | <input type="text" class="dependent_name" style="width:20%;">
       나이 | <input type="text" class="dependent_age" style="width:10%;">
       관계 | <input type="text" class="dependent_relation" style="width:20%;">
-      <button type="button" class="btn-delete dependent_delete_btn" style="margin-left:1vw;">삭제</button>
+      <button type="button" class="btn-delete dependent_delete_btn">삭제</button>
     </div>
   </div>
 </div>
