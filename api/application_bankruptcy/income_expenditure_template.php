@@ -2,7 +2,7 @@
 <div class="section-header">
   <div class="creditor-title">
     <div class="checkbox-group">
-      <span>가계수지표 (<input type="text" id="statement_month" style="padding: 0.5vw; width:2vw; border:none; background:transparent;"> 월분) | 신청일이 속한 달의 직전 달 기준</span>
+      <span>가계수지표</span>
     </div>
   </div>
 </div>
@@ -166,8 +166,8 @@
       </div>
     </div>
     <div class="form">
-      <div class="form-title"><span>가구별 생계비<br>(중위기준소득의 60%)</span></div>
-      <div class="form-content">
+      <div class="form-title form-notitle"><span>가구별 생계비<br>(중위기준소득의 60%)</span></div>
+      <div class="form-content form-nocontent">
         <select id="household_size" name="household_size">
           <option value="1">1인</option>
           <option value="2">2인</option>
