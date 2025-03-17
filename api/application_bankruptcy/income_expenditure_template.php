@@ -201,16 +201,21 @@
 	</div>
   </div>
   <div class="right-section">
-    <div class="form-title-top">부양가족</div>
-    <div id="dependents_container"></div>
-    <div class="form">
-      <div class="form-content btn-right">
-        <button type="button" id="add_dependent" class="btn-add2">추가</button>
+	<div class="form">
+      <div class="form-title form-notitle"><span>부양가족</span></div>
+      <div class="form-content form-nocontent">
+        <div id="dependents_container"></div>
       </div>
     </div>
     <div class="form">
+		<div class="form-title"><span></span></div>
+		<div class="form-content btn-right">
+			<button type="button" id="add_dependent" class="btn-add2">추가</button>
+		</div>
+    </div>
+    <div class="form">
       <div class="form-title"><span>채무자 가용소득</span></div>
-      <div class="form-content form-header-long">
+      <div class="form-content">
         <input type="text" id="disposable_income" name="disposable_income" data-type="money" readonly> 원
       </div>
     </div>
@@ -229,24 +234,10 @@
 
 <!-- 부양가족 템플릿 (JavaScript에서 사용) -->
 <div id="dependent_template" style="display:none;">
-  <div class="form dependent-row" id="dependent_{id}">
-    <div class="form-title"></div>
-    <div class="form-content">
-      <input type="hidden" class="dependent_id" value="{id}">
-      이름 | <input type="text" class="dependent_name" style="width:20%;">
-      나이 | <input type="text" class="dependent_age" style="width:10%;">
-      관계 | <input type="text" class="dependent_relation" style="width:20%;">
-      <button type="button" class="btn-delete dependent_delete_btn">삭제</button>
-    </div>
-  </div>
-</div>
-
-<!-- 생계비 금액 테이블 (이 값들은 실제 데이터로 교체되어야 함) -->
-<div id="living_expense_values" style="display:none;" 
-     data-expense1="1337067" 
-     data-expense2="2209565" 
-     data-expense3="2828794" 
-     data-expense4="3437948" 
-     data-expense5="4017441" 
-     data-expense6="4571021">
+	<input type="hidden" class="dependent_id" value="{id}">
+	이름 | <input type="text" class="dependent_name" style="width:15%;">
+	나이 | <input type="text" class="dependent_age" style="width:15%;">
+	관계 | <input type="text" class="dependent_relation" style="width:15%;">
+	<button type="button" id="add_dependent" class="btn-add2">추가</button>
+	<button type="button" class="btn-delete dependent_delete_btn">삭제</button>
 </div>
