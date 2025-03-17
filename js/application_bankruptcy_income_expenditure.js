@@ -345,18 +345,18 @@ class IncomeExpenditureManager {
 			},
 			dataType: 'json',
 			success: (response) => {
-				if (response.success && response.standards) {
+				console.log(response);
+				if (response.success && response.data) {
+					
 					// 각 가구별 생계비 업데이트
 					for (let i = 1; i <= 6; i++) {
-						const expense = response.standards[i] || 0;
+						const expense = response.data[i] || 0;
 						$('#household_expense' + i).text(this.formatMoney(expense) + '원');
 						$('#living_expense_values').data('expense' + i, expense);
 					}
 					
 					// 이후 가구 크기에 맞는 생계비 다시 계산
 					this.updateHouseholdExpense();
-				} else {
-					alert(year + '년 생계비 기준을 불러오는 데 실패했습니다.');
 				}
 			},
 			error: () => {
