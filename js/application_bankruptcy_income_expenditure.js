@@ -1,627 +1,313 @@
-class ApplicationRecoveryIncomeExpenditure {
-  constructor() {
-    this.currentYear = new Date().getFullYear();
-    this.isCompany = false;
-    this.isSaving = false;
-    this.initialize();
-  }
+// 수입지출 관리 클래스
+class IncomeExpenditureManager {
+	constructor() {
+		this.dependentCounter = 0;
+		this.initialize();
+	}
 
-  initialize() {
-    try {
-		this.loadIncomeType();
-		this.loadBusinessIncome();
-		this.initializeEventHandlers();
-		this.initializeSalarySection();
-		this.initializeBusinessSection();
-		this.initializeFamilySection();
+	initialize() {
+		// 현재 사건 번호 확인 및 설정
+		if (!window.currentCaseNo && window.currentCaseNo !== 0) {
+			if (typeof currentCaseNo !== 'undefined') {
+				window.currentCaseNo = currentCaseNo;
+			}
+		}
+
+		this.bindEvents();
 		this.loadYearOptions();
-		this.initializeLivingExpenseSection();
-		this.initializePlan10Section();
-		$('#iex_year').on('change', () => {
-			const selectedYear = $('#iex_year').val();
-			this.updateLivingExpenseStandards(selectedYear);
-		});
-    } catch (error) {
-      console.error("초기화 실패:", error);
-      alert("초기화 중 오류가 발생했습니다.");
-    }
-  }
-
-  initializeEventHandlers() {
-    // 급여수입 섹션 이벤트
-    $('#iex_salary_calc_btn').off('click').on('click', () => this.openSalaryCalculator());
-    $('#iex_salary_save_btn').off('click').on('click', () => this.saveSalaryIncome());
-    
-    // 자영수입 섹션 이벤트 
-    $('#iex_business_type').off('change').on('change', () => this.handleBusinessTypeChange());
-    $('#iex_monthly_income').off('input').on('input', (e) => this.calculateYearlyIncome(e.target.value));
-    $('#iex_business_save_btn').off('click').on('click', () => this.saveBusinessIncome());
-
-    // 가족관계 섹션 이벤트
-    $('#iex_family_add_btn').off('click').on('click', () => this.addFamilyRow());
-    $('.iex_family_save_btn').off('click').on('click', (e) => this.saveFamilyMember(e));
-    $('.iex_family_delete_btn').off('click').on('click', (e) => this.deleteFamilyMember(e));
-
-    // 생계비 섹션 이벤트
-    $('input[name="iex_expense_range"]').off('change').on('change', (e) => this.handleExpenseRangeChange(e));
-    $('#iex_direct_input').off('change').on('change', (e) => this.handleDirectInputChange(e));
-    $('#iex_expense_calc_btn').off('click').on('click', () => this.openAdditionalExpenseCalculator());
-    $('#iex_trustee_fee_btn').off('click').on('click', () => this.openTrusteeFeeCalculator());
-    $('#iex_other_fee_btn').off('click').on('click', () => this.openOtherFeeCalculator());
-
-    // 변제계획 이벤트
-    $('#iex-monthCountValue').off('input').on('input', () => this.calculateMonthlyPayment());
-    $('#iex-calcPlanBtn').off('click').on('click', () => this.calculateRepaymentPlan());
-
-    // 공통 이벤트
-    this.initializeMoneyInputs();
-  }
-
-  loadIncomeType() {
-    const caseNo = window.currentCaseNo;
-    if (!caseNo) return;
-
-    $.ajax({
-      url: '/adm/api/application_recovery/application_api.php',
-      type: 'GET',
-      data: { case_no: caseNo },
-      dataType: 'json',
-      success: (response) => {
-        if (response.success && response.data) {
-          this.isCompany = response.data.is_company === 1;
-          this.toggleIncomeSections();
-          this.loadSalaryData();
-        }
-      },
-      error: () => {
-        console.error('소득자 구분 로드 중 오류 발생');
-      }
-    });
-  }
-
-  loadSalaryData() {
-    if (this.isCompany) return;
-    
-    const caseNo = window.currentCaseNo;
-    if (!caseNo) return;
-
-    $.ajax({
-      url: '/adm/api/application_recovery/income/salary_income_api.php',
-      type: 'GET',
-      data: { case_no: caseNo },
-      dataType: 'json',
-      success: (response) => {
-        if (response.success && response.data) {
-          this.populateSalaryData(response.data);
-        }
-      },
-      error: () => {
-        console.error('급여 소득 데이터 로드 중 오류 발생');
-      }
-    });
-  }
-  
-  loadBusinessIncome() {
-  const caseNo = window.currentCaseNo;
-  if (!caseNo) return;
-
-  $.ajax({
-    url: '/adm/api/application_recovery/income/business_income_api.php',
-    type: 'GET',
-    data: { case_no: caseNo },
-    dataType: 'json',
-    success: (response) => {
-      if (response.success && response.data) {
-        // 자영수입 데이터 채우기
-        $('#iex_business_type').val(response.data.type || '사업소득');
-        $('#iex_business_type_etc').val(response.data.type_etc || '');
-        $('#iex_monthly_income').val(this.formatMoney(response.data.monthly_income || 0));
-        $('#iex_yearly_income').val(this.formatMoney(response.data.yearly_income || 0));
-        $('#iex_business_name').val(response.data.business_name || '');
-        $('#iex_business_sector').val(response.data.sector || '');
-        $('#iex_business_career').val(response.data.career || '');
-
-        // 기타 타입일 경우 기타 입력란 활성화
-        const etcInput = $('#iex_business_type_etc');
-        etcInput.prop('disabled', response.data.type !== '기타(임의입력)');
-      }
-    },
-    error: (xhr, status, error) => {
-      console.error('자영수입 데이터 로드 중 오류 발생:', error);
-    }
-  });
-}
-
-  populateSalaryData(data) {
-    $('#iex_salary_avg_income').val(this.formatMoney(data.monthly_income || 0));
-    $('#iex_salary_yearly_income').val(this.formatMoney(data.yearly_income || 0));
-    $(`input[name="iex_salary_seizure"][value="${data.is_seized || 'N'}"]`).prop('checked', true);
-    $('#iex_company_name').val(data.company_name || '');
-    $('#iex_position').val(data.position || '');
-    $('#iex_work_period').val(data.work_period || '');
-  }
-
-  toggleIncomeSections() {
-    if (this.isCompany) {
-      $('#salaryIncomeSection').hide();
-      $('#businessIncomeSection').show();
-    } else {
-      $('#salaryIncomeSection').show();
-      $('#businessIncomeSection').hide();
-    }
-  }
-
-  initializeMoneyInputs() {
-    const moneyInputs = [
-      '#iex_salary_avg_income',
-      '#iex_salary_yearly_income',
-      '#iex_monthly_income',
-      '#iex_yearly_income',
-      '#iex_family_income',
-      '#iex_family_assets',
-      '#iex_living_expense',
-      '#iex_additional_expense',
-      '#iex_other_fee'
-    ];
-
-    moneyInputs.forEach(selector => {
-      $(selector).off('input').on('input', (e) => {
-        const val = e.target.value.replace(/[^\d]/g, '');
-        e.target.value = this.formatMoney(val);
-      });
-    });
-  }
-
-  saveSalaryIncome() {
-    if (this.isCompany) {
-      alert('급여소득자만 저장할 수 있습니다.');
-      return;
-    }
-
-    if (this.isSaving) return;
-    this.isSaving = true;
-
-    const caseNo = window.currentCaseNo;
-    if (!caseNo) {
-      alert('사건 번호가 필요합니다.');
-      this.isSaving = false;
-      return;
-    }
-
-    const data = {
-      case_no: caseNo,
-      monthly_income: this.unformatMoney($('#iex_salary_avg_income').val()),
-      yearly_income: this.unformatMoney($('#iex_salary_yearly_income').val()),
-      is_seized: $('input[name="iex_salary_seizure"]:checked').val() || 'N',
-      company_name: $('#iex_company_name').val().trim(),
-      position: $('#iex_position').val().trim(),
-      work_period: $('#iex_work_period').val().trim()
-    };
-
-    $.ajax({
-      url: '/adm/api/application_recovery/income/salary_income_api.php',
-      type: 'POST',
-      data: data,
-      dataType: 'json',
-      success: (response) => {
-        if (response.success) {
-          alert('급여 수입이 저장되었습니다.');
-        } else {
-          alert(response.message || '급여 수입 저장 실패');
-        }
-      },
-      error: (xhr, status, error) => {
-        console.error('급여 수입 저장 중 오류:', error);
-        alert('급여 수입 저장 중 오류가 발생했습니다.');
-      },
-      complete: () => {
-        this.isSaving = false;
-      }
-    });
-  }
-
-  initializeSalarySection() {
-    $('#iex_salary_avg_income').off('input').on('input', (e) => {
-      const monthly = this.unformatMoney(e.target.value);
-      const yearly = monthly * 12;
-      $('#iex_salary_yearly_income').val(this.formatMoney(yearly));
-    });
-  }
-
-  openSalaryCalculator() {
-	const caseNo = window.currentCaseNo;
-    if (!caseNo) return;
-    window.open('/adm/api/application_recovery/income/salary_calculator.php?case_no=' + caseNo,
-      '월평균소득계산기',
-      'width=1600,height=600,scrollbars=yes');
-  }
-
-  formatMoney(amount) {
-    if (!amount) return '0';
-    return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  }
-
-  unformatMoney(str) {
-    if (!str) return 0;
-    return parseInt(str.replace(/,/g, '')) || 0;
-  }
-  
-  handleBusinessTypeChange() {
-    const type = $('#iex_business_type').val();
-    const etcInput = $('#iex_business_type_etc');
-    etcInput.prop('disabled', type !== '기타(임의입력)');
-    if (type !== '기타(임의입력)') {
-      etcInput.val('');
-    }
-  }
-
-  calculateYearlyIncome(monthlyIncome) {
-    const monthly = this.unformatMoney(monthlyIncome);
-    const yearly = monthly * 12;
-    $('#iex_yearly_income').val(this.formatMoney(yearly));
-  }
-
-  saveBusinessIncome() {
-    if (!this.isCompany) {
-      alert('영업소득자만 저장할 수 있습니다.');
-      return;
-    }
-
-    if (this.isSaving) return;
-    this.isSaving = true;
-
-    const data = {
-      case_no: window.currentCaseNo,
-      type: $('#iex_business_type').val(),
-      type_etc: $('#iex_business_type_etc').val().trim(),
-      monthly_income: this.unformatMoney($('#iex_monthly_income').val()),
-      yearly_income: this.unformatMoney($('#iex_yearly_income').val()),
-      business_name: $('#iex_business_name').val().trim(),
-      sector: $('#iex_business_sector').val().trim(),
-      career: $('#iex_business_career').val().trim()
-    };
-
-    $.ajax({
-      url: '/adm/api/application_recovery/income/business_income_api.php',
-      type: 'POST',
-      data: data,
-      dataType: 'json',
-      success: (response) => {
-        if (response.success) {
-          alert('자영 수입이 저장되었습니다.');
-        } else {
-          alert(response.message || '자영 수입 저장 실패');
-        }
-      },
-      error: () => {
-        alert('자영 수입 저장 중 오류가 발생했습니다.');
-      },
-      complete: () => {
-        this.isSaving = false;
-      }
-    });
-  }
-
-	addFamilyRow() {
-		const newRowId = Date.now();
-		const html = `
-			<tr>
-				<td><input type="text" class="form-control iex_family_relation"></td>
-				<td><input type="text" class="form-control iex_family_name"></td>
-				<td><input type="text" class="form-control iex_family_age">세</td>
-				<td>
-					<input type="radio" id="iex_family_live_y_${newRowId}" name="iex_family_live_together_${newRowId}" value="Y">
-					<label for="iex_family_live_y_${newRowId}">동거</label>
-					<input type="radio" id="iex_family_live_n_${newRowId}" name="iex_family_live_together_${newRowId}" value="N">
-					<label for="iex_family_live_n_${newRowId}">별거</label>
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;기간 | 
-					<input type="text" class="form-control iex_family_live_period">
-				</td>
-				<td><input type="text" class="form-control iex_family_job"></td>
-				<td><input type="text" class="form-control iex_family_income money">원</td>
-				<td><input type="text" class="form-control iex_family_assets money">원</td>
-				<td>
-					<input type="radio" id="iex_family_support_y_${newRowId}" name="iex_family_support_${newRowId}" value="Y">
-					<label for="iex_family_support_y_${newRowId}">유</label>
-					<input type="radio" id="iex_family_support_n_${newRowId}" name="iex_family_support_${newRowId}" value="N">
-					<label for="iex_family_support_n_${newRowId}">무</label>
-				</td>
-				<td>
-					<div class="button-group">
-						<button class="btn-save iex_family_save_btn">저장</button>
-						<button class="btn-delete iex_family_delete_btn">삭제</button>
-					</div>
-				</td>
-			</tr>
-		`;
-		$('#familyRelationshipSection .long-table tbody').append(html);
 		
-		// 새로 추가된 행의 이벤트 핸들러 등록
-		const newRow = $('#familyRelationshipSection .long-table tbody tr:last');
-		newRow.find('.money').on('input', (e) => {
-			const val = e.target.value.replace(/[^\d]/g, '');
+		if (window.currentCaseNo) {
+			this.loadIncomeData();
+		}
+		
+		// 부양가족 컨테이너가 비어있으면 빈 블록 추가
+		if ($('#dependents_container').children().length === 0) {
+			this.addDependent();
+		}
+		
+		// 초기 합계 계산
+		this.calculateTotals();
+	}
+
+	bindEvents() {
+		// 부양가족 추가 버튼 이벤트
+		$('#add_dependent').on('click', () => this.addDependent());
+
+		// 저장 버튼 이벤트
+		$('#save_income_expense').on('click', () => this.saveIncomeExpense());
+		$('#save_disposable_income').on('click', () => this.saveDisposableIncome());
+
+		// 이벤트 위임: 부양가족 삭제
+		$(document).on('click', '.dependent_delete_btn', (e) => {
+			const block = $(e.target).closest('.dependent-row');
+			this.deleteDependent(block);
+		});
+
+		// 금액 입력 필드 이벤트
+		$(document).on('input', 'input[data-type="money"]', (e) => {
+			const val = e.target.value.replace(/[^\d]/g, "");
 			e.target.value = this.formatMoney(val);
+			this.calculateTotals();
 		});
-		newRow.find('.iex_family_save_btn').on('click', (e) => this.saveFamilyMember(e));
-		newRow.find('.iex_family_delete_btn').on('click', (e) => this.deleteFamilyMember(e));
-	}
-
-	populateFamilyMembers(members) {
-		if (!Array.isArray(members)) return;
 		
-		members.forEach(member => {
-			const newRowId = member.member_no;
-			const row = `
-				<tr data-member-no="${member.member_no}">
-					<td><input type="text" class="form-control iex_family_relation" value="${member.relation || ''}"></td>
-					<td><input type="text" class="form-control iex_family_name" value="${member.name || ''}"></td>
-					<td><input type="text" class="form-control iex_family_age" value="${member.age || ''}">세</td>
-					<td>
-						<input type="radio" id="iex_family_live_y_${newRowId}" name="iex_family_live_together_${newRowId}" value="Y" ${member.live_together === 'Y' ? 'checked' : ''}>
-						<label for="iex_family_live_y_${newRowId}">동거</label>
-						<input type="radio" id="iex_family_live_n_${newRowId}" name="iex_family_live_together_${newRowId}" value="N" ${member.live_together === 'N' ? 'checked' : ''}>
-						<label for="iex_family_live_n_${newRowId}">별거</label>
-						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;기간 | 
-						<input type="text" class="form-control iex_family_live_period" value="${member.live_period || ''}">
-					</td>
-					<td><input type="text" class="form-control iex_family_job" value="${member.job || ''}"></td>
-					<td><input type="text" class="form-control iex_family_income money" value="${this.formatMoney(member.income || 0)}">원</td>
-					<td><input type="text" class="form-control iex_family_assets money" value="${this.formatMoney(member.assets || 0)}">원</td>
-					<td>
-						<input type="radio" id="iex_family_support_y_${newRowId}" name="iex_family_support_${newRowId}" value="Y" ${member.support === 'Y' ? 'checked' : ''}>
-						<label for="iex_family_support_y_${newRowId}">유</label>
-						<input type="radio" id="iex_family_support_n_${newRowId}" name="iex_family_support_${newRowId}" value="N" ${member.support === 'N' ? 'checked' : ''}>
-						<label for="iex_family_support_n_${newRowId}">무</label>
-					</td>
-					<td>
-						<div class="button-group">
-							<button class="btn-save iex_family_save_btn">저장</button>
-							<button class="btn-delete iex_family_delete_btn">삭제</button>
-						</div>
-					</td>
-				</tr>
-			`;
-			$('#familyRelationshipSection .long-table tbody').append(row);
-			
-			// 새로 추가된 행의 이벤트 바인딩
-			const newRow = $('#familyRelationshipSection .long-table tbody tr:last');
-			newRow.find('.money').on('input', (e) => {
-				const val = e.target.value.replace(/[^\d]/g, '');
-				e.target.value = this.formatMoney(val);
-			});
-			newRow.find('.iex_family_save_btn').on('click', (e) => this.saveFamilyMember(e));
-			newRow.find('.iex_family_delete_btn').on('click', (e) => this.deleteFamilyMember(e));
+		// 수입/지출 필드 변경 시 합계 계산
+		$('input[id^="income_"], input[id^="expense_"]').on('input', () => {
+			this.calculateTotals();
+		});
+		
+		// 가구 인원수 변경 이벤트
+		$('#household_size').on('change', () => {
+			this.updateHouseholdExpense();
+			this.calculateDisposableIncome();
+		});
+		
+		// 채무자 월 평균소득 변경 이벤트
+		$('#debtor_monthly_income').on('input', () => {
+			this.calculateDisposableIncome();
 		});
 	}
 
-
-
-  saveFamilyMember(e) {
-    if (this.isSaving) return;
-    this.isSaving = true;
-
-    const row = $(e.target).closest('tr');
-    const data = {
-      case_no: window.currentCaseNo,
-      relation: row.find('.iex_family_relation').val()?.trim() || '',
-      name: row.find('.iex_family_name').val()?.trim() || '',
-      age: row.find('.iex_family_age').val() || 0,
-      live_together: row.find('input[name^="iex_family_live_together"]:checked').val() || 'N',
-      live_period: row.find('.iex_family_live_period').val()?.trim() || '',
-      job: row.find('.iex_family_job').val()?.trim() || '',
-      income: this.unformatMoney(row.find('.iex_family_income').val()),
-      assets: this.unformatMoney(row.find('.iex_family_assets').val()),
-      support: row.find('input[name^="iex_family_support"]:checked').val() || 'N'
-    };
-
-    if (!data.relation || !data.name) {
-      alert('관계와 성명은 필수입력 항목입니다.');
-      this.isSaving = false;
-      return;
-    }
-
-    $.ajax({
-      url: '/adm/api/application_recovery/income/family_member_api.php',
-      type: 'POST',
-      data: data,
-      dataType: 'json',
-      success: (response) => {
-        if (response.success) {
-          alert('가족관계 정보가 저장되었습니다.');
-          if (response.data?.member_no) {
-            row.attr('data-member-no', response.data.member_no);
-          }
-        } else {
-          alert(response.message || '가족관계 정보 저장 실패');
-        }
-      },
-      error: () => {
-        alert('가족관계 정보 저장 중 오류가 발생했습니다.');
-      },
-      complete: () => {
-        this.isSaving = false;
-      }
-    });
-  }
-
-  deleteFamilyMember(e) {
-    const row = $(e.target).closest('tr');
-    const memberNo = row.attr('data-member-no');
-
-    if (!memberNo) {
-      row.remove();
-      return;
-    }
-
-    if (!confirm('가족관계 정보를 삭제하시겠습니까?')) return;
-
-    $.ajax({
-      url: '/adm/api/application_recovery/income/family_member_api.php',
-      type: 'DELETE',
-      data: {
-        case_no: window.currentCaseNo,
-        member_no: memberNo
-      },
-      dataType: 'json',
-      success: (response) => {
-        if (response.success) {
-          alert('가족관계 정보가 삭제되었습니다.');
-          row.remove();
-        } else {
-          alert(response.message || '가족관계 정보 삭제 실패');
-        }
-      },
-      error: () => {
-        alert('가족관계 정보 삭제 중 오류가 발생했습니다.');
-      }
-    });
-  }
-
-  handleExpenseRangeChange(e) {
-    const isStandard = e.target.value === 'Y';
-    const livingExpenseInput = $('#iex_living_expense');
-    livingExpenseInput.prop('readonly', isStandard);
-
-    if (isStandard) {
-      const familyCount = parseInt($('#iex_family_count').val()) || 1;
-      const standardAmount = this.getStandardLivingExpense(familyCount);
-      livingExpenseInput.val(this.formatMoney(standardAmount));
-    }
-
-    this.calculateTotalExpense();
-  }
-
-  handleDirectInputChange(e) {
-    $('#iex_living_expense').prop('readonly', !e.target.checked);
-  }
-
-	getStandardLivingExpense(familyCount) {
-		// form-content에서 familyCount번째 input의 값을 가져옴 
-		const standardAmount = this.unformatMoney($('#standard_amount_container input').eq(familyCount - 1).val());
-		return standardAmount || 0; // 값이 없으면 0 반환
+	// 수입/지출 합계 계산
+	calculateTotals() {
+		// 수입 합계 계산
+		let incomeTotal = 0;
+		$('input[id^="income_"]:not(#income_total)').each(function() {
+			incomeTotal += parseInt($(this).val().replace(/,/g, '') || 0);
+		});
+		$('#income_total').val(this.formatMoney(incomeTotal));
+		
+		// 지출 합계 계산
+		let expenseTotal = 0;
+		$('input[id^="expense_"]:not(#expense_total)').each(function() {
+			expenseTotal += parseInt($(this).val().replace(/,/g, '') || 0);
+		});
+		$('#expense_total').val(this.formatMoney(expenseTotal));
+		
+		// 가용소득 계산도 함께 실행
+		this.calculateDisposableIncome();
 	}
 
-  calculateTotalExpense() {
-    const livingExpense = this.unformatMoney($('#iex_living_expense').val());
-    const additionalExpense = this.unformatMoney($('#iex_additional_expense').val());
-    const totalExpense = livingExpense + additionalExpense;
-
-    $('#iex-livingExpenseValue').val(this.formatMoney(totalExpense));
-    this.calculateMonthlyPayment();
-  }
-
-  calculateMonthlyPayment() {
-    const monthCount = parseInt($('#iex-monthCountValue').val()) || 36;
-    const livingExpense = this.unformatMoney($('#iex-livingExpenseValue').val());
-    const monthlyPayment = Math.round(livingExpense / monthCount);
-    
-    $('#iex-monthPaymentValue').val(this.formatMoney(monthlyPayment));
-    this.calculateRepaymentRate();
-  }
-
-  calculateRepaymentRate() {
-    const totalDebt = this.unformatMoney($('#totalDebtAmount').val());
-    const monthlyPayment = this.unformatMoney($('#iex-monthPaymentValue').val());
-    const monthCount = parseInt($('#iex-monthCountValue').val()) || 36;
-    
-    if (totalDebt > 0) {
-      const totalPayment = monthlyPayment * monthCount;
-      const rate = (totalPayment / totalDebt) * 100;
-      $('#iex-repaymentRateValue').val(rate.toFixed(2));
-    }
-  }
-
-  openAdditionalExpenseCalculator() {
-	const caseNo = window.currentCaseNo;
-    if (!caseNo) return;
-    window.open('/adm/api/application_recovery/income/additional_expense_calculator.php?case_no=' + caseNo, '추가생계비계산기', 'width=1000,height=600,scrollbars=yes');
-  }
-
-  openTrusteeFeeCalculator() {
-	const caseNo = window.currentCaseNo;
-    if (!caseNo) return;
-    window.open('/adm/api/application_recovery/income/trustee_fee_calculator.php?case_no=' + caseNo,
-      '외부회생위원보수계산기',
-      'width=1000,height=1200,scrollbars=yes');
-  }
-
-  openOtherFeeCalculator() {
-	const caseNo = window.currentCaseNo;
-    if (!caseNo) return;
-    window.open('/adm/api/application_recovery/income/other_fee_calculator.php?case_no=' + caseNo,
-      '기타재단채권계산기',
-      'width=1000,height=1200,scrollbars=yes');
-  }
-
-  initializeBusinessSection() {
-	  // 기존 이벤트 핸들러
-	  $('#iex_business_type').on('change', () => this.handleBusinessTypeChange());
-	  $('#iex_business_save_btn').on('click', () => this.saveBusinessIncome());
-	  
-	  // 월소득 입력 시 연소득 자동 계산
-	  $('#iex_monthly_income').on('input', (e) => {
-		const monthly = this.unformatMoney(e.target.value);
-		$('#iex_yearly_income').val(this.formatMoney(monthly * 12));
-	  });
-
-	  // 숫자 포맷팅 적용
-	  $('#iex_monthly_income, #iex_yearly_income').on('input', (e) => {
-		const val = e.target.value.replace(/[^\d]/g, '');
-		e.target.value = this.formatMoney(val);
-	  });
+	// 가구별 생계비 업데이트
+	updateHouseholdExpense() {
+		const householdSize = $('#household_size').val();
+		const expenseValue = $('#living_expense_values').data('expense' + householdSize);
+		$('#household_expense').text(this.formatMoney(expenseValue) + '원');
+		
+		// 가용소득 계산도 함께 실행
+		this.calculateDisposableIncome();
+	}
+	
+	// 가용소득 계산
+	calculateDisposableIncome() {
+		const monthlyIncome = this.unformatMoney($('#debtor_monthly_income').val());
+		const householdSize = $('#household_size').val();
+		const householdExpense = this.unformatMoney($('#living_expense_values').data('expense' + householdSize));
+		
+		const disposableIncome = Math.max(0, monthlyIncome - householdExpense);
+		$('#disposable_income').val(this.formatMoney(disposableIncome));
 	}
 
-	initializeFamilySection() {
-		const caseNo = window.currentCaseNo;
-		if (!caseNo) return;
-
+	// 데이터 로드
+	loadIncomeData() {
 		$.ajax({
-			url: '/adm/api/application_recovery/income/family_member_api.php',
+			url: '/adm/api/application_bankruptcy/income/income_expenditure_api.php',
 			type: 'GET',
-			data: { case_no: caseNo },
+			data: { case_no: window.currentCaseNo },
 			dataType: 'json',
 			success: (response) => {
-				if (response.success && response.data && response.data.length > 0) {
-					this.populateFamilyMembers(response.data);
+				if (response.success) {
+					if (response.data) {
+						this.populateIncomeData(response.data);
+						this.populateDependents(response.data.dependents || []);
+					}
 				} else {
-					// 가족 데이터가 없으면 빈 행 추가
-					this.addFamilyRow();
+					console.error('데이터 로드 실패:', response.message);
 				}
-				
-				// 첫 번째 행의 이벤트 핸들러 등록
-				this.initializeFirstRowEvents();
 			},
-			error: () => {
-				console.error('가족구성원 데이터 로드 실패');
-				// 데이터 로드 실패 시에도 빈 행 추가
-				this.addFamilyRow();
-				this.initializeFirstRowEvents();
+			error: (xhr, status, error) => {
+				console.error('Ajax 에러:', error);
+			}
+		});
+	}
+
+	populateIncomeData(data) {
+		// 가계수지표 데이터 설정
+		$('#statement_month').val(data.statement_month || '');
+		
+		// 수입 데이터 설정
+		$('#income_salary_applicant').val(this.formatMoney(data.income_salary_applicant || 0));
+		$('#income_salary_spouse').val(this.formatMoney(data.income_salary_spouse || 0));
+		$('#income_salary_others').val(this.formatMoney(data.income_salary_others || 0));
+		$('#income_pension_applicant').val(this.formatMoney(data.income_pension_applicant || 0));
+		$('#income_pension_spouse').val(this.formatMoney(data.income_pension_spouse || 0));
+		$('#income_pension_others').val(this.formatMoney(data.income_pension_others || 0));
+		$('#income_support').val(this.formatMoney(data.income_support || 0));
+		$('#income_others').val(this.formatMoney(data.income_others || 0));
+		
+		// 지출 데이터 설정
+		$('#expense_housing').val(this.formatMoney(data.expense_housing || 0));
+		$('#expense_food').val(this.formatMoney(data.expense_food || 0));
+		$('#expense_education').val(this.formatMoney(data.expense_education || 0));
+		$('#expense_utilities').val(this.formatMoney(data.expense_utilities || 0));
+		$('#expense_transportation').val(this.formatMoney(data.expense_transportation || 0));
+		$('#expense_communication').val(this.formatMoney(data.expense_communication || 0));
+		$('#expense_medical').val(this.formatMoney(data.expense_medical || 0));
+		$('#expense_insurance').val(this.formatMoney(data.expense_insurance || 0));
+		$('#expense_others').val(this.formatMoney(data.expense_others || 0));
+		
+		// 가용소득 관련 데이터 설정
+		$('#debtor_monthly_income').val(this.formatMoney(data.debtor_monthly_income || 0));
+		$('#household_size').val(data.household_size || '1');
+		
+		// 합계 계산 및 생계비 업데이트
+		this.calculateTotals();
+		this.updateHouseholdExpense();
+	}
+
+	populateDependents(dependentsData) {
+		// 컨테이너 초기화
+		$('#dependents_container').empty();
+		
+		if (dependentsData && dependentsData.length > 0) {
+			dependentsData.forEach(dependent => {
+				this.addDependent(dependent);
+			});
+		} else {
+			// 데이터가 없으면 빈 블록 추가
+			this.addDependent();
+		}
+	}
+
+	// 부양가족 추가
+	addDependent(data = {}) {
+		this.dependentCounter++;
+		const id = data.dependent_id || this.dependentCounter;
+		
+		// 템플릿에서 HTML 생성
+		let html = $('#dependent_template').html()
+			.replace(/{id}/g, id);
+		
+		// 컨테이너에 추가
+		$('#dependents_container').append(html);
+		
+		// 데이터가 있으면 채우기
+		if (data.dependent_id) {
+			const block = $(`#dependent_${id}`);
+			block.find('.dependent_name').val(data.name || '');
+			block.find('.dependent_age').val(data.age || '');
+			block.find('.dependent_relation').val(data.relation || '');
+		}
+	}
+
+	deleteDependent(block) {
+		const dependentId = block.find('.dependent_id').val();
+		
+		// 저장되지 않은 블록인 경우 바로 삭제
+		if (!dependentId || dependentId === this.dependentCounter.toString()) {
+			block.remove();
+			return;
+		}
+		
+		if (!confirm('이 부양가족을 삭제하시겠습니까?')) {
+			return;
+		}
+
+		$.ajax({
+			url: '/adm/api/application_bankruptcy/income/income_expenditure_api.php',
+			type: 'POST',
+			data: {
+				case_no: window.currentCaseNo,
+				dependent_id: dependentId,
+				action: 'delete_dependent'
+			},
+			dataType: 'json',
+			success: (response) => {
+				if (response.success) {
+					alert('부양가족이 삭제되었습니다.');
+					block.remove();
+					
+					// 부양가족이 없으면 빈 블록 추가
+					if ($('#dependents_container').children().length === 0) {
+						this.addDependent();
+					}
+					
+					// 가구 크기를 다시 계산하고 생계비 업데이트
+					this.updateHouseholdSize();
+				} else {
+					alert(response.message || '삭제 중 오류가 발생했습니다.');
+				}
+			},
+			error: (xhr, status, error) => {
+				console.error('삭제 실패:', error);
+				alert('서버 통신 중 오류가 발생했습니다.');
 			}
 		});
 	}
 	
-	initializeFirstRowEvents() {
-		const firstRow = $('#familyRelationshipSection .long-table tbody tr:first');
+	// 가구 크기 업데이트
+	updateHouseholdSize() {
+		// 부양가족 수에 따라 가구 인원수 업데이트
+		const dependentCount = $('#dependents_container').children().length;
+		const householdSize = Math.min(6, dependentCount + 1); // 본인 + 부양가족, 최대 6인
 		
-		// 첫 번째 행의 금액 입력 필드에 이벤트 바인딩
-		firstRow.find('.money').on('input', (e) => {
-			const val = e.target.value.replace(/[^\d]/g, '');
-			e.target.value = this.formatMoney(val);
-		});
-
-		// 첫 번째 행의 저장 버튼 이벤트
-		firstRow.find('.iex_family_save_btn').on('click', (e) => this.saveFamilyMember(e));
+		$('#household_size').val(householdSize);
+		this.updateHouseholdExpense();
 	}
-	
+
+	// 수입지출 정보 저장
+	saveIncomeExpense() {
+		const data = {
+			case_no: window.currentCaseNo,
+			statement_month: $('#statement_month').val(),
+			income_salary_applicant: this.unformatMoney($('#income_salary_applicant').val()),
+			income_salary_spouse: this.unformatMoney($('#income_salary_spouse').val()),
+			income_salary_others: this.unformatMoney($('#income_salary_others').val()),
+			income_pension_applicant: this.unformatMoney($('#income_pension_applicant').val()),
+			income_pension_spouse: this.unformatMoney($('#income_pension_spouse').val()),
+			income_pension_others: this.unformatMoney($('#income_pension_others').val()),
+			income_support: this.unformatMoney($('#income_support').val()),
+			income_others: this.unformatMoney($('#income_others').val()),
+			income_total: this.unformatMoney($('#income_total').val()),
+			expense_housing: this.unformatMoney($('#expense_housing').val()),
+			expense_food: this.unformatMoney($('#expense_food').val()),
+			expense_education: this.unformatMoney($('#expense_education').val()),
+			expense_utilities: this.unformatMoney($('#expense_utilities').val()),
+			expense_transportation: this.unformatMoney($('#expense_transportation').val()),
+			expense_communication: this.unformatMoney($('#expense_communication').val()),
+			expense_medical: this.unformatMoney($('#expense_medical').val()),
+			expense_insurance: this.unformatMoney($('#expense_insurance').val()),
+			expense_others: this.unformatMoney($('#expense_others').val()),
+			expense_total: this.unformatMoney($('#expense_total').val())
+		};
+
+		$.ajax({
+			url: '/adm/api/application_bankruptcy/income/income_expenditure_api.php',
+			type: 'POST',
+			data: data,
+			dataType: 'json',
+			success: (response) => {
+				if (response.success) {
+					alert('수입지출 정보가 저장되었습니다.');
+				} else {
+					alert(response.message || '저장 중 오류가 발생했습니다.');
+				}
+			},
+			error: (xhr, status, error) => {
+				console.error('저장 실패:', error);
+				alert('서버 통신 중 오류가 발생했습니다.');
+			}
+		});
+	}
+
 	loadYearOptions() {
 		$.ajax({
-			url: '/adm/api/application_recovery/income/living_expense_standard_api.php',
+			url: '/adm/api/application_bankruptcy/income/living_expense_standard_api.php',
 			type: 'GET',
 			data: { action: 'get_years' },
 			dataType: 'json',
 			success: (response) => {
-				if (response.success && response.years) {
-					const $yearSelect = $('#iex_year');
+				if (response.success && response.years && response.years.length > 0) {
+					const $yearSelect = $('#standard_year');
 					$yearSelect.empty(); // 기존 옵션 제거
 
 					// 연도 옵션 동적 생성
@@ -629,63 +315,153 @@ class ApplicationRecoveryIncomeExpenditure {
 						const $option = $('<option>', {
 							value: year,
 							text: year + '년',
-							selected: index === 0 // 첫 번째 연도를 기본 선택
+							// 첫 번째 요소(가장 최근 연도)를 기본 선택
+							selected: index === 0
 						});
 						$yearSelect.append($option);
 					});
 
-					// 첫 번째 연도로 생계비 기준 업데이트
-					this.updateLivingExpenseStandards($yearSelect.val());
+					// 선택된 연도의 생계비 기준 업데이트
+					const selectedYear = $yearSelect.val();
+					if (selectedYear) {
+						this.updateLivingExpenseStandards(selectedYear);
+					}
 				} else {
-					alert('연도 목록을 불러오는 데 실패했습니다.');
+					// 연도 데이터가 없는 경우 현재 연도 표시
+					const currentYear = new Date().getFullYear();
+					$('#standard_year').empty()
+						.append($('<option>', { 
+							value: currentYear, 
+							text: currentYear + '년', 
+							selected: true 
+						}));
+					
+					// 오류 메시지 표시
+					alert('연도 목록을 불러오는 데 실패했습니다. 현재 연도를 기본값으로 사용합니다.');
+					
+					// 생계비 값 초기화
+					for (let i = 1; i <= 6; i++) {
+						$('#household_expense' + i).text('');
+					}
 				}
 			},
 			error: () => {
-				alert('연도 목록을 불러오는 중 오류가 발생했습니다.');
+				// 오류 발생 시 현재 연도 표시
+				const currentYear = new Date().getFullYear();
+				$('#standard_year').empty()
+					.append($('<option>', { 
+						value: currentYear, 
+						text: currentYear + '년', 
+						selected: true 
+					}));
+				
+				// 오류 메시지 표시
+				alert('연도 목록을 불러오는 중 오류가 발생했습니다. 현재 연도를 기본값으로 사용합니다.');
+				
+				// 생계비 값 초기화
+				for (let i = 1; i <= 6; i++) {
+					$('#household_expense' + i).text('');
+				}
 			}
 		});
 	}
 
 	updateLivingExpenseStandards(year) {
+		if (!year) return;
+		
 		$.ajax({
-			url: '/adm/api/application_recovery/income/living_expense_standard_api.php',
+			url: '/adm/api/application_bankruptcy/income/living_expense_standard_api.php',
 			type: 'GET',
-			data: { year: year },
+			data: { 
+				action: 'get_standards',
+				year: year 
+			},
 			dataType: 'json',
 			success: (response) => {
-				if (response.success && response.data) {
-					$('#standard_amount_container input').each((index, element) => {
-						const familyMembers = $(element).data('family-members');
-						const amount = response.data[familyMembers] || 0;
-						$(element).val(this.formatNumber(amount));
-					});
+				if (response.success && response.standards) {
+					// 각 가구별 생계비 업데이트
+					for (let i = 1; i <= 6; i++) {
+						const expense = response.standards[i] || 0;
+						$('#household_expense' + i).text(this.formatMoney(expense) + '원');
+						$('#living_expense_values').data('expense' + i, expense);
+					}
+					
+					// 이후 가구 크기에 맞는 생계비 다시 계산
+					this.updateHouseholdExpense();
 				} else {
-					alert('해당 연도의 생계비 기준 데이터를 찾을 수 없습니다.');
-					$('#standard_amount_container input').val(0);
+					alert(year + '년 생계비 기준을 불러오는 데 실패했습니다.');
 				}
 			},
 			error: () => {
-				alert('생계비 기준 데이터를 불러오는 데 실패했습니다.');
-				$('#standard_amount_container input').val(0);
+				alert('생계비 기준을 불러오는 중 오류가 발생했습니다.');
 			}
 		});
 	}
 
-	formatNumber(number) {
-		return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+	// 가용소득 정보 저장
+	saveDisposableIncome() {
+		// 부양가족 정보 수집
+		const dependents = [];
+		$('#dependents_container .dependent-row').each(function() {
+			const id = $(this).find('.dependent_id').val();
+			const name = $(this).find('.dependent_name').val();
+			const age = $(this).find('.dependent_age').val();
+			const relation = $(this).find('.dependent_relation').val();
+			
+			if (name || age || relation) {
+				dependents.push({
+					dependent_id: id,
+					name: name,
+					age: age,
+					relation: relation
+				});
+			}
+		});
+		
+		const data = {
+			case_no: window.currentCaseNo,
+			debtor_monthly_income: this.unformatMoney($('#debtor_monthly_income').val()),
+			household_size: $('#household_size').val(),
+			disposable_income: this.unformatMoney($('#disposable_income').val()),
+			dependents: JSON.stringify(dependents)
+		};
+
+		$.ajax({
+			url: '/adm/api/application_bankruptcy/income/income_expenditure_api.php',
+			type: 'POST',
+			data: data,
+			dataType: 'json',
+			success: (response) => {
+				if (response.success) {
+					alert('가용소득 정보가 저장되었습니다.');
+				} else {
+					alert(response.message || '저장 중 오류가 발생했습니다.');
+				}
+			},
+			error: (xhr, status, error) => {
+				console.error('저장 실패:', error);
+				alert('서버 통신 중 오류가 발생했습니다.');
+			}
+		});
 	}
 
-  initializeLivingExpenseSection() {
-    $('input[name="iex_expense_range"]:checked').trigger('change');
-    this.calculateTotalExpense();
-  }
+	// 금액 형식 변환 유틸리티 함수
+	formatMoney(amount) {
+		if (!amount) return "0";
+		return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	}
 
-  initializePlan10Section() {
-    // 변제계획안 10항 초기화 로직
-  }
+	unformatMoney(str) {
+		if (!str) return 0;
+		return parseInt(str.replace(/,/g, "")) || 0;
+	}
 }
 
-// 페이지 로드 시 인스턴스 생성
-$(document).ready(() => {
-  window.incomeExpenditure = new ApplicationRecoveryIncomeExpenditure();
+// 수입지출목록 탭이 활성화될 때 초기화
+$(document).ready(function() {
+	if (typeof currentCaseNo !== 'undefined' && currentCaseNo !== null) {
+        window.currentCaseNo = currentCaseNo;
+        console.log('수입지출목록 매니저 초기화 시 currentCaseNo 설정:', window.currentCaseNo);
+    }
+	window.incomeExpenditureManager = new IncomeExpenditureManager();
 });
