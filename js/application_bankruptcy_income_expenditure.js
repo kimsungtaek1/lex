@@ -326,42 +326,9 @@ class IncomeExpenditureManager {
 					if (selectedYear) {
 						this.updateLivingExpenseStandards(selectedYear);
 					}
-				} else {
-					// 연도 데이터가 없는 경우 현재 연도 표시
-					const currentYear = new Date().getFullYear();
-					$('#standard_year').empty()
-						.append($('<option>', { 
-							value: currentYear, 
-							text: currentYear + '년', 
-							selected: true 
-						}));
-					
-					// 오류 메시지 표시
-					alert('연도 목록을 불러오는 데 실패했습니다. 현재 연도를 기본값으로 사용합니다.');
-					
-					// 생계비 값 초기화
-					for (let i = 1; i <= 6; i++) {
-						$('#household_expense' + i).text('');
-					}
 				}
 			},
 			error: () => {
-				// 오류 발생 시 현재 연도 표시
-				const currentYear = new Date().getFullYear();
-				$('#standard_year').empty()
-					.append($('<option>', { 
-						value: currentYear, 
-						text: currentYear + '년', 
-						selected: true 
-					}));
-				
-				// 오류 메시지 표시
-				alert('연도 목록을 불러오는 중 오류가 발생했습니다. 현재 연도를 기본값으로 사용합니다.');
-				
-				// 생계비 값 초기화
-				for (let i = 1; i <= 6; i++) {
-					$('#household_expense' + i).text('');
-				}
 			}
 		});
 	}
