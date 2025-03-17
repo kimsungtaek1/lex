@@ -233,10 +233,10 @@
 
 <!-- 부양가족 템플릿 (JavaScript에서 사용) -->
 <div id="dependent_template" style="display:none;">
-	<input type="hidden" class="dependent_id" value="{id}">
-	이름&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="dependent_name" style="width:20%;">
-	나이&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="dependent_age" style="width:20%;">
-	관계&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="dependent_relation" style="width:18%;">
-	<button type="button" id="add_dependent" class="btn-add2">추가</button>
-	<button type="button" class="btn-delete dependent_delete_btn">삭제</button>
+    <input type="hidden" class="dependent_id" value="{id}">
+    이름&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="dependent_name" style="width:20%;">
+    나이&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="dependent_age" style="width:20%;">
+    관계&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="dependent_relation" style="width:18%;">
+    <button type="button" id="add_dependent" class="btn-add2">추가</button>
+    <button type="button" class="btn-delete dependent_delete_btn">삭제</button>
 </div>
