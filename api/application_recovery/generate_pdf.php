@@ -48,7 +48,6 @@ $pdf->SetAuthor('Your Name');
 $pdf->SetTitle('개인회생 신청서 자료');
 $pdf->SetSubject('개인회생 신청서');
 $pdf->SetKeywords('개인회생, 신청서, PDF');
-$fontname = $pdf->addTTFfont('/font/NanumGothic.ttf', 'UTF-8', '', 32);
 
 // 기본 폰트 설정
 $pdf->SetFont('nanumgothic', '', 11);
