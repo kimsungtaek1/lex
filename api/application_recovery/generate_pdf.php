@@ -1,6 +1,9 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
+// 파일 시작 부분에 아래 코드 추가
+header('Content-Type: text/html; charset=utf-8');
+ini_set('default_charset', 'utf-8');
 session_start();
 require_once '../../config.php';
 require_once '../tfpdf/tfpdf.php';
@@ -77,7 +80,15 @@ foreach ($print_items as $item) {
 }
 
 // 출력
-$pdf->Output('I', $basic_info['name'] . '_개인회생신청서_' . date('Ymd') . '.pdf');
+$filename = $basic_info['name'] . '_개인회생신청서_' . date('Ymd') . '.pdf';
+$filename_encoded = iconv('UTF-8', 'CP949//TRANSLIT', $filename); // Windows 환경을 위한 인코딩 변환
+
+// Content-Type 및 Content-Disposition 헤더 설정
+header('Content-Type: application/pdf');
+header('Content-Disposition: inline; filename="' . $filename_encoded . '"');
+header('Content-Disposition: inline; filename*=UTF-8\'\'' . rawurlencode($filename));
+
+$pdf->Output('I', '');
 exit;
 
 // 채권자 목록 출력 함수
