@@ -20,6 +20,13 @@ class StatementManager {
 	
 	initialize() {
 		try {
+			// 사건 번호 확인
+			if (!window.currentCaseNo) {
+				console.error("사건 번호(window.currentCaseNo)가 정의되지 않았습니다.");
+				return;
+			}
+			
+			console.log("현재 사건 번호:", window.currentCaseNo);
 			this.initializeEventHandlers();
 			this.loadData();
 		} catch (error) {
@@ -44,7 +51,6 @@ class StatementManager {
 		if ($("#career_container").length > 0) this.addCareerBlock();
 		if ($("#marriage_container").length > 0) this.addMarriageBlock();
 		if ($("#lawsuit_container").length > 0) this.addLawsuitBlock();
-		if ($("#debt_relief_container").length > 0) this.loadDebtRelief();
 	}
 
 	initializeEventHandlers() {
@@ -73,6 +79,20 @@ class StatementManager {
 	// API 호출 함수 - 중복 코드 제거
 	apiRequest(method, data = {}, successCallback, errorCallback = null) {
 		const url = "/adm/api/application_recovery/statement/statement_api.php";
+		
+		// 사건 번호 확인 및 추가
+		if (!data.case_no && window.currentCaseNo) {
+			data.case_no = window.currentCaseNo;
+		}
+		
+		// 사건 번호 누락 검사
+		if (!data.case_no) {
+			console.error("API 요청에 사건 번호가 누락되었습니다.");
+			if (errorCallback) {
+				errorCallback({success: false, message: "사건 번호가 필요합니다."});
+			}
+			return;
+		}
 		
 		// GET 요청인 경우 data를 URL 파라미터로 변환
 		if (method === "GET") {
@@ -202,8 +222,8 @@ class StatementManager {
 				alert("최종학력 정보가 저장되었습니다.");
 				this.educationData = response.data;
 			},
-			() => {
-				alert("최종학력 저장 중 오류가 발생했습니다.");
+			(error) => {
+				alert("최종학력 저장 중 오류가 발생했습니다.\n" + (error.message || ""));
 			}
 		);
 	}
@@ -360,8 +380,8 @@ class StatementManager {
 				$block.find(".career_id").val(response.data.career_id);
 				this.loadCareers();
 			},
-			() => {
-				alert("경력 저장 중 오류가 발생했습니다.");
+			(error) => {
+				alert("경력 저장 중 오류가 발생했습니다.\n" + (error.message || ""));
 			}
 		);
 	}
@@ -391,8 +411,8 @@ class StatementManager {
 				$block.remove();
 				this.checkEmptyCareerContainer();
 			},
-			() => {
-				alert("경력 삭제 중 오류가 발생했습니다.");
+			(error) => {
+				alert("경력 삭제 중 오류가 발생했습니다.\n" + (error.message || ""));
 			}
 		);
 	}
@@ -538,8 +558,8 @@ class StatementManager {
 				$block.find(".marriage_id").val(response.data.marriage_id);
 				this.loadMarriages();
 			},
-			() => {
-				alert("결혼/이혼 정보 저장 중 오류가 발생했습니다.");
+			(error) => {
+				alert("결혼/이혼 정보 저장 중 오류가 발생했습니다.\n" + (error.message || ""));
 			}
 		);
 	}
@@ -569,8 +589,8 @@ class StatementManager {
 				$block.remove();
 				this.checkEmptyMarriageContainer();
 			},
-			() => {
-				alert("결혼/이혼 정보 삭제 중 오류가 발생했습니다.");
+			(error) => {
+				alert("결혼/이혼 정보 삭제 중 오류가 발생했습니다.\n" + (error.message || ""));
 			}
 		);
 	}
@@ -606,68 +626,58 @@ class StatementManager {
 	}
 
 	populateHousingForm(data) {
-		if ($("#housing_type").length === 0) return;
+		// 주거상황 HTML에 맞게 ID 수정이 필요합니다
+		// 실제 HTML의 ID를 확인하고 아래 코드를 수정하세요
+		if ($("#housing_container").length === 0) return;
 		
-		if (data.housing_type) {
+		// 주거유형 선택
+		if (data.housing_type && $("#housing_type").length > 0) {
 			$("#housing_type").val(data.housing_type);
 		}
 		
-		if (data.deposit_amount !== undefined) {
-			$("#deposit_amount").val(data.deposit_amount);
-		}
+		// 보증금/임대료/연체액 등 필드
+		const fields = [
+			"deposit_amount", "monthly_rent", "overdue_amount", 
+			"owner_name", "relationship", "etc_description",
+			"residence_start_date", "tenant_name", "additional_info"
+		];
 		
-		if (data.monthly_rent !== undefined) {
-			$("#monthly_rent").val(data.monthly_rent);
-		}
-		
-		if (data.overdue_amount !== undefined) {
-			$("#overdue_amount").val(data.overdue_amount);
-		}
-
-		// 추가 필드들도 채움
-		if (data.owner_name !== undefined) {
-			$("#owner_name").val(data.owner_name);
-		}
-
-		if (data.relationship !== undefined) {
-			$("#relationship").val(data.relationship);
-		}
-
-		if (data.etc_description !== undefined) {
-			$("#etc_description").val(data.etc_description);
-		}
-
-		if (data.residence_start_date !== undefined) {
-			$("#residence_start_date").val(data.residence_start_date);
-		}
-
-		if (data.tenant_name !== undefined) {
-			$("#tenant_name").val(data.tenant_name);
-		}
-
-		if (data.additional_info !== undefined) {
-			$("#additional_info").val(data.additional_info);
-		}
+		fields.forEach(field => {
+			if (data[field] !== undefined && $(`#${field}`).length > 0) {
+				$(`#${field}`).val(data[field]);
+			}
+		});
 	}
 
 	saveHousing() {
-		const housingType = $("#housing_type").val();
-		
+		// 주거상황 HTML에 맞게 ID 수정이 필요합니다
+		// 실제 HTML의 ID를 확인하고 아래 코드를 수정하세요
 		const data = {
 			case_no: window.currentCaseNo,
-			statement_type: "housing",
-			housing_type: housingType,
-			deposit_amount: $("#deposit_amount").val().trim().replace(/,/g, ""),
-			monthly_rent: $("#monthly_rent").val().trim().replace(/,/g, ""),
-			overdue_amount: $("#overdue_amount").val().trim().replace(/,/g, ""),
-			owner_name: $("#owner_name").val().trim(),
-			relationship: $("#relationship").val().trim(),
-			etc_description: $("#etc_description").val().trim(),
-			residence_start_date: $("#residence_start_date").val(),
-			tenant_name: $("#tenant_name").val().trim(),
-			additional_info: $("#additional_info").val().trim()
+			statement_type: "housing"
 		};
 		
+		// 주거유형 및 각종 필드
+		const fields = [
+			"housing_type", "deposit_amount", "monthly_rent", "overdue_amount", 
+			"owner_name", "relationship", "etc_description",
+			"residence_start_date", "tenant_name", "additional_info"
+		];
+		
+		fields.forEach(field => {
+			if ($(`#${field}`).length > 0) {
+				let value = $(`#${field}`).val();
+				
+				// 금액 필드는 콤마 제거
+				if (field.includes("amount") || field.includes("rent")) {
+					value = value.replace(/,/g, "");
+				}
+				
+				data[field] = value;
+			}
+		});
+		
+		// 이미 저장된 데이터가 있으면 ID 추가
 		if (this.housingData && this.housingData.housing_id) {
 			data.housing_id = this.housingData.housing_id;
 		}
@@ -679,8 +689,8 @@ class StatementManager {
 				alert("주거상황 정보가 저장되었습니다.");
 				this.housingData = response.data;
 			},
-			() => {
-				alert("주거상황 저장 중 오류가 발생했습니다.");
+			(error) => {
+				alert("주거상황 저장 중 오류가 발생했습니다.\n" + (error.message || ""));
 			}
 		);
 	}
@@ -828,8 +838,8 @@ class StatementManager {
 				$block.find(".lawsuit_id").val(response.data.lawsuit_id);
 				this.loadLawsuits();
 			},
-			() => {
-				alert("소송/압류 정보 저장 중 오류가 발생했습니다.");
+			(error) => {
+				alert("소송/압류 정보 저장 중 오류가 발생했습니다.\n" + (error.message || ""));
 			}
 		);
 	}
@@ -859,8 +869,8 @@ class StatementManager {
 				$block.remove();
 				this.checkEmptyLawsuitContainer();
 			},
-			() => {
-				alert("소송/압류 정보 삭제 중 오류가 발생했습니다.");
+			(error) => {
+				alert("소송/압류 정보 삭제 중 오류가 발생했습니다.\n" + (error.message || ""));
 			}
 		);
 	}
@@ -943,8 +953,8 @@ class StatementManager {
 				alert("개인회생절차 사유가 저장되었습니다.");
 				this.bankruptcyReasonData = response.data;
 			},
-			() => {
-				alert("개인회생절차 사유 저장 중 오류가 발생했습니다.");
+			(error) => {
+				alert("개인회생절차 사유 저장 중 오류가 발생했습니다.\n" + (error.message || ""));
 			}
 		);
 	}
@@ -960,7 +970,6 @@ class StatementManager {
 				statement_type: "debtRelief" 
 			},
 			(response) => {
-				let debtReliefData = response.data;
 				if (Array.isArray(response.data) && response.data.length > 0) {
 					this.populateDebtReliefForm(response.data);
 				}
@@ -972,111 +981,91 @@ class StatementManager {
 		if ($("#debt_relief_container").length === 0) return;
 		
 		// 파산, 면책절차
-		if (data[0]) {
-			$("#bankruptcy_court").val(data[0].institution || "");
-			$("#bankruptcy_date").val(data[0].application_date || "");
-			$("#bankruptcy_status").val(data[0].current_status || "");
+		const bankruptcyData = data.find(item => item.relief_type === "파산_면책");
+		if (bankruptcyData) {
+			$("#bankruptcy_court").val(bankruptcyData.institution || "");
+			$("#bankruptcy_date").val(bankruptcyData.application_date || "");
+			$("#bankruptcy_status").val(bankruptcyData.current_status || "");
 		}
 		
 		// 화의, 회생, 개인회생 절차
-		if (data[1]) {
-			$("#recovery_court").val(data[1].institution || "");
-			$("#recovery_date").val(data[1].application_date || "");
-			$("#recovery_status").val(data[1].current_status || "");
+		const recoveryData = data.find(item => item.relief_type === "화의_회생");
+		if (recoveryData) {
+			$("#recovery_court").val(recoveryData.institution || "");
+			$("#recovery_date").val(recoveryData.application_date || "");
+			$("#recovery_status").val(recoveryData.current_status || "");
 		}
 		
 		// 신용회복위원회 워크아웃
-		if (data[2]) {
-			$("#workout_institution").val(data[2].institution || "");
-			$("#workout_date").val(data[2].application_date || "");
-			$("#workout_status").val(data[2].current_status || "");
+		const workoutData = data.find(item => item.relief_type === "워크아웃");
+		if (workoutData) {
+			$("#workout_institution").val(workoutData.institution || "");
+			$("#workout_date").val(workoutData.application_date || "");
+			$("#workout_status").val(workoutData.current_status || "");
 		}
 		
 		// 배드뱅크
-		if (data[3]) {
-			$("#badbank_institution").val(data[3].institution || "");
-			$("#badbank_date").val(data[3].application_date || "");
-			$("#badbank_status").val(data[3].current_status || "");
+		const badbankData = data.find(item => item.relief_type === "배드뱅크");
+		if (badbankData) {
+			$("#badbank_institution").val(badbankData.institution || "");
+			$("#badbank_date").val(badbankData.application_date || "");
+			$("#badbank_status").val(badbankData.current_status || "");
 		}
 	}
 
 	saveDebtRelief() {
-		// 파산, 면책절차
-		const bankruptcyData = {
-			case_no: window.currentCaseNo,
-			statement_type: "debtRelief",
-			relief_type: "파산_면책",
-			institution: $("#bankruptcy_court").val().trim(),
-			application_date: $("#bankruptcy_date").val(),
-			current_status: $("#bankruptcy_status").val().trim()
-		};
+		// 각 항목별 ID 확인 및 수정 필요
+		this.saveDebtReliefType("파산_면책", 
+			$("#bankruptcy_court").val() || "", 
+			$("#bankruptcy_date").val() || "", 
+			$("#bankruptcy_status").val() || ""
+		);
 		
-		// 화의, 회생, 개인회생 절차
-		const recoveryData = {
-			case_no: window.currentCaseNo,
-			statement_type: "debtRelief",
-			relief_type: "화의_회생",
-			institution: $("#recovery_court").val().trim(),
-			application_date: $("#recovery_date").val(),
-			current_status: $("#recovery_status").val().trim()
-		};
+		this.saveDebtReliefType("화의_회생", 
+			$("#recovery_court").val() || "", 
+			$("#recovery_date").val() || "", 
+			$("#recovery_status").val() || ""
+		);
 		
-		// 신용회복위원회 워크아웃
-		const workoutData = {
-			case_no: window.currentCaseNo,
-			statement_type: "debtRelief",
-			relief_type: "워크아웃",
-			institution: $("#workout_institution").val().trim(),
-			application_date: $("#workout_date").val(),
-			current_status: $("#workout_status").val().trim()
-		};
+		this.saveDebtReliefType("워크아웃", 
+			$("#workout_institution").val() || "", 
+			$("#workout_date").val() || "", 
+			$("#workout_status").val() || ""
+		);
 		
-		// 배드뱅크
-		const badbankData = {
-			case_no: window.currentCaseNo,
-			statement_type: "debtRelief",
-			relief_type: "배드뱅크",
-			institution: $("#badbank_institution").val().trim(),
-			application_date: $("#badbank_date").val(),
-			current_status: $("#badbank_status").val().trim()
-		};
+		this.saveDebtReliefType("배드뱅크", 
+			$("#badbank_institution").val() || "", 
+			$("#badbank_date").val() || "", 
+			$("#badbank_status").val() || ""
+		);
 		
-		// 모든 데이터를 저장
-		const savePromises = [
-			this.saveDebtReliefItem(bankruptcyData),
-			this.saveDebtReliefItem(recoveryData),
-			this.saveDebtReliefItem(workoutData),
-			this.saveDebtReliefItem(badbankData)
-		];
-		
-		Promise.all(savePromises)
-			.then(() => {
-				alert("과거 면책절차 이용상황이 저장되었습니다.");
-				this.loadDebtRelief();
-			})
-			.catch(() => {
-				alert("과거 면책절차 이용상황 저장 중 오류가 발생했습니다.");
-			});
+		alert("과거 면책절차 이용상황 정보가 저장되었습니다.");
 	}
 	
-	saveDebtReliefItem(data) {
-		return new Promise((resolve, reject) => {
-			if (!data.institution && !data.application_date && !data.current_status) {
-				resolve(); // 데이터가 없으면 저장하지 않고 성공으로 처리
-				return;
+	saveDebtReliefType(type, institution, date, status) {
+		// 값이 모두 비어있으면 저장하지 않음
+		if (!institution && !date && !status) return;
+		
+		const data = {
+			case_no: window.currentCaseNo,
+			statement_type: "debtRelief",
+			relief_type: type,
+			institution: institution,
+			application_date: date,
+			current_status: status
+		};
+		
+		// API 요청은 비동기로 처리
+		this.apiRequest(
+			"POST",
+			data,
+			() => {
+				console.log(`${type} 정보가 저장되었습니다.`);
+			},
+			(error) => {
+				console.error(`${type} 정보 저장 중 오류 발생:`, error.message);
 			}
-			
-			this.apiRequest(
-				"POST",
-				data,
-				(response) => {
-					resolve(response);
-				},
-				(error) => {
-					reject(error);
-				}
-			);
-		});
+		);
 	}
 }
 
