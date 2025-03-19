@@ -39,8 +39,9 @@ try {
 // PDF 생성
 $pdf = new tFPDF();
 // 폰트 추가 - 대소문자 구분에 주의하세요
-$pdf->AddFont('NanumGothic', '', 'NanumGothic.ttf', true);
-$pdf->AddFont('NanumGothicBold', '', 'NanumGothicBold.ttf', true);
+define('FPDF_FONTPATH', dirname(__FILE__) . '/../tfpdf/font/');
+$pdf->AddFont('NanumGothic', '', 'unifont/NanumGothic.ttf', true);
+$pdf->AddFont('NanumGothicBold', '', 'unifont/NanumGothicBold.ttf', true);
 $pdf->SetTitle($basic_info['name'] . ' - 개인회생 신청서 자료');
 
 // 기본 정보 페이지 추가
