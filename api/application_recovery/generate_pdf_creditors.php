@@ -36,13 +36,13 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		$basic_info = $stmt->fetch(PDO::FETCH_ASSOC);
 		
 		if (!$basic_info) {
-			$pdf->SetFont('cid0kr', '', 12);
+			$pdf->SetFont('cid0kr', '', 8);
 			$pdf->Cell(0, 10, '사건 정보가 존재하지 않습니다.', 0, 1, 'C');
 			return;
 		}
 		
 		// 날짜 정보 출력
-		$pdf->SetFont('cid0kr', '', 10);
+		$pdf->SetFont('cid0kr', '', 8);
 		$date_format = 'Y년 m월 d일';
 		$calc_date = isset($settings['claim_calculation_date']) ? date($date_format, strtotime($settings['claim_calculation_date'])) : '______년__월__일';
 		$list_date = isset($settings['list_creation_date']) ? date($date_format, strtotime($settings['list_creation_date'])) : '______년__월__일';
