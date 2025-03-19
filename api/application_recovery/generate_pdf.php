@@ -38,15 +38,16 @@ try {
 
 // PDF 생성
 $pdf = new tFPDF();
+// 폰트 추가 - 대소문자 구분에 주의하세요
 $pdf->AddFont('NanumGothic', '', 'NanumGothic.ttf', true);
 $pdf->AddFont('NanumGothicBold', '', 'NanumGothicBold.ttf', true);
 $pdf->SetTitle($basic_info['name'] . ' - 개인회생 신청서 자료');
 
 // 기본 정보 페이지 추가
 $pdf->AddPage();
-$pdf->SetFont('NanumGothicBold', '', 16);
+$pdf->SetFont('NanumGothicBold', '', 16); // 대소문자 일치하도록 수정
 $pdf->Cell(0, 10, '개인회생 신청서 자료', 0, 1, 'C');
-$pdf->SetFont('NanumGothic', '', 12);
+$pdf->SetFont('NanumGothic', '', 12); // 대소문자 일치하도록 수정
 $pdf->Cell(0, 10, '신청인: ' . $basic_info['name'], 0, 1, 'C');
 $pdf->Cell(0, 10, '사건번호: ' . $basic_info['case_number'], 0, 1, 'C');
 $pdf->Cell(0, 10, '법원: ' . $basic_info['court_name'], 0, 1, 'C');
@@ -78,7 +79,7 @@ exit;
 // 채권자 목록 출력 함수
 function addCreditorList($pdf, $pdo, $case_no) {
 	$pdf->AddPage();
-	$pdf->SetFont('NanumGothicBold', '', 14);
+	$pdf->SetFont('NanumGothicBold', '', 14); // 대소문자 일치
 	$pdf->Cell(0, 10, '채권자 목록', 0, 1, 'C');
 	$pdf->Ln(5);
 	
@@ -92,13 +93,13 @@ function addCreditorList($pdf, $pdo, $case_no) {
 		$creditors = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
 		if (empty($creditors)) {
-			$pdf->SetFont('NanumGothic', '', 12);
+			$pdf->SetFont('NanumGothic', '', 12); // 대소문자 일치
 			$pdf->Cell(0, 10, '등록된 채권자가 없습니다.', 0, 1, 'C');
 			return;
 		}
 		
 		// 테이블 헤더
-		$pdf->SetFont('NanumGothicBold', '', 10);
+		$pdf->SetFont('NanumGothicBold', '', 10); // 대소문자 일치
 		$pdf->Cell(10, 7, '번호', 1, 0, 'C');
 		$pdf->Cell(50, 7, '금융기관명', 1, 0, 'C');
 		$pdf->Cell(30, 7, '원금', 1, 0, 'C');
@@ -106,7 +107,7 @@ function addCreditorList($pdf, $pdo, $case_no) {
 		$pdf->Cell(70, 7, '채권원인', 1, 1, 'C');
 		
 		// 테이블 데이터
-		$pdf->SetFont('NanumGothic', '', 10);
+		$pdf->SetFont('NanumGothic', '', 10); // 대소문자 일치
 		foreach ($creditors as $creditor) {
 			$pdf->Cell(10, 7, $creditor['creditor_count'], 1, 0, 'C');
 			$pdf->Cell(50, 7, $creditor['financial_institution'], 1, 0, 'L');
@@ -116,7 +117,7 @@ function addCreditorList($pdf, $pdo, $case_no) {
 		}
 		
 		// 합계 행
-		$pdf->SetFont('NanumGothicBold', '', 10);
+		$pdf->SetFont('NanumGothicBold', '', 10); // 대소문자 일치
 		$stmt = $pdo->prepare("
 			SELECT SUM(principal) as total_principal, 
 			       SUM(interest) as total_interest
@@ -133,7 +134,7 @@ function addCreditorList($pdf, $pdo, $case_no) {
 		$pdf->Cell(70, 7, '', 1, 1, 'C');
 		
 	} catch (Exception $e) {
-		$pdf->SetFont('NanumGothic', '', 12);
+		$pdf->SetFont('NanumGothic', '', 12); // 대소문자 일치
 		$pdf->Cell(0, 10, '데이터 조회 중 오류가 발생했습니다: ' . $e->getMessage(), 0, 1, 'C');
 	}
 }
@@ -141,12 +142,12 @@ function addCreditorList($pdf, $pdo, $case_no) {
 // 재산 목록 출력 함수
 function addAssetList($pdf, $pdo, $case_no) {
 	$pdf->AddPage();
-	$pdf->SetFont('NanumGothicBold', '', 14);
+	$pdf->SetFont('NanumGothicBold', '', 14); // 대소문자 일치
 	$pdf->Cell(0, 10, '재산 목록', 0, 1, 'C');
 	$pdf->Ln(5);
 	
 	// 현금 및 예금
-	$pdf->SetFont('NanumGothicBold', '', 12);
+	$pdf->SetFont('NanumGothicBold', '', 12); // 대소문자 일치
 	$pdf->Cell(0, 10, '1. 현금 및 예금', 0, 1, 'L');
 	
 	try {
@@ -167,18 +168,18 @@ function addAssetList($pdf, $pdo, $case_no) {
 		$deposit_assets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
 		if (empty($cash_assets) && empty($deposit_assets)) {
-			$pdf->SetFont('NanumGothic', '', 10);
+			$pdf->SetFont('NanumGothic', '', 10); // 대소문자 일치
 			$pdf->Cell(0, 7, '등록된 현금 및 예금 정보가 없습니다.', 0, 1, 'L');
 		} else {
 			// 현금 출력
 			if (!empty($cash_assets)) {
-				$pdf->SetFont('NanumGothicBold', '', 10);
+				$pdf->SetFont('NanumGothicBold', '', 10); // 대소문자 일치
 				$pdf->Cell(0, 7, '현금', 0, 1, 'L');
 				$pdf->Cell(100, 7, '내용', 1, 0, 'C');
 				$pdf->Cell(30, 7, '가액', 1, 0, 'C');
 				$pdf->Cell(20, 7, '압류여부', 1, 1, 'C');
 				
-				$pdf->SetFont('NanumGothic', '', 10);
+				$pdf->SetFont('NanumGothic', '', 10); // 대소문자 일치
 				foreach ($cash_assets as $asset) {
 					$pdf->Cell(100, 7, $asset['property_detail'], 1, 0, 'L');
 					$pdf->Cell(30, 7, number_format($asset['liquidation_value']), 1, 0, 'R');
@@ -189,14 +190,14 @@ function addAssetList($pdf, $pdo, $case_no) {
 			
 			// 예금 출력
 			if (!empty($deposit_assets)) {
-				$pdf->SetFont('NanumGothicBold', '', 10);
+				$pdf->SetFont('NanumGothicBold', '', 10); // 대소문자 일치
 				$pdf->Cell(0, 7, '예금', 0, 1, 'L');
 				$pdf->Cell(50, 7, '은행명', 1, 0, 'C');
 				$pdf->Cell(60, 7, '계좌번호', 1, 0, 'C');
 				$pdf->Cell(30, 7, '금액', 1, 0, 'C');
 				$pdf->Cell(20, 7, '압류여부', 1, 1, 'C');
 				
-				$pdf->SetFont('NanumGothic', '', 10);
+				$pdf->SetFont('NanumGothic', '', 10); // 대소문자 일치
 				foreach ($deposit_assets as $asset) {
 					$pdf->Cell(50, 7, $asset['bank_name'], 1, 0, 'L');
 					$pdf->Cell(60, 7, $asset['account_number'], 1, 0, 'L');
@@ -208,7 +209,7 @@ function addAssetList($pdf, $pdo, $case_no) {
 		
 		// 부동산
 		$pdf->Ln(5);
-		$pdf->SetFont('NanumGothicBold', '', 12);
+		$pdf->SetFont('NanumGothicBold', '', 12); // 대소문자 일치
 		$pdf->Cell(0, 10, '2. 부동산', 0, 1, 'L');
 		
 		$stmt = $pdo->prepare("
@@ -219,16 +220,16 @@ function addAssetList($pdf, $pdo, $case_no) {
 		$real_estate_assets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
 		if (empty($real_estate_assets)) {
-			$pdf->SetFont('NanumGothic', '', 10);
+			$pdf->SetFont('NanumGothic', '', 10); // 대소문자 일치
 			$pdf->Cell(0, 7, '등록된 부동산 정보가 없습니다.', 0, 1, 'L');
 		} else {
-			$pdf->SetFont('NanumGothicBold', '', 10);
+			$pdf->SetFont('NanumGothicBold', '', 10); // 대소문자 일치
 			$pdf->Cell(50, 7, '종류', 1, 0, 'C');
 			$pdf->Cell(80, 7, '소재지', 1, 0, 'C');
 			$pdf->Cell(30, 7, '평가액', 1, 0, 'C');
 			$pdf->Cell(30, 7, '청산가치', 1, 1, 'C');
 			
-			$pdf->SetFont('NanumGothic', '', 10);
+			$pdf->SetFont('NanumGothic', '', 10); // 대소문자 일치
 			foreach ($real_estate_assets as $asset) {
 				$pdf->Cell(50, 7, $asset['property_type'], 1, 0, 'L');
 				$pdf->Cell(80, 7, $asset['property_location'], 1, 0, 'L');
@@ -239,7 +240,7 @@ function addAssetList($pdf, $pdo, $case_no) {
 		
 		// 자동차
 		$pdf->Ln(5);
-		$pdf->SetFont('NanumGothicBold', '', 12);
+		$pdf->SetFont('NanumGothicBold', '', 12); // 대소문자 일치
 		$pdf->Cell(0, 10, '3. 자동차', 0, 1, 'L');
 		
 		$stmt = $pdo->prepare("
@@ -250,16 +251,16 @@ function addAssetList($pdf, $pdo, $case_no) {
 		$vehicle_assets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
 		if (empty($vehicle_assets)) {
-			$pdf->SetFont('NanumGothic', '', 10);
+			$pdf->SetFont('NanumGothic', '', 10); // 대소문자 일치
 			$pdf->Cell(0, 7, '등록된 자동차 정보가 없습니다.', 0, 1, 'L');
 		} else {
-			$pdf->SetFont('NanumGothicBold', '', 10);
+			$pdf->SetFont('NanumGothicBold', '', 10); // 대소문자 일치
 			$pdf->Cell(100, 7, '차량정보', 1, 0, 'C');
 			$pdf->Cell(30, 7, '시가', 1, 0, 'C');
 			$pdf->Cell(30, 7, '청산가치', 1, 0, 'C');
 			$pdf->Cell(20, 7, '압류여부', 1, 1, 'C');
 			
-			$pdf->SetFont('NanumGothic', '', 10);
+			$pdf->SetFont('NanumGothic', '', 10); // 대소문자 일치
 			foreach ($vehicle_assets as $asset) {
 				$pdf->Cell(100, 7, $asset['vehicle_info'], 1, 0, 'L');
 				$pdf->Cell(30, 7, number_format($asset['expected_value']), 1, 0, 'R');
@@ -269,7 +270,7 @@ function addAssetList($pdf, $pdo, $case_no) {
 		}
 		
 	} catch (Exception $e) {
-		$pdf->SetFont('NanumGothic', '', 12);
+		$pdf->SetFont('NanumGothic', '', 12); // 대소문자 일치
 		$pdf->Cell(0, 10, '데이터 조회 중 오류가 발생했습니다: ' . $e->getMessage(), 0, 1, 'C');
 	}
 }
@@ -277,13 +278,13 @@ function addAssetList($pdf, $pdo, $case_no) {
 // 수입/지출 목록 출력 함수
 function addIncomeExpenditureList($pdf, $pdo, $case_no) {
 	$pdf->AddPage();
-	$pdf->SetFont('NanumGothicBold', '', 14);
+	$pdf->SetFont('NanumGothicBold', '', 14); // 대소문자 일치
 	$pdf->Cell(0, 10, '수입/지출 목록', 0, 1, 'C');
 	$pdf->Ln(5);
 	
 	try {
 		// 급여 소득
-		$pdf->SetFont('NanumGothicBold', '', 12);
+		$pdf->SetFont('NanumGothicBold', '', 12); // 대소문자 일치
 		$pdf->Cell(0, 10, '1. 급여 소득', 0, 1, 'L');
 		
 		$stmt = $pdo->prepare("
@@ -294,17 +295,17 @@ function addIncomeExpenditureList($pdf, $pdo, $case_no) {
 		$salary_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
 		if (empty($salary_data)) {
-			$pdf->SetFont('NanumGothic', '', 10);
+			$pdf->SetFont('NanumGothic', '', 10); // 대소문자 일치
 			$pdf->Cell(0, 7, '등록된 급여 소득 정보가 없습니다.', 0, 1, 'L');
 		} else {
-			$pdf->SetFont('NanumGothicBold', '', 10);
+			$pdf->SetFont('NanumGothicBold', '', 10); // 대소문자 일치
 			$pdf->Cell(60, 7, '회사명', 1, 0, 'C');
 			$pdf->Cell(40, 7, '직위', 1, 0, 'C');
 			$pdf->Cell(40, 7, '근무기간', 1, 0, 'C');
 			$pdf->Cell(30, 7, '월소득', 1, 0, 'C');
 			$pdf->Cell(20, 7, '압류여부', 1, 1, 'C');
 			
-			$pdf->SetFont('NanumGothic', '', 10);
+			$pdf->SetFont('NanumGothic', '', 10); // 대소문자 일치
 			foreach ($salary_data as $salary) {
 				$pdf->Cell(60, 7, $salary['company_name'], 1, 0, 'L');
 				$pdf->Cell(40, 7, $salary['position'], 1, 0, 'L');
@@ -316,7 +317,7 @@ function addIncomeExpenditureList($pdf, $pdo, $case_no) {
 		
 		// 사업 소득
 		$pdf->Ln(5);
-		$pdf->SetFont('NanumGothicBold', '', 12);
+		$pdf->SetFont('NanumGothicBold', '', 12); // 대소문자 일치
 		$pdf->Cell(0, 10, '2. 사업 소득', 0, 1, 'L');
 		
 		$stmt = $pdo->prepare("
@@ -327,16 +328,16 @@ function addIncomeExpenditureList($pdf, $pdo, $case_no) {
 		$business_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
 		if (empty($business_data)) {
-			$pdf->SetFont('NanumGothic', '', 10);
+			$pdf->SetFont('NanumGothic', '', 10); // 대소문자 일치
 			$pdf->Cell(0, 7, '등록된 사업 소득 정보가 없습니다.', 0, 1, 'L');
 		} else {
-			$pdf->SetFont('NanumGothicBold', '', 10);
+			$pdf->SetFont('NanumGothicBold', '', 10); // 대소문자 일치
 			$pdf->Cell(60, 7, '상호명', 1, 0, 'C');
 			$pdf->Cell(60, 7, '업종', 1, 0, 'C');
 			$pdf->Cell(40, 7, '경력', 1, 0, 'C');
 			$pdf->Cell(30, 7, '월소득', 1, 1, 'C');
 			
-			$pdf->SetFont('NanumGothic', '', 10);
+			$pdf->SetFont('NanumGothic', '', 10); // 대소문자 일치
 			foreach ($business_data as $business) {
 				$pdf->Cell(60, 7, $business['business_name'], 1, 0, 'L');
 				$pdf->Cell(60, 7, $business['sector'], 1, 0, 'L');
@@ -347,7 +348,7 @@ function addIncomeExpenditureList($pdf, $pdo, $case_no) {
 		
 		// 생계비 지출
 		$pdf->Ln(5);
-		$pdf->SetFont('NanumGothicBold', '', 12);
+		$pdf->SetFont('NanumGothicBold', '', 12); // 대소문자 일치
 		$pdf->Cell(0, 10, '3. 생계비 지출', 0, 1, 'L');
 		
 		$stmt = $pdo->prepare("
@@ -358,15 +359,15 @@ function addIncomeExpenditureList($pdf, $pdo, $case_no) {
 		$expense_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
 		if (empty($expense_data)) {
-			$pdf->SetFont('NanumGothic', '', 10);
+			$pdf->SetFont('NanumGothic', '', 10); // 대소문자 일치
 			$pdf->Cell(0, 7, '등록된 생계비 지출 정보가 없습니다.', 0, 1, 'L');
 		} else {
-			$pdf->SetFont('NanumGothicBold', '', 10);
+			$pdf->SetFont('NanumGothicBold', '', 10); // 대소문자 일치
 			$pdf->Cell(40, 7, '비목', 1, 0, 'C');
 			$pdf->Cell(30, 7, '금액', 1, 0, 'C');
 			$pdf->Cell(120, 7, '추가사유', 1, 1, 'C');
 			
-			$pdf->SetFont('NanumGothic', '', 10);
+			$pdf->SetFont('NanumGothic', '', 10); // 대소문자 일치
 			foreach ($expense_data as $expense) {
 				$pdf->Cell(40, 7, $expense['type'], 1, 0, 'L');
 				$pdf->Cell(30, 7, number_format($expense['amount']), 1, 0, 'R');
@@ -375,7 +376,7 @@ function addIncomeExpenditureList($pdf, $pdo, $case_no) {
 		}
 		
 	} catch (Exception $e) {
-		$pdf->SetFont('NanumGothic', '', 12);
+		$pdf->SetFont('NanumGothic', '', 12); // 대소문자 일치
 		$pdf->Cell(0, 10, '데이터 조회 중 오류가 발생했습니다: ' . $e->getMessage(), 0, 1, 'C');
 	}
 }
@@ -383,13 +384,13 @@ function addIncomeExpenditureList($pdf, $pdo, $case_no) {
 // 진술서 목록 출력 함수
 function addStatementList($pdf, $pdo, $case_no) {
 	$pdf->AddPage();
-	$pdf->SetFont('NanumGothicBold', '', 14);
+	$pdf->SetFont('NanumGothicBold', '', 14); // 대소문자 일치
 	$pdf->Cell(0, 10, '진술서', 0, 1, 'C');
 	$pdf->Ln(5);
 	
 	try {
 		// 경력 사항
-		$pdf->SetFont('NanumGothicBold', '', 12);
+		$pdf->SetFont('NanumGothicBold', '', 12); // 대소문자 일치
 		$pdf->Cell(0, 10, '1. 경력 사항', 0, 1, 'L');
 		
 		$stmt = $pdo->prepare("
@@ -401,17 +402,17 @@ function addStatementList($pdf, $pdo, $case_no) {
 		$career_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
 		if (empty($career_data)) {
-			$pdf->SetFont('NanumGothic', '', 10);
+			$pdf->SetFont('NanumGothic', '', 10); // 대소문자 일치
 			$pdf->Cell(0, 7, '등록된 경력 사항이 없습니다.', 0, 1, 'L');
 		} else {
-			$pdf->SetFont('NanumGothicBold', '', 10);
+			$pdf->SetFont('NanumGothicBold', '', 10); // 대소문자 일치
 			$pdf->Cell(30, 7, '구분', 1, 0, 'C');
 			$pdf->Cell(50, 7, '회사/상호명', 1, 0, 'C');
 			$pdf->Cell(30, 7, '직위', 1, 0, 'C');
 			$pdf->Cell(40, 7, '시작일', 1, 0, 'C');
 			$pdf->Cell(40, 7, '종료일', 1, 1, 'C');
 			
-			$pdf->SetFont('NanumGothic', '', 10);
+			$pdf->SetFont('NanumGothic', '', 10); // 대소문자 일치
 			foreach ($career_data as $career) {
 				$pdf->Cell(30, 7, $career['company_type'], 1, 0, 'L');
 				$pdf->Cell(50, 7, $career['company_name'], 1, 0, 'L');
@@ -423,7 +424,7 @@ function addStatementList($pdf, $pdo, $case_no) {
 		
 		// 학력 사항
 		$pdf->Ln(5);
-		$pdf->SetFont('NanumGothicBold', '', 12);
+		$pdf->SetFont('NanumGothicBold', '', 12); // 대소문자 일치
 		$pdf->Cell(0, 10, '2. 학력 사항', 0, 1, 'L');
 		
 		$stmt = $pdo->prepare("
@@ -435,15 +436,15 @@ function addStatementList($pdf, $pdo, $case_no) {
 		$education_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
 		if (empty($education_data)) {
-			$pdf->SetFont('NanumGothic', '', 10);
+			$pdf->SetFont('NanumGothic', '', 10); // 대소문자 일치
 			$pdf->Cell(0, 7, '등록된 학력 사항이 없습니다.', 0, 1, 'L');
 		} else {
-			$pdf->SetFont('NanumGothicBold', '', 10);
+			$pdf->SetFont('NanumGothicBold', '', 10); // 대소문자 일치
 			$pdf->Cell(100, 7, '학교명', 1, 0, 'C');
 			$pdf->Cell(50, 7, '졸업일', 1, 0, 'C');
 			$pdf->Cell(40, 7, '졸업여부', 1, 1, 'C');
 			
-			$pdf->SetFont('NanumGothic', '', 10);
+			$pdf->SetFont('NanumGothic', '', 10); // 대소문자 일치
 			foreach ($education_data as $education) {
 				$pdf->Cell(100, 7, $education['school_name'], 1, 0, 'L');
 				$pdf->Cell(50, 7, $education['graduation_date'], 1, 0, 'C');
@@ -453,7 +454,7 @@ function addStatementList($pdf, $pdo, $case_no) {
 		
 		// 혼인 사항
 		$pdf->Ln(5);
-		$pdf->SetFont('NanumGothicBold', '', 12);
+		$pdf->SetFont('NanumGothicBold', '', 12); // 대소문자 일치
 		$pdf->Cell(0, 10, '3. 혼인 사항', 0, 1, 'L');
 		
 		$stmt = $pdo->prepare("
@@ -464,10 +465,10 @@ function addStatementList($pdf, $pdo, $case_no) {
 		$marriage_data = $stmt->fetch(PDO::FETCH_ASSOC);
 		
 		if (!$marriage_data) {
-			$pdf->SetFont('NanumGothic', '', 10);
+			$pdf->SetFont('NanumGothic', '', 10); // 대소문자 일치
 			$pdf->Cell(0, 7, '등록된 혼인 사항이 없습니다.', 0, 1, 'L');
 		} else {
-			$pdf->SetFont('NanumGothic', '', 10);
+			$pdf->SetFont('NanumGothic', '', 10); // 대소문자 일치
 			$pdf->Cell(40, 7, '혼인상태:', 0, 0, 'L');
 			$pdf->Cell(150, 7, $marriage_data['marriage_status'], 0, 1, 'L');
 			
@@ -481,9 +482,7 @@ function addStatementList($pdf, $pdo, $case_no) {
 		}
 		
 	} catch (Exception $e) {
-		$pdf->SetFont('NanumGothic', '', 12);
+		$pdf->SetFont('NanumGothic', '', 12); // 대소문자 일치
 		$pdf->Cell(0, 10, '데이터 조회 중 오류가 발생했습니다: ' . $e->getMessage(), 0, 1, 'C');
 	}
 }
-
-?>
