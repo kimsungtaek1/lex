@@ -37,20 +37,17 @@ try {
 }
 
 // PDF 생성
-$pdf = new tFPDF();
-// 폰트 경로 지정
-define('FPDF_FONTPATH', dirname(__FILE__) . '/../tfpdf/font/');
+$pdf = new ApplicationPDF();
 
 // 폰트 추가
-$pdf->AddFont('nanumgothic', '', 'unifont/NanumGothic.ttf', true);
-$pdf->AddFont('nanumgothic', 'B', 'unifont/NanumGothicBold.ttf', true);
 $pdf->SetTitle($basic_info['name'] . ' - 개인회생 신청서 자료');
 
 // 기본 정보 페이지 추가
 $pdf->AddPage();
+/*
 $pdf->SetFont('nanumgothic', 'B', 16);
 $pdf->Cell(0, 10, '개인회생 신청서 자료', 0, 1, 'C');
-/*
+
 $pdf->SetFont('nanumgothic', '', 12);
 $pdf->Cell(0, 10, '신청인: ' . $basic_info['name'], 0, 1, 'C');
 $pdf->Cell(0, 10, '사건번호: ' . $basic_info['case_number'], 0, 1, 'C');
