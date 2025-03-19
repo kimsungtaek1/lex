@@ -60,42 +60,58 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		$pdf->Cell(80, 8, '목록 작성일: '.$list_date, 0, 1, 'R');
 		$pdf->Ln(1);
 		
-		// A4 용지에 맞는 테이블 너비 계산 (총 너비 180mm)
-		$colWidth1 = 70; // 채권자정보 
-		$colWidth2 = 55; // 담보부 채권
-		$colWidth3 = 55; // 무담보 채권
-		
-		// 테이블 헤더
-		$pdf->SetFont('cid0kr', 'B', 10);
-		// 채권번호 수직 병합
-		$pdf->MultiCell(10, 56, "채\n권\n번\n호", 1, 'C', false, 0);
-		// 채권자 수직 병합
-		$pdf->MultiCell(20, 56, "채\n권\n자", 1, 'C', false, 0);
-		
-		// 체권의 원인 및 주소/연락처
-		$pdf->Cell(30, 14, '', 0, 0);
-		$pdf->MultiCell(50, 14, "채권의 원인", 1, 'C', false, 0);
-		$pdf->MultiCell(50, 14, "주소 및 연락 가능한 전화번호", 1, 'C', false, 1);
-		
-		// 체권의 원인 및 주소/연락처
-		$pdf->MultiCell(50, 14, "채권의 내용", 1, 'C', false, 0);
-		$pdf->MultiCell(50, 14, "부속서류 유무", 1, 'C', false, 1);
-		// 두 번째 행
-		$pdf->Cell(30, 14, '', 0, 0);
-		$pdf->MultiCell(50, 14, "채권현재액(원금)", 1, 'C', false, 0);
-		$pdf->MultiCell(50, 14, "채권현재액(원금) 산정근거", 1, 'C', false, 1);
-		// 세 번째 행
-		$pdf->Cell(30, 14, '', 0, 0);
-		$pdf->MultiCell(50, 14, "채권현재액(이자)", 1, 'C', false, 0);
-		$pdf->MultiCell(50, 14, "채권현재액(이자) 산정근거", 1, 'C', false, 1);
-		
-
-		
 		// 법률 관련 참고사항
 		$pdf->SetFont('cid0kr', '', 8);
 		$pdf->Cell(0, 5, '※ 개시 후 이자 등: 이자 및 지연손해금 개시결정일 이후의 이자, 지연손해료 등은 채무자 회생 및 파산에 관한', 0, 1, 'L');
 		$pdf->Cell(0, 5, '   법률 제581조제2항, 제449조제1항제1호제2조의 준용에 해당됩니다.', 0, 1, 'L');
 		$pdf->Ln(1);
+		
+		// 테이블 헤더
+		$pdf->SetFont('cid0kr', 'B', 8);
+		// A4 용지에 맞는 열 너비 계산 (여백 제외하고 약 190mm 사용 가능)
+		// 열 너비를 비율에 맞게 조정
+		$col1_width = 10;
+		$col2_width = 20;
+		$col3_width = 50;
+		$col4_width = 100;
+		$col5_width = 120;
+		$col6_width = 30;
+		$col7_width = 30;
+		$col8_width = 120;
+		
+		// 텍스트 세로 중앙 정렬을 위한 스타일 설정
+		$pdf->setCellPaddings(1, 2, 1, 2); // 셀 내부 여백 설정 (좌, 상, 우, 하) - 상하 여백 줄임
+		$pdf->SetCellHeightRatio(1.3); // 줄 간격 비율 설정 - 비율 줄임
+
+		// 전체 높이 28mm (기존 56mm의 절반)
+		// 각 행 높이 7mm (기존 14mm의 절반)
+
+		// 채권번호 수직 병합 - 세로 중앙 정렬
+		$pdf->MultiCell($col1_width, 32, "채\n권\n번\n호", 1, 'C', false, 0, '', '', true, 0, false, true, 32, 'M');
+		// 채권자 수직 병합 - 세로 중앙 정렬
+		$pdf->MultiCell($col2_width, 32, "채\n권\n자", 1, 'C', false, 0, '', '', true, 0, false, true, 32, 'M');
+		// 첫 번째 행 - 세로 중앙 정렬
+		$pdf->MultiCell($col3_width, 8, "채권의 원인", 1, 'C', false, 0, '', '', true, 0, false, true, 8, 'M');
+		$pdf->MultiCell($col4_width, 8, "주소 및 연락 가능한 전화번호", 1, 'C', false, 1, '', '', true, 0, false, true, 8, 'M');
+		// 두 번째 행 - 세로 중앙 정렬
+		$pdf->Cell($col1_width + $col2_width, 8, '', 0, 0); // 앞 두 열은 이미 병합됨
+		$pdf->MultiCell($col5_width, 8, "채권의 내용", 1, 'C', false, 0, '', '', true, 0, false, true, 8, 'M');
+		$pdf->MultiCell($col6_width, 8, "부속서류 유무", 1, 'C', false, 1, '', '', true, 0, false, true, 8, 'M');
+		// 세 번째 행 - 세로 중앙 정렬
+		$pdf->Cell($col1_width + $col2_width, 8, '', 0, 0); // 앞 두 열은 이미 병합됨
+		$pdf->MultiCell($col7_width, 8, "채권현재액(원금)", 1, 'C', false, 0, '', '', true, 0, false, true, 8, 'M');
+		$pdf->MultiCell($col8_width, 8, "채권현재액(원금) 산정근거", 1, 'C', false, 1, '', '', true, 0, false, true, 8, 'M');
+		// 네 번째 행 - 세로 중앙 정렬
+		$pdf->Cell($col1_width + $col2_width, 8, '', 0, 0); // 앞 두 열은 이미 병합됨
+		$pdf->MultiCell($col7_width, 8, "채권현재액(이자)", 1, 'C', false, 0, '', '', true, 0, false, true, 8, 'M');
+		$pdf->MultiCell($col8_width, 8, "채권현재액(이자) 산정근거", 1, 'C', false, 1, '', '', true, 0, false, true, 8, 'M');
+		// 셀 패딩 및 높이 비율 원래대로 복원
+		$pdf->setCellPaddings(1, 1, 1, 1);
+		$pdf->SetCellHeightRatio(1.25);
+		
+
+		
+		
 		
 		// 채권자 테이블 헤더
 		$pdf->SetFont('cid0kr', 'B', 10);
