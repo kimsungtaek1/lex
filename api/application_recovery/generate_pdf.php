@@ -50,6 +50,7 @@ $pdf->SetTitle($basic_info['name'] . ' - 개인회생 신청서 자료');
 $pdf->AddPage();
 $pdf->SetFont('nanumgothic', 'B', 16);
 $pdf->Cell(0, 10, '개인회생 신청서 자료', 0, 1, 'C');
+/*
 $pdf->SetFont('nanumgothic', '', 12);
 $pdf->Cell(0, 10, '신청인: ' . $basic_info['name'], 0, 1, 'C');
 $pdf->Cell(0, 10, '사건번호: ' . $basic_info['case_number'], 0, 1, 'C');
@@ -489,3 +490,5 @@ function addStatementList($pdf, $pdo, $case_no) {
 		$pdf->Cell(0, 10, '데이터 조회 중 오류가 발생했습니다: ' . $e->getMessage(), 0, 1, 'C');
 	}
 }
+*/
+?>
