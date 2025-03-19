@@ -20,13 +20,6 @@ class StatementManager {
 	
 	initialize() {
 		try {
-			// 사건 번호 확인
-			if (!window.currentCaseNo) {
-				console.error("사건 번호(window.currentCaseNo)가 정의되지 않았습니다.");
-				return;
-			}
-			
-			console.log("현재 사건 번호:", window.currentCaseNo);
 			this.initializeEventHandlers();
 			this.loadData();
 		} catch (error) {
