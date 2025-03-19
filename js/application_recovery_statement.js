@@ -1045,6 +1045,3 @@ class StatementManager {
 		);
 	}
 }
-
-// 인스턴스 생성
-const statementManager = new StatementManager();
