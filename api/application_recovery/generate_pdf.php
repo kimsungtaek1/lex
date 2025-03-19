@@ -37,14 +37,17 @@ try {
 }
 
 // PDF 생성
-$pdf = new ApplicationPDF();
+$pdf = new tFPDF();
+// 폰트 경로 지정
+define('FPDF_FONTPATH', dirname(__FILE__) . '/../tfpdf/font/');
 
 // 폰트 추가
+$pdf->AddFont('nanumgothic', '', 'NanumGothic.ttf', true);
+$pdf->AddFont('nanumgothic', 'B', 'NanumGothicBold.ttf', true);
 $pdf->SetTitle($basic_info['name'] . ' - 개인회생 신청서 자료');
 
 // 기본 정보 페이지 추가
 $pdf->AddPage();
-/*
 $pdf->SetFont('nanumgothic', 'B', 16);
 $pdf->Cell(0, 10, '개인회생 신청서 자료', 0, 1, 'C');
 
@@ -487,5 +490,5 @@ function addStatementList($pdf, $pdo, $case_no) {
 		$pdf->Cell(0, 10, '데이터 조회 중 오류가 발생했습니다: ' . $e->getMessage(), 0, 1, 'C');
 	}
 }
-*/
+
 ?>
