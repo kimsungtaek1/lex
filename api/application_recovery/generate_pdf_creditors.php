@@ -93,7 +93,7 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 
 	// 왼쪽 테이블 - 첫 번째 행 (채권현재액 총합계) - 줄바꿈 적용
 	$pdf->MultiCell($left_col_width1, $row_height, "채권현재액\n총합계", 1, 'C', false, 0);
-	$pdf->Cell($left_col_width2, $row_height * 2, number_format($total_amount).'원', 1, 0, 'C');
+	$pdf->Cell($left_col_width2, $row_height, number_format($total_amount).'원', 1, 0, 'C');
 
 	// 테이블 사이 간격
 	$pdf->Cell($table_gap, $row_height * 2, '', 0, 0, 'C');
@@ -122,7 +122,7 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 	$pdf->SetY($y + $right_table_height);
 
 	// 왼쪽 테이블 - 두 번째 행 (원금의 합계)
-	$pdf->SetY($y + $row_height * 2);
+	$pdf->SetY($y + $row_height * 1);
 	$pdf->SetX(15); // 왼쪽 여백으로 이동
 	$pdf->Cell($left_col_width1, $row_height, '원금의 합계', 1, 0, 'C');
 	$pdf->Cell($left_col_width2, $row_height, number_format($total_principal).'원', 1, 1, 'C');
