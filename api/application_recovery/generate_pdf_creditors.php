@@ -73,6 +73,7 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		$pdf->MultiCell(20, 56, "채\n권\n자", 1, 'C', false, 0);
 		
 		// 체권의 원인 및 주소/연락처
+		$pdf->Cell(30, 14, '', 0, 0);
 		$pdf->MultiCell(50, 14, "채권의 원인", 1, 'C', false, 0);
 		$pdf->MultiCell(50, 14, "주소 및 연락 가능한 전화번호", 1, 'C', false, 1);
 		// 체권의 원인 및 주소/연락처
