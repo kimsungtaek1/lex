@@ -1,7 +1,3 @@
-/**
- * 회생/파산 신청서 열람 및 인쇄 기능
- * 체크된 항목들을 PDF로 출력하는 기능 구현
- */
 $(document).ready(function() {
 	// 열람/인쇄 버튼 클릭 이벤트 처리
 	$('#view_print_btn').on('click', function() {
@@ -18,8 +14,7 @@ $(document).ready(function() {
 		}
 		
 		// 현재 URL에서 case_no 파라미터 추출
-		const urlParams = new URLSearchParams(window.location.search);
-		const caseNo = urlParams.get('case_no');
+		const caseNo = window.currentCaseNo;
 		
 		if (!caseNo) {
 			alert('사건 번호가 없습니다. 다시 시도해주세요.');
