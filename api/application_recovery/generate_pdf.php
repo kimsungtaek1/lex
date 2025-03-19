@@ -60,8 +60,8 @@ $pdf->SetFooterMargin(10);
 $pdf->SetAutoPageBreak(TRUE, 15);
 
 // 폰트 설정
-$fontname = TCPDF_FONTS::addTTFfont('../tcpdf/fonts/nanumgothic.ttf', 'TrueTypeUnicode', '', 96);
-$fontnameBold = TCPDF_FONTS::addTTFfont('../tcpdf/fonts/nanumgothicbold.ttf', 'TrueTypeUnicode', '', 96);
+$fontname = $pdf->addTTFfont('../tcpdf/fonts/NanumGothic.ttf', 'TrueTypeUnicode', '', 96);
+$fontnameBold = $pdf->addTTFfont('../tcpdf/fonts/NanumGothic.ttf', 'TrueTypeUnicode', '', 96);
 
 // 기본 정보 페이지 추가
 $pdf->AddPage();
