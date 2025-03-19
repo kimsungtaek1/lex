@@ -65,22 +65,25 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		$colWidth2 = 55; // 담보부 채권
 		$colWidth3 = 55; // 무담보 채권
 		
-		// 1행: 채권자정보, 채권 구분
+		// 테이블 헤더
 		$pdf->SetFont('cid0kr', 'B', 10);
-		$pdf->Cell($colWidth1, 8, '채권자정보', 1, 0, 'C');
-		$pdf->Cell($colWidth2, 8, '담보부 채권 채권자의 일체', 1, 0, 'C');
-		$pdf->Cell($colWidth3, 8, '무담보 채권 채권자의 일체', 1, 1, 'C');
+		// 채권번호 수직 병합
+		$pdf->MultiCell(10, 28, "채\n권\n번\n호", 1, 'C', false, 0);
+		// 채권자 수직 병합
+		$pdf->MultiCell(20, 28, "채\n권\n자", 1, 'C', false, 0);
+		// 체권의 원인 및 주소/연락처
+		$pdf->MultiCell(50, 14, "체권의 원인", 1, 'C', false, 0);
+		$pdf->MultiCell(50, 14, "수수 및 얻약 가능한 전화번호", 1, 'C', false, 1);
+		// 두 번째 행
+		$pdf->Cell(30, 14, '', 0, 0); // 채권번호와 채권자 열 스킵
+		$pdf->MultiCell(50, 14, "채권현재액(원금)", 1, 'C', false, 0);
+		$pdf->MultiCell(50, 14, "우수서류 유무", 1, 'C', false, 1);
+		// 세 번째 행
+		$pdf->Cell(30, 14, '', 0, 0); // 채권번호와 채권자 열 스킵
+		$pdf->MultiCell(50, 14, "채권현재액(이자)", 1, 'C', false, 0);
+		$pdf->MultiCell(50, 14, "선정근거", 1, 'C', false, 1);
 		
-		// 2행: 일반의 일체, 기타의 일체
-		$pdf->SetFont('cid0kr', '', 10);
-		$pdf->Cell($colWidth1, 8, '일반의 일체', 1, 0, 'C');
-		$pdf->Cell($colWidth2, 8, '', 1, 0, 'C');
-		$pdf->Cell($colWidth3, 8, '', 1, 1, 'C');
-		
-		// 3행: 기타의 일체
-		$pdf->Cell($colWidth1, 8, '기타의 일체', 1, 0, 'C');
-		$pdf->Cell($colWidth2, 8, '', 1, 0, 'C');
-		$pdf->Cell($colWidth3, 8, '', 1, 1, 'C');
+
 		
 		// 법률 관련 참고사항
 		$pdf->SetFont('cid0kr', '', 8);
