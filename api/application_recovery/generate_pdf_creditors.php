@@ -128,6 +128,47 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 
 		$pdf->Ln(5);
 		
+		// A4 용지에 맞는 열 너비 계산 (여백 제외하고 약 190mm 사용 가능)
+		$col1_width = 10;
+		$col2_width = 20;
+		$col3_width = 50;
+		$col4_width = 100;
+		$col5_width = 120;
+		$col6_width = 30;
+		$col7_width = 30;
+		$col8_width = 120;
+		
+		// 텍스트 세로 중앙 정렬을 위한 스타일 설정
+		$pdf->setCellPaddings(1, 2, 1, 2); // 셀 내부 여백 설정 (좌, 상, 우, 하) - 상하 여백 줄임
+		$pdf->SetCellHeightRatio(1.3); // 줄 간격 비율 설정 - 비율 줄임
+
+		// 전체 높이 32mm
+		// 각 행 높이 8mm
+		$pdf->SetFont('cid0kr', 'B', 8);
+		
+		// 채권번호 수직 병합 - 세로 중앙 정렬
+		$pdf->MultiCell($col1_width, 32, "채\n권\n번\n호", 1, 'C', false, 0, '', '', true, 0, false, true, 32, 'M');
+		// 채권자 수직 병합 - 세로 중앙 정렬
+		$pdf->MultiCell($col2_width, 32, "채\n권\n자", 1, 'C', false, 0, '', '', true, 0, false, true, 32, 'M');
+		// 첫 번째 행 - 세로 중앙 정렬
+		$pdf->MultiCell($col3_width, 8, "채권의 원인", 1, 'C', false, 0, '', '', true, 0, false, true, 8, 'M');
+		$pdf->MultiCell($col4_width, 8, "주소 및 연락 가능한 전화번호", 1, 'C', false, 1, '', '', true, 0, false, true, 8, 'M');
+		// 두 번째 행 - 세로 중앙 정렬
+		$pdf->Cell($col1_width + $col2_width, 8, '', 0, 0); // 앞 두 열은 이미 병합됨
+		$pdf->MultiCell($col5_width, 8, "채권의 내용", 1, 'C', false, 0, '', '', true, 0, false, true, 8, 'M');
+		$pdf->MultiCell($col6_width, 8, "부속서류 유무", 1, 'C', false, 1, '', '', true, 0, false, true, 8, 'M');
+		// 세 번째 행 - 세로 중앙 정렬
+		$pdf->Cell($col1_width + $col2_width, 8, '', 0, 0); // 앞 두 열은 이미 병합됨
+		$pdf->MultiCell($col7_width, 8, "채권현재액(원금)", 1, 'C', false, 0, '', '', true, 0, false, true, 8, 'M');
+		$pdf->MultiCell($col8_width, 8, "채권현재액(원금) 산정근거", 1, 'C', false, 1, '', '', true, 0, false, true, 8, 'M');
+		// 네 번째 행 - 세로 중앙 정렬
+		$pdf->Cell($col1_width + $col2_width, 8, '', 0, 0); // 앞 두 열은 이미 병합됨
+		$pdf->MultiCell($col7_width, 8, "채권현재액(이자)", 1, 'C', false, 0, '', '', true, 0, false, true, 8, 'M');
+		$pdf->MultiCell($col8_width, 8, "채권현재액(이자) 산정근거", 1, 'C', false, 1, '', '', true, 0, false, true, 8, 'M');
+		// 셀 패딩 및 높이 비율 원래대로 복원
+		$pdf->setCellPaddings(1, 1, 1, 1);
+		$pdf->SetCellHeightRatio(1.25);
+		
 		// 채권자 정보 가져오기
 		$stmt = $pdo->prepare("
 			SELECT * FROM application_recovery_creditor 
@@ -144,51 +185,37 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 			// 채권자 정보 출력
 			foreach ($creditors as $creditor) {
 				// 새 페이지 확인 - 현재 페이지에 공간이 충분하지 않으면 새 페이지 추가
-				if ($pdf->GetY() + $row_height * 10 > $pdf->getPageHeight() - 20) {
+				if ($pdf->GetY() + 48 > $pdf->getPageHeight() - 20) {
 					$pdf->AddPage();
+					$pdf->SetFont('cid0kr', 'B', 8);
 				}
 				
-				// 표 너비 설정
-				$w1 = 25; // 왼쪽 라벨 열
-				$w2 = 155; // 오른쪽 내용 열
-				$lineHeight = 6; // 행 높이
+				// 채권자 테이블 높이 설정
+				$tableHeight = 48;
 				
-				// 테이블 시작 - 채권자 정보
-				$pdf->SetFont('cid0kr', 'B', 9);
+				// 1. 채권번호 열
+				$pdf->MultiCell($col1_width, $tableHeight, $creditor['creditor_count'], 1, 'C', false, 0, '', '', true, 0, false, true, $tableHeight, 'M');
 				
-				// 첫 번째 행 - 채권번호와 채권자
-				$pdf->Cell($w1, $lineHeight, '채권번호:', 1, 0, 'R');
-				$pdf->Cell($w2/2 - $w1, $lineHeight, $creditor['creditor_count'], 1, 0, 'L');
-				$pdf->Cell($w1, $lineHeight, '채권자:', 1, 0, 'R');
-				// 채권자 이름 및 기관 정보를 2줄로 표시
-				$financial = $creditor['financial_institution'];
-				$entity_type = $creditor['entity_type'];
-				$pdf->Cell($w2/2, $lineHeight, $financial . ' (' . $entity_type . ')', 1, 1, 'L');
+				// 2. 채권자 열
+				$pdf->MultiCell($col2_width, $tableHeight, $creditor['financial_institution'], 1, 'C', false, 0, '', '', true, 0, false, true, $tableHeight, 'M');
 				
-				// 두 번째 행 - 채권의 원인
-				$pdf->Cell($w1, $lineHeight, '채권의 원인:', 1, 0, 'R');
-				$pdf->Cell($w2/2, $lineHeight, $creditor['claim_reason'], 1, 0, 'L');
+				// 현재 위치 저장
+				$x = $pdf->GetX();
+				$y = $pdf->GetY();
 				
-				// 주소 및 전화번호
-				$pdf->Cell($w1, $lineHeight, '주소 및 전화번호:', 1, 0, 'R');
-				// 주소와 전화번호
-				$address = $creditor['address'];
-				$phone = formatPhoneNumber($creditor['phone']);
-				$fax = $creditor['fax'];
-				$contactInfo = "(주소) " . $address . "\n(전화) " . $phone;
-				if (!empty($fax)) {
-					$contactInfo .= " (팩스) " . $fax;
-				}
-				$pdf->MultiCell($w2/2, $lineHeight, $contactInfo, 1, 'L', false, 1);
+				// 3. 채권의 원인 열
+				$pdf->MultiCell($col3_width, 16, $creditor['claim_reason'], 1, 'L', false, 0, '', '', true, 0, false, true, 8, 'M');
 				
-				// 세 번째 행 - 채권의 내용
-				$pdf->Cell($w1, $lineHeight, '채권의 내용:', 1, 0, 'R');
-				$pdf->Cell($w2/2, $lineHeight, $creditor['claim_content'], 1, 0, 'L');
+				// 4. 주소 및 연락처 열
+				$pdf->MultiCell($col4_width, 16, $creditor['address'], 1, 'L', false, 1, '', '', true, 0, false, true, 8, 'M');
 				
-				// 부속서류 유무
-				$pdf->Cell($w1, $lineHeight, '부속서류 유무:', 1, 0, 'R');
+				// 5. 채권의 내용 행
+				$pdf->Cell($col1_width + $col2_width, 16, '', 0, 0); // 빈 셀 (채권번호, 채권자 자리)
+				$pdf->MultiCell($col5_width, 16, $creditor['claim_content'], 1, 'L', false, 0, '', '', true, 0, false, true, 16, 'M');
 				
+				// 6. 부속서류 유무 행
 				// 부속서류 체크 - 실제 데이터 가져오기
+				$checkBox = '';
 				$stmt = $pdo->prepare("
 					SELECT COUNT(*) as count FROM application_recovery_creditor_appendix 
 					WHERE case_no = ? AND creditor_count = ?
@@ -197,24 +224,26 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 				$appendixCount = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
 				
 				// 체크박스 표시
-				$checkBox = ($appendixCount > 0) ? '☑' : '□';
-				$pdf->Cell($w2/2, $lineHeight, $checkBox . ' 부속서류 (1, 2, 3, 4)', 1, 1, 'L');
+				if ($appendixCount > 0) {
+					$checkBox = "☑  부속서류\n(1, 2, 3, 4)";
+				} else {
+					$checkBox = "□  부속서류\n(1, 2, 3, 4)";
+				}
+				$pdf->MultiCell($col6_width, 16, $checkBox, 1, 'C', false, 1, '', '', true, 0, false, true, 16, 'M');
 				
-				// 네 번째 행 - 채권현재액(원금)
-				$pdf->Cell($w1, $lineHeight, '채권현재액(원금):', 1, 0, 'R');
-				$pdf->Cell($w2/2, $lineHeight, number_format($creditor['principal']) . '원', 1, 0, 'L');
+				// 7. 채권현재액(원금) 행
+				$pdf->Cell($col1_width + $col2_width, 8, '', 0, 0); // 빈 셀 (채권번호, 채권자 자리)
+				$pdf->MultiCell($col7_width, 8, number_format($creditor['principal']).'원', 1, 'R', false, 0, '', '', true, 0, false, true, 8, 'M');
 				
-				// 채권현재액(원금) 산정근거
-				$pdf->Cell($w1, $lineHeight, '채권현재액(원금) 산정근거:', 1, 0, 'R');
-				$pdf->Cell($w2/2, $lineHeight, $creditor['principal_calculation'], 1, 1, 'L');
+				// 8. 채권현재액(원금) 산정근거 행
+				$pdf->MultiCell($col8_width, 8, $creditor['principal_calculation'], 1, 'L', false, 1, '', '', true, 0, false, true, 8, 'M');
 				
-				// 다섯 번째 행 - 채권현재액(이자)
-				$pdf->Cell($w1, $lineHeight, '채권현재액(이자):', 1, 0, 'R');
-				$pdf->Cell($w2/2, $lineHeight, number_format($creditor['interest']) . '원', 1, 0, 'L');
+				// 9. 채권현재액(이자) 행
+				$pdf->Cell($col1_width + $col2_width, 8, '', 0, 0); // 빈 셀 (채권번호, 채권자 자리)
+				$pdf->MultiCell($col7_width, 8, number_format($creditor['interest']).'원', 1, 'R', false, 0, '', '', true, 0, false, true, 8, 'M');
 				
-				// 채권현재액(이자) 산정근거
-				$pdf->Cell($w1, $lineHeight, '채권현재액(이자) 산정근거:', 1, 0, 'R');
-				$pdf->Cell($w2/2, $lineHeight, $creditor['interest_calculation'], 1, 1, 'L');
+				// 10. 채권현재액(이자) 산정근거 행
+				$pdf->MultiCell($col8_width, 8, $creditor['interest_calculation'], 1, 'L', false, 1, '', '', true, 0, false, true, 8, 'M');
 				
 				$pdf->Ln(5); // 채권자 사이에 간격 추가
 			}
