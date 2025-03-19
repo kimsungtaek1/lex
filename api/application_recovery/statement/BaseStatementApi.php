@@ -92,25 +92,26 @@ class BaseStatementApi {
         }
     }
 
-    // 조회
-    public function get($case_no, $id = null) {
-        try {
-            if ($id !== null) {
-                $sql = "SELECT * FROM {$this->tableName} WHERE case_no = :case_no AND {$this->idField} = :id";
-                $stmt = $this->pdo->prepare($sql);
-                $stmt->execute(['case_no' => $case_no, 'id' => $id]);
-                $data = $stmt->fetch(PDO::FETCH_ASSOC);
-                return ['success' => true, 'data' => $data];
-            } else {
-                $sql = "SELECT * FROM {$this->tableName} WHERE case_no = :case_no";
-                $stmt = $this->pdo->prepare($sql);
-                $stmt->execute(['case_no' => $case_no]);
-                $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                return ['success' => true, 'data' => $data];
-            }
-        } catch (Exception $e) {
-            return ['success' => false, 'message' => $e->getMessage()];
-        }
-    }
+	// 조회
+	public function get($case_no, $id = null) {
+		try {
+			if ($id !== null) {
+				$sql = "SELECT * FROM {$this->tableName} WHERE case_no = :case_no AND {$this->idField} = :id";
+				$stmt = $this->pdo->prepare($sql);
+				$stmt->execute(['case_no' => $case_no, 'id' => $id]);
+				$data = $stmt->fetch(PDO::FETCH_ASSOC);
+				return ['success' => true, 'data' => $data];
+			} else {
+				$sql = "SELECT * FROM {$this->tableName} WHERE case_no = :case_no";
+				$stmt = $this->pdo->prepare($sql);
+				$stmt->execute(['case_no' => $case_no]);
+				$data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+				
+				return ['success' => true, 'data' => $data];
+			}
+		} catch (Exception $e) {
+			return ['success' => false, 'message' => $e->getMessage()];
+		}
+	}
 }
 ?>
