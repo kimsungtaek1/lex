@@ -10,11 +10,12 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 	
 	// 새 페이지 추가
 	$pdf->AddPage();
-	$pdf->SetFont('cid0kr', 'B', 14);
 	
 	// 문서 제목
+	$pdf->SetFont('cid0kr', 'B', 14);
 	$pdf->Cell(0, 10, '개인회생채권자목록', 0, 1, 'C');
 	$pdf->Ln(3);
+	$pdf->SetFont('cid0kr', '', 8);
 	
 	try {
 		// 설정 정보 가져오기
@@ -42,7 +43,7 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		}
 		
 		// 날짜 정보 출력
-		$pdf->SetFont('cid0kr', '', 8);
+		
 		$date_format = 'Y년 m월 d일';
 		$calc_date = isset($settings['claim_calculation_date']) ? date($date_format, strtotime($settings['claim_calculation_date'])) : '______년__월__일';
 		$list_date = isset($settings['list_creation_date']) ? date($date_format, strtotime($settings['list_creation_date'])) : '______년__월__일';
@@ -54,13 +55,84 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		$pdf->Ln(1);
 		
 		// 법률 관련 참고사항
-		$pdf->SetFont('cid0kr', '', 8);
 		$pdf->Cell(0, 5, '※ 개시 후 이자 등: 이자 및 지연손해금 개시결정일 이후의 이자, 지연손해료 등은 채무자 회생 및 파산에 관한', 0, 1, 'L');
 		$pdf->Cell(0, 5, '   법률 제581조제2항, 제449조제1항제1호제2조의 준용에 해당됩니다.', 0, 1, 'L');
 		$pdf->Ln(1);
 		
-		// 테이블 헤더
-		$pdf->SetFont('cid0kr', 'B', 8);
+
+
+
+
+
+
+
+
+// 총채권액 계산
+$stmt = $pdo->prepare("
+    SELECT 
+        SUM(principal) as total_principal,
+        SUM(interest) as total_interest,
+        SUM(CASE WHEN priority_payment = 1 THEN principal + interest ELSE 0 END) as secured_total,
+        SUM(CASE WHEN priority_payment = 0 THEN principal + interest ELSE 0 END) as unsecured_total
+    FROM application_recovery_creditor 
+    WHERE case_no = ?
+");
+$stmt->execute([$case_no]);
+$totals = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$total_principal = $totals['total_principal'] ?? 0;
+$total_interest = $totals['total_interest'] ?? 0;
+$total_amount = $total_principal + $total_interest;
+$secured_total = $totals['secured_total'] ?? 0;
+$unsecured_total = $totals['unsecured_total'] ?? 0;
+
+// 테이블 너비 설정
+$left_table_width = 80; // 왼쪽 테이블 전체 너비
+$right_table_width = 80; // 오른쪽 테이블 전체 너비
+$right_col_width = $right_table_width / 2; // 오른쪽 테이블의 열 너비
+$table_gap = 5; // 테이블 사이 간격
+$row_height = 7; // 행 높이
+
+// 왼쪽 테이블 시작
+$pdf->SetFont('cid0kr', 'B', 8);
+
+// 왼쪽 테이블 - 첫 번째 행 (채권현재액 총합계)
+$pdf->Cell($left_table_width, $row_height, '채권현재액 총합계', 1, 0, 'C');
+
+// 테이블 사이 간격
+$pdf->Cell($table_gap, $row_height, '', 0, 0, 'C');
+
+// 오른쪽 테이블 - 첫 번째 행
+$pdf->Cell($right_col_width, $row_height, '담보부 회생', 'TLR', 0, 'C'); // 위, 왼쪽, 오른쪽 테두리만
+$pdf->Cell($right_col_width, $row_height, '무담보 회생', 'TLR', 1, 'C'); // 위, 왼쪽, 오른쪽 테두리만
+
+// 왼쪽 테이블 - 두 번째 행 (원금의 합계)
+$pdf->SetFont('cid0kr', '', 8);
+$pdf->Cell($left_table_width, $row_height, '원금의 합계: '.number_format($total_principal).'원', 1, 0, 'L');
+
+// 테이블 사이 간격
+$pdf->Cell($table_gap, $row_height, '', 0, 0, 'C');
+
+// 오른쪽 테이블 - 두 번째 행
+$pdf->SetFont('cid0kr', 'B', 8);
+$pdf->Cell($right_col_width, $row_height, '채권현재액 합계', 'LRB', 0, 'C'); // 아래, 왼쪽, 오른쪽 테두리만
+$pdf->Cell($right_col_width, $row_height, '채권현재액 합계', 'LRB', 1, 'C'); // 아래, 왼쪽, 오른쪽 테두리만
+
+// 왼쪽 테이블 - 세 번째 행 (이자의 합계)
+$pdf->SetFont('cid0kr', '', 8);
+$pdf->Cell($left_table_width, $row_height, '이자의 합계: '.number_format($total_interest).'원', 1, 0, 'L');
+
+// 테이블 사이 간격
+$pdf->Cell($table_gap, $row_height, '', 0, 0, 'C');
+
+// 오른쪽 테이블 - 세 번째 행 (값)
+$pdf->Cell($right_col_width, $row_height, number_format($secured_total).'원', 1, 0, 'C');
+$pdf->Cell($right_col_width, $row_height, number_format($unsecured_total).'원', 1, 1, 'C');
+
+$pdf->Ln(1);
+
+
+		
 		// A4 용지에 맞는 열 너비 계산 (여백 제외하고 약 190mm 사용 가능)
 		// 열 너비를 비율에 맞게 조정
 		$col1_width = 10;
