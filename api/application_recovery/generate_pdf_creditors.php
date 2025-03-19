@@ -201,7 +201,7 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 			
 			// 기타미확정채권
 			$stmt = $pdo->prepare("
-				SELECT * FROM sapplication_recovery_creditor_other_claims 
+				SELECT * FROM application_recovery_creditor_other_claims 
 				WHERE case_no = ? AND creditor_count = ?
 			");
 			$stmt->execute([$case_no, $creditor['creditor_count']]);
