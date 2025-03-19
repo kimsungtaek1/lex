@@ -35,11 +35,6 @@
 					<input type="checkbox" id="view_print_item_4" name="view_print[]" value="수입지출목록 열람">
 					<label for="view_print_item_4">수입지출목록 열람</label>
 				</div>
-				
-				<div class="view-print-item">
-					<input type="checkbox" id="view_print_item_4" name="view_print[]" value="진술서 열람">
-					<label for="view_print_item_4">진술서 열람</label>
-				</div>
 			</div>
 			<div class="view-print-button">
 				<button type="button" class="btn-save btn-long" id="view_print_btn">열람/인쇄</button>
