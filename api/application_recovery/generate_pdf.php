@@ -59,10 +59,6 @@ $pdf->SetHeaderMargin(5);
 $pdf->SetFooterMargin(10);
 $pdf->SetAutoPageBreak(TRUE, 15);
 
-// PDF 인코딩 방식 설정
-$pdf->setEncoding('UTF-8');
-
-// TCPDF의 기본 폰트 사용 (내장 폰트)
 // 한글 지원을 위해 유니코드 폰트 사용
 $pdf->SetFont('cid0kr', '', 12); // 한글 지원 폰트
 
