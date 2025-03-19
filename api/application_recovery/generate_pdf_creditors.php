@@ -37,12 +37,12 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		$basic_info = $stmt->fetch(PDO::FETCH_ASSOC);
 		
 		if (!$basic_info) {
+			$pdf->SetFont('cid0kr', '', 10);
 			$pdf->Cell(0, 10, '사건 정보가 존재하지 않습니다.', 0, 1, 'C');
 			return;
 		}
 		
 		// 날짜 정보 출력
-		
 		$date_format = 'Y년 m월 d일';
 		$calc_date = isset($settings['claim_calculation_date']) ? date($date_format, strtotime($settings['claim_calculation_date'])) : '______년__월__일';
 		$list_date = isset($settings['list_creation_date']) ? date($date_format, strtotime($settings['list_creation_date'])) : '______년__월__일';
@@ -51,6 +51,11 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		$pdf->SetLineWidth(0.1);
 		$pdf->Cell(90, 8, '채권현재액 산정기준일: '.$calc_date, 0, 0, 'L');
 		$pdf->Cell(80, 8, '목록 작성일: '.$list_date, 0, 1, 'R');
+		$pdf->Ln(1);
+		
+		// 법률 관련 참고사항
+		$pdf->Cell(0, 5, '※ 개시 후 이자 등: 이자 및 지연손해금 개시결정일 이후의 이자, 지연손해료 등은 채무자 회생 및 파산에 관한', 0, 1, 'L');
+		$pdf->Cell(0, 5, '     (법률 제581조제2항, 제449조제1항제1호제2조의 준용에 해당됩니다.', 0, 1, 'L');
 		$pdf->Ln(1);
 		
 		// 총채권액 계산
@@ -102,10 +107,10 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		$pdf->MultiCell($right_col_width, $right_table_height, "담보부 회생\n채권현재액 합계", 0, 'C', false, 0, '', '', true, 0, false, true, $right_table_height, 'M');
 		$pdf->SetXY($x + $right_col_width, $y);
 		$pdf->MultiCell($right_col_width * 1.5, $right_table_height, number_format($secured_total)."원", 0, 'C', false, 0, '', '', true, 0, false, true, $right_table_height, 'M');
-		$pdf->SetXY($x + $right_col_width, $y);
-		$pdf->MultiCell($right_col_width * 4, $right_table_height, "무담보 회생\n채권현재액 합계", 0, 'C', false, 0, '', '', true, 0, false, true, $right_table_height, 'M');
-		$pdf->SetXY($x + $right_col_width * 3.75, $y);
-		$pdf->MultiCell($right_col_width, $right_table_height, number_format($unsecured_total)."원", 0, 'C', false, 0, '', '', true, 0, false, true, $right_table_height, 'M');
+		$pdf->SetXY($x + $right_col_width * 2.5, $y);
+		$pdf->MultiCell($right_col_width, $right_table_height, "무담보 회생\n채권현재액 합계", 0, 'C', false, 0, '', '', true, 0, false, true, $right_table_height, 'M');
+		$pdf->SetXY($x + $right_col_width * 3.5, $y);
+		$pdf->MultiCell($right_col_width * 1.5, $right_table_height, number_format($unsecured_total)."원", 0, 'C', false, 0, '', '', true, 0, false, true, $right_table_height, 'M');
 
 		// Y 위치 조정
 		$pdf->SetY($y + $right_table_height);
@@ -121,12 +126,7 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		$pdf->Cell($left_col_width1, $row_height, '이자의 합계', 1, 0, 'C');
 		$pdf->Cell($left_col_width2, $row_height, number_format($total_interest).'원', 1, 1, 'C');
 
-		$pdf->Ln(1);
-		
-		// 법률 관련 참고사항
-		$pdf->Cell(0, 5, '※ 개시 후 이자 등: 이자 및 지연손해금 개시결정일 이후의 이자, 지연손해료 등은 채무자 회생 및 파산에 관한', 0, 1, 'L');
-		$pdf->Cell(0, 5, '     (법률 제581조제2항, 제449조제1항제1호제2조의 준용에 해당됩니다.', 0, 1, 'L');
-		$pdf->Ln(1);
+		$pdf->Ln(5);
 		
 		// A4 용지에 맞는 열 너비 계산 (여백 제외하고 약 190mm 사용 가능)
 		$col1_width = 10;
@@ -142,9 +142,10 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		$pdf->setCellPaddings(1, 2, 1, 2); // 셀 내부 여백 설정 (좌, 상, 우, 하) - 상하 여백 줄임
 		$pdf->SetCellHeightRatio(1.3); // 줄 간격 비율 설정 - 비율 줄임
 
-		// 전체 높이 28mm (기존 56mm의 절반)
-		// 각 행 높이 7mm (기존 14mm의 절반)
-
+		// 전체 높이 32mm
+		// 각 행 높이 8mm
+		$pdf->SetFont('cid0kr', 'B', 8);
+		
 		// 채권번호 수직 병합 - 세로 중앙 정렬
 		$pdf->MultiCell($col1_width, 32, "채\n권\n번\n호", 1, 'C', false, 0, '', '', true, 0, false, true, 32, 'M');
 		// 채권자 수직 병합 - 세로 중앙 정렬
@@ -168,22 +169,6 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		$pdf->setCellPaddings(1, 1, 1, 1);
 		$pdf->SetCellHeightRatio(1.25);
 		
-
-		
-		
-		
-		// 채권자 테이블 - 제목 행 (A4 용지에 맞게 조정된 열 너비)
-		$w1 = 14;  // 채권번호
-		$w2 = 24;  // 채권자
-		$w3 = 72;  // 채권의 원인
-		$w4 = 70;  // 주소 및 연락처
-		
-		// 채권자 목록 테이블 헤더
-		$pdf->Cell($w1, 12, '채권번호', 1, 0, 'C');
-		$pdf->Cell($w2, 12, '채권자', 1, 0, 'C');
-		$pdf->Cell($w3, 12, '채권의 원인', 1, 0, 'C');
-		$pdf->Cell($w4, 12, '주소 및 연락 가능한 전화번호', 1, 1, 'C');
-		
 		// 채권자 정보 가져오기
 		$stmt = $pdo->prepare("
 			SELECT * FROM application_recovery_creditor 
@@ -194,78 +179,79 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		$creditors = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
 		if (empty($creditors)) {
-			$pdf->Cell($w1 + $w2 + $w3 + $w4, 10, '등록된 채권자 정보가 없습니다.', 1, 1, 'C');
+			$pdf->SetFont('cid0kr', '', 10);
+			$pdf->Cell(180, 10, '등록된 채권자 정보가 없습니다.', 1, 1, 'C');
 		} else {
-			
+			// 채권자 정보 출력
 			foreach ($creditors as $creditor) {
-				// 높이 설정 - 셀 높이를 줄여 A4에 맞게 조정
-				$rowHeight = 6;
-				$contentRows = 6; // 내용 행 수
-				$totalHeight = $rowHeight * $contentRows;
-				
 				// 새 페이지 확인 - 현재 페이지에 공간이 충분하지 않으면 새 페이지 추가
-				if ($pdf->GetY() + $totalHeight > $pdf->getPageHeight() - 20) {
+				if ($pdf->GetY() + 32 > $pdf->getPageHeight() - 20) {
 					$pdf->AddPage();
-					$pdf->Cell($w1, 12, '채권번호', 1, 0, 'C');
-					$pdf->Cell($w2, 12, '채권자', 1, 0, 'C');
-					$pdf->Cell($w3, 12, '채권의 원인', 1, 0, 'C');
-					$pdf->Cell($w4, 12, '주소 및 연락 가능한 전화번호', 1, 1, 'C');
+					$pdf->SetFont('cid0kr', 'B', 8);
 				}
 				
-				// 채권자정보 (왼쪽 2칸)
-				$pdf->Cell($w1, $totalHeight, $creditor['creditor_count'], 1, 0, 'C');
-				$pdf->Cell($w2, $totalHeight, $creditor['financial_institution'], 1, 0, 'C');
+				// 채권자 테이블 높이 설정
+				$tableHeight = 32;
 				
-				// 채권의 원인 열 - 여러 행으로 구성
+				// 1. 채권번호 열
+				$pdf->MultiCell($col1_width, $tableHeight, $creditor['creditor_count'], 1, 'C', false, 0, '', '', true, 0, false, true, $tableHeight, 'M');
+				
+				// 2. 채권자 열
+				$pdf->MultiCell($col2_width, $tableHeight, $creditor['financial_institution'], 1, 'C', false, 0, '', '', true, 0, false, true, $tableHeight, 'M');
+				
+				// 현재 위치 저장
 				$x = $pdf->GetX();
 				$y = $pdf->GetY();
 				
-				// 원인 칸 그리기
-				$pdf->Cell($w3, $totalHeight, '', 1, 0);
+				// 3. 채권의 원인 열
+				$pdf->MultiCell($col3_width, 8, $creditor['claim_reason'], 1, 'L', false, 0, '', '', true, 0, false, true, 8, 'M');
 				
-				// 원인 내용 넣기
-				$pdf->SetXY($x, $y);
+				// 4. 주소 및 연락처 열
+				$pdf->MultiCell($col4_width, 8, $creditor['address'], 1, 'L', false, 1, '', '', true, 0, false, true, 8, 'M');
 				
-				// 채권현재액(원금) 행
-				$pdf->Cell($w3, $rowHeight, '채권현재액(원금): '.number_format($creditor['principal']).'원', 0, 2, 'L');
-				$pdf->SetX($x);
-				$pdf->Cell($w3, $rowHeight, '채권현재액(원금) 산정근거', 0, 2, 'L');
+				// 5. 채권의 내용 행
+				$pdf->Cell($col1_width + $col2_width, 8, '', 0, 0); // 빈 셀 (채권번호, 채권자 자리)
+				$pdf->MultiCell($col5_width, 8, $creditor['claim_content'], 1, 'L', false, 0, '', '', true, 0, false, true, 8, 'M');
 				
-				// 채권현재액(이자) 행
-				$pdf->SetX($x);
-				$pdf->Cell($w3, $rowHeight, '채권현재액(이자): '.number_format($creditor['interest']).'원', 0, 2, 'L');
-				$pdf->SetX($x);
-				$pdf->Cell($w3, $rowHeight, '채권현재액(이자) 산정근거', 0, 2, 'L');
+				// 6. 부속서류 유무 행
+				// 부속서류 체크 - 실제 데이터 가져오기
+				$checkBox = '';
+				$stmt = $pdo->prepare("
+					SELECT COUNT(*) as count FROM application_recovery_creditor_appendix 
+					WHERE case_no = ? AND creditor_count = ?
+				");
+				$stmt->execute([$case_no, $creditor['creditor_count']]);
+				$appendixCount = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
 				
-				// 수수료 및 담보 정보
-				$pdf->SetX($x);
-				$pdf->Cell($w3/2, $rowHeight, '(수수)', 0, 0, 'C');
-				$pdf->Cell($w3/2, $rowHeight, '(팩스)', 0, 2, 'C');
-				$pdf->SetX($x);
-				$pdf->Cell($w3/2, $rowHeight, '(전화)', 0, 0, 'C');
-				$pdf->Cell($w3/2, $rowHeight, '', 'B', 2, 'C'); // 밑줄 추가
+				// 체크박스 표시
+				if ($appendixCount > 0) {
+					$checkBox = '☑';
+				} else {
+					$checkBox = '□';
+				}
 				
-				// 주소 및 연락처 칸
-				$x = $pdf->GetX();
-				$y = $pdf->GetY() - $rowHeight * 5; // 원래 Y 위치로 돌아가기
-				$pdf->SetXY($x, $y);
+				$pdf->MultiCell($col6_width, 8, $checkBox, 1, 'C', false, 1, '', '', true, 0, false, true, 8, 'M');
 				
-				// 주소 칸 그리기
-				$pdf->Cell($w4, $totalHeight, '', 1, 0);
+				// 7. 채권현재액(원금) 행
+				$pdf->Cell($col1_width + $col2_width, 8, '', 0, 0); // 빈 셀 (채권번호, 채권자 자리)
+				$pdf->MultiCell($col7_width, 8, number_format($creditor['principal']).'원', 1, 'R', false, 0, '', '', true, 0, false, true, 8, 'M');
 				
-				// 주소 및 연락처 내용 넣기
-				$pdf->SetXY($x, $y);
-				$pdf->MultiCell($w4, $rowHeight * 4, $creditor['address']."\n전화: ".formatPhoneNumber($creditor['phone']), 0, 'L');
+				// 8. 채권현재액(원금) 산정근거 행
+				$pdf->MultiCell($col8_width, 8, $creditor['principal_calculation'], 1, 'L', false, 1, '', '', true, 0, false, true, 8, 'M');
 				
-				// 부속서류 유무 체크박스
-				$pdf->SetXY($x, $y + $rowHeight * 4);
-				$pdf->Cell($w4, $rowHeight * 2, '□ 부속서류 (1, 2, 3, 4)', 0, 0, 'R');
+				// 9. 채권현재액(이자) 행
+				$pdf->Cell($col1_width + $col2_width, 8, '', 0, 0); // 빈 셀 (채권번호, 채권자 자리)
+				$pdf->MultiCell($col7_width, 8, number_format($creditor['interest']).'원', 1, 'R', false, 0, '', '', true, 0, false, true, 8, 'M');
 				
-				$pdf->Ln($totalHeight);
+				// 10. 채권현재액(이자) 산정근거 행
+				$pdf->MultiCell($col8_width, 8, $creditor['interest_calculation'], 1, 'L', false, 1, '', '', true, 0, false, true, 8, 'M');
+				
+				$pdf->Ln(5); // 채권자 사이에 간격 추가
 			}
 		}
 		
 	} catch (Exception $e) {
+		$pdf->SetFont('cid0kr', '', 12);
 		$pdf->Cell(0, 10, '채권자 정보 조회 중 오류가 발생했습니다: ' . $e->getMessage(), 0, 1, 'C');
 		error_log('PDF 채권자 목록 생성 오류: ' . $e->getMessage());
 	}
