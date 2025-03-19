@@ -81,13 +81,25 @@ foreach ($print_items as $item) {
 
 // 출력
 $filename = $basic_info['name'] . '_개인회생신청서_' . date('Ymd') . '.pdf';
-$filename_encoded = iconv('UTF-8', 'CP949//TRANSLIT', $filename); // Windows 환경을 위한 인코딩 변환
 
 // Content-Type 및 Content-Disposition 헤더 설정
 header('Content-Type: application/pdf');
-header('Content-Disposition: inline; filename="' . $filename_encoded . '"');
-header('Content-Disposition: inline; filename*=UTF-8\'\'' . rawurlencode($filename));
 
+// 브라우저별 인코딩 처리를 위한 더 안정적인 방법
+$user_agent = $_SERVER['HTTP_USER_AGENT'];
+
+// IE 브라우저 체크
+if (preg_match('/MSIE|Trident|Edge/i', $user_agent)) {
+	// IE는 URL 인코딩된 UTF-8 파일명을 지원하지 않으므로 CP949로 변환
+	$filename_encoded = iconv('UTF-8', 'CP949//IGNORE', $filename);
+	header('Content-Disposition: attachment; filename="' . $filename_encoded . '"');
+} else {
+	// 모던 브라우저는 UTF-8 지원
+	header('Content-Disposition: attachment; filename="' . $filename . '"');
+	header('Content-Disposition: attachment; filename*=UTF-8\'\'' . rawurlencode($filename));
+}
+
+// 인라인 표시로 변경하려면 'attachment'를 'inline'으로 수정
 $pdf->Output('I', '');
 exit;
 
