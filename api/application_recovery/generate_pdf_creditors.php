@@ -37,7 +37,6 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		$basic_info = $stmt->fetch(PDO::FETCH_ASSOC);
 		
 		if (!$basic_info) {
-			$pdf->SetFont('cid0kr', '', 8);
 			$pdf->Cell(0, 10, '사건 정보가 존재하지 않습니다.', 0, 1, 'C');
 			return;
 		}
@@ -80,9 +79,6 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		$table_gap = 2; // 테이블 사이 간격
 		$row_height = 7; // 행 높이
 		$right_table_height = $row_height * 3; // 오른쪽 테이블 총 높이
-
-		// 왼쪽 테이블 시작
-		$pdf->SetFont('cid0kr', 'B', 8);
 
 		// 왼쪽 테이블 - 첫 번째 행 (채권현재액 총합계) - 줄바꿈 적용
 		$pdf->MultiCell($left_col_width1, $row_height, "채권현재액\n총합계", 1, 'C', false, 0);
@@ -176,9 +172,6 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		
 		
 		
-		// 채권자 테이블 헤더
-		$pdf->SetFont('cid0kr', 'B', 10);
-		
 		// 채권자 테이블 - 제목 행 (A4 용지에 맞게 조정된 열 너비)
 		$w1 = 14;  // 채권번호
 		$w2 = 24;  // 채권자
@@ -201,11 +194,8 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		$creditors = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
 		if (empty($creditors)) {
-			$pdf->SetFont('cid0kr', '', 10);
 			$pdf->Cell($w1 + $w2 + $w3 + $w4, 10, '등록된 채권자 정보가 없습니다.', 1, 1, 'C');
 		} else {
-			// 각 채권자 정보 출력
-			$pdf->SetFont('cid0kr', '', 9);
 			
 			foreach ($creditors as $creditor) {
 				// 높이 설정 - 셀 높이를 줄여 A4에 맞게 조정
@@ -216,12 +206,10 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 				// 새 페이지 확인 - 현재 페이지에 공간이 충분하지 않으면 새 페이지 추가
 				if ($pdf->GetY() + $totalHeight > $pdf->getPageHeight() - 20) {
 					$pdf->AddPage();
-					$pdf->SetFont('cid0kr', 'B', 10);
 					$pdf->Cell($w1, 12, '채권번호', 1, 0, 'C');
 					$pdf->Cell($w2, 12, '채권자', 1, 0, 'C');
 					$pdf->Cell($w3, 12, '채권의 원인', 1, 0, 'C');
 					$pdf->Cell($w4, 12, '주소 및 연락 가능한 전화번호', 1, 1, 'C');
-					$pdf->SetFont('cid0kr', '', 9);
 				}
 				
 				// 채권자정보 (왼쪽 2칸)
@@ -278,7 +266,6 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		}
 		
 	} catch (Exception $e) {
-		$pdf->SetFont('cid0kr', '', 12);
 		$pdf->Cell(0, 10, '채권자 정보 조회 중 오류가 발생했습니다: ' . $e->getMessage(), 0, 1, 'C');
 		error_log('PDF 채권자 목록 생성 오류: ' . $e->getMessage());
 	}
