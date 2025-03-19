@@ -67,33 +67,49 @@ class StatementManager {
     }
   }
   
-	loadEducation() {
-	  $.ajax({
+loadEducation() {
+	$.ajax({
 		url: "/adm/api/application_recovery/statement/statement_api.php",
 		type: "GET",
 		data: { 
-		  case_no: window.currentCaseNo,
-		  statement_type: "education" 
+			case_no: window.currentCaseNo,
+			statement_type: "education" 
 		},
 		dataType: "json",
 		success: (response) => {
-		  let educationData = response.data;
-		  if (response.success && Array.isArray(response.data)) {
-			educationData = response.data[0];
-		  }
-		  
-		  if (response.success && educationData) {
-			this.educationData = educationData;
+			console.log("교육 데이터 응답:", response); // 디버깅용 로그
 			
-			setTimeout(() => {
-			  this.populateEducationForm(educationData);
-			}, 100);
-		  }
+			if (response.success) {
+				// 데이터가 배열이고 요소가 있는 경우
+				if (Array.isArray(response.data) && response.data.length > 0) {
+					this.educationData = response.data[0];
+					setTimeout(() => {
+						this.populateEducationForm(this.educationData);
+					}, 100);
+				} 
+				// 데이터가 객체인 경우 (단일 객체로 반환된 경우)
+				else if (response.data && typeof response.data === 'object' && !Array.isArray(response.data)) {
+					this.educationData = response.data;
+					setTimeout(() => {
+						this.populateEducationForm(this.educationData);
+					}, 100);
+				}
+				// 데이터가 없는 경우 - 새 폼으로 처리
+				else {
+					console.log("교육 데이터가 없습니다. 새 폼을 준비합니다.");
+					this.educationData = null;
+				}
+			} else {
+				console.error("교육 데이터 로드 실패:", response.message);
+			}
 		},
 		error: (xhr, status, error) => {
+			console.error("교육 데이터 AJAX 오류:", error);
 		}
-	  });
-	}
+	});
+}
+
+
   
   loadCareers() {
     $.ajax({
@@ -118,26 +134,26 @@ class StatementManager {
     });
   }
   
-  populateEducationForm(data) {
-	  if ($("#school_name").length === 0) {
+populateEducationForm(data) {
+	if (!data || $("#school_name").length === 0) {
 		return;
-	  }
-	  
-	  if (data.school_name !== undefined) {
+	}
+	
+	if (data.school_name !== undefined) {
 		$("#school_name").val(data.school_name);
-	  }
-	  
-	  if (data.graduation_date !== undefined) {
+	}
+	
+	if (data.graduation_date !== undefined) {
 		$("#graduation_date").val(data.graduation_date);
-	  }
-	  
-	  if (data.graduation_status) {
+	}
+	
+	if (data.graduation_status) {
 		const $radio = $(`input[name="graduation_status"][value="${data.graduation_status}"]`);
 		if ($radio.length > 0) {
-		  $radio.prop("checked", true);
+			$radio.prop("checked", true);
 		}
-	  }
 	}
+}
   
 	populateCareerBlocks(careers) {
 	  if ($("#career_container").length === 0) {
@@ -162,37 +178,43 @@ class StatementManager {
 	  });
 	}
   
-	saveEducation() {
-	  const data = {
+saveEducation() {
+	const data = {
 		case_no: window.currentCaseNo,
 		statement_type: "education",
 		school_name: $("#school_name").val().trim(),
 		graduation_date: $("#graduation_date").val(),
 		graduation_status: $("input[name='graduation_status']:checked").val() || ""
-	  };
-	  
-	  if (this.educationData && this.educationData.education_id) {
+	};
+	
+	if (this.educationData && this.educationData.education_id) {
 		data.education_id = this.educationData.education_id;
-	  }
-	  
-	  $.ajax({
+	}
+	
+	console.log("교육 데이터 저장 요청:", data); // 디버깅용 로그
+	
+	$.ajax({
 		url: "/adm/api/application_recovery/statement/statement_api.php",
 		type: "POST",
 		data: data,
 		dataType: "json",
 		success: (response) => {
-		  if (response.success) {
-			alert("최종학력 정보가 저장되었습니다.");
-			this.educationData = response.data;
-		  } else {
-			alert(response.message || "최종학력 저장 실패");
-		  }
+			console.log("교육 데이터 저장 응답:", response); // 디버깅용 로그
+			
+			if (response.success) {
+				alert("최종학력 정보가 저장되었습니다.");
+				this.educationData = response.data;
+				this.loadEducation();
+			} else {
+				alert(response.message || "최종학력 저장 실패");
+			}
 		},
 		error: (xhr) => {
-		  alert("최종학력 저장 중 오류가 발생했습니다.");
+			console.error("교육 데이터 저장 AJAX 오류:", xhr.responseText);
+			alert("최종학력 저장 중 오류가 발생했습니다.");
 		}
-	  });
-	}
+	});
+}
 
 	saveCareerBlock(block) {
 	  const careerId = block.find(".career_id").val();
