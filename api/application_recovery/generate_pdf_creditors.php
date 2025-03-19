@@ -54,89 +54,85 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		$pdf->Cell(80, 8, '목록 작성일: '.$list_date, 0, 1, 'R');
 		$pdf->Ln(1);
 		
+		// 총채권액 계산
+		$stmt = $pdo->prepare("
+			SELECT 
+				SUM(principal) as total_principal,
+				SUM(interest) as total_interest,
+				SUM(CASE WHEN priority_payment = 1 THEN principal + interest ELSE 0 END) as secured_total,
+				SUM(CASE WHEN priority_payment = 0 THEN principal + interest ELSE 0 END) as unsecured_total
+			FROM application_recovery_creditor 
+			WHERE case_no = ?
+		");
+		$stmt->execute([$case_no]);
+		$totals = $stmt->fetch(PDO::FETCH_ASSOC);
+
+		$total_principal = $totals['total_principal'] ?? 0;
+		$total_interest = $totals['total_interest'] ?? 0;
+		$total_amount = $total_principal + $total_interest;
+		$secured_total = $totals['secured_total'] ?? 0;
+		$unsecured_total = $totals['unsecured_total'] ?? 0;
+
+		// 테이블 너비 설정
+		$left_col_width1 = 18; // 왼쪽 테이블의 첫 번째 열 너비
+		$left_col_width2 = 30; // 왼쪽 테이블의 두 번째 열 너비
+		$right_col_width = 26; // 오른쪽 테이블의 각 열 너비
+		$table_gap = 2; // 테이블 사이 간격
+		$row_height = 7; // 행 높이
+		$right_table_height = $row_height * 3; // 오른쪽 테이블 총 높이
+
+		// 왼쪽 테이블 시작
+		$pdf->SetFont('cid0kr', 'B', 8);
+
+		// 왼쪽 테이블 - 첫 번째 행 (채권현재액 총합계) - 줄바꿈 적용
+		$pdf->MultiCell($left_col_width1, $row_height, "채권현재액\n총합계", 1, 'C', false, 0);
+		$pdf->Cell($left_col_width2, $row_height, number_format($total_amount).'원', 1, 0, 'C');
+
+		// 테이블 사이 간격
+		$pdf->Cell($table_gap, $row_height * 2, '', 0, 0, 'C');
+
+		// 오른쪽 테이블 시작 위치 저장
+		$x = $pdf->GetX();
+		$y = $pdf->GetY();
+
+		// 오른쪽 테이블 테두리와 셀 생성
+		$pdf->Cell($right_col_width, $right_table_height, '', 1, 0, 'C');
+		$pdf->Cell($right_col_width * 1.5, $right_table_height, '', 1, 0, 'C');
+		$pdf->Cell($right_col_width, $right_table_height, '', 1, 0, 'C');
+		$pdf->Cell($right_col_width * 1.5, $right_table_height, '', 1, 0, 'C');
+
+		// 오른쪽 테이블 내용 채우기 (세로 중앙 정렬)
+		$pdf->SetXY($x, $y);
+		$pdf->MultiCell($right_col_width, $right_table_height, "담보부 회생\n채권현재액 합계", 0, 'C', false, 0, '', '', true, 0, false, true, $right_table_height, 'M');
+		$pdf->SetXY($x + $right_col_width, $y);
+		$pdf->MultiCell($right_col_width * 1.5, $right_table_height, number_format($secured_total)."원", 0, 'C', false, 0, '', '', true, 0, false, true, $right_table_height, 'M');
+		$pdf->SetXY($x + $right_col_width, $y);
+		$pdf->MultiCell($right_col_width * 4, $right_table_height, "무담보 회생\n채권현재액 합계", 0, 'C', false, 0, '', '', true, 0, false, true, $right_table_height, 'M');
+		$pdf->SetXY($x + $right_col_width * 3.75, $y);
+		$pdf->MultiCell($right_col_width, $right_table_height, number_format($unsecured_total)."원", 0, 'C', false, 0, '', '', true, 0, false, true, $right_table_height, 'M');
+
+		// Y 위치 조정
+		$pdf->SetY($y + $right_table_height);
+
+		// 왼쪽 테이블 - 두 번째 행 (원금의 합계)
+		$pdf->SetY($y + $row_height * 1);
+		$pdf->SetX(15); // 왼쪽 여백으로 이동
+		$pdf->Cell($left_col_width1, $row_height, '원금의 합계', 1, 0, 'C');
+		$pdf->Cell($left_col_width2, $row_height, number_format($total_principal).'원', 1, 1, 'C');
+
+		// 왼쪽 테이블 - 세 번째 행 (이자의 합계)
+		$pdf->SetX(15); // 왼쪽 여백으로 이동
+		$pdf->Cell($left_col_width1, $row_height, '이자의 합계', 1, 0, 'C');
+		$pdf->Cell($left_col_width2, $row_height, number_format($total_interest).'원', 1, 1, 'C');
+
+		$pdf->Ln(1);
+		
 		// 법률 관련 참고사항
 		$pdf->Cell(0, 5, '※ 개시 후 이자 등: 이자 및 지연손해금 개시결정일 이후의 이자, 지연손해료 등은 채무자 회생 및 파산에 관한', 0, 1, 'L');
 		$pdf->Cell(0, 5, '     (법률 제581조제2항, 제449조제1항제1호제2조의 준용에 해당됩니다.', 0, 1, 'L');
 		$pdf->Ln(1);
 		
-		// 총채권액 계산
-	$stmt = $pdo->prepare("
-		SELECT 
-			SUM(principal) as total_principal,
-			SUM(interest) as total_interest,
-			SUM(CASE WHEN priority_payment = 1 THEN principal + interest ELSE 0 END) as secured_total,
-			SUM(CASE WHEN priority_payment = 0 THEN principal + interest ELSE 0 END) as unsecured_total
-		FROM application_recovery_creditor 
-		WHERE case_no = ?
-	");
-	$stmt->execute([$case_no]);
-	$totals = $stmt->fetch(PDO::FETCH_ASSOC);
-
-	$total_principal = $totals['total_principal'] ?? 0;
-	$total_interest = $totals['total_interest'] ?? 0;
-	$total_amount = $total_principal + $total_interest;
-	$secured_total = $totals['secured_total'] ?? 0;
-	$unsecured_total = $totals['unsecured_total'] ?? 0;
-
-	// 테이블 너비 설정
-	$left_table_width = 20; // 왼쪽 테이블 전체 너비
-	$left_col_width1 = 20; // 왼쪽 테이블의 첫 번째 열 너비
-	$left_col_width2 = 30; // 왼쪽 테이블의 두 번째 열 너비
-	$right_table_width = 40; // 오른쪽 테이블 전체 너비
-	$right_col_width = 20; // 오른쪽 테이블의 각 열 너비
-	$table_gap = 5; // 테이블 사이 간격
-	$row_height = 7; // 행 높이
-	$right_table_height = $row_height * 3; // 오른쪽 테이블 총 높이
-
-	// 왼쪽 테이블 시작
-	$pdf->SetFont('cid0kr', 'B', 8);
-
-	// 왼쪽 테이블 - 첫 번째 행 (채권현재액 총합계) - 줄바꿈 적용
-	$pdf->MultiCell($left_col_width1, $row_height, "채권현재액\n총합계", 1, 'C', false, 0);
-	$pdf->Cell($left_col_width2, $row_height, number_format($total_amount).'원', 1, 0, 'C');
-
-	// 테이블 사이 간격
-	$pdf->Cell($table_gap, $row_height * 2, '', 0, 0, 'C');
-
-	// 오른쪽 테이블 시작 위치 저장
-	$x = $pdf->GetX();
-	$y = $pdf->GetY();
-
-	// 오른쪽 테이블 테두리와 셀 생성
-	$pdf->Cell($right_col_width * 2, $right_table_height, '', 1, 0, 'C');
-	$pdf->Cell($right_col_width, $right_table_height, '', 1, 0, 'C');
-	$pdf->Cell($right_col_width * 2, $right_table_height, '', 1, 0, 'C');
-	$pdf->Cell($right_col_width, $right_table_height, '', 1, 0, 'C');
-
-	// 오른쪽 테이블 내용 채우기 (세로 중앙 정렬)
-	$pdf->SetXY($x, $y);
-	$pdf->MultiCell($right_col_width * 2, $right_table_height, "담보부 회생\n채권현재액 합계", 0, 'C', false, 0, '', '', true, 0, false, true, $right_table_height, 'M');
-	$pdf->SetXY($x + $right_col_width * 2, $y);
-	$pdf->MultiCell($right_col_width, $right_table_height, number_format($secured_total)."원", 0, 'C', false, 0, '', '', true, 0, false, true, $right_table_height, 'M');
-	$pdf->SetXY($x + $right_col_width * 3, $y);
-	$pdf->MultiCell($right_col_width * 2, $right_table_height, "무담보 회생\n채권현재액 합계", 0, 'C', false, 0, '', '', true, 0, false, true, $right_table_height, 'M');
-	$pdf->SetXY($x + $right_col_width * 5, $y);
-	$pdf->MultiCell($right_col_width, $right_table_height, number_format($unsecured_total)."원", 0, 'C', false, 0, '', '', true, 0, false, true, $right_table_height, 'M');
-
-	// Y 위치 조정
-	$pdf->SetY($y + $right_table_height);
-
-	// 왼쪽 테이블 - 두 번째 행 (원금의 합계)
-	$pdf->SetY($y + $row_height * 1);
-	$pdf->SetX(15); // 왼쪽 여백으로 이동
-	$pdf->Cell($left_col_width1, $row_height, '원금의 합계', 1, 0, 'C');
-	$pdf->Cell($left_col_width2, $row_height, number_format($total_principal).'원', 1, 1, 'C');
-
-	// 왼쪽 테이블 - 세 번째 행 (이자의 합계)
-	$pdf->SetX(15); // 왼쪽 여백으로 이동
-	$pdf->Cell($left_col_width1, $row_height, '이자의 합계', 1, 0, 'C');
-	$pdf->Cell($left_col_width2, $row_height, number_format($total_interest).'원', 1, 1, 'C');
-
-	$pdf->Ln(1);
-
-		
 		// A4 용지에 맞는 열 너비 계산 (여백 제외하고 약 190mm 사용 가능)
-		// 열 너비를 비율에 맞게 조정
 		$col1_width = 10;
 		$col2_width = 20;
 		$col3_width = 50;
