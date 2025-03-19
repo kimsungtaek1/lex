@@ -78,15 +78,6 @@ class StatementManager {
 			data.case_no = window.currentCaseNo;
 		}
 		
-		// 사건 번호 누락 검사
-		if (!data.case_no) {
-			console.error("API 요청에 사건 번호가 누락되었습니다.");
-			if (errorCallback) {
-				errorCallback({success: false, message: "사건 번호가 필요합니다."});
-			}
-			return;
-		}
-		
 		// GET 요청인 경우 data를 URL 파라미터로 변환
 		if (method === "GET") {
 			$.ajax({
@@ -97,14 +88,7 @@ class StatementManager {
 				success: (response) => {
 					if (response.success) {
 						successCallback(response);
-					} else {
-						console.error("API 요청 실패:", response.message);
-						if (errorCallback) errorCallback(response);
 					}
-				},
-				error: (xhr, status, error) => {
-					console.error("API 요청 중 오류 발생:", error);
-					if (errorCallback) errorCallback({success: false, message: error});
 				}
 			});
 		} else if (method === "DELETE") {
