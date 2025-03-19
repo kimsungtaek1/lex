@@ -16,20 +16,29 @@
 					<label for="select_all_items">모두 선택</label>
 				</div>
 				<div class="view-print-item">
-					<input type="checkbox" id="view_print_item_0" name="view_print[]" value="채권자목록 열람">
-					<label for="view_print_item_0">채권자목록 열람</label>
+					<input type="checkbox" id="view_print_item_0" name="view_print[]" value="진술서 열람">
+					<label for="view_print_item_0">진술서 열람</label>
 				</div>
 				<div class="view-print-item">
-					<input type="checkbox" id="view_print_item_1" name="view_print[]" value="재산목록 열람">
-					<label for="view_print_item_1">재산목록 열람</label>
+					<input type="checkbox" id="view_print_item_1" name="view_print[]" value="채권자목록 열람">
+					<label for="view_print_item_1">채권자목록 열람</label>
 				</div>
 				<div class="view-print-item">
-					<input type="checkbox" id="view_print_item_2" name="view_print[]" value="수입지출목록 열람">
-					<label for="view_print_item_2">수입지출목록 열람</label>
+					<input type="checkbox" id="view_print_item_2" name="view_print[]" value="재산목록 열람">
+					<label for="view_print_item_2">재산목록 열람</label>
 				</div>
 				<div class="view-print-item">
-					<input type="checkbox" id="view_print_item_3" name="view_print[]" value="진술서 열람">
-					<label for="view_print_item_3">진술서 열람</label>
+					<input type="checkbox" id="view_print_item_3" name="view_print[]" value="생활상황목록 열람">
+					<label for="view_print_item_3">생활상황목록 열람</label>
+				</div>
+				<div class="view-print-item">
+					<input type="checkbox" id="view_print_item_4" name="view_print[]" value="수입지출목록 열람">
+					<label for="view_print_item_4">수입지출목록 열람</label>
+				</div>
+				
+				<div class="view-print-item">
+					<input type="checkbox" id="view_print_item_4" name="view_print[]" value="진술서 열람">
+					<label for="view_print_item_4">진술서 열람</label>
 				</div>
 			</div>
 			<div class="view-print-button">
