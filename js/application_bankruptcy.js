@@ -117,6 +117,7 @@ $(document).ready(function() {
 					<td>${startIndex + index + 1}</td>
 					<td>${item.name || ''}</td>
 					<td>${item.case_number || ''}</td>
+					<td></td>
 				</tr>
 			`;
 			tbody.append(row);
