@@ -186,27 +186,28 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		
 		// 부동산
 		$stmt = $pdo->prepare("
-			SELECT SUM(property_liquidation_value) as total,
-				   GROUP_CONCAT(property_location SEPARATOR ', ') as locations,
-				   GROUP_CONCAT(property_type SEPARATOR ', ') as types,
-				   GROUP_CONCAT(property_right_type SEPARATOR ', ') as rights,
-				   GROUP_CONCAT(property_expected_value SEPARATOR ', ') as values,
-				   GROUP_CONCAT(property_security_type SEPARATOR ', ') as securities,
-				   GROUP_CONCAT(property_secured_debt SEPARATOR ', ') as secured_debts,
-				   MAX(is_seized) as is_seized
+			SELECT 
+				SUM(property_liquidation_value) as total,
+				GROUP_CONCAT(DISTINCT property_location SEPARATOR ', ') as locations,
+				GROUP_CONCAT(DISTINCT property_type SEPARATOR ', ') as types,
+				GROUP_CONCAT(DISTINCT property_right_type SEPARATOR ', ') as rights,
+				MAX(property_expected_value) as expected_value,
+				GROUP_CONCAT(DISTINCT property_security_type SEPARATOR ', ') as securities,
+				MAX(property_secured_debt) as secured_debt,
+				MAX(is_seized) as is_seized
 			FROM application_recovery_asset_real_estate
 			WHERE case_no = ?
 		");
 		$stmt->execute([$case_no]);
 		$real_estate = $stmt->fetch(PDO::FETCH_ASSOC);
-		
+
 		$real_estate_total = $real_estate['total'] ?? 0;
 		$real_estate_locations = $real_estate['locations'] ?? '';
 		$real_estate_types = $real_estate['types'] ?? '';
 		$real_estate_rights = $real_estate['rights'] ?? '';
-		$real_estate_values = $real_estate['values'] ?? '';
+		$real_estate_values = $real_estate['expected_value'] ?? 0;
 		$real_estate_securities = $real_estate['securities'] ?? '';
-		$real_estate_secured_debts = $real_estate['secured_debts'] ?? '';
+		$real_estate_secured_debts = $real_estate['secured_debt'] ?? 0;
 		$real_estate_seized = $real_estate['is_seized'] ?? 'N';
 		
 		$pdf->Cell($col1_width, 40, '부동산' . "\n" . '(환가 예상액에서 피담보채권을 뺀 금액을 금액란에 적는다.)', 1, 0, 'L');
