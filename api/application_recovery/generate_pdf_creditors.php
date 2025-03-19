@@ -11,9 +11,12 @@ if (!defined('INCLUDED_FROM_MAIN')) {
  * @param int $case_no 사건 번호
  */
 function generatePdfCreditors($pdf, $pdo, $case_no) {
+	// 기본 설정
 	$pdf->AddPage();
-	$pdf->SetFont('cid0kr', 'B', 14);
-	$pdf->Cell(0, 10, '채권자 목록', 0, 1, 'C');
+	$pdf->SetFont('cid0kr', 'B', 16);
+	
+	// 문서 제목
+	$pdf->Cell(0, 10, '개인회생채권자목록', 0, 1, 'C');
 	$pdf->Ln(5);
 	
 	try {
@@ -25,12 +28,65 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		$stmt->execute([$case_no]);
 		$settings = $stmt->fetch(PDO::FETCH_ASSOC);
 		
-		if ($settings) {
-			$pdf->SetFont('cid0kr', '', 10);
-			$pdf->Cell(0, 7, '목록작성일: ' . ($settings['list_creation_date'] ? date('Y년 m월 d일', strtotime($settings['list_creation_date'])) : ''), 0, 1, 'R');
-			$pdf->Cell(0, 7, '채권현재액산정기준일: ' . ($settings['claim_calculation_date'] ? date('Y년 m월 d일', strtotime($settings['claim_calculation_date'])) : ''), 0, 1, 'R');
-			$pdf->Ln(3);
+		// 기본 정보 조회
+		$stmt = $pdo->prepare("
+			SELECT ar.*, cm.name, cm.case_number 
+			FROM application_recovery ar
+			JOIN case_management cm ON ar.case_no = cm.case_no
+			WHERE ar.case_no = ?
+		");
+		$stmt->execute([$case_no]);
+		$basic_info = $stmt->fetch(PDO::FETCH_ASSOC);
+		
+		if (!$basic_info) {
+			$pdf->SetFont('cid0kr', '', 12);
+			$pdf->Cell(0, 10, '사건 정보가 존재하지 않습니다.', 0, 1, 'C');
+			return;
 		}
+		
+		// 날짜 정보 출력
+		$pdf->SetFont('cid0kr', '', 10);
+		$date_format = 'Y년 m월 d일';
+		$calc_date = isset($settings['claim_calculation_date']) ? date($date_format, strtotime($settings['claim_calculation_date'])) : '______년__월__일';
+		$list_date = isset($settings['list_creation_date']) ? date($date_format, strtotime($settings['list_creation_date'])) : '______년__월__일';
+		
+		// 날짜 출력 (테이블 형식)
+		$pdf->SetLineWidth(0.1);
+		$pdf->Cell(100, 8, '채권현재액 산정기준일: '.$calc_date, 0, 0, 'L');
+		$pdf->Cell(90, 8, '목록 작성일: '.$list_date, 0, 1, 'R');
+		$pdf->Ln(2);
+		
+		// 1행: 채권자정보, 은행 구분
+		$pdf->SetFont('cid0kr', 'B', 10);
+		$pdf->Cell(80, 10, '채권자정보', 1, 0, 'C');
+		$pdf->Cell(60, 10, '담보부 채권 채권자의 일체', 1, 0, 'C');
+		$pdf->Cell(60, 10, '무담보 채권 채권자의 일체', 1, 1, 'C');
+		
+		// 2행: 일반의 일체, 기타의 일체
+		$pdf->SetFont('cid0kr', '', 10);
+		$pdf->Cell(80, 10, '일반의 일체', 1, 0, 'C');
+		$pdf->Cell(60, 10, '', 1, 0, 'C');
+		$pdf->Cell(60, 10, '', 1, 1, 'C');
+		
+		// 3행: 기타의 일체
+		$pdf->Cell(80, 10, '기타의 일체', 1, 0, 'C');
+		$pdf->Cell(60, 10, '', 1, 0, 'C');
+		$pdf->Cell(60, 10, '', 1, 1, 'C');
+		
+		// 법률 관련 참고사항
+		$pdf->SetFont('cid0kr', '', 8);
+		$pdf->Cell(0, 5, '※ 개시 후 이자 등: 이자 및 지연손해금 개시결정일 이후의 이자, 지연손해료 등은 채무자 회생 및 파산에 관한', 0, 1, 'L');
+		$pdf->Cell(0, 5, '   법률 제581조제2항, 제449조제1항제1호제2조의 준용에 해당됩니다.', 0, 1, 'L');
+		$pdf->Ln(2);
+		
+		// 채권자 테이블 헤더
+		$pdf->SetFont('cid0kr', 'B', 10);
+		
+		// 채권자 테이블 - 제목 행
+		$pdf->Cell(15, 15, '채권번호', 1, 0, 'C');
+		$pdf->Cell(25, 15, '채권자', 1, 0, 'C');
+		$pdf->Cell(80, 15, '채권의 원인', 1, 0, 'C');
+		$pdf->Cell(80, 15, '주소 및 연락 가능한 전화번호', 1, 1, 'C');
 		
 		// 채권자 정보 가져오기
 		$stmt = $pdo->prepare("
@@ -42,306 +98,72 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		$creditors = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
 		if (empty($creditors)) {
-			$pdf->SetFont('cid0kr', '', 12);
-			$pdf->Cell(0, 10, '등록된 채권자 정보가 없습니다.', 0, 1, 'C');
-			return;
-		}
-		
-		// 합계 계산 변수
-		$total_principal = 0;
-		$total_interest = 0;
-		$total_amount = 0;
-		$secured_total = 0;
-		$unsecured_total = 0;
-		
-		// 각 채권자 정보 출력
-		foreach ($creditors as $index => $creditor) {
-			// 페이지 넘침 확인 및 새 페이지 추가
-			if ($pdf->GetY() > 230 && $index > 0) {
-				$pdf->AddPage();
-				$pdf->SetFont('cid0kr', 'B', 12);
-				$pdf->Cell(0, 10, '채권자 목록 (계속)', 0, 1, 'C');
-				$pdf->Ln(5);
-			}
-			
-			// 채권자 기본 정보 헤더
-			$pdf->SetFont('cid0kr', 'B', 12);
-			$pdf->Cell(0, 10, ($index + 1) . '. ' . $creditor['financial_institution'], 0, 1, 'L');
-			
-			// 채권자 상세 정보
 			$pdf->SetFont('cid0kr', '', 10);
+			$pdf->Cell(200, 10, '등록된 채권자 정보가 없습니다.', 1, 1, 'C');
+		} else {
+			// 각 채권자 정보 출력
+			$pdf->SetFont('cid0kr', '', 9);
 			
-			// 채권자 정보 테이블
-			$pdf->SetFillColor(235, 235, 235);
-			
-			// 기본 정보 행 (주소, 연락처)
-			$pdf->Cell(30, 7, '주소', 1, 0, 'C', true);
-			$pdf->Cell(150, 7, $creditor['address'], 1, 1, 'L');
-			
-			$pdf->Cell(30, 7, '연락처', 1, 0, 'C', true);
-			$contact_info = '전화: ' . (empty($creditor['phone']) ? '-' : formatPhoneNumber($creditor['phone']));
-			if (!empty($creditor['fax'])) {
-				$contact_info .= ', 팩스: ' . $creditor['fax'];
-			}
-			$pdf->Cell(150, 7, $contact_info, 1, 1, 'L');
-			
-			// 채권 정보 행 (원금, 이자, 총액)
-			$pdf->Cell(30, 7, '원금', 1, 0, 'C', true);
-			$pdf->Cell(150, 7, number_format($creditor['principal']) . '원', 1, 1, 'L');
-			
-			$pdf->Cell(30, 7, '이자', 1, 0, 'C', true);
-			$pdf->Cell(150, 7, number_format($creditor['interest']) . '원', 1, 1, 'L');
-			
-			$total = $creditor['principal'] + $creditor['interest'];
-			$pdf->Cell(30, 7, '총액', 1, 0, 'C', true);
-			$pdf->Cell(150, 7, number_format($total) . '원', 1, 1, 'L');
-			
-			// 채권 원인 및 내용
-			$pdf->Cell(30, 7, '채권원인', 1, 0, 'C', true);
-			$pdf->Cell(150, 7, $creditor['claim_reason'], 1, 1, 'L');
-			
-			// MultiCell로 변경하여 긴 내용 처리
-			$pdf->Cell(30, 7, '채권내용', 1, 0, 'C', true);
-			$content_x = $pdf->GetX();
-			$content_y = $pdf->GetY();
-			$content_w = 150;
-			$pdf->MultiCell($content_w, 7, $creditor['claim_content'], 1, 'L');
-			
-			// 연체이율
-			$pdf->Cell(30, 7, '연체이율', 1, 0, 'C', true);
-			$pdf->Cell(150, 7, '연 ' . $creditor['default_rate'] . '%', 1, 1, 'L');
-			
-			// 구분 (담보/무담보)
-			$security_type = $creditor['priority_payment'] == 1 ? '담보채권' : '무담보채권';
-			$pdf->Cell(30, 7, '구분', 1, 0, 'C', true);
-			$pdf->Cell(150, 7, $security_type, 1, 1, 'L');
-			
-			// 추가 옵션 체크사항
-			$options = [];
-			if ($creditor['undetermined_claim'] == 1) $options[] = '미확정채권';
-			if ($creditor['pension_debt'] == 1) $options[] = '연금채무';
-			if ($creditor['mortgage_restructuring'] == 1) $options[] = '주택담보대출채권';
-			
-			if (!empty($options)) {
-				$pdf->Cell(30, 7, '추가 구분', 1, 0, 'C', true);
-				$pdf->Cell(150, 7, implode(', ', $options), 1, 1, 'L');
-			}
-			
-			// 별제권부채권 정보 가져오기
-			$stmt = $pdo->prepare("
-				SELECT * FROM application_recovery_creditor_appendix 
-				WHERE case_no = ? AND creditor_count = ? AND appendix_type = '별제권부채권'
-			");
-			$stmt->execute([$case_no, $creditor['creditor_count']]);
-			$separateBonds = $stmt->fetchAll(PDO::FETCH_ASSOC);
-			
-			if (!empty($separateBonds)) {
-				$pdf->SetFont('cid0kr', 'B', 10);
-				$pdf->Cell(180, 7, '▶ 별제권부채권 정보', 1, 1, 'L', true);
-				$pdf->SetFont('cid0kr', '', 9);
+			foreach ($creditors as $creditor) {
+				// 높이 설정
+				$rowHeight = 7;
+				$contentRows = 6; // 내용 행 수
+				$totalHeight = $rowHeight * $contentRows;
 				
-				foreach ($separateBonds as $bond) {
-					$pdf->MultiCell(180, 7, $bond['content'], 1, 'L');
-				}
-			}
-			
-			// 다툼있는채권 정보 가져오기
-			$stmt = $pdo->prepare("
-				SELECT * FROM application_recovery_creditor_appendix 
-				WHERE case_no = ? AND creditor_count = ? AND appendix_type = '다툼있는채권'
-			");
-			$stmt->execute([$case_no, $creditor['creditor_count']]);
-			$disputedClaims = $stmt->fetchAll(PDO::FETCH_ASSOC);
-			
-			if (!empty($disputedClaims)) {
-				$pdf->SetFont('cid0kr', 'B', 10);
-				$pdf->Cell(180, 7, '▶ 다툼있는채권 정보', 1, 1, 'L', true);
-				$pdf->SetFont('cid0kr', '', 9);
+				// 채권자정보 (왼쪽 2칸)
+				$pdf->Cell(15, $totalHeight, $creditor['creditor_count'], 1, 0, 'C');
+				$pdf->Cell(25, $totalHeight, $creditor['financial_institution'], 1, 0, 'C');
 				
-				foreach ($disputedClaims as $claim) {
-					$pdf->MultiCell(180, 7, $claim['content'], 1, 'L');
-				}
-			}
-			
-			// 전부명령된 채권
-			$stmt = $pdo->prepare("
-				SELECT * FROM application_recovery_creditor_appendix 
-				WHERE case_no = ? AND creditor_count = ? AND appendix_type = '전부명령된채권'
-			");
-			$stmt->execute([$case_no, $creditor['creditor_count']]);
-			$garnishments = $stmt->fetchAll(PDO::FETCH_ASSOC);
-			
-			if (!empty($garnishments)) {
-				$pdf->SetFont('cid0kr', 'B', 10);
-				$pdf->Cell(180, 7, '▶ 전부명령된채권 정보', 1, 1, 'L', true);
-				$pdf->SetFont('cid0kr', '', 9);
+				// 채권의 원인 열 - 여러 행으로 구성
+				$x = $pdf->GetX();
+				$y = $pdf->GetY();
+				$width = 80;
 				
-				foreach ($garnishments as $garnishment) {
-					$pdf->MultiCell(180, 7, $garnishment['content'], 1, 'L');
-				}
-			}
-			
-			// 기타 부속서류
-			$stmt = $pdo->prepare("
-				SELECT * FROM application_recovery_creditor_appendix 
-				WHERE case_no = ? AND creditor_count = ? AND appendix_type = '기타'
-			");
-			$stmt->execute([$case_no, $creditor['creditor_count']]);
-			$otherAppendices = $stmt->fetchAll(PDO::FETCH_ASSOC);
-			
-			if (!empty($otherAppendices)) {
-				$pdf->SetFont('cid0kr', 'B', 10);
-				$pdf->Cell(180, 7, '▶ 기타 부속서류', 1, 1, 'L', true);
-				$pdf->SetFont('cid0kr', '', 9);
+				// 원인 칸 그리기
+				$pdf->Cell($width, $totalHeight, '', 1, 0);
 				
-				foreach ($otherAppendices as $appendix) {
-					$pdf->MultiCell(180, 7, $appendix['content'], 1, 'L');
-				}
-			}
-			
-			// 기타미확정채권
-			$stmt = $pdo->prepare("
-				SELECT * FROM application_recovery_creditor_other_claims 
-				WHERE case_no = ? AND creditor_count = ?
-			");
-			$stmt->execute([$case_no, $creditor['creditor_count']]);
-			$otherClaims = $stmt->fetchAll(PDO::FETCH_ASSOC);
-			
-			if (!empty($otherClaims)) {
-				$pdf->SetFont('cid0kr', 'B', 10);
-				$pdf->Cell(180, 7, '▶ 기타미확정채권', 1, 1, 'L', true);
-				$pdf->SetFont('cid0kr', '', 9);
+				// 원인 내용 넣기
+				$pdf->SetXY($x, $y);
 				
-				foreach ($otherClaims as $claim) {
-					$pdf->Cell(40, 7, '채권종류: ' . $claim['claim_type'], 1, 0, 'L');
-					$pdf->Cell(50, 7, '금액: ' . number_format($claim['amount']) . '원', 1, 0, 'L');
-					$pdf->Cell(90, 7, '변제기: ' . $claim['payment_term'], 1, 1, 'L');
-					if (!empty($claim['description'])) {
-						$pdf->Cell(30, 7, '설명:', 1, 0, 'L');
-						$pdf->MultiCell(150, 7, $claim['description'], 1, 'L');
-					}
-				}
-			}
-			
-			// 보증인이 있는 채무
-			$stmt = $pdo->prepare("
-				SELECT * FROM application_recovery_creditor_guaranteed_debts 
-				WHERE case_no = ? AND creditor_count = ?
-			");
-			$stmt->execute([$case_no, $creditor['creditor_count']]);
-			$guaranteedDebts = $stmt->fetchAll(PDO::FETCH_ASSOC);
-			
-			if (!empty($guaranteedDebts)) {
-				$pdf->SetFont('cid0kr', 'B', 10);
-				$pdf->Cell(180, 7, '▶ 보증인이 있는 채무', 1, 1, 'L', true);
-				$pdf->SetFont('cid0kr', '', 9);
+				// 채권현재액(원금) 행
+				$pdf->Cell($width, $rowHeight, '채권현재액(원금): '.number_format($creditor['principal']).'원', 0, 2, 'L');
+				$pdf->SetX($x);
+				$pdf->Cell($width, $rowHeight, '채권현재액(원금) 산정근거', 0, 2, 'L');
 				
-				$pdf->Cell(50, 7, '보증인', 1, 0, 'C', true);
-				$pdf->Cell(80, 7, '주소', 1, 0, 'C', true);
-				$pdf->Cell(50, 7, '보증금액', 1, 1, 'C', true);
+				// 채권현재액(이자) 행
+				$pdf->SetX($x);
+				$pdf->Cell($width, $rowHeight, '채권현재액(이자): '.number_format($creditor['interest']).'원', 0, 2, 'L');
+				$pdf->SetX($x);
+				$pdf->Cell($width, $rowHeight, '채권현재액(이자) 산정근거', 0, 2, 'L');
 				
-				foreach ($guaranteedDebts as $debt) {
-					$pdf->Cell(50, 7, $debt['guarantor_name'], 1, 0, 'L');
-					$pdf->Cell(80, 7, $debt['guarantor_address'], 1, 0, 'L');
-					$pdf->Cell(50, 7, number_format($debt['guarantee_amount']) . '원', 1, 1, 'R');
-				}
+				// 수수료 및 담보 정보
+				$pdf->SetX($x);
+				$pdf->Cell($width/2, $rowHeight, '(수수)', 0, 0, 'C');
+				$pdf->Cell($width/2, $rowHeight, '(팩스)', 0, 2, 'C');
+				$pdf->SetX($x);
+				$pdf->Cell($width/2, $rowHeight, '(전화)', 0, 0, 'C');
+				$pdf->Cell($width/2, $rowHeight, '', 'B', 2, 'C'); // 밑줄 추가
+				
+				// 주소 및 연락처 칸
+				$x = $pdf->GetX();
+				$y = $pdf->GetY() - $rowHeight * 5; // 원래 Y 위치로 돌아가기
+				$pdf->SetXY($x, $y);
+				$width = 80;
+				
+				// 주소 칸 그리기
+				$pdf->Cell($width, $totalHeight, '', 1, 0);
+				
+				// 주소 및 연락처 내용 넣기
+				$pdf->SetXY($x, $y);
+				$pdf->MultiCell($width, $rowHeight * 4, $creditor['address']."\n전화: ".formatPhoneNumber($creditor['phone']), 0, 'L');
+				
+				// 부속서류 유무 체크박스
+				$pdf->SetXY($x, $y + $rowHeight * 4);
+				$pdf->Cell($width, $rowHeight * 2, '□ 부속서류 (1, 2, 3, 4)', 0, 0, 'R');
+				
+				$pdf->Ln($totalHeight);
 			}
-			
-			// 합계 계산
-			$total_principal += $creditor['principal'];
-			$total_interest += $creditor['interest'];
-			$total_amount += ($creditor['principal'] + $creditor['interest']);
-			
-			if ($creditor['priority_payment'] == 1) {
-				$secured_total += ($creditor['principal'] + $creditor['interest']);
-			} else {
-				$unsecured_total += ($creditor['principal'] + $creditor['interest']);
-			}
-			
-			// 구분선 추가
-			$pdf->Ln(10);
 		}
-		
-		// 새 페이지에 합계 정보 추가
-		$pdf->AddPage();
-		$pdf->SetFont('cid0kr', 'B', 14);
-		$pdf->Cell(0, 10, '채권자 총 현황', 0, 1, 'C');
-		$pdf->Ln(5);
-		
-		// 채권자수, 채권총액 요약
-		$pdf->SetFont('cid0kr', 'B', 12);
-		$pdf->Cell(180, 10, '채권자 수: ' . count($creditors) . '명', 0, 1, 'L');
-		$pdf->Ln(5);
-		
-		// 채권총액 테이블
-		$pdf->SetFillColor(235, 235, 235);
-		$pdf->SetFont('cid0kr', 'B', 11);
-		
-		// 테이블 헤더
-		$pdf->Cell(60, 10, '구분', 1, 0, 'C', true);
-		$pdf->Cell(60, 10, '금액', 1, 0, 'C', true);
-		$pdf->Cell(60, 10, '비율', 1, 1, 'C', true);
-		
-		// 원금 합계
-		$pdf->SetFont('cid0kr', '', 10);
-		$pdf->Cell(60, 8, '원금 합계', 1, 0, 'L');
-		$pdf->Cell(60, 8, number_format($total_principal) . '원', 1, 0, 'R');
-		$principal_ratio = $total_amount > 0 ? ($total_principal / $total_amount * 100) : 0;
-		$pdf->Cell(60, 8, number_format($principal_ratio, 2) . '%', 1, 1, 'R');
-		
-		// 이자 합계
-		$pdf->Cell(60, 8, '이자 합계', 1, 0, 'L');
-		$pdf->Cell(60, 8, number_format($total_interest) . '원', 1, 0, 'R');
-		$interest_ratio = $total_amount > 0 ? ($total_interest / $total_amount * 100) : 0;
-		$pdf->Cell(60, 8, number_format($interest_ratio, 2) . '%', 1, 1, 'R');
-		
-		// 전체 합계
-		$pdf->SetFont('cid0kr', 'B', 10);
-		$pdf->Cell(60, 8, '채권 총액', 1, 0, 'L');
-		$pdf->Cell(60, 8, number_format($total_amount) . '원', 1, 0, 'R');
-		$pdf->Cell(60, 8, '100.00%', 1, 1, 'R');
-		
-		$pdf->Ln(10);
-		
-		// 담보/무담보 구분 테이블
-		$pdf->SetFont('cid0kr', 'B', 12);
-		$pdf->Cell(180, 10, '담보/무담보 구분', 0, 1, 'L');
-		$pdf->Ln(2);
-		
-		$pdf->SetFont('cid0kr', 'B', 11);
-		$pdf->Cell(60, 10, '구분', 1, 0, 'C', true);
-		$pdf->Cell(60, 10, '금액', 1, 0, 'C', true);
-		$pdf->Cell(60, 10, '비율', 1, 1, 'C', true);
-		
-		$pdf->SetFont('cid0kr', '', 10);
-		$pdf->Cell(60, 8, '담보채권', 1, 0, 'L');
-		$pdf->Cell(60, 8, number_format($secured_total) . '원', 1, 0, 'R');
-		$secured_ratio = $total_amount > 0 ? ($secured_total / $total_amount * 100) : 0;
-		$pdf->Cell(60, 8, number_format($secured_ratio, 2) . '%', 1, 1, 'R');
-		
-		$pdf->Cell(60, 8, '무담보채권', 1, 0, 'L');
-		$pdf->Cell(60, 8, number_format($unsecured_total) . '원', 1, 0, 'R');
-		$unsecured_ratio = $total_amount > 0 ? ($unsecured_total / $total_amount * 100) : 0;
-		$pdf->Cell(60, 8, number_format($unsecured_ratio, 2) . '%', 1, 1, 'R');
-		
-		$pdf->SetFont('cid0kr', 'B', 10);
-		$pdf->Cell(60, 8, '합계', 1, 0, 'L');
-		$pdf->Cell(60, 8, number_format($total_amount) . '원', 1, 0, 'R');
-		$pdf->Cell(60, 8, '100.00%', 1, 1, 'R');
-		
-		$pdf->Ln(10);
-		
-		// 유의사항
-		$pdf->SetFont('cid0kr', 'B', 11);
-		$pdf->Cell(0, 10, '◈ 유의사항', 0, 1, 'L');
-		
-		$pdf->SetFont('cid0kr', '', 10);
-		$notice = "1. 본 채권자 목록은 신청인이 제출한 자료를 기반으로 작성되었습니다.\n";
-		$notice .= "2. 담보채권 15억원 이상 또는 무담보채권 10억원 이상인 경우 개인회생신청 대상에서 제외될 수 있습니다.\n";
-		$notice .= "3. 채권자의 주소, 연락처 등 정보가 정확하지 않을 경우 회생 절차에 지장이 있을 수 있습니다.\n";
-		$notice .= "4. 본 목록에 기재되지 않은 채권은 면책 대상에서 제외될 수 있으므로, 모든 채권을 정확히 기재해야 합니다.";
-		
-		$pdf->MultiCell(0, 7, $notice, 0, 'L');
 		
 	} catch (Exception $e) {
 		$pdf->SetFont('cid0kr', '', 12);
