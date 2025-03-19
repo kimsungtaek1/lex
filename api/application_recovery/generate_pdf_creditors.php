@@ -1,15 +1,8 @@
 <?php
-// generate_pdf_creditors.php
 if (!defined('INCLUDED_FROM_MAIN')) {
 	die('이 파일은 직접 실행할 수 없습니다.');
 }
 
-/**
- * 채권자 목록 출력 함수
- * @param TCPDF $pdf PDF 객체
- * @param PDO $pdo 데이터베이스 연결 객체
- * @param int $case_no 사건 번호
- */
 function generatePdfCreditors($pdf, $pdo, $case_no) {
 	// A4 용지에 맞게 여백 설정
 	$pdf->SetMargins(15, 15, 15);
