@@ -50,7 +50,7 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		// 날짜 출력 (테이블 형식)
 		$pdf->SetLineWidth(0.1);
 		$pdf->Cell(90, 8, '채권현재액 산정기준일: '.$calc_date, 0, 0, 'L');
-		$pdf->Cell(80, 8, '목록 작성일: '.$list_date, 0, 1, 'R');
+		$pdf->Cell(90, 8, '목록 작성일: '.$list_date, 0, 1, 'R');
 		$pdf->Ln(1);
 		
 		// 법률 관련 참고사항
