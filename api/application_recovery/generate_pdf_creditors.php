@@ -179,19 +179,20 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		$creditors = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
 		if (empty($creditors)) {
-			$pdf->SetFont('cid0kr', '', 10);
-			$pdf->Cell(180, 10, '등록된 채권자 정보가 없습니다.', 1, 1, 'C');
+			$pdf->SetFont('cid0kr', '', 7);
+			$pdf->Cell(180, 7, '등록된 채권자 정보가 없습니다.', 1, 1, 'C');
 		} else {
 			// 채권자 정보 출력
 			foreach ($creditors as $creditor) {
+				$pdf->SetFont('cid0kr', '', 7);
 				// 새 페이지 확인 - 현재 페이지에 공간이 충분하지 않으면 새 페이지 추가
-				if ($pdf->GetY() + 48 > $pdf->getPageHeight() - 20) {
+				if ($pdf->GetY() + 40 > $pdf->getPageHeight() - 20) {
 					$pdf->AddPage();
-					$pdf->SetFont('cid0kr', 'B', 8);
+					$pdf->SetFont('cid0kr', '', 7);
 				}
 				
 				// 채권자 테이블 높이 설정
-				$tableHeight = 48;
+				$tableHeight = 40;
 				
 				// 1. 채권번호 열
 				$pdf->MultiCell($col1_width, $tableHeight, $creditor['creditor_count'], 1, 'C', false, 0, '', '', true, 0, false, true, $tableHeight, 'M');
@@ -204,10 +205,10 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 				$y = $pdf->GetY();
 				
 				// 3. 채권의 원인 열
-				$pdf->MultiCell($col3_width, 16, $creditor['claim_reason'], 1, 'L', false, 0, '', '', true, 0, false, true, 8, 'M');
+				$pdf->MultiCell($col3_width, 8, $creditor['claim_reason']."\n", 1, 'L', false, 0, '', '', true, 0, false, true, 8, 'M');
 				
 				// 4. 주소 및 연락처 열
-				$pdf->MultiCell($col4_width, 16, $creditor['address'], 1, 'L', false, 1, '', '', true, 0, false, true, 8, 'M');
+				$pdf->MultiCell($col4_width, 8, "(주소) ".$creditor['address']."\n(전화) ".$creditor['phone']."           (팩스) ".$creditor['fax'], 1, 'L', false, 1, '', '', true, 0, false, true, 8, 'M');
 				
 				// 5. 채권의 내용 행
 				$pdf->Cell($col1_width + $col2_width, 16, '', 0, 0); // 빈 셀 (채권번호, 채권자 자리)
@@ -244,8 +245,6 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 				
 				// 10. 채권현재액(이자) 산정근거 행
 				$pdf->MultiCell($col8_width, 8, $creditor['interest_calculation'], 1, 'L', false, 1, '', '', true, 0, false, true, 8, 'M');
-				
-				$pdf->Ln(5); // 채권자 사이에 간격 추가
 			}
 		}
 		
