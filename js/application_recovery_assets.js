@@ -897,7 +897,7 @@ class AssetManager {
             <div class="form">
               <div class="form-title"><span>월세</span></div>
               <div class="form-content">
-                <input type="text" class="rent_monthly_rent input86" value="${data.monthly_rent ? this.formatMoney(data.monthly_rent) : ""}" class="form-control form-content-justify">원
+                <input type="text" class="rent_monthly_rent input86" value="${data.monthly_rent ? this.formatMoney(data.monthly_rent) : ""}" class="form-control">원
               </div>
             </div>
             <div class="form">
