@@ -202,16 +202,16 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 					$pdf->AddPage();
 				}
 				
-				$pdf->Cell($col1_width, 40, '자동차 #'.($index+1)."\n(오토바이 포함)", 1, 0, 'C');
-				$pdf->Cell($col2_width, 40, number_format($vehicle['liquidation_value']), 1, 0, 'R');
-				$pdf->Cell($col3_width, 40, $vehicle['is_seized'] ?? 'N', 1, 0, 'C');
+				$pdf->MultiCell($col1_width, 40, '자동차 #'.($index+1)."\n(오토바이 포함)", 1, 'C', false, 0, '', '', true, 0, false, true, 40, 'M');
+				$pdf->MultiCell($col2_width, 40, number_format($vehicle['liquidation_value']), 1, 'R', false, 0, '', '', true, 0, false, true, 40, 'M');
+				$pdf->MultiCell($col3_width, 40, $vehicle['is_seized'] ?? 'N', 1, 'C', false, 0, '', '', true, 0, false, true, 40, 'M');
 				
 				// 비고 셀 시작 위치 저장
 				$x = $pdf->GetX();
 				$y = $pdf->GetY();
 				
 				// 열 너비 계산 (비고 내 항목명을 위한 공간 할당)
-				$first_col_width = 35;
+				$first_col_width = 25;
 				$second_col_width = $col4_width - $first_col_width;
 				$cell_height = 40 / 6; // 6개 항목을 넣기 위해 높이 조정
 				
@@ -227,7 +227,7 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 				// 채권(최고)액
 				$pdf->SetXY($x, $y + ($cell_height * 2));
 				$pdf->Cell($first_col_width, $cell_height, '채권(최고)액', 1, 0, 'C');
-				$pdf->Cell($second_col_width, $cell_height, ($vehicle['debt_amount'] ? number_format($vehicle['debt_amount']).'원' : ''), 1, 1, 'L');
+				$pdf->Cell($second_col_width, $cell_height, ($vehicle['max_bond'] ? number_format($vehicle['max_bond']).'원' : ''), 1, 1, 'L');
 				
 				// 환가예상액
 				$pdf->SetXY($x, $y + ($cell_height * 3));
@@ -237,7 +237,7 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 				// 채무잔액
 				$pdf->SetXY($x, $y + ($cell_height * 4));
 				$pdf->Cell($first_col_width, $cell_height, '채무잔액', 1, 0, 'C');
-				$pdf->Cell($second_col_width, $cell_height, ($vehicle['remaining_debt'] ? number_format($vehicle['remaining_debt']).'원' : ''), 1, 1, 'L');
+				$pdf->Cell($second_col_width, $cell_height, ($vehicle['financial_balance'] ? number_format($vehicle['financial_balance']).'원' : ''), 1, 1, 'L');
 				
 				// 청산가치판단금액
 				$pdf->SetXY($x, $y + ($cell_height * 5));
