@@ -899,10 +899,6 @@ class AssetManager {
               <div class="form-content">
                 <input type="text" class="rent_monthly_rent input86" value="${data.monthly_rent ? this.formatMoney(data.monthly_rent) : ""}" class="form-control form-content-justify">원
               </div>
-              <div class="form-content checkbox-right">
-                <input type="checkbox" id="${blockId}_rent_monthly_spouse" class="rent_monthly_spouse" ${data.is_monthly_spouse==1 ? "checked" : ""}>
-                <label for="${blockId}_rent_monthly_spouse">배우자명의</label>
-              </div>
             </div>
             <div class="form">
               <div class="form-title"><span>반환받을 보증금</span></div>
