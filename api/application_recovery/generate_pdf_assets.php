@@ -182,23 +182,79 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		
 		// 자동차
 		$stmt = $pdo->prepare("
-			SELECT SUM(liquidation_value) as total,
-				   GROUP_CONCAT(vehicle_info SEPARATOR ', ') as vehicles,
-				   MAX(is_seized) as is_seized
+			SELECT *
 			FROM application_recovery_asset_vehicles
 			WHERE case_no = ?
 		");
 		$stmt->execute([$case_no]);
-		$vehicle = $stmt->fetch(PDO::FETCH_ASSOC);
-		
-		$vehicle_total = $vehicle['total'] ?? 0;
-		$vehicle_info = $vehicle['vehicles'] ?? '';
-		$vehicle_seized = $vehicle['is_seized'] ?? 'N';
-		
-		$pdf->MultiCell($col1_width, $row_height, "자동차\n(오토바이 포함)", 1, 'C', false, 0, '', '', true, 0, false, true, $row_height, 'M');
-		$pdf->MultiCell($col2_width, $row_height, number_format($vehicle_total), 1, 'R', false, 0, '', '', true, 0, false, true, $row_height, 'M');
-		$pdf->MultiCell($col3_width, $row_height, $vehicle_seized, 1, 'C', false, 0, '', '', true, 0, false, true, $row_height, 'M');
-		$pdf->MultiCell($col4_width, $row_height, $vehicle_info, 1, 'L', false, 1, '', '', true, 0, false, true, $row_height, 'M');
+		$vehicles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+		$vehicle_total = 0;
+		foreach ($vehicles as $vehicle) {
+			$vehicle_total += $vehicle['liquidation_value'];
+		}
+
+		// 각 자동차 데이터별로 개별 테이블 행 생성
+		if (count($vehicles) > 0) {
+			foreach ($vehicles as $index => $vehicle) {
+				// 새 페이지 확인 - 현재 페이지에 충분한 공간이 없으면 새 페이지 추가
+				if ($pdf->GetY() + 25 > $pdf->getPageHeight() - 20) {
+					$pdf->AddPage();
+				}
+				
+				$pdf->Cell($col1_width, 40, '자동차 #'.($index+1)."\n(오토바이 포함)", 1, 0, 'C');
+				$pdf->Cell($col2_width, 40, number_format($vehicle['liquidation_value']), 1, 0, 'R');
+				$pdf->Cell($col3_width, 40, $vehicle['is_seized'] ?? 'N', 1, 0, 'C');
+				
+				// 비고 셀 시작 위치 저장
+				$x = $pdf->GetX();
+				$y = $pdf->GetY();
+				
+				// 열 너비 계산 (비고 내 항목명을 위한 공간 할당)
+				$first_col_width = 35;
+				$second_col_width = $col4_width - $first_col_width;
+				$cell_height = 40 / 6; // 6개 항목을 넣기 위해 높이 조정
+				
+				// 차량정보
+				$pdf->Cell($first_col_width, $cell_height, '차량정보', 1, 0, 'C');
+				$pdf->Cell($second_col_width, $cell_height, $vehicle['vehicle_info'] ?? '', 1, 1, 'L');
+				
+				// 담보권종류
+				$pdf->SetXY($x, $y + $cell_height);
+				$pdf->Cell($first_col_width, $cell_height, '담보권종류', 1, 0, 'C');
+				$pdf->Cell($second_col_width, $cell_height, $vehicle['security_type'] ?? '', 1, 1, 'L');
+				
+				// 채권(최고)액
+				$pdf->SetXY($x, $y + ($cell_height * 2));
+				$pdf->Cell($first_col_width, $cell_height, '채권(최고)액', 1, 0, 'C');
+				$pdf->Cell($second_col_width, $cell_height, ($vehicle['debt_amount'] ? number_format($vehicle['debt_amount']).'원' : ''), 1, 1, 'L');
+				
+				// 환가예상액
+				$pdf->SetXY($x, $y + ($cell_height * 3));
+				$pdf->Cell($first_col_width, $cell_height, '환가예상액', 1, 0, 'C');
+				$pdf->Cell($second_col_width, $cell_height, number_format($vehicle['expected_value']).'원', 1, 1, 'L');
+				
+				// 채무잔액
+				$pdf->SetXY($x, $y + ($cell_height * 4));
+				$pdf->Cell($first_col_width, $cell_height, '채무잔액', 1, 0, 'C');
+				$pdf->Cell($second_col_width, $cell_height, ($vehicle['remaining_debt'] ? number_format($vehicle['remaining_debt']).'원' : ''), 1, 1, 'L');
+				
+				// 청산가치판단금액
+				$pdf->SetXY($x, $y + ($cell_height * 5));
+				$pdf->Cell($first_col_width, $cell_height, '청산가치판단금액', 1, 0, 'C');
+				$pdf->Cell($second_col_width, $cell_height, number_format($vehicle['liquidation_value']).'원', 1, 0, 'L');
+				
+				// Y 위치 조정하여 다음 항목 출력 준비
+				$pdf->SetY($y + 40);
+			}
+		} else {
+			// 자동차 데이터가 없는 경우
+			$pdf->Cell($col1_width, 8, '자동차', 1, 0, 'C');
+			$pdf->Cell($col2_width, 8, '0', 1, 0, 'R');
+			$pdf->Cell($col3_width, 8, '', 1, 0, 'C');
+			$pdf->Cell($col4_width, 8, '해당 없음', 1, 1, 'L');
+		}
+
 		
 		// 임차보증금
 		$stmt = $pdo->prepare("
