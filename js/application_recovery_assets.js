@@ -976,7 +976,6 @@ class AssetManager {
       contract_deposit: this.unformatMoney(block.find(".rent_contract_deposit").val()),
       is_deposit_spouse: block.find(".rent_deposit_spouse").is(":checked") ? 1 : 0,
       monthly_rent: this.unformatMoney(block.find(".rent_monthly_rent").val()),
-      is_monthly_spouse: block.find(".rent_monthly_spouse").is(":checked") ? 1 : 0,
       refund_deposit: this.unformatMoney(block.find(".rent_refund_deposit").val()),
       difference_reason: block.find(".rent_difference_reason").val().trim(),
       priority_deposit: this.unformatMoney(block.find(".rent_priority_deposit").val()),
