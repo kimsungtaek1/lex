@@ -6,7 +6,7 @@ if (!defined('INCLUDED_FROM_MAIN')) {
 function generatePdfAssets($pdf, $pdo, $case_no) {
 	$pdf->AddPage();
 	$pdf->SetFont('cid0kr', 'B', 14);
-	$pdf->Cell(0, 10, '재 산 목 록', 0, 1, 'C');
+	$pdf->Cell(0, 8, '재 산 목 록', 0, 1, 'C');
 	$pdf->Ln(5);
 	$pdf->SetFont('cid0kr', '', 8);
 	
@@ -15,10 +15,10 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 	$pdf->SetFillColor(240, 240, 240);
 	
 	// 열 너비 설정
-	$col1_width = 35; // 명칭
-	$col2_width = 35; // 금액 또는 시가
+	$col1_width = 25; // 명칭
+	$col2_width = 25; // 금액 또는 시가
 	$col3_width = 15; // 압류유무
-	$col4_width = 95; // 비고
+	$col4_width = 115; // 비고
 	
 	// 행 높이
 	$row_height = 8;
@@ -37,7 +37,7 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		
 	try {
 		// 현금
-		$pdf->Cell($col1_width, 10, '현금', 1, 0, 'L');
+		$pdf->Cell($col1_width, $row_height, '현금', 1, 0, 'C');
 		
 		// 현금 데이터 조회
 		$stmt = $pdo->prepare("
@@ -52,9 +52,9 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		$cash_total = $cash['total'] ?? 0;
 		$cash_seized = $cash['is_seized'] ?? 'N';
 		
-		$pdf->Cell($col2_width, 10, number_format($cash_total), 1, 0, 'R');
-		$pdf->Cell($col3_width, 10, $cash_seized, 1, 0, 'C');
-		$pdf->Cell($col4_width, 10, '', 1, 1, 'L');
+		$pdf->Cell($col2_width, $row_height, number_format($cash_total), 1, 0, 'R');
+		$pdf->Cell($col3_width, $row_height, $cash_seized, 1, 0, 'C');
+		$pdf->Cell($col4_width, $row_height, '', 1, 1, 'L');
 		
 		// 예금
 		$stmt = $pdo->prepare("
@@ -71,7 +71,7 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		$deposit_banks = $deposit['banks'] ?? '';
 		$deposit_seized = $deposit['is_seized'] ?? 'N';
 		
-		$pdf->Cell($col1_width, 25, '예금', 1, 0, 'L');
+		$pdf->Cell($col1_width, 25, '예금', 1, 0, 'C');
 		$pdf->Cell($col2_width, 25, number_format($deposit_total), 1, 0, 'R');
 		$pdf->Cell($col3_width, 25, $deposit_seized, 1, 0, 'C');
 		
@@ -109,7 +109,7 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		$insurance_seized = $insurance['is_seized'] ?? 'N';
 		$insurance_securities = $insurance['securities'] ?? '';
 		
-		$pdf->Cell($col1_width, 25, '보험', 1, 0, 'L');
+		$pdf->Cell($col1_width, 25, '보험', 1, 0, 'C');
 		$pdf->Cell($col2_width, 25, number_format($insurance_total), 1, 0, 'R');
 		$pdf->Cell($col3_width, 25, $insurance_seized, 1, 0, 'C');
 		
@@ -145,10 +145,10 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		$vehicle_info = $vehicle['vehicles'] ?? '';
 		$vehicle_seized = $vehicle['is_seized'] ?? 'N';
 		
-		$pdf->MultiCell($col1_width, $row_height, "자동차\n(오토바이 포함)", 1, 'C', true, 1, '', '', true, 0, false, true, $row_height, 'M');
-		$pdf->Cell($col2_width, $row_height, number_format($vehicle_total), 1, 0, 'R');
-		$pdf->Cell($col3_width, $row_height, $vehicle_seized, 1, 0, 'C');
-		$pdf->Cell($col4_width, $row_height, $vehicle_info, 1, 1, 'L');
+		$pdf->MultiCell($col1_width, $row_height, "자동차\n(오토바이 포함)", 1, 'C', false, 0, '', '', true, 0, false, true, $row_height, 'M');
+		$pdf->MultiCell($col2_width, $row_height, number_format($vehicle_total), 1, 'R', false, 0, '', '', true, 0, false, true, $row_height, 'M');
+		$pdf->MultiCell($col3_width, $row_height, $vehicle_seized, 1, 'C', false, 0, '', '', true, 0, false, true, $row_height, 'M');
+		$pdf->MultiCell($col4_width, $row_height, $vehicle_info, 1, 'L', false, 1, '', '', true, 0, false, true, $row_height, 'M');
 		
 		// 임차보증금
 		$stmt = $pdo->prepare("
@@ -171,9 +171,9 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		$rent_reasons = $rent['reasons'] ?? '';
 		$rent_seized = $rent['is_seized'] ?? 'N';
 		
-		$pdf->Cell($col1_width, 25, '임차보증금' . "\n" . '(반환받을 금액을 금액란에 적는다.)', 1, 0, 'L');
-		$pdf->Cell($col2_width, 25, number_format($rent_total), 1, 0, 'R');
-		$pdf->Cell($col3_width, 25, $rent_seized, 1, 0, 'C');
+		$pdf->MultiCell($col1_width, 25, "임차보증금\n(반환받을 금액을 금액란에 적는다.)", 1, 'C', false, 0, '', '', true, 0, false, true, 25, 'M');
+		$pdf->MultiCell($col2_width, 25, number_format($rent_total), 1, 'R', false, 0, '', '', true, 0, false, true, 25, 'M');
+		$pdf->MultiCell($col3_width, 25, $rent_seized, 1, 'C', false, 0, '', '', true, 0, false, true, 25, 'M');
 		
 		// 비고 셀 생성
 		$x = $pdf->GetX();
@@ -218,11 +218,11 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		$real_estate_securities = $real_estate['securities'] ?? '';
 		$real_estate_secured_debts = $real_estate['secured_debt'] ?? 0;
 		$real_estate_seized = $real_estate['is_seized'] ?? 'N';
-		
-		$pdf->Cell($col1_width, 40, '부동산' . "\n" . '(환가 예상액에서 피담보채권을 뺀 금액을 금액란에 적는다.)', 1, 0, 'L');
-		$pdf->Cell($col2_width, 40, number_format($real_estate_total), 1, 0, 'R');
-		$pdf->Cell($col3_width, 40, $real_estate_seized, 1, 0, 'C');
-		
+				
+		$pdf->MultiCell($col1_width, 40, "부동산\n(환가 예상액에서 피담보채권을 뺀 금액을 금액란에 적는다.)", 1, 'C', false, 0, '', '', true, 0, false, true, 40, 'M');
+		$pdf->MultiCell($col2_width, 40, number_format($real_estate_total), 1, 'R', false, 0, '', '', true, 0, false, true, 40, 'M');
+		$pdf->MultiCell($col3_width, 40, $real_estate_seized, 1, 'C', false, 0, '', '', true, 0, false, true, 40, 'M');
+				
 		// 비고 셀 생성
 		$x = $pdf->GetX();
 		$y = $pdf->GetY();
@@ -264,9 +264,9 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		$business_quantities = $business['quantities'] ?? '';
 		$business_prices = $business['prices'] ?? '';
 		
-		$pdf->Cell($col1_width, 25, '사업용 설비, 재고품, 비품 등', 1, 0, 'L');
-		$pdf->Cell($col2_width, 25, number_format($business_total), 1, 0, 'R');
-		$pdf->Cell($col3_width, 25, '', 1, 0, 'C');
+		$pdf->MultiCell($col1_width, 25, "사업용 설비,\n재고품, 비품 등", 1, 'C', false, 0, '', '', true, 0, false, true, 25, 'M');
+		$pdf->MultiCell($col2_width, 25, number_format($business_total), 1, 'R', false, 0, '', '', true, 0, false, true, 25, 'M');
+		$pdf->MultiCell($col3_width, 25, '', 1, 'C', false, 0, '', '', true, 0, false, true, 25, 'M');
 		
 		// 비고 셀 생성
 		$x = $pdf->GetX();
@@ -303,7 +303,7 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		$loan_evidences = $loan['evidences'] ?? '';
 		$loan_seized = $loan['is_seized'] ?? 'N';
 		
-		$pdf->Cell($col1_width, 20, '대여금 채권', 1, 0, 'L');
+		$pdf->Cell($col1_width, 20, '대여금 채권', 1, 0, 'C');
 		$pdf->Cell($col2_width, 20, number_format($loan_total), 1, 0, 'R');
 		$pdf->Cell($col3_width, 20, $loan_seized, 1, 0, 'C');
 		
@@ -357,7 +357,7 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		$sales_evidences = $sales['evidences'] ?? '';
 		$sales_seized = $sales['is_seized'] ?? 'N';
 		
-		$pdf->Cell($col1_width, 20, '매출금 채권', 1, 0, 'L');
+		$pdf->Cell($col1_width, 20, '매출금 채권', 1, 0, 'C');
 		$pdf->Cell($col2_width, 20, number_format($sales_total), 1, 0, 'R');
 		$pdf->Cell($col3_width, 20, $sales_seized, 1, 0, 'C');
 		
@@ -409,10 +409,10 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		$severance_workplaces = $severance['workplaces'] ?? '';
 		$severance_seized = $severance['is_seized'] ?? 'N';
 		
-		$pdf->Cell($col1_width, 10, '예상 퇴직금', 1, 0, 'L');
-		$pdf->Cell($col2_width, 10, number_format($severance_total), 1, 0, 'R');
-		$pdf->Cell($col3_width, 10, $severance_seized, 1, 0, 'C');
-		$pdf->Cell($col4_width, 10, "근무처: ".$severance_workplaces." (압류할 수 없는 퇴직금 원제외)", 1, 1, 'L');
+		$pdf->Cell($col1_width, $row_height, '예상 퇴직금', 1, 0, 'C');
+		$pdf->Cell($col2_width, $row_height, number_format($severance_total), 1, 0, 'R');
+		$pdf->Cell($col3_width, $row_height, $severance_seized, 1, 0, 'C');
+		$pdf->Cell($col4_width, $row_height, "근무처: ".$severance_workplaces." (압류할 수 없는 퇴직금 원제외)", 1, 1, 'L');
 		
 		// 기타 자산
 		$stmt = $pdo->prepare("
@@ -429,10 +429,10 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		$other_contents = $other['contents'] ?? '';
 		$other_seized = $other['is_seized'] ?? 'N';
 		
-		$pdf->Cell($col1_width, 10, '기타', 1, 0, 'L');
-		$pdf->Cell($col2_width, 10, number_format($other_total), 1, 0, 'R');
-		$pdf->Cell($col3_width, 10, $other_seized, 1, 0, 'C');
-		$pdf->Cell($col4_width, 10, $other_contents, 1, 1, 'L');
+		$pdf->Cell($col1_width, $row_height, '기타', 1, 0, 'C');
+		$pdf->Cell($col2_width, $row_height, number_format($other_total), 1, 0, 'R');
+		$pdf->Cell($col3_width, $row_height, $other_seized, 1, 0, 'C');
+		$pdf->Cell($col4_width, $row_height, $other_contents, 1, 1, 'L');
 		
 		// 합계
 		$total_assets = $cash_total + $deposit_total + $insurance_total + $vehicle_total + 
@@ -440,10 +440,10 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 						$loan_total + $sales_total + $severance_total + $other_total;
 		
 		
-		$pdf->Cell($col1_width, 10, '합계', 1, 0, 'L');
-		$pdf->Cell($col2_width, 10, number_format($total_assets), 1, 0, 'R');
-		$pdf->Cell($col3_width, 10, '', 1, 0, 'C');
-		$pdf->Cell($col4_width, 10, '', 1, 1, 'L');
+		$pdf->Cell($col1_width, $row_height, '합계', 1, 0, 'C');
+		$pdf->Cell($col2_width, $row_height, number_format($total_assets), 1, 0, 'R');
+		$pdf->Cell($col3_width, $row_height, '', 1, 0, 'C');
+		$pdf->Cell($col4_width, $row_height, '', 1, 1, 'L');
 		
 		// 면제재산
 		$stmt = $pdo->prepare("
@@ -469,22 +469,22 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		
 		$total_exemption = $exemption1_total + $exemption2_total;
 		
-		$pdf->Cell($col1_width, 10, '면제재산 결정신청 금액', 1, 0, 'L');
-		$pdf->Cell($col2_width, 10, number_format($total_exemption), 1, 0, 'R');
-		$pdf->Cell($col3_width, 10, '', 1, 0, 'C');
-		$pdf->Cell($col4_width, 10, "면제재산 결정신청 내용: ".$exemption_contents, 1, 1, 'L');
+		$pdf->MultiCell($col1_width, $row_height, "면제재산 결정\n신청 금액", 1, 'C', false, 0, '', '', true, 0, false, true, $row_height, 'M');
+		$pdf->MultiCell($col2_width, $row_height, number_format($total_exemption), 1, 'R', false, 0, '', '', true, 0, false, true, $row_height, 'M');
+		$pdf->MultiCell($col3_width, $row_height, '', 1, 'C', false, 0, '', '', true, 0, false, true, $row_height, 'M');
+		$pdf->MultiCell($col4_width, $row_height, "면제재산 결정신청 내용: ".$exemption_contents, 1, 'L', false, 1, '', '', true, 0, false, true, $row_height, 'M');
 		
 		// 청산가치
 		$liquidation_value = $total_assets - $total_exemption;
 		
 		
-		$pdf->Cell($col1_width, 10, '청산가치', 1, 0, 'L');
-		$pdf->Cell($col2_width, 10, number_format($liquidation_value), 1, 0, 'R');
-		$pdf->Cell($col3_width, 10, '', 1, 0, 'C');
-		$pdf->Cell($col4_width, 10, '', 1, 1, 'L');
+		$pdf->Cell($col1_width, $row_height, '청산가치', 1, 0, 'C');
+		$pdf->Cell($col2_width, $row_height, number_format($liquidation_value), 1, 0, 'R');
+		$pdf->Cell($col3_width, $row_height, '', 1, 0, 'C');
+		$pdf->Cell($col4_width, $row_height, '', 1, 1, 'L');
 		
 	} catch (Exception $e) {
-		$pdf->MultiCell(0, 10, 
+		$pdf->MultiCell(0, $row_height, 
 			"데이터 조회 중 오류가 발생했습니다:\n" . 
 			$e->getMessage() . 
 			"\n\n관리자에게 문의해 주시기 바랍니다.", 
