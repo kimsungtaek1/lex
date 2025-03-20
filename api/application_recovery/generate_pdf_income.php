@@ -100,7 +100,7 @@ function generatePdfIncome($pdf, $pdo, $case_no) {
 		$living_expense_amount = $income_info['living_expense_amount'] ?? 0;
 		$living_expense_range = $living_expense_amount > 0 ? '초과' : '이하';
 
-		$pdf->Cell(0, 10, '□ 채무자가 예상하는 생계비가 보건복지부 공표 기준 중위소득의 100분의 60 ' . $living_expense_range . '인 경우', 0, 1, 'L');
+		$pdf->Cell(0, 10, '[  ] 채무자가 예상하는 생계비가 보건복지부 공표 기준 중위소득의 100분의 60 ' . $living_expense_range . '인 경우', 0, 1, 'L');
 		$pdf->Cell(0, 10, '가구 기준 중위소득 ' . number_format($living_expense_amount) . '원의 약 ' . ($income_info['income_percentage'] ?? 0) . '%', 0, 1, 'L');
 
 		// III. 가족관계

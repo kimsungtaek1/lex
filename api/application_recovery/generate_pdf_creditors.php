@@ -226,9 +226,9 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 				
 				// 체크박스 표시
 				if ($appendixCount > 0) {
-					$checkBox = "☑  부속서류\n(1, 2, 3, 4)";
+					$checkBox = "[V]  부속서류\n(1, 2, 3, 4)";
 				} else {
-					$checkBox = "□  부속서류\n(1, 2, 3, 4)";
+					$checkBox = "[  ]  부속서류\n(1, 2, 3, 4)";
 				}
 				$pdf->MultiCell($col6_width, 16, $checkBox, 1, 'C', false, 1, '', '', true, 0, false, true, 16, 'M');
 				

@@ -313,7 +313,7 @@ function generatePdfStatements($pdf, $pdo, $case_no) {
 		
 		for ($i = 0; $i < count($reason_options); $i++) {
 			$option = $reason_options[$i];
-			$checked = in_array($option, $reasons) ? '☑' : '□';
+			$checked = in_array($option, $reasons) ? '[V]' : '[  ]';
 			
 			$text = $checked . ' ' . $option . ' ';
 			
@@ -386,7 +386,7 @@ function generatePdfStatements($pdf, $pdo, $case_no) {
 		}
 		
 		// 파산, 면책절차
-		$bankruptcy_checked = $bankruptcy_relief ? '☑' : '□';
+		$bankruptcy_checked = $bankruptcy_relief ? '[V]' : '[  ]';
 		$bankruptcy_institution = $bankruptcy_relief ? $bankruptcy_relief['institution'] : '';
 		$bankruptcy_date = $bankruptcy_relief && !empty($bankruptcy_relief['application_date']) ? 
 			date('Y년 m월 d일', strtotime($bankruptcy_relief['application_date'])) : '';
@@ -398,7 +398,7 @@ function generatePdfStatements($pdf, $pdo, $case_no) {
 		$pdf->Cell(50, 8, $bankruptcy_status, 1, 1, 'L');
 		
 		// 화의, 회생, 개인회생 절차
-		$recovery_checked = $recovery_relief ? '☑' : '□';
+		$recovery_checked = $recovery_relief ? '[V]' : '[  ]';
 		$recovery_institution = $recovery_relief ? $recovery_relief['institution'] : '';
 		$recovery_date = $recovery_relief && !empty($recovery_relief['application_date']) ? 
 			date('Y년 m월 d일', strtotime($recovery_relief['application_date'])) : '';
@@ -410,8 +410,8 @@ function generatePdfStatements($pdf, $pdo, $case_no) {
 		$pdf->Cell(50, 8, $recovery_status, 1, 1, 'L');
 		
 		// 신용회복위원회 워크아웃 & 배드뱅크
-		$workout_checked = $workout_relief ? '☑' : '□';
-		$badbank_checked = $badbank_relief ? '☑' : '□';
+		$workout_checked = $workout_relief ? '[V]' : '[  ]';
+		$badbank_checked = $badbank_relief ? '[V]' : '[  ]';
 		$workout_institution = $workout_relief ? $workout_relief['institution'] : '';
 		$workout_date = $workout_relief && !empty($workout_relief['application_date']) ? 
 			date('Y년 m월 d일', strtotime($workout_relief['application_date'])) : '';
@@ -440,7 +440,7 @@ function generatePdfStatements($pdf, $pdo, $case_no) {
 		// 면책절차 관련 설명
 		$pdf->SetFont('cid0kr', '', 8);
 		$pdf->Ln(2);
-		$pdf->Cell(0, 4, '☆ 과거에 면책절차 등을 이용하였다면 해당란에 ☑ 표시 후 기재합니다.', 0, 1, 'L');
+		$pdf->Cell(0, 4, '☆ 과거에 면책절차 등을 이용하였다면 해당란에 [V] 표시 후 기재합니다.', 0, 1, 'L');
 		$pdf->Cell(0, 4, '☆ 신청일 전 10년 내에 회생사건․화의사건․파산사건 또는 개인회생사건을 신청한 사실이 있는 때에는 관련서류 1통을 제출하여야 합니다.', 0, 1, 'L');
 		
 	} catch (Exception $e) {
