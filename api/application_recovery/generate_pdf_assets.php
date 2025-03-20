@@ -24,16 +24,16 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 	$row_height = 8;
 
 	// 첫 번째 열 - 명칭
-	$pdf->MultiCell($col1_width, $row_height, "명칭", 1, 'C', true, 0, '', '', true, 0, false, true, $row_height, 'M');
+	$pdf->MultiCell($col1_width, 10, "명칭", 1, 'C', true, 0, '', '', true, 0, false, true, 10, 'M');
 
 	// 두 번째 열 - 금액 또는 시가
-	$pdf->MultiCell($col2_width, $row_height, "금액 또는 시가\n(단위: 원)", 1, 'C', true, 0, '', '', true, 0, false, true, $row_height, 'M');
+	$pdf->MultiCell($col2_width, 10, "금액 또는 시가\n(단위: 원)", 1, 'C', true, 0, '', '', true, 0, false, true, 10, 'M');
 
 	// 세 번째 열 - 압류 등 유무
-	$pdf->MultiCell($col3_width, $row_height, "압류 등\n유무", 1, 'C', true, 0, '', '', true, 0, false, true, $row_height, 'M');
+	$pdf->MultiCell($col3_width, 10, "압류 등\n유무", 1, 'C', true, 0, '', '', true, 0, false, true, 10, 'M');
 
 	// 네 번째 열 - 비고
-	$pdf->MultiCell($col4_width, $row_height, "비고", 1, 'C', true, 1, '', '', true, 0, false, true, $row_height, 'M');
+	$pdf->MultiCell($col4_width, 10, "비고", 1, 'C', true, 1, '', '', true, 0, false, true, 10, 'M');
 		
 	try {
 		// 현금
@@ -318,7 +318,7 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 				$isSpouseRent = isset($rent['is_spouse_rent']) && $rent['is_spouse_rent'] == 1;
 				$rentText = number_format($rent['monthly_rent'] ?? 0).'원';
 				if ($isSpouseRent) {
-					$rentText .= " [  ] 배우자명의";
+					$rentText .= " [ V] 배우자명의";
 				}
 				$pdf->Cell($second_col_width, $cell_height, $rentText, 1, 1, 'L');
 				
