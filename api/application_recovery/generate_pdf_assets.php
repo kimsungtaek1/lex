@@ -138,13 +138,13 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		if (count($insurances) > 0) {
 			foreach ($insurances as $index => $insurance) {
 				// 새 페이지 확인 - 현재 페이지에 충분한 공간이 없으면 새 페이지 추가
-				if ($pdf->GetY() + 25 > $pdf->getPageHeight() - 20) {
+				if ($pdf->GetY() + 32 > $pdf->getPageHeight() - 20) {
 					$pdf->AddPage();
 				}
 				
-				$pdf->Cell($col1_width, 25, '보험 #'.($index+1), 1, 0, 'C');
-				$pdf->Cell($col2_width, 25, number_format($insurance['refund_amount']), 1, 0, 'R');
-				$pdf->Cell($col3_width, 25, $insurance['is_seized'] ?? 'N', 1, 0, 'C');
+				$pdf->Cell($col1_width, 32, '보험 #'.($index+1), 1, 0, 'C');
+				$pdf->Cell($col2_width, 32, number_format($insurance['refund_amount']), 1, 0, 'R');
+				$pdf->Cell($col3_width, 32, $insurance['is_seized'] ?? 'N', 1, 0, 'C');
 				
 				// 비고 셀 시작 위치 저장
 				$x = $pdf->GetX();
@@ -153,24 +153,29 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 				// 열 너비 계산
 				$first_col_width = 25;
 				$second_col_width = $col4_width - $first_col_width;
-				$cell_height = 25 / 3;
+				$cell_height = 32 / 4;
 				
-				// 첫 번째 행 - 보험회사명
+				// 보장성 보험여부
+				$pdf->Cell($first_col_width, $cell_height, '보장성보험여부', 1, 0, 'C');
+				$pdf->Cell($second_col_width, $cell_height, $insurance['is_coverage'] ?? '', 1, 1, 'L');
+
+				// 보험회사명
+				$pdf->SetXY($x, $y + $cell_height);
 				$pdf->Cell($first_col_width, $cell_height, '보험회사명', 1, 0, 'C');
 				$pdf->Cell($second_col_width, $cell_height, $insurance['company_name'] ?? '', 1, 1, 'L');
-				
-				// 두 번째 행 - 증권번호
-				$pdf->SetXY($x, $y + $cell_height);
+
+				// 증권번호
+				$pdf->SetXY($x, $y + ($cell_height * 2));
 				$pdf->Cell($first_col_width, $cell_height, '증권번호', 1, 0, 'C');
 				$pdf->Cell($second_col_width, $cell_height, $insurance['securities_number'] ?? '상세내역 별첨', 1, 1, 'L');
-				
-				// 세 번째 행 - 해약환급금
-				$pdf->SetXY($x, $y + ($cell_height * 2));
+
+				// 해약환급금
+				$pdf->SetXY($x, $y + ($cell_height * 3));
 				$pdf->Cell($first_col_width, $cell_height, '해약환급금', 1, 0, 'C');
 				$pdf->Cell($second_col_width, $cell_height, number_format($insurance['refund_amount']).'원', 1, 0, 'L');
-				
+								
 				// Y 위치 조정하여 다음 항목 출력 준비
-				$pdf->SetY($y + 25);
+				$pdf->SetY($y + 32);
 			}
 		} else {
 			// 보험 데이터가 없는 경우
@@ -258,46 +263,94 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		
 		// 임차보증금
 		$stmt = $pdo->prepare("
-			SELECT SUM(liquidation_value) as total,
-				   GROUP_CONCAT(rent_location SEPARATOR ', ') as locations,
-				   GROUP_CONCAT(contract_deposit SEPARATOR ', ') as deposits,
-				   GROUP_CONCAT(monthly_rent SEPARATOR ', ') as rents,
-				   GROUP_CONCAT(difference_reason SEPARATOR ', ') as reasons,
-				   MAX(is_seized) as is_seized
+			SELECT *
 			FROM application_recovery_asset_rent_deposits
 			WHERE case_no = ?
 		");
 		$stmt->execute([$case_no]);
-		$rent = $stmt->fetch(PDO::FETCH_ASSOC);
+		$rent_deposits = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
-		$rent_total = $rent['total'] ?? 0;
-		$rent_locations = $rent['locations'] ?? '';
-		$rent_deposits = $rent['deposits'] ?? '';
-		$rent_rents = $rent['rents'] ?? '';
-		$rent_reasons = $rent['reasons'] ?? '';
-		$rent_seized = $rent['is_seized'] ?? 'N';
+		$rent_total = 0;
+		foreach ($rent_deposits as $rent) {
+			$rent_total += $rent['liquidation_value'];
+		}
 		
-		$pdf->MultiCell($col1_width, 25, "임차보증금\n(반환받을 금액을 금액란에 적는다.)", 1, 'C', false, 0, '', '', true, 0, false, true, 25, 'M');
-		$pdf->MultiCell($col2_width, 25, number_format($rent_total), 1, 'R', false, 0, '', '', true, 0, false, true, 25, 'M');
-		$pdf->MultiCell($col3_width, 25, $rent_seized, 1, 'C', false, 0, '', '', true, 0, false, true, 25, 'M');
-		
-		// 비고 셀 생성
-		$x = $pdf->GetX();
-		$y = $pdf->GetY();
-		
-		// 임차보증금 비고 내용
-		$pdf->MultiCell($col4_width, 8, "임차물건: ".$rent_locations, 0, 'L');
-		$pdf->SetXY($x, $y + 8);
-		$pdf->MultiCell($col4_width, 8, "보증금 및 월세: ".($rent_deposits ? "보증금 ".number_format($rent_deposits)."원" : "")
-			.($rent_rents ? ", 월세 ".number_format($rent_rents)."원" : ""), 0, 'L');
-		$pdf->SetXY($x, $y + 16);
-		$pdf->MultiCell($col4_width, 9, "차이나는 사유: ".$rent_reasons, 0, 'L');
-		
-		// 비고 셀 경계선
-		$pdf->Rect($x, $y, $col4_width, 25);
-		$pdf->SetXY($x + $col4_width, $y + 25);
-		
-		$pdf->Ln(0);
+		// 각 임차보증금 데이터별로 개별 테이블 행 생성
+		if (count($rent_deposits) > 0) {
+			foreach ($rent_deposits as $index => $rent) {
+				// 새 페이지 확인 - 현재 페이지에 충분한 공간이 없으면 새 페이지 추가
+				if ($pdf->GetY() + 50 > $pdf->getPageHeight() - 20) {
+					$pdf->AddPage();
+				}
+				
+				$pdf->MultiCell($col1_width, 55, "임차보증금 #".($index+1)."\n(반환받을 금액을 금액란에 적는다.)", 1, 'C', false, 0, '', '', true, 0, false, true, 55, 'M');
+				$pdf->MultiCell($col2_width, 55, number_format($rent['liquidation_value']), 1, 'R', false, 0, '', '', true, 0, false, true, 55, 'M');
+				$pdf->MultiCell($col3_width, 55, $rent['is_seized'] ?? 'N', 1, 'C', false, 0, '', '', true, 0, false, true, 55, 'M');
+				
+				// 비고 셀 시작 위치 저장
+				$x = $pdf->GetX();
+				$y = $pdf->GetY();
+				
+				// 열 너비 계산 (비고 내 항목명을 위한 공간 할당)
+				$first_col_width = 25;
+				$second_col_width = $col4_width - $first_col_width;
+				$cell_height = 55 / 8; // 8개 항목을 넣기 위해 높이 조정
+				
+				// 임차지
+				$pdf->Cell($first_col_width, $cell_height, '임차지', 1, 0, 'C');
+				$isBusinessUse = isset($rent['is_business_location']) && $rent['is_business_location'] == 'Y';
+				$checkBox = $isBusinessUse ? '☑' : '☐';
+				$pdf->Cell($second_col_width, $cell_height, $rent['rent_location'] ?? '' . " {$checkBox} 영업장", 1, 1, 'L');
+				
+				// 계약상 보증금
+				$pdf->SetXY($x, $y + $cell_height);
+				$pdf->Cell($first_col_width, $cell_height, '계약상 보증금', 1, 0, 'C');
+				$isSpouseOwned = isset($rent['is_spouse_deposit']) && $rent['is_spouse_deposit'] == 'Y';
+				$checkBox = $isSpouseOwned ? '☑' : '☐';
+				$pdf->Cell($second_col_width, $cell_height, number_format($rent['contract_deposit'] ?? 0).'원'. " {$checkBox}☑ 배우자명의", 1, 1, 'L');
+				
+				// 월세
+				$pdf->SetXY($x, $y + ($cell_height * 2));
+				$pdf->Cell($first_col_width, $cell_height, '월세', 1, 0, 'C');
+				$isSpouseRent = isset($rent['is_spouse_rent']) && $rent['is_spouse_rent'] == 'Y';
+				$checkBox = $isSpouseRent ? '☑' : '☐';
+				$pdf->Cell($second_col_width, $cell_height, number_format($rent['monthly_rent'] ?? 0).'원' . " {$checkBox} 배우자명의", 1, 1, 'L');
+				
+				// 반환받을 보증금
+				$pdf->SetXY($x, $y + ($cell_height * 3));
+				$pdf->Cell($first_col_width, $cell_height, '반환받을 보증금', 1, 0, 'C');
+				$pdf->Cell($second_col_width, $cell_height, number_format($rent['refundable_deposit'] ?? 0).'원', 1, 1, 'L');
+				
+				// 차이나는 이유
+				$pdf->SetXY($x, $y + ($cell_height * 4));
+				$pdf->Cell($first_col_width, $cell_height, '차이나는 이유', 1, 0, 'C');
+				$pdf->Cell($second_col_width, $cell_height, $rent['difference_reason'] ?? '', 1, 1, 'L');
+				
+				// 압류할 수 없는 최우선 변제 보증금
+				$pdf->SetXY($x, $y + ($cell_height * 5));
+				$pdf->Cell($first_col_width, $cell_height, '최우선 변제 보증금', 1, 0, 'C');
+				$pdf->Cell($second_col_width, $cell_height, number_format($rent['priority_deposit'] ?? 0).'원', 1, 1, 'L');
+				
+				// 청산가치 판단금액
+				$pdf->SetXY($x, $y + ($cell_height * 6));
+				$pdf->Cell($first_col_width, $cell_height, '청산가치 판단금액', 1, 0, 'C');
+				$pdf->Cell($second_col_width, $cell_height, number_format($rent['liquidation_value']).'원', 1, 1, 'L');
+				
+				// 부연설명
+				$pdf->SetXY($x, $y + ($cell_height * 7));
+				$pdf->Cell($first_col_width, $cell_height, '부연설명', 1, 0, 'C');
+				$pdf->Cell($second_col_width, $cell_height, $rent['additional_note'] ?? '', 1, 0, 'L');
+				
+				// Y 위치 조정하여 다음 항목 출력 준비
+				$pdf->SetY($y + 55);
+			}
+		} else {
+			// 임차보증금 데이터가 없는 경우
+			$pdf->Cell($col1_width, 8, '임차보증금', 1, 0, 'C');
+			$pdf->Cell($col2_width, 8, '0', 1, 0, 'R');
+			$pdf->Cell($col3_width, 8, '', 1, 0, 'C');
+			$pdf->Cell($col4_width, 8, '해당 없음', 1, 1, 'L');
+		}
 		
 		// 부동산
 		$stmt = $pdo->prepare("
