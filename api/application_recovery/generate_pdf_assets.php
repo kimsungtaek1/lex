@@ -66,29 +66,43 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		");
 		$stmt->execute([$case_no]);
 		$deposit = $stmt->fetch(PDO::FETCH_ASSOC);
-		
+
 		$deposit_total = $deposit['total'] ?? 0;
 		$deposit_banks = $deposit['banks'] ?? '';
 		$deposit_seized = $deposit['is_seized'] ?? 'N';
-		
+
 		$pdf->Cell($col1_width, 25, '예금', 1, 0, 'C');
 		$pdf->Cell($col2_width, 25, number_format($deposit_total), 1, 0, 'R');
 		$pdf->Cell($col3_width, 25, $deposit_seized, 1, 0, 'C');
-		
-		// 비고 셀 생성
+
+		// 비고 셀 시작 위치 저장
 		$x = $pdf->GetX();
 		$y = $pdf->GetY();
-		
-		// 예금 비고 내용
-		$pdf->MultiCell($col4_width, 8, "금융기관명: ".$deposit_banks, 0, 'L');
-		$pdf->SetXY($x, $y + 8);
-		$pdf->MultiCell($col4_width, 8, "계좌번호: 상세내역 별첨", 0, 'L');
-		$pdf->SetXY($x, $y + 16);
-		$pdf->MultiCell($col4_width, 9, "잔고: ".number_format($deposit_total)."원", 0, 'L');
-		
-		// 비고 셀 경계선
-		$pdf->Rect($x, $y, $col4_width, 25);
-		$pdf->SetXY($x + $col4_width, $y + 25);
+
+		// 3행 2열 구조를 위한 크기 계산
+		$cell_width = $col4_width / 2;
+		$cell_height = 25 / 3;
+
+		// 첫 번째 행
+		$pdf->Cell($cell_width, $cell_height, '금융기관명', 'LTR', 0, 'C');
+		$pdf->Cell($cell_width, $cell_height, $deposit_banks, 'TR', 1, 'L');
+
+		// 두 번째 행의 시작 위치 설정
+		$pdf->SetXY($x, $y + $cell_height);
+
+		// 두 번째 행
+		$pdf->Cell($cell_width, $cell_height, '계좌번호', 'LR', 0, 'C');
+		$pdf->Cell($cell_width, $cell_height, '상세내역 별첨', 'R', 1, 'L');
+
+		// 세 번째 행의 시작 위치 설정
+		$pdf->SetXY($x, $y + ($cell_height * 2));
+
+		// 세 번째 행
+		$pdf->Cell($cell_width, $cell_height, '잔고', 'LBR', 0, 'C');
+		$pdf->Cell($cell_width, $cell_height, number_format($deposit_total).'원', 'BR', 0, 'L');
+
+		// Y 위치 조정하여 다음 항목 출력 준비
+		$pdf->SetY($y + 25);
 		
 		$pdf->Ln(0);
 		
