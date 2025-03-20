@@ -79,8 +79,8 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		$x = $pdf->GetX();
 		$y = $pdf->GetY();
 
-		// 열 너비 계산: 첫 번째 열은 20, 두 번째 열은 나머지
-		$first_col_width = 20;
+		// 열 너비 계산: 첫 번째 열은 25, 두 번째 열은 나머지
+		$first_col_width = 25;
 		$second_col_width = $col4_width - $first_col_width;
 		$cell_height = 25 / 3;
 
