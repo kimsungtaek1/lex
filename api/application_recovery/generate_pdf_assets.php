@@ -318,7 +318,7 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 				$isSpouseRent = isset($rent['is_spouse_rent']) && $rent['is_spouse_rent'] == 1;
 				$rentText = number_format($rent['monthly_rent'] ?? 0).'원';
 				if ($isSpouseRent) {
-					$rentText .= " [ V] 배우자명의";
+					$rentText .= " [  ] 배우자명의";
 				}
 				$pdf->Cell($second_col_width, $cell_height, $rentText, 1, 1, 'L');
 				
