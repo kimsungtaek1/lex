@@ -306,15 +306,21 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 				$pdf->SetXY($x, $y + $cell_height);
 				$pdf->Cell($first_col_width, $cell_height, '계약상 보증금', 1, 0, 'C');
 				$isSpouseOwned = isset($rent['is_deposit_spouse']) && $rent['is_deposit_spouse'] == 1;
-				$checkBox = $isSpouseOwned ? '[ V]' : '[  ]';
-				$pdf->Cell($second_col_width, $cell_height, number_format($rent['contract_deposit'] ?? 0).'원'. " {$checkBox} 배우자명의", 1, 1, 'L');
-				
+				$depositText = number_format($rent['contract_deposit'] ?? 0).'원';
+				if ($isSpouseOwned) {
+					$depositText .= " [ V] 배우자명의";
+				}
+				$pdf->Cell($second_col_width, $cell_height, $depositText, 1, 1, 'L');
+
 				// 월세
 				$pdf->SetXY($x, $y + ($cell_height * 2));
 				$pdf->Cell($first_col_width, $cell_height, '월세', 1, 0, 'C');
 				$isSpouseRent = isset($rent['is_spouse_rent']) && $rent['is_spouse_rent'] == 1;
-				$checkBox = $isSpouseRent ? '[ V]' : '[  ]';
-				$pdf->Cell($second_col_width, $cell_height, number_format($rent['monthly_rent'] ?? 0).'원' . " {$checkBox} 배우자명의", 1, 1, 'L');
+				$rentText = number_format($rent['monthly_rent'] ?? 0).'원';
+				if ($isSpouseRent) {
+					$rentText .= " [ V] 배우자명의";
+				}
+				$pdf->Cell($second_col_width, $cell_height, $rentText, 1, 1, 'L');
 				
 				// 반환받을 보증금
 				$pdf->SetXY($x, $y + ($cell_height * 3));
