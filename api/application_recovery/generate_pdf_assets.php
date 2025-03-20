@@ -79,32 +79,31 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		$x = $pdf->GetX();
 		$y = $pdf->GetY();
 
-		// 3행 2열 구조를 위한 크기 계산
-		$cell_width = $col4_width / 2;
+		// 열 너비 계산: 첫 번째 열은 20, 두 번째 열은 나머지
+		$first_col_width = 20;
+		$second_col_width = $col4_width - $first_col_width;
 		$cell_height = 25 / 3;
 
 		// 첫 번째 행
-		$pdf->Cell($cell_width, $cell_height, '금융기관명', 'LTR', 0, 'C');
-		$pdf->Cell($cell_width, $cell_height, $deposit_banks, 'TR', 1, 'L');
+		$pdf->Cell($first_col_width, $cell_height, '금융기관명', 1, 0, 'C');
+		$pdf->Cell($second_col_width, $cell_height, $deposit_banks, 1, 1, 'L');
 
 		// 두 번째 행의 시작 위치 설정
 		$pdf->SetXY($x, $y + $cell_height);
 
 		// 두 번째 행
-		$pdf->Cell($cell_width, $cell_height, '계좌번호', 'LR', 0, 'C');
-		$pdf->Cell($cell_width, $cell_height, '상세내역 별첨', 'R', 1, 'L');
+		$pdf->Cell($first_col_width, $cell_height, '계좌번호', 1, 0, 'C');
+		$pdf->Cell($second_col_width, $cell_height, '상세내역 별첨', 1, 1, 'L');
 
 		// 세 번째 행의 시작 위치 설정
 		$pdf->SetXY($x, $y + ($cell_height * 2));
 
 		// 세 번째 행
-		$pdf->Cell($cell_width, $cell_height, '잔고', 'LBR', 0, 'C');
-		$pdf->Cell($cell_width, $cell_height, number_format($deposit_total).'원', 'BR', 0, 'L');
+		$pdf->Cell($first_col_width, $cell_height, '잔고', 1, 0, 'C');
+		$pdf->Cell($second_col_width, $cell_height, number_format($deposit_total).'원', 1, 0, 'L');
 
 		// Y 위치 조정하여 다음 항목 출력 준비
 		$pdf->SetY($y + 25);
-		
-		$pdf->Ln(0);
 		
 		// 보험
 		$stmt = $pdo->prepare("
