@@ -20,12 +20,21 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 	$col3_width = 15; // 압류유무
 	$col4_width = 95; // 비고
 	
-	// 헤더 행
-	$pdf->Cell($col1_width, 10, '명칭', 1, 0, 'C', true);
-	$pdf->Cell($col2_width, 10, '금액 또는 시가 (단위: 원)', 1, 0, 'C', true);
-	$pdf->Cell($col3_width, 10, '압류유무', 1, 0, 'C', true);
-	$pdf->Cell($col4_width, 10, '비고', 1, 1, 'C', true);
-	
+	// 행 높이
+	$row_height = 8;
+
+	// 첫 번째 열 - 명칭
+	$pdf->MultiCell($col1_width, $row_height, "명칭", 1, 'C', true, 0, '', '', true, 0, false, true, $row_height, 'M');
+
+	// 두 번째 열 - 금액 또는 시가
+	$pdf->MultiCell($col2_width, $row_height, "금액 또는 시가\n(단위: 원)", 1, 'C', true, 0, '', '', true, 0, false, true, $row_height, 'M');
+
+	// 세 번째 열 - 압류 등 유무
+	$pdf->MultiCell($col3_width, $row_height, "압류 등\n유무", 1, 'C', true, 0, '', '', true, 0, false, true, $row_height, 'M');
+
+	// 네 번째 열 - 비고
+	$pdf->MultiCell($col4_width, $row_height, "비고", 1, 'C', true, 1, '', '', true, 0, false, true, $row_height, 'M');
+		
 	try {
 		// 현금
 		$pdf->Cell($col1_width, 10, '현금', 1, 0, 'L');
@@ -136,10 +145,10 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		$vehicle_info = $vehicle['vehicles'] ?? '';
 		$vehicle_seized = $vehicle['is_seized'] ?? 'N';
 		
-		$pdf->Cell($col1_width, 10, '자동차(오토바이 포함)', 1, 0, 'L');
-		$pdf->Cell($col2_width, 10, number_format($vehicle_total), 1, 0, 'R');
-		$pdf->Cell($col3_width, 10, $vehicle_seized, 1, 0, 'C');
-		$pdf->Cell($col4_width, 10, $vehicle_info, 1, 1, 'L');
+		$pdf->MultiCell($col1_width, $row_height, "자동차\n(오토바이 포함)", 1, 'C', true, 1, '', '', true, 0, false, true, $row_height, 'M');
+		$pdf->Cell($col2_width, $row_height, number_format($vehicle_total), 1, 0, 'R');
+		$pdf->Cell($col3_width, $row_height, $vehicle_seized, 1, 0, 'C');
+		$pdf->Cell($col4_width, $row_height, $vehicle_info, 1, 1, 'L');
 		
 		// 임차보증금
 		$stmt = $pdo->prepare("
