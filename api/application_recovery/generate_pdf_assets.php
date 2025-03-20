@@ -72,12 +72,6 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 			$deposit_total += $deposit['deposit_amount'];
 		}
 
-		// 예금 합계 행 출력
-		$pdf->Cell($col1_width, 8, '예금(합계)', 1, 0, 'C');
-		$pdf->Cell($col2_width, 8, number_format($deposit_total), 1, 0, 'R');
-		$pdf->Cell($col3_width, 8, '', 1, 0, 'C');
-		$pdf->Cell($col4_width, 8, '아래 세부내역 참조', 1, 1, 'L');
-
 		// 각 예금 데이터별로 개별 테이블 생성
 		if (count($deposits) > 0) {
 			foreach ($deposits as $index => $deposit) {
