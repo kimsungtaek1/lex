@@ -734,7 +734,7 @@ class AssetManager {
               </div>
             </div>
             <div class="form">
-              <div class="form-title"><span>재무 잔액</span></div>
+              <div class="form-title"><span>채무 잔액</span></div>
               <div class="form-content">
                 <input type="text" class="vehicle_financial_balance" value="${data.financial_balance ? this.formatMoney(data.financial_balance) : ""}">원
               </div>
