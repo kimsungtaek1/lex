@@ -56,92 +56,74 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		$pdf->Cell($col3_width, $row_height, $cash_seized, 1, 0, 'C');
 		$pdf->Cell($col4_width, $row_height, '', 1, 1, 'L');
 		
-		// 예금
+		
+		// 예금 데이터 개별 조회
 		$stmt = $pdo->prepare("
-			SELECT SUM(deposit_amount) as total,
-				   GROUP_CONCAT(DISTINCT bank_name SEPARATOR ', ') as banks,
-				   MAX(is_seized) as is_seized
+			SELECT *
 			FROM application_recovery_asset_deposits
 			WHERE case_no = ?
+			ORDER BY bank_name
 		");
 		$stmt->execute([$case_no]);
-		$deposit = $stmt->fetch(PDO::FETCH_ASSOC);
+		$deposits = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-		$deposit_total = $deposit['total'] ?? 0;
-		$deposit_banks = $deposit['banks'] ?? '';
-		$deposit_seized = $deposit['is_seized'] ?? 'N';
+		// 예금 총액 계산
+		$deposit_total = 0;
+		foreach ($deposits as $deposit) {
+			$deposit_total += $deposit['deposit_amount'];
+		}
 
-		$pdf->Cell($col1_width, 25, '예금', 1, 0, 'C');
-		$pdf->Cell($col2_width, 25, number_format($deposit_total), 1, 0, 'R');
-		$pdf->Cell($col3_width, 25, $deposit_seized, 1, 0, 'C');
+		// 예금 합계 행 출력
+		$pdf->Cell($col1_width, 8, '예금(합계)', 1, 0, 'C');
+		$pdf->Cell($col2_width, 8, number_format($deposit_total), 1, 0, 'R');
+		$pdf->Cell($col3_width, 8, '', 1, 0, 'C');
+		$pdf->Cell($col4_width, 8, '아래 세부내역 참조', 1, 1, 'L');
 
-		// 비고 셀 시작 위치 저장
-		$x = $pdf->GetX();
-		$y = $pdf->GetY();
-
-		// 열 너비 계산: 첫 번째 열은 25, 두 번째 열은 나머지
-		$first_col_width = 25;
-		$second_col_width = $col4_width - $first_col_width;
-		$cell_height = 25 / 3;
-
-		// 첫 번째 행
-		$pdf->Cell($first_col_width, $cell_height, '금융기관명', 1, 0, 'C');
-		$pdf->Cell($second_col_width, $cell_height, $deposit_banks, 1, 1, 'L');
-
-		// 두 번째 행의 시작 위치 설정
-		$pdf->SetXY($x, $y + $cell_height);
-
-		// 두 번째 행
-		$pdf->Cell($first_col_width, $cell_height, '계좌번호', 1, 0, 'C');
-		$pdf->Cell($second_col_width, $cell_height, '상세내역 별첨', 1, 1, 'L');
-
-		// 세 번째 행의 시작 위치 설정
-		$pdf->SetXY($x, $y + ($cell_height * 2));
-
-		// 세 번째 행
-		$pdf->Cell($first_col_width, $cell_height, '잔고', 1, 0, 'C');
-		$pdf->Cell($second_col_width, $cell_height, number_format($deposit_total).'원', 1, 0, 'L');
-
-		// Y 위치 조정하여 다음 항목 출력 준비
-		$pdf->SetY($y + 25);
-		
-		// 보험
-		$stmt = $pdo->prepare("
-			SELECT SUM(refund_amount) as total,
-				   GROUP_CONCAT(DISTINCT company_name SEPARATOR ', ') as companies,
-				   MAX(is_seized) as is_seized,
-				   GROUP_CONCAT(securities_number SEPARATOR ', ') as securities
-			FROM application_recovery_asset_insurance
-			WHERE case_no = ?
-		");
-		$stmt->execute([$case_no]);
-		$insurance = $stmt->fetch(PDO::FETCH_ASSOC);
-		
-		$insurance_total = $insurance['total'] ?? 0;
-		$insurance_companies = $insurance['companies'] ?? '';
-		$insurance_seized = $insurance['is_seized'] ?? 'N';
-		$insurance_securities = $insurance['securities'] ?? '';
-		
-		$pdf->Cell($col1_width, 25, '보험', 1, 0, 'C');
-		$pdf->Cell($col2_width, 25, number_format($insurance_total), 1, 0, 'R');
-		$pdf->Cell($col3_width, 25, $insurance_seized, 1, 0, 'C');
-		
-		// 비고 셀 생성
-		$x = $pdf->GetX();
-		$y = $pdf->GetY();
-		
-		// 보험 비고 내용
-		$pdf->MultiCell($col4_width, 8, "보험회사명: ".$insurance_companies, 0, 'L');
-		$pdf->SetXY($x, $y + 8);
-		$pdf->MultiCell($col4_width, 8, "증권번호: ".($insurance_securities ?: "상세내역 별첨"), 0, 'L');
-		$pdf->SetXY($x, $y + 16);
-		$pdf->MultiCell($col4_width, 9, "해약반환금: ".number_format($insurance_total)."원", 0, 'L');
-		
-		// 비고 셀 경계선
-		$pdf->Rect($x, $y, $col4_width, 25);
-		$pdf->SetXY($x + $col4_width, $y + 25);
-		
-		$pdf->Ln(0);
+		// 각 예금 데이터별로 개별 테이블 생성
+		if (count($deposits) > 0) {
+			foreach ($deposits as $index => $deposit) {
+				// 새 페이지 확인 - 현재 페이지에 충분한 공간이 없으면 새 페이지 추가
+				if ($pdf->GetY() + 25 > $pdf->getPageHeight() - 20) {
+					$pdf->AddPage();
+				}
+				
+				$pdf->Cell($col1_width, 25, '예금 #'.($index+1), 1, 0, 'C');
+				$pdf->Cell($col2_width, 25, number_format($deposit['deposit_amount']), 1, 0, 'R');
+				$pdf->Cell($col3_width, 25, $deposit['is_seized'] ?? 'N', 1, 0, 'C');
+				
+				// 비고 셀 시작 위치 저장
+				$x = $pdf->GetX();
+				$y = $pdf->GetY();
+				
+				// 열 너비 계산
+				$first_col_width = 25;
+				$second_col_width = $col4_width - $first_col_width;
+				$cell_height = 25 / 3;
+				
+				// 첫 번째 행 - 금융기관명
+				$pdf->Cell($first_col_width, $cell_height, '금융기관명', 1, 0, 'C');
+				$pdf->Cell($second_col_width, $cell_height, $deposit['bank_name'] ?? '', 1, 1, 'L');
+				
+				// 두 번째 행 - 계좌번호
+				$pdf->SetXY($x, $y + $cell_height);
+				$pdf->Cell($first_col_width, $cell_height, '계좌번호', 1, 0, 'C');
+				$pdf->Cell($second_col_width, $cell_height, $deposit['account_number'] ?? '상세내역 별첨', 1, 1, 'L');
+				
+				// 세 번째 행 - 잔고
+				$pdf->SetXY($x, $y + ($cell_height * 2));
+				$pdf->Cell($first_col_width, $cell_height, '잔고', 1, 0, 'C');
+				$pdf->Cell($second_col_width, $cell_height, number_format($deposit['deposit_amount']).'원', 1, 0, 'L');
+				
+				// Y 위치 조정하여 다음 항목 출력 준비
+				$pdf->SetY($y + 25);
+			}
+		} else {
+			// 예금 데이터가 없는 경우
+			$pdf->Cell($col1_width, 8, '예금', 1, 0, 'C');
+			$pdf->Cell($col2_width, 8, '0', 1, 0, 'R');
+			$pdf->Cell($col3_width, 8, '', 1, 0, 'C');
+			$pdf->Cell($col4_width, 8, '해당 없음', 1, 1, 'L');
+		}
 		
 		// 자동차
 		$stmt = $pdo->prepare("
