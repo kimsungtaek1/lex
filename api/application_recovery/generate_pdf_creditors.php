@@ -249,10 +249,13 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		}
 		
 	} catch (Exception $e) {
-		$pdf->SetFont('cid0kr', '', 12);
-		$pdf->Cell(0, 10, '채권자 정보 조회 중 오류가 발생했습니다: ' . $e->getMessage(), 0, 1, 'C');
-		error_log('PDF 채권자 목록 생성 오류: ' . $e->getMessage());
-	}
+		$pdf->MultiCell(0, 10, 
+			"데이터 조회 중 오류가 발생했습니다:\n" . 
+			$e->getMessage() . 
+			"\n\n관리자에게 문의해 주시기 바랍니다.", 
+			0, 
+			'C'
+		);	}
 }
 
 /**
