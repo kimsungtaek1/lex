@@ -23,7 +23,11 @@
 .form:nth-child(1) .form-title{border-top-left-radius: 0.6vw;}
 .form:nth-child(1) .form-content{border-top-right-radius: 0.6vw;}
 .form:nth-last-child(1) .form-title{border-bottom-left-radius: 0.6vw;}
-.form:nth-last-child(1) .form-content{border-bottom-right-radius: 0.6vw;}
+.form:nth-last-child(1) .form-content{border-bottom-right-radius: 0vw;}
+.type-field .form:nth-child(1) .form-title{border-top-left-radius: 0vw;}
+.type-field .form:nth-child(1) .form-content{border-top-right-radius: 0vw;}
+.type-field .form:nth-last-child(1) .form-title{border-bottom-left-radius: 0vw;}
+.type-field .form:nth-last-child(1) .form-content{border-bottom-right-radius: 0vw;}
 
 .form-content input[type="text"],
 .form-content input[type="number"]{padding:12px 0;width:40%;border:none;border-radius:6px;box-sizing:border-box;background:transparent;outline:none}
