@@ -518,32 +518,32 @@ $(document).ready(function() {
     }
 	
     // 부속서류 창 열기
-    function openAppendixWindow(count) {
-        if (!currentCaseNo) {
-            alert('사건을 먼저 선택해주세요.');
-            return;
-        }
-    
-        // 현재 선택된 별제권 유형 가져오기
-        const type = $(`#separateBond${count}`).val();
-        
-        // 현재 원금과 이자 값 가져오기
-        const capital = $(`#principal${count}`).val().replace(/,/g, '');
-        const interest = $(`#interest${count}`).val().replace(/,/g, '');
-        
-        // 팝업 창 크기와 위치 설정
-        const width = 1200;
-        const height = 750;
-        const left = (screen.width - width) / 2;
-        const top = (screen.height - height) / 2;
-    
-        // 팝업 창 열기
-        window.open(
-            `api/application_recovery/appendix.php?case_no=${currentCaseNo}&count=${count}&type=${type}&capital=${capital}&interest=${interest}`,
-            'AppendixWindow',
-            `width=${width},height=${height},left=${left},top=${top},scrollbars=yes`
-        );
-    }
+	function openAppendixWindow(count) {
+		if (!currentCaseNo) {
+			alert('사건을 먼저 선택해주세요.');
+			return;
+		}
+
+		// 현재 선택된 별제권 유형 가져오기
+		const type = $(`#separateBond${count}`).val();
+		
+		// 현재 원금과 이자 값 가져오기
+		const capital = $(`#principal${count}`).val().replace(/,/g, '');
+		const interest = $(`#interest${count}`).val().replace(/,/g, '');
+		
+		// 팝업 창 크기와 위치 설정
+		const width = 1200;
+		const height = 750;
+		const left = (screen.width - width) / 2;
+		const top = (screen.height - height) / 2;
+
+		// 팝업 창 열기 - type 파라미터 추가
+		window.open(
+			`api/application_recovery/appendix.php?case_no=${currentCaseNo}&count=${count}&type=${encodeURIComponent(type)}&capital=${capital}&interest=${interest}`,
+			'AppendixWindow',
+			`width=${width},height=${height},left=${left},top=${top},scrollbars=yes`
+		);
+	}
 
     // 기타미확정채권 창 열기
     function openOtherClaimWindow(count) {

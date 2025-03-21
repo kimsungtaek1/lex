@@ -255,17 +255,25 @@ function appendDataToMainForm(property) {
 
 // 폼 데이터 채우기
 function fillFormData(data) {
-	// 상단 테이블 데이터 채우기
-	for (const [key, value] of Object.entries(data)) {
-		const $input = $(`#${key}`);
-		if ($input.length) {
-			if ($input.hasClass('number-input')) {
-				$input.val(Number(value).toLocaleString('ko-KR'));
-			} else {
-				$input.val(value);
-			}
-		}
-	}
+    // 상단 테이블 데이터 채우기
+    for (const [key, value] of Object.entries(data)) {
+        const $input = $(`#${key}`);
+        if ($input.length) {
+            if ($input.hasClass('number-input')) {
+                $input.val(Number(value).toLocaleString('ko-KR'));
+            } else {
+                $input.val(value);
+            }
+        }
+    }
+
+    // appendixType 설정
+    if (data.appendix_type) {
+        $('#appendixType').val(data.appendix_type);
+    }
+
+    // 타입에 따라 UI 조정
+    setupUIByType($('#appendixType').val() || '(근)저당권설정');
 
 	// 하단 테이블 데이터 채우기
 	const bottomFields = [
