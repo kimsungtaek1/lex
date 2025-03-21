@@ -357,6 +357,7 @@ function saveForm() {
 		return val && val.trim() !== '' ? parseInt(val.replace(/,/g, '')) : null;
 	};
 
+	// 기본 데이터
 	const formData = {
 		case_no: currentCaseNo,
 		creditor_count: current_creditor_count,
@@ -365,20 +366,32 @@ function saveForm() {
 		property_detail: $('#property_detail').val() || '',
 		expected_value: getIntValue('#expected_value'),
 		evaluation_rate: $('#evaluation_rate').val(),
-		max_claim: getIntValue('#max_claim'),
-		registration_date: $('#registration_date').val() || '',
 		secured_expected_claim: getIntValue('#secured_expected_claim'),
 		unsecured_remaining_claim: getIntValue('#unsecured_remaining_claim'),
 		rehabilitation_secured_claim: getIntValue('#rehabilitation_secured_claim')
 	};
 	
 	// 타입별 추가 필드
-	if (appendixType === '최우선변제임차권') {
-		formData.priority_amount = getIntValue('#priority_amount');
-	}
-	
-	if (appendixType === '우선변제임차권') {
-		formData.resident_registration_date = $('#resident_registration_date').val() || '';
+	if (appendixType === '(근)저당권설정') {
+		formData.max_claim = getIntValue('#max_claim');
+		formData.registration_date = $('#registration_date').val() || '';
+	} else if (appendixType === '질권설정/채권양도(전세보증금)') {
+		formData.pledge_deposit = getIntValue('#pledge_deposit');
+		formData.pledge_amount = getIntValue('#pledge_amount');
+		formData.lease_start_date = $('#lease_start_date').val() || '';
+		formData.lease_end_date = $('#lease_end_date').val() || '';
+	} else if (appendixType === '최우선변제임차권') {
+		formData.first_mortgage_date = $('#first_mortgage_date').val() || '';
+		formData.region = $('#region').val() || '';
+		formData.lease_deposit = getIntValue('#lease_deposit');
+		formData.top_priority_amount = getIntValue('#top_priority_amount');
+		formData.top_lease_start_date = $('#top_lease_start_date').val() || '';
+		formData.top_lease_end_date = $('#top_lease_end_date').val() || '';
+	} else if (appendixType === '우선변제임차권') {
+		formData.priority_deposit = getIntValue('#priority_deposit');
+		formData.priority_lease_start_date = $('#priority_lease_start_date').val() || '';
+		formData.priority_lease_end_date = $('#priority_lease_end_date').val() || '';
+		formData.fixed_date = $('#fixed_date').val() || '';
 	}
 
 	$.ajax({
@@ -405,18 +418,7 @@ function saveForm() {
 			}
 		},
 		error: function(xhr) {
-			try {
-				const response = JSON.parse(xhr.responseText);
-				console.error('서버 오류:', response);
-				if (response.message) {
-					alert(`서버 오류: ${response.message}\nSQL: ${response.sql}`);
-				} else {
-					alert('알 수 없는 오류가 발생했습니다.');
-				}
-			} catch (e) {
-				console.error('오류 처리 실패:', e);
-				alert('알 수 없는 오류가 발생했습니다.');
-			}
+			// 에러 처리 코드
 		}
 	});
 }
