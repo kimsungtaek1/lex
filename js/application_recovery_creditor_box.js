@@ -135,12 +135,6 @@ window.creditorBoxTemplate = `<div class="creditor-box" data-count="{count}">
                         <div class="form-group">
                             <button type="button" class="btn-nomargin" onclick="openAppendixWindow({count})">선택</button>
                             <span>1. 별제권부채권</span>
-                            <select class="form-select" id="separateBond{count}" name="separateBond">
-                                <option value="(근)저당권설정" selected>(근)저당권설정</option>
-                                <option value="질권설정/채권양도(전세보증금)">질권설정/채권양도(전세보증금)</option>
-                                <option value="최우선변제임차권">최우선변제임차권</option>
-                                <option value="우선변제임차권">우선변제임차권</option>
-                            </select>
                         </div>
                         <div class="form-group">
                             <button type="button" class="btn-nomargin" onclick="openOtherClaimWindow({count})">선택</button>
