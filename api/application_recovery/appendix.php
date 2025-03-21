@@ -111,6 +111,8 @@ $case_no = (int)$_GET['case_no'];
                 <button type="button" id="calculateButton">계산하기</button>
             </div>
         </div>
+		
+		<!-- 동적으로 생성-->
 
         <div class="form">
             <div class="form-title"><span>③ 별제권 행사 등으로<br>변제가 예상되는 채권액</span></div>
@@ -150,10 +152,10 @@ $case_no = (int)$_GET['case_no'];
 <input type="hidden" id="appendixType" value="<?php echo isset($_GET['type']) ? htmlspecialchars($_GET['type']) : '(근)저당권설정'; ?>">
 <input type="hidden" id="mortgageNo" value="<?php echo isset($_GET['mortgage_no']) ? $_GET['mortgage_no'] : ''; ?>">
 <script>
-    var selected_capital = <?php echo isset($_GET['capital']) ? $_GET['capital'] : 'null'; ?>;
-    var selected_interest = <?php echo isset($_GET['interest']) ? $_GET['interest'] : 'null'; ?>;
-    var current_creditor_count = <?php echo isset($_GET['count']) ? $_GET['count'] : 'null'; ?>;
     var currentCaseNo = <?php echo $_GET['case_no']; ?>;
+    var current_creditor_count = <?php echo isset($_GET['count']) && $_GET['count'] !== '' ? $_GET['count'] : 'null'; ?>;
+    var selected_capital = <?php echo isset($_GET['capital']) && $_GET['capital'] !== '' ? $_GET['capital'] : 0; ?>;
+    var selected_interest = <?php echo isset($_GET['interest']) && $_GET['interest'] !== '' ? $_GET['interest'] : 0; ?>;
 </script>
 <script src="../../js/appendix.js"></script>
 </body>
