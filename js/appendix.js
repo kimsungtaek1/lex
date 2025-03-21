@@ -1,13 +1,23 @@
 $(document).ready(function() {
-	// 초기화
-	initializeFormEvents();
-	loadSavedData();
-	
-	// 타입 가져오기
-	const appendixType = $('#appendixType').val() || '(근)저당권설정';
-	
-	// 타입에 따라 UI 초기화
-	setupUIByType(appendixType);
+    // 초기화
+    initializeFormEvents();
+    
+    // URL에서 타입 가져오기
+    const urlParams = new URLSearchParams(window.location.search);
+    const appendixTypeFromUrl = urlParams.get('type');
+    
+    // appendixType 요소 값 설정
+    if (appendixTypeFromUrl) {
+        $('#appendixType').val(appendixTypeFromUrl);
+    }
+    
+    // 타입 가져오기
+    const appendixType = $('#appendixType').val() || '(근)저당권설정';
+    
+    // 타입에 따라 UI 초기화
+    setupUIByType(appendixType);
+    
+    loadSavedData();
 
 	// 목적물 선택 버튼 이벤트
 	$('#propertySelectBtn').on('click', function() {
