@@ -82,6 +82,18 @@ $case_no = (int)$_GET['case_no'];
     <div class="form-header"><?=$_GET['type']?></div>
 	<div class="left-section">
 		<div class="form">
+			<div class="form-title"><span>부속서류 타입</span></div>
+			<div class="form-content">
+				<select id="appendixType" class="form-control">
+					<option value="(근)저당권설정">(근)저당권설정</option>
+					<option value="질권설정/채권양도(전세보증금)">질권설정/채권양도(전세보증금)</option>
+					<option value="최우선변제임차권">최우선변제임차권</option>
+					<option value="우선변제임차권">우선변제임차권</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="form">
 			<div class="form-title"><span>동일목적물</span></div>
 			<div class="form-content">
 				<button type="button" class="btn-nomargin" id="propertySelectBtn">목적물 선택</button>
@@ -130,7 +142,7 @@ $case_no = (int)$_GET['case_no'];
 		</div>
 		
 		<!-- 질권설정/채권양도(전세보증금) 필드 -->
-		<div class="type-field type-pledge">
+		<div class="type-field type-pledge" style="display:none;">
 			<div class="form">
 				<div class="form-title"><span>보증금(전세/임대차)</span></div>
 				<div class="form-content form-row">
@@ -155,7 +167,7 @@ $case_no = (int)$_GET['case_no'];
 		</div>
 		
 		<!-- 최우선변제임차권 필드 -->
-		<div class="type-field type-top-priority">
+		<div class="type-field type-top-priority" style="display:none;">
 			<div class="form">
 				<div class="form-title"><span>최초근저당권설정일</span></div>
 				<div class="form-content">
@@ -197,7 +209,7 @@ $case_no = (int)$_GET['case_no'];
 		</div>
 		
 		<!-- 우선변제임차권 필드 -->
-		<div class="type-field type-priority">
+		<div class="type-field type-priority" style="display:none;">
 			<div class="form">
 				<div class="form-title"><span>임대차보증금</span></div>
 				<div class="form-content form-row">
