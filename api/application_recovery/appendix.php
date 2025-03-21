@@ -113,21 +113,6 @@ $case_no = (int)$_GET['case_no'];
         </div>
 
         <div class="form">
-            <div class="form-title"><span>채권최고액(담보액)</span></div>
-            <div class="form-content form-row">
-                <input type="text" id="max_claim" class="form-control number-input">
-                <span>원</span>
-            </div>
-        </div>
-
-        <div class="form">
-            <div class="form-title"><span>등기(등록)일자</span></div>
-            <div class="form-content">
-                <input type="date" id="registration_date" class="form-control">
-            </div>
-        </div>
-
-        <div class="form">
             <div class="form-title"><span>③ 별제권 행사 등으로<br>변제가 예상되는 채권액</span></div>
             <div class="form-content form-row">
                 <input type="text" id="secured_expected_claim" class="form-control number-input">
