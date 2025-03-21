@@ -267,8 +267,6 @@ $case_no = (int)$_GET['case_no'];
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <input type="hidden" id="mortgageNo" value="<?php echo isset($_GET['mortgage_no']) ? $_GET['mortgage_no'] : ''; ?>">
-<input type="hidden" id="appendixType" value="<?php echo isset($_GET['type']) ? htmlspecialchars($_GET['type']) : '(근)저당권설정'; ?>">
-<input type="hidden" id="mortgageNo" value="<?php echo isset($_GET['mortgage_no']) ? $_GET['mortgage_no'] : ''; ?>">
 <script>
     var currentCaseNo = <?php echo $_GET['case_no']; ?>;
     var current_creditor_count = <?php echo isset($_GET['count']) && $_GET['count'] !== '' ? $_GET['count'] : 'null'; ?>;
