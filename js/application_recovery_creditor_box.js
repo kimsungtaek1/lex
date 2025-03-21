@@ -130,8 +130,8 @@ window.creditorBoxTemplate = `<div class="creditor-box" data-count="{count}">
                 </div>
 
                 <div class="form">
-                    <div class="form-title"><span>부속서류</span></div>
-                    <div class="form-content">
+                    <div class="form-title form-notitle"><span>부속서류</span></div>
+                    <div class="form-content form-nocontent">
                         <div class="form-group">
                             <button type="button" class="btn-nomargin" onclick="openAppendixWindow({count})">선택</button>
                             <span>1. 별제권부채권</span>
