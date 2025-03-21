@@ -517,16 +517,13 @@ $(document).ready(function() {
         $(`#fax${count}`).val(institution.fax);
     }
 	
-    // 부속서류 창 열기
+	// 부속서류 창 열기
 	function openAppendixWindow(count) {
 		if (!currentCaseNo) {
 			alert('사건을 먼저 선택해주세요.');
 			return;
 		}
 
-		// 현재 선택된 별제권 유형 가져오기
-		const type = $(`#separateBond${count}`).val();
-		
 		// 현재 원금과 이자 값 가져오기
 		const capital = $(`#principal${count}`).val().replace(/,/g, '');
 		const interest = $(`#interest${count}`).val().replace(/,/g, '');
@@ -537,9 +534,9 @@ $(document).ready(function() {
 		const left = (screen.width - width) / 2;
 		const top = (screen.height - height) / 2;
 
-		// 팝업 창 열기 - type 파라미터 추가
+		// 팝업 창 열기 - type 파라미터 고정
 		window.open(
-			`api/application_recovery/appendix.php?case_no=${currentCaseNo}&count=${count}&type=${encodeURIComponent(type)}&capital=${capital}&interest=${interest}`,
+			`api/application_recovery/appendix.php?case_no=${currentCaseNo}&count=${count}&capital=${capital}&interest=${interest}`,
 			'AppendixWindow',
 			`width=${width},height=${height},left=${left},top=${top},scrollbars=yes`
 		);
