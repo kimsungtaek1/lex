@@ -92,23 +92,19 @@ $(document).ready(function() {
 
 // 타입에 따라 UI 조정
 function setupUIByType(type) {
+	// 모든 타입별 필드 숨김
+	$('.type-field').hide();
 	
 	// 타입에 따라 필요한 필드 표시
 	if (type === '최우선변제임차권') {
-		$('#max_claim').closest('.form').find('.form-title span').text('임차보증금');
-		$('#registration_date').closest('.form').find('.form-title span').text('확정일자 취득일');
-		$('#priority_amount').closest('.form').show();
+		$('.type-top-priority').show();
 	} else if (type === '우선변제임차권') {
-		$('#max_claim').closest('.form').find('.form-title span').text('임차보증금');
-		$('#registration_date').closest('.form').find('.form-title span').text('확정일자 취득일');
-		$('#resident_registration_date').closest('.form').show();
+		$('.type-priority').show();
 	} else if (type === '질권설정/채권양도(전세보증금)') {
-		$('#max_claim').closest('.form').find('.form-title span').text('전세보증금액');
-		$('#registration_date').closest('.form').find('.form-title span').text('계약일자');
+		$('.type-pledge').show();
 	} else {
 		// (근)저당권설정 (기본값)
-		$('#max_claim').closest('.form').find('.form-title span').text('채권최고액(담보액)');
-		$('#registration_date').closest('.form').find('.form-title span').text('등기(등록)일자');
+		$('.type-mortgage').show();
 	}
 }
 
@@ -275,42 +271,70 @@ function fillFormData(data) {
     // 타입에 따라 UI 조정
     setupUIByType($('#appendixType').val() || '(근)저당권설정');
 
-	// 하단 테이블 데이터 채우기
-	const bottomFields = [
-		'property_detail',
-		'expected_value', 
-		'evaluation_rate',
-		'max_claim',
-		'registration_date',
-		'secured_expected_claim',
-		'unsecured_remaining_claim',
-		'rehabilitation_secured_claim',
-		'priority_amount',
-		'resident_registration_date'
-	];
+    // 기본 필드들
+    const commonFields = [
+        'property_detail',
+        'expected_value', 
+        'evaluation_rate',
+        'secured_expected_claim',
+        'unsecured_remaining_claim',
+        'rehabilitation_secured_claim'
+    ];
 
-	bottomFields.forEach(field => {
-		const $input = $(`#${field}`);
-		if ($input.length) {
-			const value = data[field] || '';
-			
-			if ($input.hasClass('number-input')) {
-				if (value) {
-					const numValue = typeof value === 'string' ?
-						parseInt(value.replace(/,/g, '')) :
-						value;
-					$input.val(numValue.toLocaleString('ko-KR'));
-				} else {
-					$input.val('');
-				}
-			} else {
-				$input.val(value);
-			}
-		}
-	});
-	
-	// 타입에 따라 UI 조정
-	setupUIByType(data.appendix_type || '(근)저당권설정');
+    // 타입별 특수 필드
+    const typeSpecificFields = {
+        '(근)저당권설정': ['max_claim', 'registration_date'],
+        '질권설정/채권양도(전세보증금)': ['pledge_deposit', 'pledge_amount', 'lease_start_date', 'lease_end_date'],
+        '최우선변제임차권': ['first_mortgage_date', 'region', 'lease_deposit', 'top_priority_amount', 'top_lease_start_date', 'top_lease_end_date'],
+        '우선변제임차권': ['priority_deposit', 'priority_lease_start_date', 'priority_lease_end_date', 'fixed_date']
+    };
+    
+    // 현재 타입
+    const currentType = data.appendix_type || '(근)저당권설정';
+    
+    // 공통 필드 채우기
+    commonFields.forEach(field => {
+        const $input = $(`#${field}`);
+        if ($input.length) {
+            const value = data[field] || '';
+            
+            if ($input.hasClass('number-input')) {
+                if (value) {
+                    const numValue = typeof value === 'string' ?
+                        parseInt(value.replace(/,/g, '')) :
+                        value;
+                    $input.val(numValue.toLocaleString('ko-KR'));
+                } else {
+                    $input.val('');
+                }
+            } else {
+                $input.val(value);
+            }
+        }
+    });
+    
+    // 타입별 특수 필드 채우기
+    if (typeSpecificFields[currentType]) {
+        typeSpecificFields[currentType].forEach(field => {
+            const $input = $(`#${field}`);
+            if ($input.length) {
+                const value = data[field] || '';
+                
+                if ($input.hasClass('number-input')) {
+                    if (value) {
+                        const numValue = typeof value === 'string' ?
+                            parseInt(value.replace(/,/g, '')) :
+                            value;
+                        $input.val(numValue.toLocaleString('ko-KR'));
+                    } else {
+                        $input.val('');
+                    }
+                } else {
+                    $input.val(value);
+                }
+            }
+        });
+    }
 }
 
 // 목적물 데이터 채우기
