@@ -80,71 +80,177 @@ $case_no = (int)$_GET['case_no'];
         <?php endwhile; ?>
     </div>
     <div class="form-header"><?=$_GET['type']?></div>
-    <div class="left-section">
-        <div class="form">
-            <div class="form-title"><span>동일목적물</span></div>
-            <div class="form-content">
-                <button type="button" class="btn-nomargin" id="propertySelectBtn">목적물 선택</button>
-                <span>* 기존 입력된 목적물이 있는 경우</span>
-            </div>
-        </div>
+	<div class="left-section">
+		<div class="form">
+			<div class="form-title"><span>동일목적물</span></div>
+			<div class="form-content">
+				<button type="button" class="btn-nomargin" id="propertySelectBtn">목적물 선택</button>
+				<span>* 기존 입력된 목적물이 있는 경우</span>
+			</div>
+		</div>
 
-        <div class="form">
-            <div class="form-title"><span>목적물</span></div>
-            <div class="form-content">
-                <input type="text" id="property_detail" class="form-control form-control-long" placeholder="부동산 : 주소입력 / 차량 : 차량번호, 연식, 모델(예:123가4567, 2020년형, 현대쏘나타)">
-            </div>
-        </div>
+		<div class="form">
+			<div class="form-title"><span>목적물</span></div>
+			<div class="form-content">
+				<input type="text" id="property_detail" class="form-control form-control-long" placeholder="부동산 : 주소입력 / 차량 : 차량번호, 연식, 모델(예:123가4567, 2020년형, 현대쏘나타)">
+			</div>
+		</div>
 
-        <div class="form">
-            <div class="form-title"><span>환가예상액</span></div>
-            <div class="form-content form-row">
-                <input type="text" id="expected_value" class="form-control number-input">
-                <span>원</span>
-            </div>
-        </div>
+		<div class="form">
+			<div class="form-title"><span>환가예상액</span></div>
+			<div class="form-content form-row">
+				<input type="text" id="expected_value" class="form-control number-input">
+				<span>원</span>
+			</div>
+		</div>
 
-        <div class="form">
-            <div class="form-title"><span>평가비율</span></div>
-            <div class="form-content">
-                <input type="text" id="evaluation_rate" class="form-control"><span>%</span>
-                <button type="button" id="calculateButton">계산하기</button>
-            </div>
-        </div>
+		<div class="form">
+			<div class="form-title"><span>평가비율</span></div>
+			<div class="form-content">
+				<input type="text" id="evaluation_rate" class="form-control"><span>%</span>
+				<button type="button" id="calculateButton">계산하기</button>
+			</div>
+		</div>
+			
+		<!-- 동적으로 생성 - (근)저당권설정 필드 -->
+		<div class="type-field type-mortgage">
+			<div class="form">
+				<div class="form-title"><span>채권최고액(담보액)</span></div>
+				<div class="form-content form-row">
+					<input type="text" id="max_claim" class="form-control number-input">
+					<span>원</span>
+				</div>
+			</div>
+			<div class="form">
+				<div class="form-title"><span>등기(등록)일자</span></div>
+				<div class="form-content">
+					<input type="date" id="registration_date" class="form-control">
+				</div>
+			</div>
+		</div>
 		
-		<!-- 동적으로 생성-->
+		<!-- 질권설정/채권양도(전세보증금) 필드 -->
+		<div class="type-field type-pledge">
+			<div class="form">
+				<div class="form-title"><span>보증금(전세/임대차)</span></div>
+				<div class="form-content form-row">
+					<input type="text" id="pledge_deposit" class="form-control number-input">
+					<span>원</span>
+				</div>
+			</div>
+			<div class="form">
+				<div class="form-title"><span>질권설정(채권양도)금</span></div>
+				<div class="form-content form-row">
+					<input type="text" id="pledge_amount" class="form-control number-input">
+					<span>원</span>
+				</div>
+			</div>
+			<div class="form">
+				<div class="form-title"><span>전세(임대차)기간</span></div>
+				<div class="form-content">
+					<input type="date" id="lease_start_date" class="form-control"> ~ 
+					<input type="date" id="lease_end_date" class="form-control">
+				</div>
+			</div>
+		</div>
+		
+		<!-- 최우선변제임차권 필드 -->
+		<div class="type-field type-top-priority">
+			<div class="form">
+				<div class="form-title"><span>최초근저당권설정일</span></div>
+				<div class="form-content">
+					<input type="date" id="first_mortgage_date" class="form-control">
+				</div>
+			</div>
+			<div class="form">
+				<div class="form-title"><span>지역</span></div>
+				<div class="form-content">
+					<select id="region" class="form-control">
+						<option value="서울특별시">서울특별시</option>
+						<option value="경기도">경기도</option>
+						<option value="인천광역시">인천광역시</option>
+						<option value="기타">기타</option>
+					</select>
+				</div>
+			</div>
+			<div class="form">
+				<div class="form-title"><span>임대차보증금</span></div>
+				<div class="form-content form-row">
+					<input type="text" id="lease_deposit" class="form-control number-input">
+					<span>원</span>
+				</div>
+			</div>
+			<div class="form">
+				<div class="form-title"><span>최우선변제금</span></div>
+				<div class="form-content form-row">
+					<input type="text" id="top_priority_amount" class="form-control number-input">
+					<span>원</span>
+				</div>
+			</div>
+			<div class="form">
+				<div class="form-title"><span>임대차기간</span></div>
+				<div class="form-content">
+					<input type="date" id="top_lease_start_date" class="form-control"> ~ 
+					<input type="date" id="top_lease_end_date" class="form-control">
+				</div>
+			</div>
+		</div>
+		
+		<!-- 우선변제임차권 필드 -->
+		<div class="type-field type-priority">
+			<div class="form">
+				<div class="form-title"><span>임대차보증금</span></div>
+				<div class="form-content form-row">
+					<input type="text" id="priority_deposit" class="form-control number-input">
+					<span>원</span>
+				</div>
+			</div>
+			<div class="form">
+				<div class="form-title"><span>임대차기간</span></div>
+				<div class="form-content">
+					<input type="date" id="priority_lease_start_date" class="form-control"> ~ 
+					<input type="date" id="priority_lease_end_date" class="form-control">
+				</div>
+			</div>
+			<div class="form">
+				<div class="form-title"><span>확정일자</span></div>
+				<div class="form-content">
+					<input type="date" id="fixed_date" class="form-control">
+				</div>
+			</div>
+		</div>
 
-        <div class="form">
-            <div class="form-title"><span>③ 별제권 행사 등으로<br>변제가 예상되는 채권액</span></div>
-            <div class="form-content form-row">
-                <input type="text" id="secured_expected_claim" class="form-control number-input">
-                <span>원</span>
-            </div>
-        </div>
-        <div class="form">
-            <div class="form-title"><span>④ 별제권 행사 등으로도<br>변제 받을 수 없는 채권액</span></div>
-            <div class="form-content form-row">
-                <input type="text" id="unsecured_remaining_claim" class="form-control number-input">
-                <span>원</span>
-            </div>
-        </div>
-        <div class="form">
-            <div class="form-title"><span>➄ 담보부 회생채권액</span></div>
-            <div class="form-content form-row">
-                <input type="text" id="rehabilitation_secured_claim" class="form-control number-input">
-                <span>원</span>
-            </div>
-        </div>
+		<div class="form">
+			<div class="form-title"><span>③ 별제권 행사 등으로<br>변제가 예상되는 채권액</span></div>
+			<div class="form-content form-row">
+				<input type="text" id="secured_expected_claim" class="form-control number-input">
+				<span>원</span>
+			</div>
+		</div>
+		<div class="form">
+			<div class="form-title"><span>④ 별제권 행사 등으로도<br>변제 받을 수 없는 채권액</span></div>
+			<div class="form-content form-row">
+				<input type="text" id="unsecured_remaining_claim" class="form-control number-input">
+				<span>원</span>
+			</div>
+		</div>
+		<div class="form">
+			<div class="form-title"><span>➄ 담보부 회생채권액</span></div>
+			<div class="form-content form-row">
+				<input type="text" id="rehabilitation_secured_claim" class="form-control number-input">
+				<span>원</span>
+			</div>
+		</div>
 
-        <div class="form">
-            <div class="form-title"><span></span></div>
-            <div class="form-content btn-right">
-                <button type="button" id="closeButton">닫기</button>
-                <button type="button" id="deleteButton">삭제</button>
-                <button type="button" id="saveButton">저장</button>
-            </div>
-        </div>
-    </div>
+		<div class="form">
+			<div class="form-title"><span></span></div>
+			<div class="form-content btn-right">
+				<button type="button" id="closeButton">닫기</button>
+				<button type="button" id="deleteButton">삭제</button>
+				<button type="button" id="saveButton">저장</button>
+			</div>
+		</div>
+	</div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
