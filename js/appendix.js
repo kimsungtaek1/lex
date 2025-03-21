@@ -82,9 +82,6 @@ $(document).ready(function() {
 
 // 타입에 따라 UI 조정
 function setupUIByType(type) {
-	// 모든 타입별 특수 필드를 우선 숨김
-	$('#priority_amount').closest('.form').hide();
-	$('#resident_registration_date').closest('.form').hide();
 	
 	// 타입에 따라 필요한 필드 표시
 	if (type === '최우선변제임차권') {
