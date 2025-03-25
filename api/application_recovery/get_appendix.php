@@ -9,7 +9,7 @@ try {
 	$sql = "SELECT 
 				m.*,
 				c.financial_institution AS creditor_name
-			FROM application_recovery_mortgage m
+			FROM application_recovery_creditor_appendix m
 			LEFT JOIN application_recovery_creditor c
 			  ON m.case_no = c.case_no
 			  AND m.creditor_count = c.creditor_count

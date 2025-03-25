@@ -47,7 +47,7 @@ try {
 	$pdo->beginTransaction();
 	
 	// 기존 데이터 확인
-	$checkSql = "SELECT COUNT(*) FROM application_recovery_mortgage 
+	$checkSql = "SELECT COUNT(*) FROM application_recovery_creditor_appendix 
 				 WHERE case_no = ? AND creditor_count = ?";
 	$checkStmt = $pdo->prepare($checkSql);
 	$checkStmt->execute([$data['case_no'], $data['creditor_count']]);
@@ -56,7 +56,7 @@ try {
 	// SQL 쿼리 생성 (타입에 따라 다른 필드 포함)
 	if ($exists) {
 		// 업데이트 쿼리 생성
-		$sql = "UPDATE application_recovery_mortgage SET ";
+		$sql = "UPDATE application_recovery_creditor_appendix SET ";
 		$updateFields = [];
 		$params = [];
 		
@@ -76,7 +76,7 @@ try {
 		$fields = array_keys($data);
 		$placeholders = array_fill(0, count($fields), '?');
 		
-		$sql = "INSERT INTO application_recovery_mortgage (" . implode(', ', $fields) . ") 
+		$sql = "INSERT INTO application_recovery_creditor_appendix (" . implode(', ', $fields) . ") 
 				VALUES (" . implode(', ', $placeholders) . ")";
 		$params = array_values($data);
 	}

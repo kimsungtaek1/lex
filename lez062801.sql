@@ -1061,7 +1061,7 @@ CREATE TABLE `application_recovery_living_expenses` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE `application_recovery_mortgage` (
+CREATE TABLE `application_recovery_creditor_appendix` (
   `mortgage_no` int(11) NOT NULL,
   `case_no` int(11) NOT NULL,
   `creditor_count` int(11) NOT NULL,
@@ -1664,7 +1664,7 @@ ALTER TABLE `application_recovery_living_expenses`
   ADD PRIMARY KEY (`expense_no`),
   ADD KEY `case_no` (`case_no`);
 
-ALTER TABLE `application_recovery_mortgage`
+ALTER TABLE `application_recovery_creditor_appendix`
   ADD PRIMARY KEY (`mortgage_no`),
   ADD KEY `idx_case_creditor` (`case_no`,`creditor_count`);
 
@@ -1982,7 +1982,7 @@ ALTER TABLE `application_recovery_income_salary`
 ALTER TABLE `application_recovery_living_expenses`
   MODIFY `expense_no` int(11) NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE `application_recovery_mortgage`
+ALTER TABLE `application_recovery_creditor_appendix`
   MODIFY `mortgage_no` int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `application_recovery_plan10`
@@ -2179,7 +2179,7 @@ ALTER TABLE `application_recovery_income_salary`
 ALTER TABLE `application_recovery_living_expenses`
   ADD CONSTRAINT `fk_living_expenses_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
-ALTER TABLE `application_recovery_mortgage`
+ALTER TABLE `application_recovery_creditor_appendix`
   ADD CONSTRAINT `fk_mortgage_creditor` FOREIGN KEY (`case_no`,`creditor_count`) REFERENCES `application_recovery_creditor` (`case_no`, `creditor_count`) ON DELETE CASCADE;
 
 ALTER TABLE `application_recovery_plan10`

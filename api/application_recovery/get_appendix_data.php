@@ -20,7 +20,7 @@ if (!$case_no || !$creditor_count) {
 try {
 	$stmt = $pdo->prepare("
 		SELECT *
-		FROM application_recovery_mortgage
+		FROM application_recovery_creditor_appendix
 		WHERE case_no = ? AND creditor_count = ?
 	");
 	

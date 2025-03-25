@@ -28,7 +28,7 @@ $case_no = (int)$_GET['case_no'];
     $creditor_count = isset($_GET['count']) ? $_GET['count'] : null;
     $mortgage_no = isset($_GET['mortgage_no']) ? $_GET['mortgage_no'] : null;
 
-    $query = "SELECT * FROM application_recovery_mortgage 
+    $query = "SELECT * FROM application_recovery_creditor_appendix 
               WHERE case_no = ? 
               AND (? IS NULL OR creditor_count = ?)
               AND (? IS NULL OR mortgage_no = ?)

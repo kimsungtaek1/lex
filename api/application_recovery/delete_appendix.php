@@ -17,7 +17,7 @@ try {
 	$pdo->beginTransaction();
 	
 	// 삭제 쿼리 준비
-	$sql = "DELETE FROM application_recovery_mortgage 
+	$sql = "DELETE FROM application_recovery_creditor_appendix 
 			WHERE case_no = ? AND creditor_count = ?";
 	$params = [$case_no, $creditor_count];
 	

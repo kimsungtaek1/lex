@@ -19,7 +19,7 @@ try {
     $pdo->beginTransaction();
     
     // 기존 데이터 확인 (채권당 1개만 존재하도록)
-    $checkSql = "SELECT COUNT(*) FROM application_recovery_mortgage 
+    $checkSql = "SELECT COUNT(*) FROM application_recovery_creditor_appendix 
                  WHERE case_no = ? AND creditor_count = ?";
     $checkStmt = $pdo->prepare($checkSql);
     $checkStmt->execute([$data['case_no'], $data['creditor_count']]);
@@ -27,7 +27,7 @@ try {
 
         if ($exists) {
             // 업데이트
-            $sql = "UPDATE application_recovery_mortgage SET
+            $sql = "UPDATE application_recovery_creditor_appendix SET
                     mortgage_no = :mortgage_no,
                     property_detail = :property_detail,
                     expected_value = :expected_value,
@@ -41,7 +41,7 @@ try {
                       AND creditor_count = :creditor_count";
         } else {
             // 삽입
-            $sql = "INSERT INTO application_recovery_mortgage (
+            $sql = "INSERT INTO application_recovery_creditor_appendix (
                     case_no, creditor_count, mortgage_no, property_detail,
                     expected_value, evaluation_rate, max_claim, registration_date,
                     secured_expected_claim, unsecured_remaining_claim, rehabilitation_secured_claim

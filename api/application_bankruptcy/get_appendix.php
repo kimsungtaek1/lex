@@ -16,7 +16,7 @@ try {
                 m.rehabilitation_secured_claim,
                 m.mortgage_no,
                 c.financial_institution AS creditor_name
-            FROM application_recovery_mortgage m
+            FROM application_recovery_creditor_appendix m
             LEFT JOIN application_recovery_creditor c
               ON m.case_no = c.case_no
               AND m.mortgage_no = c.creditor_count
