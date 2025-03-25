@@ -56,7 +56,7 @@ $claim_no = isset($_GET['claim_no']) ? $_GET['claim_no'] : null;
 		<div class="form">
 			<div class="form-title"><span>전부명령의 대상이 된<br>채권의 범위</span></div>
 			<div class="form-content">
-				<textarea id="claim_range" class="form-control form-control-long" rows="3"></textarea>
+				<input text id="claim_range" class="form-control form-control-long"></input>
 			</div>
 		</div>
 
