@@ -5,7 +5,7 @@ include '../../config.php';
 $data = [
 	'case_no' => (int)$_POST['case_no'],
 	'creditor_count' => (int)$_POST['creditor_count'],
-	'mortgage_no' => isset($_POST['mortgage_no']) && $_POST['mortgage_no'] !== '' ? (int)$_POST['mortgage_no'] : null,
+	'appendix_no' => isset($_POST['appendix_no']) && $_POST['appendix_no'] !== '' ? (int)$_POST['appendix_no'] : null,
 	'appendix_type' => $_POST['appendix_type'] ?? '(근)저당권설정',
 	'property_detail' => $_POST['property_detail'],
 	'expected_value' => isset($_POST['expected_value']) ? (float)$_POST['expected_value'] : null,

@@ -4,7 +4,7 @@ include '../../config.php';
     $data = [
         'case_no' => (int)$_POST['case_no'],
         'creditor_count' => (int)$_POST['creditor_count'],
-        'mortgage_no' => isset($_POST['mortgage_no']) && $_POST['mortgage_no'] !== '' ? (int)$_POST['mortgage_no'] : null,
+        'appendix_no' => isset($_POST['appendix_no']) && $_POST['appendix_no'] !== '' ? (int)$_POST['appendix_no'] : null,
         'property_detail' => $_POST['property_detail'],
         'expected_value' => isset($_POST['expected_value']) ? (float)$_POST['expected_value'] : null,
         'evaluation_rate' => isset($_POST['evaluation_rate']) ? (float)$_POST['evaluation_rate'] : null,
@@ -28,7 +28,7 @@ try {
         if ($exists) {
             // 업데이트
             $sql = "UPDATE application_recovery_creditor_appendix SET
-                    mortgage_no = :mortgage_no,
+                    appendix_no = :appendix_no,
                     property_detail = :property_detail,
                     expected_value = :expected_value,
                     evaluation_rate = :evaluation_rate,
@@ -42,11 +42,11 @@ try {
         } else {
             // 삽입
             $sql = "INSERT INTO application_recovery_creditor_appendix (
-                    case_no, creditor_count, mortgage_no, property_detail,
+                    case_no, creditor_count, appendix_no, property_detail,
                     expected_value, evaluation_rate, max_claim, registration_date,
                     secured_expected_claim, unsecured_remaining_claim, rehabilitation_secured_claim
                     ) VALUES (
-                    :case_no, :creditor_count, :mortgage_no, :property_detail,
+                    :case_no, :creditor_count, :appendix_no, :property_detail,
                     :expected_value, :evaluation_rate, :max_claim, :registration_date,
                     :secured_expected_claim, :unsecured_remaining_claim, :rehabilitation_secured_claim)";
         }

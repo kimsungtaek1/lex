@@ -119,7 +119,7 @@ function loadSavedData() {
 		method: 'GET',
 		data: {
 			case_no: currentCaseNo,
-			mortgage_no: current_creditor_count
+			appendix_no: current_creditor_count
 		},
 		success: function(response) {
 			try {
@@ -476,7 +476,7 @@ function saveForm() {
 	const formData = {
 		case_no: currentCaseNo,
 		creditor_count: current_creditor_count,
-		mortgage_no: $('#mortgageNo').val() || current_creditor_count,
+		appendix_no: $('#mortgageNo').val() || current_creditor_count,
 		appendix_type: appendixType,
 		property_detail: $('#property_detail').val() || '',
 		expected_value: getIntValue('#expected_value'),
@@ -557,7 +557,7 @@ function deleteForm() {
 		data: {
 			case_no: currentCaseNo,
 			creditor_count: current_creditor_count,
-			mortgage_no: $('#mortgageNo').val() || current_creditor_count
+			appendix_no: $('#mortgageNo').val() || current_creditor_count
 		},
 		success: function(response) {
 			try {

@@ -11,7 +11,7 @@ if (!isset($_POST['case_no']) || !isset($_POST['creditor_count'])) {
 
 $case_no = (int)$_POST['case_no'];
 $creditor_count = (int)$_POST['creditor_count'];
-$mortgage_no = isset($_POST['mortgage_no']) && $_POST['mortgage_no'] ? (int)$_POST['mortgage_no'] : null;
+$appendix_no = isset($_POST['appendix_no']) && $_POST['appendix_no'] ? (int)$_POST['appendix_no'] : null;
 
 try {
 	$pdo->beginTransaction();
@@ -21,10 +21,10 @@ try {
 			WHERE case_no = ? AND creditor_count = ?";
 	$params = [$case_no, $creditor_count];
 	
-	// mortgage_no가 있는 경우 조건 추가
-	if ($mortgage_no) {
-		$sql .= " AND mortgage_no = ?";
-		$params[] = $mortgage_no;
+	// appendix_no가 있는 경우 조건 추가
+	if ($appendix_no) {
+		$sql .= " AND appendix_no = ?";
+		$params[] = $appendix_no;
 	}
 	
 	$stmt = $pdo->prepare($sql);

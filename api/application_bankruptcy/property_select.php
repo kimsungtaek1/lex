@@ -33,13 +33,13 @@ if (!$caseNo) {
     <script>
     $(document).ready(function() {
         const caseNo = "<?= $caseNo ?>";
-        const mortgage_no = "<?= $count ?>";
+        const appendix_no = "<?= $count ?>";
         // 목적물 데이터 로드
         $.ajax({
             url: 'get_appendix.php',
             method: 'GET',
             data: { case_no: caseNo,
-                mortgage_no: mortgage_no
+                appendix_no: appendix_no
              },
             dataType: 'json',
             success: function(response) {
@@ -73,7 +73,7 @@ if (!$caseNo) {
         properties.forEach(property => {
             const row = `
                 <div class="table-row">
-                    <div class="col">${property.mortgage_no || ''}</div>
+                    <div class="col">${property.appendix_no || ''}</div>
                     <div class="col">${property.creditor_name || ''}</div>
                     <div class="col">${property.property_detail || ''}</div>
                     <div class="col">

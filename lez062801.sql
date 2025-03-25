@@ -1062,7 +1062,7 @@ CREATE TABLE `application_recovery_living_expenses` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `application_recovery_creditor_appendix` (
-  `mortgage_no` int(11) NOT NULL,
+  `appendix_no` int(11) NOT NULL,
   `case_no` int(11) NOT NULL,
   `creditor_count` int(11) NOT NULL,
   `property_detail` varchar(255) DEFAULT NULL COMMENT '목적물',
@@ -1665,7 +1665,7 @@ ALTER TABLE `application_recovery_living_expenses`
   ADD KEY `case_no` (`case_no`);
 
 ALTER TABLE `application_recovery_creditor_appendix`
-  ADD PRIMARY KEY (`mortgage_no`),
+  ADD PRIMARY KEY (`appendix_no`),
   ADD KEY `idx_case_creditor` (`case_no`,`creditor_count`);
 
 ALTER TABLE `application_recovery_plan10`
@@ -1983,7 +1983,7 @@ ALTER TABLE `application_recovery_living_expenses`
   MODIFY `expense_no` int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `application_recovery_creditor_appendix`
-  MODIFY `mortgage_no` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `appendix_no` int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `application_recovery_plan10`
   MODIFY `plan_no` int(11) NOT NULL AUTO_INCREMENT;

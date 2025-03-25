@@ -26,12 +26,12 @@ $case_no = (int)$_GET['case_no'];
     <div class="appendix-title">부속서류 1. 별제권부채권</div>
     <?php
     $creditor_count = isset($_GET['count']) ? $_GET['count'] : null;
-    $mortgage_no = isset($_GET['mortgage_no']) ? $_GET['mortgage_no'] : null;
+    $appendix_no = isset($_GET['appendix_no']) ? $_GET['appendix_no'] : null;
 
     $query = "SELECT * FROM application_recovery_creditor_appendix 
               WHERE case_no = ? 
               AND (? IS NULL OR creditor_count = ?)
-              AND (? IS NULL OR mortgage_no = ?)
+              AND (? IS NULL OR appendix_no = ?)
               ORDER BY creditor_count ASC";
               
     $stmt = $pdo->prepare($query);
@@ -42,7 +42,7 @@ $case_no = (int)$_GET['case_no'];
         ]));
     }
     
-    if (!$stmt->execute([$case_no, $creditor_count, $creditor_count, $mortgage_no, $mortgage_no])) {
+    if (!$stmt->execute([$case_no, $creditor_count, $creditor_count, $appendix_no, $appendix_no])) {
         die(json_encode([
             'status' => 'error',
             'message' => '쿼리 실행 실패: ' . $stmt->errorInfo()[2]
@@ -161,7 +161,7 @@ $case_no = (int)$_GET['case_no'];
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<input type="hidden" id="mortgageNo" value="<?php echo isset($_GET['mortgage_no']) ? $_GET['mortgage_no'] : ''; ?>">
+<input type="hidden" id="mortgageNo" value="<?php echo isset($_GET['appendix_no']) ? $_GET['appendix_no'] : ''; ?>">
 <script>
     var selected_capital = <?php echo isset($_GET['capital']) ? $_GET['capital'] : 'null'; ?>;
     var selected_interest = <?php echo isset($_GET['interest']) ? $_GET['interest'] : 'null'; ?>;
