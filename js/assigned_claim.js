@@ -89,14 +89,15 @@ function clearForm() {
 
 // 폼 데이터 채우기
 function fillFormData(data) {
-	$('#original_creditor').val(data.original_creditor || '');
-	$('#debtor_name').val(data.debtor_name || '');
 	$('#court_name').val(data.court_name || '');
 	$('#case_number').val(data.case_number || '');
+	$('#original_creditor').val(data.original_creditor || '');
+	$('#debtor_name').val(data.debtor_name || '');
 	$('#order_amount').val(formatNumberValue(data.order_amount));
 	$('#order_date').val(data.order_date || '');
-	$('#remark').val(data.remark || '');
+	$('#claim_range').val(data.claim_range || '');
 }
+
 
 // 숫자 포맷팅
 function formatNumber(input) {
