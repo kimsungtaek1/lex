@@ -735,26 +735,26 @@ $(document).ready(function() {
 	}
 
 	function checkOtherClaimExists(count) {
-	if (!currentCaseNo) return;
-	
-	$.ajax({
-		url: 'api/application_recovery/get_other_claims.php',
-		type: 'GET',
-		data: {
-			case_no: currentCaseNo,
-			creditor_count: count
-		},
-		success: function(response) {
-			if (response.success && response.data && response.data.length > 0) {
-				// 데이터가 있으면 버튼 색상 변경
-				$(`.creditor-box[data-count="${count}"] button[onclick*="openOtherClaimWindow"]`).addClass('btn-other-claim-saved');
-			} else {
-				// 데이터가 없으면 버튼 색상 원래대로
-				$(`.creditor-box[data-count="${count}"] button[onclick*="openOtherClaimWindow"]`).removeClass('btn-other-claim-saved');
+		if (!currentCaseNo) return;
+		
+		$.ajax({
+			url: 'api/application_recovery/get_other_claims.php',
+			type: 'GET',
+			data: {
+				case_no: currentCaseNo,
+				creditor_count: count
+			},
+			success: function(response) {
+				if (response.success && response.data && response.data.length > 0) {
+					// 데이터가 있으면 버튼 색상 변경
+					$(`.creditor-box[data-count="${count}"] button[onclick*="openOtherClaimWindow"]`).addClass('btn-other-claim-saved');
+				} else {
+					// 데이터가 없으면 버튼 색상 원래대로
+					$(`.creditor-box[data-count="${count}"] button[onclick*="openOtherClaimWindow"]`).removeClass('btn-other-claim-saved');
+				}
 			}
-		}
-	});
-}
+		});
+	}
 
     // 부속서류 개수 로드
     function loadAppendixCount(count) {

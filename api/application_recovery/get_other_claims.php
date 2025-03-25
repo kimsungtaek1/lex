@@ -27,14 +27,6 @@ try {
 	";
 	$params = [$case_no, $creditor_count];
 	
-	// 특정 claim_no가 지정된 경우 추가 조건
-	if ($claim_no) {
-		$sql .= " AND claim_no = ?";
-		$params[] = $claim_no;
-	}
-	
-	$sql .= " ORDER BY claim_no ASC";
-	
 	$stmt = $pdo->prepare($sql);
 	$stmt->execute($params);
 	$claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
