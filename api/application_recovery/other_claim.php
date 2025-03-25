@@ -81,8 +81,8 @@ $claim_no = isset($_GET['claim_no']) ? $_GET['claim_no'] : null;
 		</div>
 
 		<div class="form">
-			<div class="form-notitle"><span>소송제기 여부 및<br>진행경과</span></div>
-			<div class="form-nocontent">
+			<div class="form-title form-notitle"><span>소송제기 여부 및<br>진행경과</span></div>
+			<div class="form-content form-nocontent">
 				<span>※  주채권자 정보를 저장한 후 부속서류를 선택하실 수 있습니다.</span>
 			</div>
 		</div>
