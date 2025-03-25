@@ -611,66 +611,67 @@ $(document).ready(function() {
         openClaimWindow(count, 'guaranteed');
     }
 
-    // 메시지 이벤트 리스너
-    window.addEventListener('message', function(event) {
-        console.log('수신된 메시지:', event.data);
-        
-        // 부속서류 저장 이벤트 처리
-        if (event.data.type === 'appendixSaved') {
-            const count = event.data.creditorCount;
-            const hasData = event.data.hasData;
-            
-            // 해당 채권자의 별제권부채권 버튼 색상 변경
-            if (hasData) {
-                $(`.creditor-box[data-count="${count}"] button[onclick*="openAppendixWindow"]`).addClass('btn-appendix-saved');
-            }
-            
-            // 부속서류 개수 새로고침
-            loadAppendixCount(count);
-            
-            // 금액 합계 재계산
-            calculateTotals();
-        }
-        
-        // 부속서류 삭제 이벤트 처리
-        if (event.data.type === 'appendixDeleted') {
-            const count = event.data.creditorCount;
-            
-            // 해당 채권자의 별제권부채권 버튼 색상 원래대로
-            $(`.creditor-box[data-count="${count}"] button[onclick*="openAppendixWindow"]`).removeClass('btn-appendix-saved');
-            
-            // 부속서류 개수 새로고침
-            loadAppendixCount(count);
-            
-            // 금액 합계 재계산
-            calculateTotals();
-        }
-        
-        // 다툼있는 채권 저장 이벤트 처리
-        if (event.data.type === 'otherClaimSaved') {
-            const count = event.data.creditorCount;
-            const hasData = event.data.hasData;
-            
-            // 해당 채권자의 다툼있는 채권 버튼 색상 변경
-            if (hasData) {
-                $(`.creditor-box[data-count="${count}"] button[onclick*="openOtherClaimWindow"]`).addClass('btn-other-claim-saved');
-            }
-            
-            // 다툼있는 채권 개수 새로고침
-            loadOtherClaimCount(count);
-        }
-        
-        // 다툼있는 채권 삭제 이벤트 처리
-        if (event.data.type === 'otherClaimDeleted') {
-            const count = event.data.creditorCount;
-            
-            // 해당 채권자의 다툼있는 채권 버튼 색상 원래대로
-            $(`.creditor-box[data-count="${count}"] button[onclick*="openOtherClaimWindow"]`).removeClass('btn-other-claim-saved');
-            
-            // 다툼있는 채권 개수 새로고침
-            loadOtherClaimCount(count);
-        }
-    });
+	// 메시지 이벤트 리스너
+	window.addEventListener('message', function(event) {
+		console.log('수신된 메시지:', event.data);
+		
+		// 부속서류 저장 이벤트 처리
+		if (event.data.type === 'appendixSaved') {
+			const count = event.data.creditorCount;
+			const hasData = event.data.hasData;
+			
+			// 해당 채권자의 별제권부채권 버튼 색상 변경
+			if (hasData) {
+				// 수정된 선택자: 버튼에 ID 또는 직접적인 참조가 필요
+				$(`#openAppendix${count}`).addClass('btn-appendix-saved');
+			}
+			
+			// 부속서류 개수 새로고침
+			loadAppendixCount(count);
+			
+			// 금액 합계 재계산
+			calculateTotals();
+		}
+		
+		// 부속서류 삭제 이벤트 처리
+		if (event.data.type === 'appendixDeleted') {
+			const count = event.data.creditorCount;
+			
+			// 해당 채권자의 별제권부채권 버튼 색상 원래대로
+			$(`#openAppendix${count}`).removeClass('btn-appendix-saved');
+			
+			// 부속서류 개수 새로고침
+			loadAppendixCount(count);
+			
+			// 금액 합계 재계산
+			calculateTotals();
+		}
+		
+		// 다툼있는 채권 저장 이벤트 처리
+		if (event.data.type === 'otherClaimSaved') {
+			const count = event.data.creditorCount;
+			const hasData = event.data.hasData;
+			
+			// 해당 채권자의 다툼있는 채권 버튼 색상 변경
+			if (hasData) {
+				$(`#openOtherClaim${count}`).addClass('btn-other-claim-saved');
+			}
+			
+			// 다툼있는 채권 개수 새로고침
+			loadOtherClaimCount(count);
+		}
+		
+		// 다툼있는 채권 삭제 이벤트 처리
+		if (event.data.type === 'otherClaimDeleted') {
+			const count = event.data.creditorCount;
+			
+			// 해당 채권자의 다툼있는 채권 버튼 색상 원래대로
+			$(`#openOtherClaim${count}`).removeClass('btn-other-claim-saved');
+			
+			// 다툼있는 채권 개수 새로고침
+			loadOtherClaimCount(count);
+		}
+	});
 
     // 부속정보 로드
     function loadCreditorSpecificData(count) {
@@ -684,71 +685,71 @@ $(document).ready(function() {
         checkOtherClaimExists(count);
     }
 
-    // 별제권부채권 데이터 존재 여부 확인
-    function checkAppendixExists(count) {
-        if (!currentCaseNo) return;
-        
-        $.ajax({
-            url: 'api/application_recovery/get_appendix_data.php',
-            type: 'GET',
-            data: {
-                case_no: currentCaseNo,
-                creditor_count: count
-            },
-            success: function(response) {
-                try {
-                    // 응답이 문자열이면 JSON으로 파싱
-                    const data = typeof response === 'string' ? JSON.parse(response) : response;
-                    
-                    if (data.success && data.data && data.data.length > 0) {
-                        // 데이터가 있으면 버튼 색상 변경
-                        $(`.creditor-box[data-count="${count}"] button[onclick*="openAppendixWindow"]`).addClass('btn-appendix-saved');
-                    } else {
-                        // 데이터가 없으면 버튼 색상 원래대로
-                        $(`.creditor-box[data-count="${count}"] button[onclick*="openAppendixWindow"]`).removeClass('btn-appendix-saved');
-                    }
-                } catch (e) {
-                    console.error('JSON 파싱 오류:', e);
-                }
-            },
-            error: function(xhr) {
-                console.error('서버 오류:', xhr.responseText);
-            }
-        });
-    }
+	// 별제권부채권 데이터 존재 여부 확인
+	function checkAppendixExists(count) {
+		if (!currentCaseNo) return;
+		
+		$.ajax({
+			url: 'api/application_recovery/get_appendix_data.php',
+			type: 'GET',
+			data: {
+				case_no: currentCaseNo,
+				creditor_count: count
+			},
+			success: function(response) {
+				try {
+					// 응답이 문자열이면 JSON으로 파싱
+					const data = typeof response === 'string' ? JSON.parse(response) : response;
+					
+					if (data.success && data.data && data.data.length > 0) {
+						// 데이터가 있으면 버튼 색상 변경
+						$(`#openAppendix${count}`).addClass('btn-appendix-saved');
+					} else {
+						// 데이터가 없으면 버튼 색상 원래대로
+						$(`#openAppendix${count}`).removeClass('btn-appendix-saved');
+					}
+				} catch (e) {
+					console.error('JSON 파싱 오류:', e);
+				}
+			},
+			error: function(xhr) {
+				console.error('서버 오류:', xhr.responseText);
+			}
+		});
+	}
 
-    // 다툼있는 채권 데이터 존재 여부 확인
-    function checkOtherClaimExists(count) {
-        if (!currentCaseNo) return;
-        
-        $.ajax({
-            url: 'api/application_recovery/get_other_claims.php',
-            type: 'GET',
-            data: {
-                case_no: currentCaseNo,
-                creditor_count: count
-            },
-            success: function(response) {
-                try {
-                    // 응답이 문자열이면 JSON으로 파싱
-                    const data = typeof response === 'string' ? JSON.parse(response) : response;
-                    
-                    if (data.success && data.data && data.data.length > 0) {
-                        // 데이터가 있으면 버튼 색상 변경
-                        $(`.creditor-box[data-count="${count}"] button[onclick*="openOtherClaimWindow"]`).addClass('btn-other-claim-saved');
-                    } else {
-                        // 데이터가 없으면 버튼 색상 원래대로
-                        $(`.creditor-box[data-count="${count}"] button[onclick*="openOtherClaimWindow"]`).removeClass('btn-other-claim-saved');
-                    }
-                } catch (e) {
-                    console.error('JSON 파싱 오류:', e);
-                }
-            },
-            error: function(xhr) {
-                console.error('서버 오류:', xhr.responseText);
-            }
-        });
-    }
+	// 다툼있는 채권 데이터 존재 여부 확인
+	function checkOtherClaimExists(count) {
+		if (!currentCaseNo) return;
+		
+		$.ajax({
+			url: 'api/application_recovery/get_other_claims.php',
+			type: 'GET',
+			data: {
+				case_no: currentCaseNo,
+				creditor_count: count
+			},
+			success: function(response) {
+				try {
+					// 응답이 문자열이면 JSON으로 파싱
+					const data = typeof response === 'string' ? JSON.parse(response) : response;
+					
+					if (data.success && data.data && data.data.length > 0) {
+						// 데이터가 있으면 버튼 색상 변경
+						$(`#openOtherClaim${count}`).addClass('btn-other-claim-saved');
+					} else {
+						// 데이터가 없으면 버튼 색상 원래대로
+						$(`#openOtherClaim${count}`).removeClass('btn-other-claim-saved');
+					}
+				} catch (e) {
+					console.error('JSON 파싱 오류:', e);
+				}
+			},
+			error: function(xhr) {
+				console.error('서버 오류:', xhr.responseText);
+			}
+		});
+	}
 
     // 부속서류 개수 로드
     function loadAppendixCount(count) {

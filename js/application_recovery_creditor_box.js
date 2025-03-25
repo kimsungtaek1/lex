@@ -133,11 +133,11 @@ window.creditorBoxTemplate = `<div class="creditor-box" data-count="{count}">
                     <div class="form-title form-notitle"><span>부속서류</span></div>
                     <div class="form-content">
                         <div class="form-group">
-                            <button type="button" class="btn-nomargin" onclick="openClaimWindow({count}, 'appendix')">선택</button>
+                            <button type="button" id="openAppendix{count}" class="btn-nomargin" onclick="openClaimWindow({count}, 'appendix')">선택</button>
                             <span>1. 별제권부채권</span>
                         </div>
                         <div class="form-group">
-                            <button type="button" class="btn-nomargin" onclick="openClaimWindow({count}, 'disputed')">선택</button>
+                            <button type="button" id="openOtherClaim{count}" class="btn-nomargin" onclick="openClaimWindow({count}, 'disputed')">선택</button>
                             <span>2. 다툼있는 채권</span>
                         </div>
                     </div>
