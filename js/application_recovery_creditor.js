@@ -579,6 +579,34 @@ $(document).ready(function() {
             `width=${width},height=${height},left=${left},top=${top},scrollbars=yes`
         );
     }
+	
+	// 부속서류 저장 메시지 리스너
+	window.addEventListener('message', function(event) {
+		// 부속서류 저장 이벤트 처리
+		if (event.data.type === 'appendixSaved') {
+			const count = event.data.creditorCount;
+			const hasData = event.data.hasData;
+			
+			// 해당 채권자의 별제권부채권 버튼 색상 변경
+			if (hasData) {
+				$(`.creditor-box[data-count="${count}"] button[onclick*="openAppendixWindow"]`).addClass('btn-appendix-saved');
+			}
+			
+			// 부속서류 개수 새로고침
+			loadAppendixCount(count);
+		}
+		
+		// 부속서류 삭제 이벤트 처리
+		if (event.data.type === 'appendixDeleted') {
+			const count = event.data.creditorCount;
+			
+			// 해당 채권자의 별제권부채권 버튼 색상 원래대로
+			$(`.creditor-box[data-count="${count}"] button[onclick*="openAppendixWindow"]`).removeClass('btn-appendix-saved');
+			
+			// 부속서류 개수 새로고침
+			loadAppendixCount(count);
+		}
+	});
 
     // 부속정보 로드
     function loadCreditorSpecificData(count) {

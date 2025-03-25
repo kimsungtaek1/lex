@@ -195,3 +195,5 @@ input[type="checkbox"]:not(:checked) + label::after{content:none}
 .view-print-item{margin:1vw 0 0 0;}
 .view-print-item:first-child{margin:0;}
 .view-print-button{margin:1vw 1vw 0 0;display:flex;justify-content:flex-end;}
+
+.btn-appendix-saved{background:#00e6c3 !important;color:#fff !important;font-weight:bold;}

@@ -258,9 +258,17 @@ function saveFormData(formData) {
 			try {
 				const result = typeof response === 'string' ? JSON.parse(response) : response;
 				if (result.status === 'success') {
-					alert('목적물 정보가 저장되었습니다.');
+					alert(result.message || '저장되었습니다.');
+					// 저장 성공 메시지 전달 (상태 정보 추가)
+					window.opener.postMessage({
+						type: 'appendixSaved', 
+						creditorCount: current_creditor_count,
+						hasData: true // 데이터가 있음을 표시
+					}, '*');
+					location.reload();
 				} else {
-					console.error('저장 실패:', result);
+					console.log('저장 실패 응답:', result);
+					alert('저장 중 오류가 발생했습니다.');
 				}
 			} catch (e) {
 				console.error('저장 오류:', e);
