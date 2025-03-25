@@ -98,7 +98,6 @@ function fillFormData(data) {
 	$('#claim_range').val(data.claim_range || '');
 }
 
-
 // 숫자 포맷팅
 function formatNumber(input) {
 	if (!input || !input.val) return;
@@ -133,20 +132,18 @@ function saveForm() {
 		return parseFloat($(selector).val().replace(/,/g, '')) || 0;
 	};
 	
-	// 데이터 수집
 	const formData = {
 		case_no: currentCaseNo,
 		creditor_count: current_creditor_count,
-		original_creditor: $('#original_creditor').val(),
-		debtor_name: $('#debtor_name').val(),
 		court_name: $('#court_name').val(),
 		case_number: $('#case_number').val(),
+		original_creditor: $('#original_creditor').val(),
+		debtor_name: $('#debtor_name').val(),
 		order_amount: getNumber('#order_amount'),
 		order_date: $('#order_date').val(),
-		remark: $('#remark').val()
+		claim_range: $('#claim_range').val()
 	};
 	
-	// claim_no가 있으면 추가
 	const claimNo = $('#claimNo').val();
 	if (claimNo) {
 		formData.claim_no = claimNo;
@@ -162,7 +159,7 @@ function saveForm() {
 				if (result.success) {
 					alert(result.message || '저장되었습니다.');
 					
-					// 부모 창에 메시지 전달 - 버튼 색상 변경을 위한 정보 포함
+					// 부모 창에 메시지 전달
 					window.opener.postMessage({
 						type: 'assignedClaimSaved', 
 						creditorCount: current_creditor_count,
@@ -174,11 +171,7 @@ function saveForm() {
 						$('#claimNo').val(result.claim_no);
 					}
 				} else {
-					console.error('저장 실패 응답:', result);
-					alert('저장 중 오류가 발생했습니다.');
-					if (result.message) {
-						console.error('에러 메시지:', result.message);
-					}
+					alert(result.message || '저장 중 오류가 발생했습니다.');
 				}
 			} catch (e) {
 				console.error('저장 오류:', e);

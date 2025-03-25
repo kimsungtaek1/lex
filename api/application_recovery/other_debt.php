@@ -26,49 +26,23 @@ $debt_no = isset($_GET['debt_no']) ? $_GET['debt_no'] : null;
 		<input type="hidden" id="debtNo" value="<?php echo $debt_no; ?>">
 		
 		<div class="form">
-			<div class="form-title"><span>보증인명</span></div>
+			<div class="form-title form-notitle"><span>기타내역</span></div>
 			<div class="form-content">
-				<input type="text" id="guarantor_name" class="form-control">
+				채권번호 : 해당 채권사에 대한 원금 원의 채무는 연대보증 채무이며 채권원인(으)로 발생한 채무입니다.
 			</div>
 		</div>
 
 		<div class="form">
-			<div class="form-title"><span>채무유형</span></div>
+			<div class="form-title form-notitle"><span></span></div>
 			<div class="form-content">
-				<select id="debt_type" class="form-control">
-					<option value="보증채무">보증채무</option>
-					<option value="연대채무">연대채무</option>
-					<option value="기타">기타</option>
-				</select>
+				주채무자 소유 부동산에 근저당권이 설정되어 있는 경우 
 			</div>
 		</div>
 
 		<div class="form">
-			<div class="form-title"><span>채무금액</span></div>
-			<div class="form-content form-row">
-				<input type="text" id="debt_amount" class="form-control number-input">
-				<span>원</span>
-			</div>
-		</div>
-
-		<div class="form">
-			<div class="form-title"><span>보증일</span></div>
+			<div class="form-title"><span></span></div>
 			<div class="form-content">
-				<input type="date" id="guarantee_date" class="form-control">
-			</div>
-		</div>
-
-		<div class="form">
-			<div class="form-title"><span>채무내용</span></div>
-			<div class="form-content">
-				<textarea id="debt_content" class="form-control" rows="3"></textarea>
-			</div>
-		</div>
-
-		<div class="form">
-			<div class="form-title"><span>비고</span></div>
-			<div class="form-content">
-				<input type="text" id="remark" class="form-control form-control-long">
+				※  채무자가 보증인인 경우, 주채무의 내용(주채무자,금액, 관계 등) 채무자 이외의 제3자가 물상보증을 제공한 경우 등 1~3의 부속서류에 기재하기 어려운 유형의 채권이 있는 경우에도 본 란에 기재할 수 있습니다.      
 			</div>
 		</div>
 
