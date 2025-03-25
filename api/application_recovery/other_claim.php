@@ -14,55 +14,7 @@ $claim_no = isset($_GET['claim_no']) ? $_GET['claim_no'] : null;
 <link rel="stylesheet" href="../../css/appendix.css">
 <div class="content-wrapper">
     <div class="appendix-title">부속서류 2. 다툼있는 채권</div>
-    <?php
-    $query = "SELECT * FROM application_recovery_creditor_other_claims 
-              WHERE case_no = ? 
-              AND creditor_count = ?
-              AND (? IS NULL OR claim_no = ?)
-              ORDER BY claim_no ASC";
-              
-    $stmt = $pdo->prepare($query);
-    if (!$stmt) {
-        die(json_encode([
-            'status' => 'error',
-            'message' => '쿼리 준비 실패: ' . $pdo->errorInfo()[2]
-        ]));
-    }
     
-    if (!$stmt->execute([$case_no, $creditor_count, $claim_no, $claim_no])) {
-        die(json_encode([
-            'status' => 'error',
-            'message' => '쿼리 실행 실패: ' . $stmt->errorInfo()[2]
-        ]));
-    }
-    
-    $result = $stmt;
-    $rowCount = $stmt->rowCount();
-    
-    if ($rowCount === 0) {
-        echo '<div class="no-data">데이터가 없습니다</div>';
-    }
-    ?>
-    
-    <div class="appendix-table">
-        <div class="table-header">
-            <div class="col">|&nbsp;&nbsp;번호</div>
-            <div class="col">|&nbsp;&nbsp;다툼 원인</div>
-            <div class="col">|&nbsp;&nbsp;채권자 주장</div>
-            <div class="col">|&nbsp;&nbsp;다툼없는 부분</div>
-            <div class="col">|&nbsp;&nbsp;차이나는 부분</div>
-        </div>
-        <?php while($row = $result->fetch()): ?>
-        <div class="table-row">
-            <div class="col"><?= $row['claim_no'] ?></div>
-            <div class="col"><?= $row['claim_type'] ?></div>
-            <div class="col"><?= number_format($row['amount']) ?>원</div>
-            <div class="col"><?= number_format($row['undisputed_amount'] ?? 0) ?>원</div>
-            <div class="col"><?= number_format(($row['amount'] ?? 0) - ($row['undisputed_amount'] ?? 0)) ?>원</div>
-        </div>
-        <?php endwhile; ?>
-    </div>
-    <div class="form-header">다툼있는 채권 상세</div>
 	<div class="left-section">
 		<input type="hidden" id="claimNo" value="<?php echo $claim_no; ?>">
 		
