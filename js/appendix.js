@@ -62,15 +62,9 @@ function registerEventListeners() {
 
 // 부속서류 헤더 업데이트
 function updateAppendixHeader(type) {
-	const headerMapping = {
-		'(근)저당권설정': '부속서류 1. 별제권부채권',
-		'질권설정/채권양도(전세보증금)': '부속서류 2. 질권설정/채권양도',
-		'최우선변제임차권': '부속서류 3. 최우선변제임차권',
-		'우선변제임차권': '부속서류 4. 우선변제임차권'
-	};
-	
-	$('#appendixTypeHeader').text(headerMapping[type] || '부속서류');
-	$('#appendixTypeDisplay').text(headerMapping[type] || '부속서류');
+	// 선택한 타입 그대로 헤더에 표시
+	$('#appendixTypeHeader').text(type);
+	$('#appendixTypeDisplay').text(type);
 }
 
 // 타입에 따라 UI 조정
