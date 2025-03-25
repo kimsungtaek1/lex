@@ -198,3 +198,4 @@ input[type="checkbox"]:not(:checked) + label::after{content:none}
 
 .btn-appendix-saved{background:#00e6c3 !important;}
 .btn-other-claim-saved{background:#00e6c3 !important;}
+.btn-guaranteed-debt-saved{background:#00e6c3 !important;}
