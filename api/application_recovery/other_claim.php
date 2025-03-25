@@ -3,7 +3,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 session_start();
 if (!isset($_SESSION['employee_no'])) {
-    exit("권한이 없습니다.");
+	exit("권한이 없습니다.");
 }
 include '../../config.php';
 
@@ -11,10 +11,17 @@ $case_no = (int)$_GET['case_no'];
 $creditor_count = isset($_GET['creditor_count']) ? $_GET['creditor_count'] : null;
 $claim_no = isset($_GET['claim_no']) ? $_GET['claim_no'] : null;
 ?>
-<link rel="stylesheet" href="../../css/appendix.css">
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>다툼있는 채권</title>
+	<link rel="stylesheet" href="../../css/appendix.css">
+</head>
+<body>
 <div class="content-wrapper">
-    <div class="appendix-title">부속서류 2&nbsp;&nbsp;|&nbsp;&nbsp;다툼있는 채권</div>
-    
+	<div class="appendix-title">부속서류 2&nbsp;&nbsp;|&nbsp;&nbsp;다툼있는 채권</div>
+	
 	<div class="left-section">
 		<input type="hidden" id="claimNo" value="<?php echo $claim_no; ?>">
 		
@@ -100,8 +107,8 @@ $claim_no = isset($_GET['claim_no']) ? $_GET['claim_no'] : null;
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    var currentCaseNo = <?php echo $_GET['case_no']; ?>;
-    var current_creditor_count = <?php echo isset($_GET['creditor_count']) && $_GET['creditor_count'] !== '' ? $_GET['creditor_count'] : 'null'; ?>;
+	var currentCaseNo = <?php echo $_GET['case_no']; ?>;
+	var current_creditor_count = <?php echo isset($_GET['creditor_count']) && $_GET['creditor_count'] !== '' ? $_GET['creditor_count'] : 'null'; ?>;
 </script>
 <script src="../../js/other_claim.js"></script>
 </body>

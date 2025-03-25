@@ -839,7 +839,6 @@ CREATE TABLE `application_recovery_asset_rent_deposits` (
   `contract_deposit` int(11) DEFAULT 0,
   `is_deposit_spouse` tinyint(1) DEFAULT 0 COMMENT '보증금배우자명의',
   `monthly_rent` int(11) DEFAULT 0,
-  `is_monthly_spouse` tinyint(1) DEFAULT 0 COMMENT '월세배우자명의',
   `refund_deposit` int(11) DEFAULT 0,
   `difference_reason` text DEFAULT NULL COMMENT '차이나는이유',
   `priority_deposit` int(11) DEFAULT 0,
@@ -924,10 +923,31 @@ CREATE TABLE `application_recovery_creditor_appendix` (
   `appendix_no` int(11) NOT NULL,
   `case_no` int(11) NOT NULL,
   `creditor_count` int(11) NOT NULL,
-  `appendix_type` enum('별제권부채권','다툼있는채권','전부명령된채권','기타') NOT NULL,
-  `content` text NOT NULL COMMENT '내용',
+  `appendix_type` enum('(근)저당권설정','질권설정/채권양도(전세보증금)','최우선변제임차권','우선변제임차권') NOT NULL DEFAULT '(근)저당권설정',
+  `property_detail` varchar(255) DEFAULT NULL COMMENT '목적물',
+  `expected_value` int(11) DEFAULT NULL,
+  `evaluation_rate` decimal(5,2) DEFAULT NULL COMMENT '평가비율',
+  `max_claim` int(11) DEFAULT NULL,
+  `registration_date` date DEFAULT NULL COMMENT '등기일자',
+  `secured_expected_claim` int(11) DEFAULT NULL,
+  `unsecured_remaining_claim` int(11) DEFAULT NULL,
+  `rehabilitation_secured_claim` int(11) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `pledge_deposit` bigint(20) DEFAULT 0 COMMENT '보증금(전세/임대차)',
+  `pledge_amount` bigint(20) DEFAULT 0 COMMENT '질권설정(채권양도)금',
+  `lease_start_date` date DEFAULT NULL COMMENT '전세(임대차)시작일',
+  `lease_end_date` date DEFAULT NULL COMMENT '전세(임대차)종료일',
+  `first_mortgage_date` date DEFAULT NULL COMMENT '최초근저당권설정일',
+  `region` varchar(50) DEFAULT NULL COMMENT '지역',
+  `lease_deposit` bigint(20) DEFAULT 0 COMMENT '임대차보증금',
+  `top_priority_amount` bigint(20) DEFAULT 0 COMMENT '최우선변제금',
+  `top_lease_start_date` date DEFAULT NULL COMMENT '임대차시작일(최우선)',
+  `top_lease_end_date` date DEFAULT NULL COMMENT '임대차종료일(최우선)',
+  `priority_deposit` bigint(20) DEFAULT 0 COMMENT '임대차보증금(우선)',
+  `priority_lease_start_date` date DEFAULT NULL COMMENT '임대차시작일(우선)',
+  `priority_lease_end_date` date DEFAULT NULL COMMENT '임대차종료일(우선)',
+  `fixed_date` date DEFAULT NULL COMMENT '확정일자'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `application_recovery_creditor_guaranteed_debts` (
@@ -951,7 +971,13 @@ CREATE TABLE `application_recovery_creditor_other_claims` (
   `description` text DEFAULT NULL COMMENT '설명',
   `payment_term` varchar(100) DEFAULT NULL COMMENT '변제기',
   `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `creditor_principal` int(11) DEFAULT 0,
+  `creditor_interest` int(11) DEFAULT 0,
+  `undisputed_principal` int(11) DEFAULT 0,
+  `undisputed_interest` int(11) DEFAULT 0,
+  `dispute_reason` text DEFAULT NULL,
+  `litigation_status` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `application_recovery_creditor_settings` (
@@ -1061,22 +1087,6 @@ CREATE TABLE `application_recovery_living_expenses` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE `application_recovery_creditor_appendix` (
-  `appendix_no` int(11) NOT NULL,
-  `case_no` int(11) NOT NULL,
-  `creditor_count` int(11) NOT NULL,
-  `property_detail` varchar(255) DEFAULT NULL COMMENT '목적물',
-  `expected_value` int(11) DEFAULT NULL,
-  `evaluation_rate` decimal(5,2) DEFAULT NULL COMMENT '평가비율',
-  `max_claim` int(11) DEFAULT NULL,
-  `registration_date` date DEFAULT NULL COMMENT '등기일자',
-  `secured_expected_claim` int(11) DEFAULT NULL,
-  `unsecured_remaining_claim` int(11) DEFAULT NULL,
-  `rehabilitation_secured_claim` int(11) DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 CREATE TABLE `application_recovery_plan10` (
   `plan_no` int(11) NOT NULL,
   `case_no` int(11) NOT NULL,
@@ -1096,38 +1106,87 @@ CREATE TABLE `application_recovery_prohibition_orders` (
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+CREATE TABLE `application_recovery_statement_bankruptcy_reason` (
+  `bankruptcy_reason_id` int(11) NOT NULL,
+  `case_no` int(11) NOT NULL,
+  `reasons` text DEFAULT NULL,
+  `detail` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE `application_recovery_statement_career` (
   `career_id` int(11) NOT NULL,
   `case_no` int(11) NOT NULL,
-  `company_type` varchar(20) DEFAULT NULL COMMENT '소속 유형(급여/자영)',
-  `business_type` varchar(100) DEFAULT NULL COMMENT '업종',
-  `company_name` varchar(100) DEFAULT NULL COMMENT '직장명/상호',
-  `position` varchar(50) DEFAULT NULL COMMENT '직위',
-  `work_start_date` date DEFAULT NULL COMMENT '근무 시작일',
-  `work_end_date` date DEFAULT NULL COMMENT '근무 종료일',
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `company_type` varchar(20) DEFAULT NULL,
+  `business_type` varchar(100) DEFAULT NULL,
+  `company_name` varchar(100) DEFAULT NULL,
+  `position` varchar(50) DEFAULT NULL,
+  `work_start_date` date DEFAULT NULL,
+  `work_end_date` date DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `application_recovery_statement_debt_relief` (
+  `debt_relief_id` int(11) NOT NULL,
+  `case_no` int(11) NOT NULL,
+  `relief_type` varchar(50) DEFAULT NULL,
+  `institution` varchar(100) DEFAULT NULL,
+  `application_date` date DEFAULT NULL,
+  `current_status` varchar(100) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `application_recovery_statement_education` (
   `education_id` int(11) NOT NULL,
   `case_no` int(11) NOT NULL,
-  `school_name` varchar(100) DEFAULT NULL COMMENT '학교명',
-  `graduation_date` date DEFAULT NULL COMMENT '졸업시기',
-  `graduation_status` varchar(20) DEFAULT NULL COMMENT '졸업여부(졸업/중퇴)',
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `school_name` varchar(100) DEFAULT NULL,
+  `graduation_date` date DEFAULT NULL,
+  `graduation_status` varchar(20) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `application_recovery_statement_housing` (
+  `housing_id` int(11) NOT NULL,
+  `case_no` int(11) NOT NULL,
+  `housing_type` varchar(100) DEFAULT NULL,
+  `deposit_amount` decimal(15,0) DEFAULT NULL,
+  `monthly_rent` decimal(15,0) DEFAULT NULL,
+  `overdue_amount` decimal(15,0) DEFAULT NULL,
+  `owner_name` varchar(50) DEFAULT NULL,
+  `relationship` varchar(50) DEFAULT NULL,
+  `etc_description` text DEFAULT NULL,
+  `residence_start_date` date DEFAULT NULL,
+  `tenant_name` varchar(50) DEFAULT NULL,
+  `additional_info` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `application_recovery_statement_lawsuit` (
+  `lawsuit_id` int(11) NOT NULL,
+  `case_no` int(11) NOT NULL,
+  `lawsuit_type` varchar(100) DEFAULT NULL,
+  `creditor` varchar(100) DEFAULT NULL,
+  `court` varchar(100) DEFAULT NULL,
+  `case_number` varchar(100) DEFAULT NULL,
+  `lawsuit_date` date DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `application_recovery_statement_marriage` (
   `marriage_id` int(11) NOT NULL,
-  `case_no` varchar(50) NOT NULL,
-  `marriage_status` varchar(10) DEFAULT NULL COMMENT '결혼/이혼 여부',
-  `marriage_date` date DEFAULT NULL COMMENT '결혼/이혼 일자',
-  `spouse_name` varchar(50) DEFAULT NULL COMMENT '배우자 이름',
+  `case_no` int(11) NOT NULL,
+  `marriage_status` varchar(20) DEFAULT NULL,
+  `marriage_date` date DEFAULT NULL,
+  `spouse_name` varchar(50) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='회생 신청서 결혼/이혼 경력';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `application_recovery_stay_orders` (
   `order_no` int(11) NOT NULL,
@@ -1664,10 +1723,6 @@ ALTER TABLE `application_recovery_living_expenses`
   ADD PRIMARY KEY (`expense_no`),
   ADD KEY `case_no` (`case_no`);
 
-ALTER TABLE `application_recovery_creditor_appendix`
-  ADD PRIMARY KEY (`appendix_no`),
-  ADD KEY `idx_case_creditor` (`case_no`,`creditor_count`);
-
 ALTER TABLE `application_recovery_plan10`
   ADD PRIMARY KEY (`plan_no`),
   ADD UNIQUE KEY `case_no` (`case_no`);
@@ -1676,17 +1731,37 @@ ALTER TABLE `application_recovery_prohibition_orders`
   ADD PRIMARY KEY (`order_no`),
   ADD KEY `case_no` (`case_no`);
 
+ALTER TABLE `application_recovery_statement_bankruptcy_reason`
+  ADD PRIMARY KEY (`bankruptcy_reason_id`),
+  ADD UNIQUE KEY `case_no` (`case_no`),
+  ADD KEY `idx_bankruptcy_reason_case_no` (`case_no`);
+
 ALTER TABLE `application_recovery_statement_career`
   ADD PRIMARY KEY (`career_id`),
-  ADD KEY `idx_case_no` (`case_no`);
+  ADD KEY `idx_career_case_no` (`case_no`);
+
+ALTER TABLE `application_recovery_statement_debt_relief`
+  ADD PRIMARY KEY (`debt_relief_id`),
+  ADD KEY `idx_debt_relief_case_no` (`case_no`),
+  ADD KEY `idx_debt_relief_type` (`relief_type`);
 
 ALTER TABLE `application_recovery_statement_education`
   ADD PRIMARY KEY (`education_id`),
-  ADD KEY `idx_case_no` (`case_no`);
+  ADD UNIQUE KEY `case_no` (`case_no`),
+  ADD KEY `idx_education_case_no` (`case_no`);
+
+ALTER TABLE `application_recovery_statement_housing`
+  ADD PRIMARY KEY (`housing_id`),
+  ADD UNIQUE KEY `case_no` (`case_no`),
+  ADD KEY `idx_housing_case_no` (`case_no`);
+
+ALTER TABLE `application_recovery_statement_lawsuit`
+  ADD PRIMARY KEY (`lawsuit_id`),
+  ADD KEY `idx_lawsuit_case_no` (`case_no`);
 
 ALTER TABLE `application_recovery_statement_marriage`
   ADD PRIMARY KEY (`marriage_id`),
-  ADD KEY `idx_case_no` (`case_no`);
+  ADD KEY `idx_marriage_case_no` (`case_no`);
 
 ALTER TABLE `application_recovery_stay_orders`
   ADD PRIMARY KEY (`order_no`),
@@ -1982,20 +2057,29 @@ ALTER TABLE `application_recovery_income_salary`
 ALTER TABLE `application_recovery_living_expenses`
   MODIFY `expense_no` int(11) NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE `application_recovery_creditor_appendix`
-  MODIFY `appendix_no` int(11) NOT NULL AUTO_INCREMENT;
-
 ALTER TABLE `application_recovery_plan10`
   MODIFY `plan_no` int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `application_recovery_prohibition_orders`
   MODIFY `order_no` int(11) NOT NULL AUTO_INCREMENT;
 
+ALTER TABLE `application_recovery_statement_bankruptcy_reason`
+  MODIFY `bankruptcy_reason_id` int(11) NOT NULL AUTO_INCREMENT;
+
 ALTER TABLE `application_recovery_statement_career`
   MODIFY `career_id` int(11) NOT NULL AUTO_INCREMENT;
 
+ALTER TABLE `application_recovery_statement_debt_relief`
+  MODIFY `debt_relief_id` int(11) NOT NULL AUTO_INCREMENT;
+
 ALTER TABLE `application_recovery_statement_education`
   MODIFY `education_id` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `application_recovery_statement_housing`
+  MODIFY `housing_id` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `application_recovery_statement_lawsuit`
+  MODIFY `lawsuit_id` int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `application_recovery_statement_marriage`
   MODIFY `marriage_id` int(11) NOT NULL AUTO_INCREMENT;
@@ -2153,7 +2237,7 @@ ALTER TABLE `application_recovery_creditor`
   ADD CONSTRAINT `fk_creditor_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
 ALTER TABLE `application_recovery_creditor_appendix`
-  ADD CONSTRAINT `fk_appendix_creditor` FOREIGN KEY (`case_no`,`creditor_count`) REFERENCES `application_recovery_creditor` (`case_no`, `creditor_count`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fk_mortgage_creditor` FOREIGN KEY (`case_no`,`creditor_count`) REFERENCES `application_recovery_creditor` (`case_no`, `creditor_count`) ON DELETE CASCADE;
 
 ALTER TABLE `application_recovery_creditor_guaranteed_debts`
   ADD CONSTRAINT `fk_guaranteed_debts_creditor` FOREIGN KEY (`case_no`,`creditor_count`) REFERENCES `application_recovery_creditor` (`case_no`, `creditor_count`) ON DELETE CASCADE;
@@ -2179,20 +2263,32 @@ ALTER TABLE `application_recovery_income_salary`
 ALTER TABLE `application_recovery_living_expenses`
   ADD CONSTRAINT `fk_living_expenses_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
-ALTER TABLE `application_recovery_creditor_appendix`
-  ADD CONSTRAINT `fk_mortgage_creditor` FOREIGN KEY (`case_no`,`creditor_count`) REFERENCES `application_recovery_creditor` (`case_no`, `creditor_count`) ON DELETE CASCADE;
-
 ALTER TABLE `application_recovery_plan10`
   ADD CONSTRAINT `fk_plan10_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
 ALTER TABLE `application_recovery_prohibition_orders`
   ADD CONSTRAINT `application_recovery_prohibition_orders_ibfk_1` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
+ALTER TABLE `application_recovery_statement_bankruptcy_reason`
+  ADD CONSTRAINT `application_recovery_statement_bankruptcy_reason_ibfk_1` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
+
 ALTER TABLE `application_recovery_statement_career`
-  ADD CONSTRAINT `fk_career_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
+  ADD CONSTRAINT `application_recovery_statement_career_ibfk_1` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
+
+ALTER TABLE `application_recovery_statement_debt_relief`
+  ADD CONSTRAINT `application_recovery_statement_debt_relief_ibfk_1` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
 ALTER TABLE `application_recovery_statement_education`
-  ADD CONSTRAINT `fk_education_case` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
+  ADD CONSTRAINT `application_recovery_statement_education_ibfk_1` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
+
+ALTER TABLE `application_recovery_statement_housing`
+  ADD CONSTRAINT `application_recovery_statement_housing_ibfk_1` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
+
+ALTER TABLE `application_recovery_statement_lawsuit`
+  ADD CONSTRAINT `application_recovery_statement_lawsuit_ibfk_1` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
+
+ALTER TABLE `application_recovery_statement_marriage`
+  ADD CONSTRAINT `application_recovery_statement_marriage_ibfk_1` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`) ON DELETE CASCADE;
 
 ALTER TABLE `application_recovery_stay_orders`
   ADD CONSTRAINT `application_recovery_stay_orders_ibfk_1` FOREIGN KEY (`case_no`) REFERENCES `case_management` (`case_no`);
