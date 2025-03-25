@@ -79,7 +79,7 @@ $case_no = (int)$_GET['case_no'];
         </div>
         <?php endwhile; ?>
     </div>
-    <div class="form-header"><?=$_GET['type']?></div>
+    <div class="form-header" id="appendixTypeHeader"></div>
 	<div class="left-section">
 		<div class="form">
 			<div class="form-title"><span>부속서류 타입</span></div>

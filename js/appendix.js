@@ -1,93 +1,77 @@
 $(document).ready(function() {
 	// 초기화
-	initializeFormEvents();
-	
-	// URL에서 타입 가져오기
-	const urlParams = new URLSearchParams(window.location.search);
-	const appendixType = urlParams.get('type') || '(근)저당권설정';
-	
-	// 타입에 따라 UI 초기화
-	setupUIByType(appendixType);
-	
-	// 타입 정보 히든 필드에 저장
-	$('#appendixType').val(appendixType);
-	
+	initializeForm();
 	loadSavedData();
+	
+	// 이벤트 리스너 등록
+	registerEventListeners();
+});
 
-	// 목적물 선택 버튼 이벤트
-	$('#propertySelectBtn').on('click', function() {
-		$.ajax({
-			url: '../../api/application_recovery/get_assets.php',
-			method: 'GET',
-			data: { case_no: currentCaseNo },
-			success: function(response) {
-				let data = response;
-				// response가 이미 객체인 경우 JSON.parse 생략
-				if (typeof response === 'string') {
-					try {
-						data = JSON.parse(response);
-					} catch (e) {
-						console.error('목적물 데이터 파싱 오류:', e);
-						return;
-					}
-				}
-				
-				if (data.success) {
-					showPropertySelector(data.data);
-				} else {
-					console.error('목적물 데이터 로드 실패:', data.message || 'Unknown error');
-				}
-			},
-			error: function(xhr) {
-				console.error('목적물 데이터 요청 오류:', xhr.responseText);
-			}
-		});
+// 폼 초기화
+function initializeForm() {
+	// 숫자 입력 필드 포맷팅
+	$('.number-input').each(function() {
+		formatNumber($(this));
 	});
+	
+	// 초기 타입에 따라 UI 설정
+	const initialType = $('#appendixType').val() || '(근)저당권설정';
+	$('#appendixType').val(initialType);
+	updateAppendixHeader(initialType);
+	setupUIByType(initialType);
+}
 
+// 이벤트 리스너 등록
+function registerEventListeners() {
+	// 목적물 선택 버튼
+	$('#propertySelectBtn').on('click', loadAndShowPropertySelector);
+	
 	// 숫자 입력 필드 이벤트
 	$(document).on('input', '.number-input', function() {
 		formatNumber($(this));
 	});
-
+	
 	// 평가비율 입력 이벤트
-	$('#evaluation_rate').on('input', function() {
-		let value = $(this).val();
-		// 숫자와 소수점만 허용
-		value = value.replace(/[^\d.]/g, '');
-		// 소수점이 2개 이상 입력되는 것 방지
-		const decimalParts = value.split('.');
-		if (decimalParts.length > 2) {
-			value = decimalParts[0] + '.' + decimalParts.slice(1).join('');
-		}
-		// 소수점 이하 2자리로 제한
-		if (decimalParts.length > 1) {
-			value = decimalParts[0] + '.' + decimalParts[1].slice(0, 2);
-		}
-		$(this).val(value);
+	$('#evaluation_rate').on('input', handleEvaluationRateInput);
+	
+	// 부속서류 타입 변경 이벤트
+	$('#appendixType').on('change', function() {
+		const selectedType = $(this).val();
+		updateAppendixHeader(selectedType);
+		setupUIByType(selectedType);
 	});
-
-	// 저장 버튼 이벤트
-	$('#saveButton').on('click', function() {
-		saveForm();
-	});
-
-	// 삭제 버튼 이벤트
+	
+	// 계산 버튼
+	$('#calculateButton').on('click', calculateValues);
+	
+	// 저장 버튼
+	$('#saveButton').on('click', saveForm);
+	
+	// 삭제 버튼
 	$('#deleteButton').on('click', function() {
 		if (confirm('정말 삭제하시겠습니까?')) {
 			deleteForm();
 		}
 	});
-
-	// 닫기 버튼 이벤트
+	
+	// 닫기 버튼
 	$('#closeButton').on('click', function() {
 		window.close();
 	});
+}
+
+// 부속서류 헤더 업데이트
+function updateAppendixHeader(type) {
+	const headerMapping = {
+		'(근)저당권설정': '부속서류 1. 별제권부채권',
+		'질권설정/채권양도(전세보증금)': '부속서류 2. 질권설정/채권양도',
+		'최우선변제임차권': '부속서류 3. 최우선변제임차권',
+		'우선변제임차권': '부속서류 4. 우선변제임차권'
+	};
 	
-	// 계산 버튼 이벤트
-	$('#calculateButton').on('click', function() {
-		calculateValues();
-	});
-});
+	$('#appendixTypeHeader').text(headerMapping[type] || '부속서류');
+	$('#appendixTypeDisplay').text(headerMapping[type] || '부속서류');
+}
 
 // 타입에 따라 UI 조정
 function setupUIByType(type) {
@@ -95,112 +79,38 @@ function setupUIByType(type) {
 	$('.type-field').hide();
 	
 	// 타입에 따라 필요한 필드 표시
-	if (type === '최우선변제임차권') {
-		$('.type-top-priority').show();
-	} else if (type === '우선변제임차권') {
-		$('.type-priority').show();
-	} else if (type === '질권설정/채권양도(전세보증금)') {
-		$('.type-pledge').show();
-	} else {
-		// (근)저당권설정 (기본값)
-		$('.type-mortgage').show();
-	}
-}
-
-// 값 계산 함수
-function calculateValues() {
-	const appendixType = $('#appendixType').val() || '(근)저당권설정';
-	
-	const getIntValue = (selector) => {
-		const val = $(selector).val();
-		return val && val.trim() !== '' ? parseInt(val.replace(/,/g, '')) : 0;
+	const typeMapping = {
+		'(근)저당권설정': '.type-mortgage',
+		'질권설정/채권양도(전세보증금)': '.type-pledge',
+		'최우선변제임차권': '.type-top-priority',
+		'우선변제임차권': '.type-priority'
 	};
-
-	// 입력 값 가져오기
-	const expectedValue = getIntValue('#expected_value');
-	const evaluationRate = parseFloat($('#evaluation_rate').val() || 70); // 기본값 70%
 	
-	// 타입별 계산 로직
-	let securedExpectedClaim = 0;
-	let unsecuredRemainingClaim = 0;
-	let rehabilitationSecuredClaim = 0;
-	
-	// 원금과 이자 합계
-	const totalClaim = selected_capital + selected_interest;
-
-	if (appendixType === '(근)저당권설정') {
-		const maxClaim = getIntValue('#max_claim');
-		
-		if (!expectedValue || !maxClaim) {
-			alert('환가예상액과 채권최고액을 먼저 입력해주세요.');
-			return;
-		}
-		
-		const evaluatedValue = Math.floor((expectedValue * evaluationRate) / 100);
-		securedExpectedClaim = Math.min(evaluatedValue, maxClaim, totalClaim);
-		unsecuredRemainingClaim = Math.max(0, Math.min(totalClaim - securedExpectedClaim, maxClaim - securedExpectedClaim));
-		rehabilitationSecuredClaim = securedExpectedClaim;
-	} else if (appendixType === '질권설정/채권양도(전세보증금)') {
-		const pledgeAmount = getIntValue('#pledge_amount');
-		
-		if (!pledgeAmount) {
-			alert('질권설정(채권양도)금을 입력해주세요.');
-			return;
-		}
-		
-		securedExpectedClaim = Math.min(pledgeAmount, totalClaim);
-		unsecuredRemainingClaim = Math.max(0, totalClaim - securedExpectedClaim);
-		rehabilitationSecuredClaim = securedExpectedClaim;
-	} else if (appendixType === '최우선변제임차권') {
-		const topPriorityAmount = getIntValue('#top_priority_amount');
-		
-		if (!topPriorityAmount) {
-			alert('최우선변제금을 입력해주세요.');
-			return;
-		}
-		
-		securedExpectedClaim = Math.min(topPriorityAmount, totalClaim);
-		unsecuredRemainingClaim = Math.max(0, totalClaim - securedExpectedClaim);
-		rehabilitationSecuredClaim = securedExpectedClaim;
-	} else if (appendixType === '우선변제임차권') {
-		const priorityDeposit = getIntValue('#priority_deposit');
-		
-		if (!priorityDeposit) {
-			alert('임대차보증금을 입력해주세요.');
-			return;
-		}
-		
-		securedExpectedClaim = Math.min(priorityDeposit, totalClaim);
-		unsecuredRemainingClaim = Math.max(0, totalClaim - securedExpectedClaim);
-		rehabilitationSecuredClaim = securedExpectedClaim;
-	}
-
-	// 결과 값 설정
-	$('#secured_expected_claim').val(securedExpectedClaim.toLocaleString('ko-KR'));
-	$('#unsecured_remaining_claim').val(unsecuredRemainingClaim.toLocaleString('ko-KR'));
-	$('#rehabilitation_secured_claim').val(rehabilitationSecuredClaim.toLocaleString('ko-KR'));
-}
-
-// 폼 이벤트 초기화
-function initializeFormEvents() {
-	// 숫자 입력 필드 초기화
-	$('.number-input').each(function() {
-		formatNumber($(this));
-	});
-}
-
-// 숫자 포맷팅 함수
-function formatNumber(input) {
-	let value = input.val().replace(/[^\d]/g, '');
-	if (value) {
-		value = Number(value).toLocaleString('ko-KR');
-		input.val(value);
+	const selector = typeMapping[type];
+	if (selector) {
+		$(selector).show();
 	}
 }
 
-// 쉼표 제거 함수
-function removeCommas(str) {
-	return str ? str.replace(/,/g, '') : '';
+// 평가비율 입력 처리
+function handleEvaluationRateInput() {
+	let value = $(this).val();
+	
+	// 숫자와 소수점만 허용
+	value = value.replace(/[^\d.]/g, '');
+	
+	// 소수점이 2개 이상 입력되는 것 방지
+	const decimalParts = value.split('.');
+	if (decimalParts.length > 2) {
+		value = decimalParts[0] + '.' + decimalParts.slice(1).join('');
+	}
+	
+	// 소수점 이하 2자리로 제한
+	if (decimalParts.length > 1) {
+		value = decimalParts[0] + '.' + decimalParts[1].slice(0, 2);
+	}
+	
+	$(this).val(value);
 }
 
 // 기존 데이터 로드
@@ -239,6 +149,36 @@ function loadSavedData() {
 	});
 }
 
+// 목적물 데이터 로드 및 선택기 표시
+function loadAndShowPropertySelector() {
+	$.ajax({
+		url: '../../api/application_recovery/get_assets.php',
+		method: 'GET',
+		data: { case_no: currentCaseNo },
+		success: function(response) {
+			let data = response;
+			// response가 이미 객체인 경우 JSON.parse 생략
+			if (typeof response === 'string') {
+				try {
+					data = JSON.parse(response);
+				} catch (e) {
+					console.error('목적물 데이터 파싱 오류:', e);
+					return;
+				}
+			}
+			
+			if (data.success) {
+				showPropertySelector(data.data);
+			} else {
+				console.error('목적물 데이터 로드 실패:', data.message || 'Unknown error');
+			}
+		},
+		error: function(xhr) {
+			console.error('목적물 데이터 요청 오류:', xhr.responseText);
+		}
+	});
+}
+
 // 목적물 선택 창 열기
 function showPropertySelector(properties) {
 	const popupWindow = window.open(
@@ -257,6 +197,17 @@ function showPropertySelector(properties) {
 			}
 		}
 	});
+}
+
+// 목적물 데이터 채우기
+function fillPropertyData(property) {
+	$('#property_detail').val(property.detail || '');
+	if (property.expected_value) {
+		$('#expected_value').val(Number(property.expected_value).toLocaleString('ko-KR'));
+	}
+	if (property.evaluation_rate) {
+		$('#evaluation_rate').val(property.evaluation_rate);
+	}
 }
 
 // 선택한 데이터를 메인 폼에 자동 입력
@@ -296,6 +247,11 @@ function appendDataToMainForm(property) {
 	}
 
 	// 데이터 저장 요청
+	saveFormData(formData);
+}
+
+// 데이터 저장 API 호출
+function saveFormData(formData) {
 	$.ajax({
 		url: '../../api/application_recovery/save_appendix.php',
 		method: 'POST',
@@ -327,6 +283,7 @@ function fillFormData(data) {
 	// 타입 설정 및 UI 조정
 	const appendixType = data.appendix_type || $('#appendixType').val() || '(근)저당권설정';
 	$('#appendixType').val(appendixType);
+	updateAppendixHeader(appendixType);
 	setupUIByType(appendixType);
 	
 	// 공통 필드 설정
@@ -348,38 +305,153 @@ function fillFormData(data) {
 	formatNumberField('#rehabilitation_secured_claim', data.rehabilitation_secured_claim);
 	
 	// 타입별 필드 설정
-	if (appendixType === '(근)저당권설정') {
-		formatNumberField('#max_claim', data.max_claim);
-		$('#registration_date').val(data.registration_date || '');
-	} else if (appendixType === '질권설정/채권양도(전세보증금)') {
-		formatNumberField('#pledge_deposit', data.pledge_deposit);
-		formatNumberField('#pledge_amount', data.pledge_amount);
-		$('#lease_start_date').val(data.lease_start_date || '');
-		$('#lease_end_date').val(data.lease_end_date || '');
-	} else if (appendixType === '최우선변제임차권') {
-		$('#first_mortgage_date').val(data.first_mortgage_date || '');
-		$('#region').val(data.region || '서울특별시');
-		formatNumberField('#lease_deposit', data.lease_deposit);
-		formatNumberField('#top_priority_amount', data.top_priority_amount);
-		$('#top_lease_start_date').val(data.top_lease_start_date || '');
-		$('#top_lease_end_date').val(data.top_lease_end_date || '');
-	} else if (appendixType === '우선변제임차권') {
-		formatNumberField('#priority_deposit', data.priority_deposit);
-		$('#priority_lease_start_date').val(data.priority_lease_start_date || '');
-		$('#priority_lease_end_date').val(data.priority_lease_end_date || '');
-		$('#fixed_date').val(data.fixed_date || '');
+	const typeFieldSetters = {
+		'(근)저당권설정': () => {
+			formatNumberField('#max_claim', data.max_claim);
+			$('#registration_date').val(data.registration_date || '');
+		},
+		'질권설정/채권양도(전세보증금)': () => {
+			formatNumberField('#pledge_deposit', data.pledge_deposit);
+			formatNumberField('#pledge_amount', data.pledge_amount);
+			$('#lease_start_date').val(data.lease_start_date || '');
+			$('#lease_end_date').val(data.lease_end_date || '');
+		},
+		'최우선변제임차권': () => {
+			$('#first_mortgage_date').val(data.first_mortgage_date || '');
+			$('#region').val(data.region || '서울특별시');
+			formatNumberField('#lease_deposit', data.lease_deposit);
+			formatNumberField('#top_priority_amount', data.top_priority_amount);
+			$('#top_lease_start_date').val(data.top_lease_start_date || '');
+			$('#top_lease_end_date').val(data.top_lease_end_date || '');
+		},
+		'우선변제임차권': () => {
+			formatNumberField('#priority_deposit', data.priority_deposit);
+			$('#priority_lease_start_date').val(data.priority_lease_start_date || '');
+			$('#priority_lease_end_date').val(data.priority_lease_end_date || '');
+			$('#fixed_date').val(data.fixed_date || '');
+		}
+	};
+	
+	const setter = typeFieldSetters[appendixType];
+	if (setter) setter();
+}
+
+// 값 계산 함수
+function calculateValues() {
+	const appendixType = $('#appendixType').val() || '(근)저당권설정';
+	
+	const getIntValue = (selector) => {
+		const val = $(selector).val();
+		return val && val.trim() !== '' ? parseInt(val.replace(/,/g, '')) : 0;
+	};
+
+	// 입력 값 가져오기
+	const expectedValue = getIntValue('#expected_value');
+	const evaluationRate = parseFloat($('#evaluation_rate').val() || 70); // 기본값 70%
+	
+	// 타입별 계산 로직
+	let securedExpectedClaim = 0;
+	let unsecuredRemainingClaim = 0;
+	let rehabilitationSecuredClaim = 0;
+	
+	// 원금과 이자 합계
+	const totalClaim = selected_capital + selected_interest;
+
+	// 타입별 계산 로직
+	const typeCalculators = {
+		'(근)저당권설정': () => {
+			const maxClaim = getIntValue('#max_claim');
+			
+			if (!expectedValue || !maxClaim) {
+				alert('환가예상액과 채권최고액을 먼저 입력해주세요.');
+				return false;
+			}
+			
+			const evaluatedValue = Math.floor((expectedValue * evaluationRate) / 100);
+			securedExpectedClaim = Math.min(evaluatedValue, maxClaim, totalClaim);
+			unsecuredRemainingClaim = Math.max(0, Math.min(totalClaim - securedExpectedClaim, maxClaim - securedExpectedClaim));
+			rehabilitationSecuredClaim = securedExpectedClaim;
+			return true;
+		},
+		'질권설정/채권양도(전세보증금)': () => {
+			const pledgeAmount = getIntValue('#pledge_amount');
+			
+			if (!pledgeAmount) {
+				alert('질권설정(채권양도)금을 입력해주세요.');
+				return false;
+			}
+			
+			securedExpectedClaim = Math.min(pledgeAmount, totalClaim);
+			unsecuredRemainingClaim = Math.max(0, totalClaim - securedExpectedClaim);
+			rehabilitationSecuredClaim = securedExpectedClaim;
+			return true;
+		},
+		'최우선변제임차권': () => {
+			const topPriorityAmount = getIntValue('#top_priority_amount');
+			
+			if (!topPriorityAmount) {
+				alert('최우선변제금을 입력해주세요.');
+				return false;
+			}
+			
+			securedExpectedClaim = Math.min(topPriorityAmount, totalClaim);
+			unsecuredRemainingClaim = Math.max(0, totalClaim - securedExpectedClaim);
+			rehabilitationSecuredClaim = securedExpectedClaim;
+			return true;
+		},
+		'우선변제임차권': () => {
+			const priorityDeposit = getIntValue('#priority_deposit');
+			
+			if (!priorityDeposit) {
+				alert('임대차보증금을 입력해주세요.');
+				return false;
+			}
+			
+			securedExpectedClaim = Math.min(priorityDeposit, totalClaim);
+			unsecuredRemainingClaim = Math.max(0, totalClaim - securedExpectedClaim);
+			rehabilitationSecuredClaim = securedExpectedClaim;
+			return true;
+		}
+	};
+	
+	const calculator = typeCalculators[appendixType];
+	if (calculator && calculator()) {
+		// 결과 값 설정
+		$('#secured_expected_claim').val(securedExpectedClaim.toLocaleString('ko-KR'));
+		$('#unsecured_remaining_claim').val(unsecuredRemainingClaim.toLocaleString('ko-KR'));
+		$('#rehabilitation_secured_claim').val(rehabilitationSecuredClaim.toLocaleString('ko-KR'));
 	}
 }
 
-// 목적물 데이터 채우기
-function fillPropertyData(property) {
-	$('#property_detail').val(property.detail || '');
-	if (property.expected_value) {
-		$('#expected_value').val(Number(property.expected_value).toLocaleString('ko-KR'));
+// 숫자 포맷팅 함수
+function formatNumber(input) {
+	if (!input || !input.val) return;
+	
+	let value = input.val().replace(/[^\d.-]/g, '');
+	if (value) {
+		try {
+			value = Number(value).toLocaleString('ko-KR');
+			input.val(value);
+		} catch (e) {
+			console.error('숫자 변환 오류:', e);
+		}
 	}
-	if (property.evaluation_rate) {
-		$('#evaluation_rate').val(property.evaluation_rate);
-	}
+}
+
+// 쉼표 제거 함수
+function removeCommas(str) {
+	return str ? str.replace(/,/g, '') : '';
+}
+
+// 폼 초기화
+function clearForm() {
+	$('input[type="text"]').val('');
+	$('input[type="number"]').val('');
+	$('.number-input').val('');
+	$('select').each(function() {
+		$(this).val($(this).find('option:first').val());
+	});
+	$('input[type="date"]').val('');
 }
 
 // 폼 저장
@@ -412,27 +484,37 @@ function saveForm() {
 		rehabilitation_secured_claim: getIntValue('#rehabilitation_secured_claim')
 	};
 	
-	// 타입별 추가 필드
-	if (appendixType === '(근)저당권설정') {
-		formData.max_claim = getIntValue('#max_claim');
-		formData.registration_date = $('#registration_date').val() || null;
-	} else if (appendixType === '질권설정/채권양도(전세보증금)') {
-		formData.pledge_deposit = getIntValue('#pledge_deposit');
-		formData.pledge_amount = getIntValue('#pledge_amount');
-		formData.lease_start_date = $('#lease_start_date').val() || null;
-		formData.lease_end_date = $('#lease_end_date').val() || null;
-	} else if (appendixType === '최우선변제임차권') {
-		formData.first_mortgage_date = $('#first_mortgage_date').val() || null;
-		formData.region = $('#region').val() || null;
-		formData.lease_deposit = getIntValue('#lease_deposit');
-		formData.top_priority_amount = getIntValue('#top_priority_amount');
-		formData.top_lease_start_date = $('#top_lease_start_date').val() || null;
-		formData.top_lease_end_date = $('#top_lease_end_date').val() || null;
-	} else if (appendixType === '우선변제임차권') {
-		formData.priority_deposit = getIntValue('#priority_deposit');
-		formData.priority_lease_start_date = $('#priority_lease_start_date').val() || null;
-		formData.priority_lease_end_date = $('#priority_lease_end_date').val() || null;
-		formData.fixed_date = $('#fixed_date').val() || null;
+	// 타입별 추가 필드 설정
+	const typeDataCollectors = {
+		'(근)저당권설정': () => ({
+			max_claim: getIntValue('#max_claim'),
+			registration_date: $('#registration_date').val() || null
+		}),
+		'질권설정/채권양도(전세보증금)': () => ({
+			pledge_deposit: getIntValue('#pledge_deposit'),
+			pledge_amount: getIntValue('#pledge_amount'),
+			lease_start_date: $('#lease_start_date').val() || null,
+			lease_end_date: $('#lease_end_date').val() || null
+		}),
+		'최우선변제임차권': () => ({
+			first_mortgage_date: $('#first_mortgage_date').val() || null,
+			region: $('#region').val() || null,
+			lease_deposit: getIntValue('#lease_deposit'),
+			top_priority_amount: getIntValue('#top_priority_amount'),
+			top_lease_start_date: $('#top_lease_start_date').val() || null,
+			top_lease_end_date: $('#top_lease_end_date').val() || null
+		}),
+		'우선변제임차권': () => ({
+			priority_deposit: getIntValue('#priority_deposit'),
+			priority_lease_start_date: $('#priority_lease_start_date').val() || null,
+			priority_lease_end_date: $('#priority_lease_end_date').val() || null,
+			fixed_date: $('#fixed_date').val() || null
+		})
+	};
+	
+	const collector = typeDataCollectors[appendixType];
+	if (collector) {
+		Object.assign(formData, collector());
 	}
 
 	$.ajax({
@@ -463,17 +545,6 @@ function saveForm() {
 			alert('서버와의 통신 중 오류가 발생했습니다.');
 		}
 	});
-}
-
-// 폼 초기화
-function clearForm() {
-	$('input[type="text"]').val('');
-	$('input[type="number"]').val('');
-	$('.number-input').val('');
-	$('select').each(function() {
-		$(this).val($(this).find('option:first').val());
-	});
-	$('input[type="date"]').val('');
 }
 
 // 폼 삭제
