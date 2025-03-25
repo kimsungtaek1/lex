@@ -609,11 +609,37 @@ $(document).ready(function() {
 	});
 
     // 부속정보 로드
-    function loadCreditorSpecificData(count) {
-        loadAppendixCount(count);
-        loadOtherClaimCount(count);
-        loadGuaranteedDebtCount(count);
-    }
+	function loadCreditorSpecificData(count) {
+		loadAppendixCount(count);
+		loadOtherClaimCount(count);
+		loadGuaranteedDebtCount(count);
+		
+		// 별제권부채권 데이터 확인 및 버튼 색상 설정
+		checkAppendixExists(count);
+	}
+
+	// 별제권부채권 데이터 존재 여부 확인
+	function checkAppendixExists(count) {
+		if (!currentCaseNo) return;
+		
+		$.ajax({
+			url: 'api/application_recovery/get_appendix_data.php',
+			type: 'GET',
+			data: {
+				case_no: currentCaseNo,
+				creditor_count: count
+			},
+			success: function(response) {
+				if (response.success && response.data && response.data.length > 0) {
+					// 데이터가 있으면 버튼 색상 변경
+					$(`.creditor-box[data-count="${count}"] button[onclick*="openAppendixWindow"]`).addClass('btn-appendix-saved');
+				} else {
+					// 데이터가 없으면 버튼 색상 원래대로
+					$(`.creditor-box[data-count="${count}"] button[onclick*="openAppendixWindow"]`).removeClass('btn-appendix-saved');
+				}
+			}
+		});
+	}
 
     // 부속서류 개수 로드
     function loadAppendixCount(count) {
