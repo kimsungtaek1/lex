@@ -7,31 +7,14 @@ if (!isset($_SESSION['employee_no'])) {
 }
 include '../../config.php';
 
-// case_no 파라미터 필수 체크
-if (!isset($_GET['case_no']) || empty($_GET['case_no'])) {
-    die(json_encode([
-        'status' => 'error',
-        'message' => 'case_no 파라미터가 필요합니다'
-    ]));
-}
-
-// DB 연결 확인
-if (!$pdo) {
-    die(json_encode([
-        'status' => 'error', 
-        'message' => '데이터베이스 연결 실패'
-    ]));
-}
-
 $case_no = (int)$_GET['case_no'];
+$creditor_count = isset($_GET['count']) ? $_GET['count'] : null;
+$appendix_no = isset($_GET['appendix_no']) ? $_GET['appendix_no'] : null;
 ?>
 <link rel="stylesheet" href="../../css/appendix.css">
 <div class="content-wrapper">
     <div class="appendix-title">부속서류 1. 별제권부채권</div>
     <?php
-    $creditor_count = isset($_GET['count']) ? $_GET['count'] : null;
-    $appendix_no = isset($_GET['appendix_no']) ? $_GET['appendix_no'] : null;
-
     $query = "SELECT * FROM application_recovery_creditor_appendix 
               WHERE case_no = ? 
               AND (? IS NULL OR creditor_count = ?)
