@@ -460,17 +460,15 @@ function clearForm() {
 function saveForm() {
 	const appendixType = $('#appendixType').val() || '(근)저당권설정';
 	
+	// 필수 입력값 검증 강화
+	if (!validateForm(appendixType)) {
+		return;
+	}
+
 	const getIntValue = (selector) => {
 		const val = $(selector).val();
 		return val && val.trim() !== '' ? parseInt(val.replace(/,/g, '')) : null;
 	};
-
-	// 필수 값 검증
-	if (!$('#property_detail').val()) {
-		alert('목적물을 입력해주세요.');
-		$('#property_detail').focus();
-		return;
-	}
 
 	// 기본 데이터
 	const formData = {
@@ -528,14 +526,25 @@ function saveForm() {
 				const result = typeof response === 'string' ? JSON.parse(response) : response;
 				if (result.status === 'success') {
 					alert(result.message || '저장되었습니다.');
+					// 부모 창에 메시지 전송 및 데이터 전달
 					window.opener.postMessage({
 						type: 'appendixSaved', 
-						creditorCount: current_creditor_count
+						creditorCount: current_creditor_count,
+						hasData: true
 					}, '*');
-					location.reload();
+					
+					// 부모 창 새로고침
+					window.opener.location.reload();
+					
+					// 현재 창 새로고침 또는 닫기 (옵션에 따라 선택)
+					// window.close(); // 저장 후 창 닫기
+					location.reload(); // 저장 후 현재 창 새로고침
 				} else {
 					console.log('저장 실패 응답:', result);
 					alert('저장 중 오류가 발생했습니다.');
+					if (result.message) {
+						console.error('에러 메시지:', result.message);
+					}
 				}
 			} catch (e) {
 				console.error('저장 오류:', e);
@@ -547,6 +556,79 @@ function saveForm() {
 			alert('서버와의 통신 중 오류가 발생했습니다.');
 		}
 	});
+}
+
+// 폼 유효성 검사 함수 추가
+function validateForm(appendixType) {
+	// 기본 필수 필드 검증
+	if (!$('#property_detail').val().trim()) {
+		alert('목적물을 입력해주세요.');
+		$('#property_detail').focus();
+		return false;
+	}
+	
+	if (!$('#expected_value').val().trim()) {
+		alert('환가예상액을 입력해주세요.');
+		$('#expected_value').focus();
+		return false;
+	}
+	
+	if (!$('#evaluation_rate').val().trim()) {
+		alert('평가비율을 입력해주세요.');
+		$('#evaluation_rate').focus();
+		return false;
+	}
+	
+	// 타입별 필수 필드 검증
+	switch (appendixType) {
+		case '(근)저당권설정':
+			if (!$('#max_claim').val().trim()) {
+				alert('채권최고액(담보액)을 입력해주세요.');
+				$('#max_claim').focus();
+				return false;
+			}
+			break;
+			
+		case '질권설정/채권양도(전세보증금)':
+			if (!$('#pledge_amount').val().trim()) {
+				alert('질권설정(채권양도)금을 입력해주세요.');
+				$('#pledge_amount').focus();
+				return false;
+			}
+			break;
+			
+		case '최우선변제임차권':
+			if (!$('#top_priority_amount').val().trim()) {
+				alert('최우선변제금을 입력해주세요.');
+				$('#top_priority_amount').focus();
+				return false;
+			}
+			break;
+			
+		case '우선변제임차권':
+			if (!$('#priority_deposit').val().trim()) {
+				alert('임대차보증금을 입력해주세요.');
+				$('#priority_deposit').focus();
+				return false;
+			}
+			break;
+	}
+	
+	// 계산 결과 필드 검증
+	if (!$('#secured_expected_claim').val().trim() || !$('#unsecured_remaining_claim').val().trim() || !$('#rehabilitation_secured_claim').val().trim()) {
+		if (confirm('채권액 계산이 완료되지 않았습니다. 계산하시겠습니까?')) {
+			calculateValues();
+			// 계산 후 다시 검증
+			if (!$('#secured_expected_claim').val().trim() || !$('#unsecured_remaining_claim').val().trim() || !$('#rehabilitation_secured_claim').val().trim()) {
+				alert('채권액 계산을 완료해주세요.');
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+	
+	return true;
 }
 
 // 폼 삭제
