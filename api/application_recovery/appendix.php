@@ -1,6 +1,10 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+session_start();
+if (!isset($_SESSION['employee_no'])) {
+    exit("권한이 없습니다.");
+}
 include '../../config.php';
 
 // case_no 파라미터 필수 체크
