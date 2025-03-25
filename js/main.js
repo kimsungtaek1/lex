@@ -59,8 +59,6 @@ $(document).ready(function() {
     generateCalendar(currentDate.getFullYear(), currentDate.getMonth() + 1);
 
     $('.menu-item').click(function() {
-		$('.menu-item').removeClass('active');
-		$(this).addClass('active');
 		
 		const link = $(this).data('link');
 		

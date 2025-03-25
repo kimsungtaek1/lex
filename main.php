@@ -47,7 +47,7 @@ checkLogin();
                     <div class="icon schedule"></div>
                     <span>기일관리</span>
                 </div>
-                <div class="menu-item active" data-link="calendar">
+                <div class="menu-item" data-link="calendar">
                     <div class="icon calendar"></div>
                     <span>달력</span>
                 </div>
