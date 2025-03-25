@@ -11,13 +11,20 @@ if (!isset($_SESSION['employee_no'])) {
 
 $case_no = $_POST['case_no'] ?? 0;
 $creditor_count = $_POST['creditor_count'] ?? 0;
-$claim_type = $_POST['claim_type'] ?? '';
-$amount = $_POST['amount'] ?? 0;
-$description = $_POST['description'] ?? '';
-$payment_term = $_POST['payment_term'] ?? '';
+$claim_type = $_POST['claim_type'] ?? '다툼있는채권';
 $claim_no = $_POST['claim_no'] ?? 0;
 
-if (!$case_no || !$creditor_count || !$claim_type) {
+// 필수 필드
+$creditor_principal = $_POST['creditor_principal'] ?? 0;
+$creditor_interest = $_POST['creditor_interest'] ?? 0;
+$undisputed_principal = $_POST['undisputed_principal'] ?? 0;
+$undisputed_interest = $_POST['undisputed_interest'] ?? 0;
+$difference_principal = $_POST['difference_principal'] ?? 0;
+$difference_interest = $_POST['difference_interest'] ?? 0;
+$dispute_reason = $_POST['dispute_reason'] ?? '';
+$litigation_status = $_POST['litigation_status'] ?? '';
+
+if (!$case_no || !$creditor_count) {
 	echo json_encode(['success' => false, 'message' => '필수 데이터가 누락되었습니다.']);
 	exit;
 }
@@ -29,18 +36,54 @@ try {
 		// 수정
 		$stmt = $pdo->prepare("
 			UPDATE application_recovery_creditor_other_claims 
-			SET claim_type = ?, amount = ?, description = ?, payment_term = ?
+			SET claim_type = ?, 
+				creditor_principal = ?,
+				creditor_interest = ?,
+				undisputed_principal = ?,
+				undisputed_interest = ?,
+				difference_principal = ?,
+				difference_interest = ?,
+				dispute_reason = ?,
+				litigation_status = ?,
+				updated_at = CURRENT_TIMESTAMP
 			WHERE claim_no = ? AND case_no = ? AND creditor_count = ?
 		");
-		$stmt->execute([$claim_type, $amount, $description, $payment_term, $claim_no, $case_no, $creditor_count]);
+		$stmt->execute([
+			$claim_type,
+			$creditor_principal,
+			$creditor_interest,
+			$undisputed_principal,
+			$undisputed_interest,
+			$difference_principal,
+			$difference_interest,
+			$dispute_reason,
+			$litigation_status,
+			$claim_no,
+			$case_no,
+			$creditor_count
+		]);
 	} else {
 		// 신규 등록
 		$stmt = $pdo->prepare("
 			INSERT INTO application_recovery_creditor_other_claims 
-			(case_no, creditor_count, claim_type, amount, description, payment_term)
-			VALUES (?, ?, ?, ?, ?, ?)
+			(case_no, creditor_count, claim_type, 
+			 creditor_principal, creditor_interest, undisputed_principal, undisputed_interest,
+			 difference_principal, difference_interest, dispute_reason, litigation_status)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		");
-		$stmt->execute([$case_no, $creditor_count, $claim_type, $amount, $description, $payment_term]);
+		$stmt->execute([
+			$case_no,
+			$creditor_count,
+			$claim_type,
+			$creditor_principal,
+			$creditor_interest,
+			$undisputed_principal,
+			$undisputed_interest,
+			$difference_principal,
+			$difference_interest,
+			$dispute_reason,
+			$litigation_status
+		]);
 		$claim_no = $pdo->lastInsertId();
 	}
 
@@ -53,7 +96,7 @@ try {
 
 } catch (Exception $e) {
 	$pdo->rollBack();
-	error_log("기타미확정채권 저장 오류: " . $e->getMessage());
+	error_log("다툼있는 채권 저장 오류: " . $e->getMessage());
 	echo json_encode([
 		'success' => false,
 		'message' => '저장 중 오류가 발생했습니다.',

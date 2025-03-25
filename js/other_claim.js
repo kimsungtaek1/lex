@@ -47,25 +47,31 @@ function registerEventListeners() {
 
 // 저장된 클레임 데이터 불러오기
 function loadClaimData() {
-	const claimNo = $('#claimNo').val();
-	
-	if (!claimNo) {
-		return; // 새로운 항목인 경우 로드 안함
+	// 사건 및 채권자 번호가 없으면 데이터를 조회할 수 없음
+	if (!currentCaseNo || !current_creditor_count) {
+		console.error('필수 파라미터 누락: case_no 또는 creditor_count');
+		return;
 	}
 	
+	// claim_no가 없는 경우에도 creditor_count에 해당하는 데이터 조회
 	$.ajax({
 		url: '../../api/application_recovery/get_other_claims.php',
 		method: 'GET',
 		data: {
 			case_no: currentCaseNo,
-			creditor_count: current_creditor_count,
-			claim_no: claimNo
+			creditor_count: current_creditor_count
 		},
 		success: function(response) {
 			try {
 				const data = typeof response === 'string' ? JSON.parse(response) : response;
 				if (data.success && data.data && data.data.length > 0) {
+					// 첫 번째 데이터로 폼 채우기 
+					// (보통 creditor_count당 하나의 데이터만 존재하므로)
 					fillFormData(data.data[0]);
+					// claim_no 필드에 값 설정
+					$('#claimNo').val(data.data[0].claim_no);
+				} else {
+					clearForm(); // 데이터가 없으면 폼 초기화
 				}
 			} catch (e) {
 				console.error('데이터 파싱 오류:', e);
@@ -77,16 +83,28 @@ function loadClaimData() {
 	});
 }
 
+// 폼 초기화
+function clearForm() {
+	$('#creditor_principal').val('');
+	$('#creditor_interest').val('');
+	$('#undisputed_principal').val('');
+	$('#undisputed_interest').val('');
+	$('#difference_principal').val('');
+	$('#difference_interest').val('');
+	$('#dispute_reason').val('');
+	$('#litigation_status').val('');
+}
+
 // 폼 데이터 채우기
 function fillFormData(data) {
 	$('#creditor_principal').val(formatNumberValue(data.creditor_principal));
 	$('#creditor_interest').val(formatNumberValue(data.creditor_interest));
 	$('#undisputed_principal').val(formatNumberValue(data.undisputed_principal));
 	$('#undisputed_interest').val(formatNumberValue(data.undisputed_interest));
+	$('#difference_principal').val(formatNumberValue(data.difference_principal));
+	$('#difference_interest').val(formatNumberValue(data.difference_interest));
 	$('#dispute_reason').val(data.dispute_reason || '');
 	$('#litigation_status').val(data.litigation_status || '');
-	
-	calculateDifference();
 }
 
 // 차이 계산
@@ -137,20 +155,23 @@ function formatNumberValue(value) {
 
 // 폼 저장
 function saveForm() {
+	const getNumber = function(selector) {
+		return parseFloat($(selector).val().replace(/,/g, '')) || 0;
+	};
+	
 	// 데이터 수집
 	const formData = {
 		case_no: currentCaseNo,
 		creditor_count: current_creditor_count,
 		claim_type: '다툼있는채권', // 기본값 설정
-		creditor_principal: $('#creditor_principal').val().replace(/,/g, ''),
-		creditor_interest: $('#creditor_interest').val().replace(/,/g, ''),
-		undisputed_principal: $('#undisputed_principal').val().replace(/,/g, ''),
-		undisputed_interest: $('#undisputed_interest').val().replace(/,/g, ''),
-		difference_principal: $('#difference_principal').val().replace(/,/g, ''),
-		difference_interest: $('#difference_interest').val().replace(/,/g, ''),
+		creditor_principal: getNumber('#creditor_principal'),
+		creditor_interest: getNumber('#creditor_interest'),
+		undisputed_principal: getNumber('#undisputed_principal'),
+		undisputed_interest: getNumber('#undisputed_interest'),
+		difference_principal: getNumber('#difference_principal'),
+		difference_interest: getNumber('#difference_interest'),
 		dispute_reason: $('#dispute_reason').val(),
-		litigation_status: $('#litigation_status').val(),
-		amount: $('#difference_principal').val().replace(/,/g, '') // amount 필드 설정
+		litigation_status: $('#litigation_status').val()
 	};
 	
 	// claim_no가 있으면 추가
@@ -168,15 +189,24 @@ function saveForm() {
 				const result = typeof response === 'string' ? JSON.parse(response) : response;
 				if (result.success) {
 					alert(result.message || '저장되었습니다.');
-					// 부모 창에 메시지 전달
+					
+					// 부모 창에 메시지 전달 - 버튼 색상 변경을 위한 정보 포함
 					window.opener.postMessage({
 						type: 'otherClaimSaved', 
 						creditorCount: current_creditor_count,
 						hasData: true
 					}, '*');
 					
-					// 현재 창 새로 로드
-					location.reload();
+					// claim_no 업데이트
+					if (result.claim_no) {
+						$('#claimNo').val(result.claim_no);
+					}
+					
+					// 부모 창 새로고침 (옵션)
+					// window.opener.location.reload();
+					
+					// 현재 창 새로 로드 (옵션)
+					// location.reload();
 				} else {
 					console.error('저장 실패 응답:', result);
 					alert('저장 중 오류가 발생했습니다.');
@@ -211,10 +241,12 @@ function deleteForm() {
 				const result = typeof response === 'string' ? JSON.parse(response) : response;
 				if (result.success) {
 					alert(result.message || '삭제되었습니다.');
-					// 부모 창에 메시지 전달
+					
+					// 부모 창에 메시지 전달 - 버튼 색상 변경을 위한 정보 포함
 					window.opener.postMessage({
 						type: 'otherClaimDeleted',
-						creditorCount: current_creditor_count
+						creditorCount: current_creditor_count,
+						hasData: false
 					}, '*');
 					
 					// 창 닫기

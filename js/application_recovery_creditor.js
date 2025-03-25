@@ -640,7 +640,7 @@ $(document).ready(function() {
 		});
 	}
 
-	// 부속서류 저장 메시지 리스너
+	// 메시지 이벤트 리스너
 	window.addEventListener('message', function(event) {
 		// 부속서류 저장 이벤트 처리
 		if (event.data.type === 'appendixSaved') {
@@ -672,6 +672,31 @@ $(document).ready(function() {
 			// 금액 합계 재계산
 			calculateTotals();
 		}
+		
+		// 다툼있는 채권 저장 이벤트 처리
+		if (event.data.type === 'otherClaimSaved') {
+			const count = event.data.creditorCount;
+			const hasData = event.data.hasData;
+			
+			// 해당 채권자의 다툼있는 채권 버튼 색상 변경
+			if (hasData) {
+				$(`.creditor-box[data-count="${count}"] button[onclick*="openOtherClaimWindow"]`).addClass('btn-other-claim-saved');
+			}
+			
+			// 다툼있는 채권 개수 새로고침
+			loadOtherClaimCount(count);
+		}
+		
+		// 다툼있는 채권 삭제 이벤트 처리
+		if (event.data.type === 'otherClaimDeleted') {
+			const count = event.data.creditorCount;
+			
+			// 해당 채권자의 다툼있는 채권 버튼 색상 원래대로
+			$(`.creditor-box[data-count="${count}"] button[onclick*="openOtherClaimWindow"]`).removeClass('btn-other-claim-saved');
+			
+			// 다툼있는 채권 개수 새로고침
+			loadOtherClaimCount(count);
+		}
 	});
 
     // 부속정보 로드
@@ -682,6 +707,8 @@ $(document).ready(function() {
 		
 		// 별제권부채권 데이터 확인 및 버튼 색상 설정
 		checkAppendixExists(count);
+		// 다툼있는 채권 데이터 확인 및 버튼 색상 설정
+		checkOtherClaimExists(count);
 	}
 
 	// 별제권부채권 데이터 존재 여부 확인
@@ -706,6 +733,28 @@ $(document).ready(function() {
 			}
 		});
 	}
+
+	function checkOtherClaimExists(count) {
+	if (!currentCaseNo) return;
+	
+	$.ajax({
+		url: 'api/application_recovery/get_other_claims.php',
+		type: 'GET',
+		data: {
+			case_no: currentCaseNo,
+			creditor_count: count
+		},
+		success: function(response) {
+			if (response.success && response.data && response.data.length > 0) {
+				// 데이터가 있으면 버튼 색상 변경
+				$(`.creditor-box[data-count="${count}"] button[onclick*="openOtherClaimWindow"]`).addClass('btn-other-claim-saved');
+			} else {
+				// 데이터가 없으면 버튼 색상 원래대로
+				$(`.creditor-box[data-count="${count}"] button[onclick*="openOtherClaimWindow"]`).removeClass('btn-other-claim-saved');
+			}
+		}
+	});
+}
 
     // 부속서류 개수 로드
     function loadAppendixCount(count) {
