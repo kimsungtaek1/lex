@@ -950,14 +950,49 @@ CREATE TABLE application_recovery_creditor_appendix (
   fixed_date date DEFAULT NULL COMMENT '확정일자'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+CREATE TABLE application_recovery_creditor_assigned_claims (
+  claim_no int(11) NOT NULL,
+  case_no int(11) NOT NULL,
+  creditor_count int(11) NOT NULL,
+  assignment_date date DEFAULT NULL,
+  original_creditor varchar(100) DEFAULT NULL,
+  assigned_creditor varchar(100) DEFAULT NULL,
+  amount int(11) DEFAULT 0,
+  assignment_reason text DEFAULT NULL,
+  court_name varchar(100) DEFAULT NULL,
+  court_case_number varchar(50) DEFAULT NULL,
+  created_at datetime DEFAULT current_timestamp(),
+  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE application_recovery_creditor_disputed_claims (
+  claim_no int(11) NOT NULL,
+  case_no int(11) NOT NULL,
+  creditor_count int(11) NOT NULL,
+  creditor_principal int(11) DEFAULT 0,
+  creditor_interest int(11) DEFAULT 0,
+  undisputed_principal int(11) DEFAULT 0,
+  undisputed_interest int(11) DEFAULT 0,
+  difference_principal int(11) DEFAULT 0,
+  difference_interest int(11) DEFAULT 0,
+  dispute_reason text DEFAULT NULL,
+  litigation_status text DEFAULT NULL,
+  created_at datetime DEFAULT current_timestamp(),
+  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 CREATE TABLE application_recovery_creditor_guaranteed_debts (
   debt_no int(11) NOT NULL,
   case_no int(11) NOT NULL,
   creditor_count int(11) NOT NULL,
   guarantor_name varchar(100) NOT NULL COMMENT '보증인명',
   guarantor_address varchar(255) DEFAULT NULL COMMENT '보증인주소',
+  guarantor_phone varchar(20) DEFAULT NULL,
+  relationship varchar(50) DEFAULT NULL,
   guarantee_amount int(11) DEFAULT NULL,
+  guarantee_type varchar(50) DEFAULT NULL,
   guarantee_date date DEFAULT NULL COMMENT '보증일자',
+  notes text DEFAULT NULL,
   created_at datetime DEFAULT current_timestamp(),
   updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -979,12 +1014,36 @@ CREATE TABLE application_recovery_creditor_other_claims (
   updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+CREATE TABLE application_recovery_creditor_other_debts (
+  debt_no int(11) NOT NULL,
+  case_no int(11) NOT NULL,
+  creditor_count int(11) NOT NULL,
+  debt_description text DEFAULT NULL,
+  amount int(11) DEFAULT 0,
+  notes text DEFAULT NULL,
+  created_at datetime DEFAULT current_timestamp(),
+  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 CREATE TABLE application_recovery_creditor_settings (
   setting_no int(11) NOT NULL,
   case_no int(11) NOT NULL,
   principal_interest_sum tinyint(1) DEFAULT 0,
   list_creation_date date DEFAULT NULL,
   claim_calculation_date date DEFAULT NULL,
+  created_at datetime DEFAULT current_timestamp(),
+  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE application_recovery_creditor_undetermined_claims (
+  claim_no int(11) NOT NULL,
+  case_no int(11) NOT NULL,
+  creditor_count int(11) NOT NULL,
+  claim_description text DEFAULT NULL,
+  estimated_amount int(11) DEFAULT 0,
+  determination_criteria text DEFAULT NULL,
+  determination_date date DEFAULT NULL,
+  status varchar(50) DEFAULT NULL,
   created_at datetime DEFAULT current_timestamp(),
   updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -1682,6 +1741,14 @@ ALTER TABLE application_recovery_creditor_appendix
   ADD PRIMARY KEY (appendix_no),
   ADD KEY idx_case_creditor (case_no,creditor_count);
 
+ALTER TABLE application_recovery_creditor_assigned_claims
+  ADD PRIMARY KEY (claim_no),
+  ADD KEY idx_case_creditor (case_no,creditor_count);
+
+ALTER TABLE application_recovery_creditor_disputed_claims
+  ADD PRIMARY KEY (claim_no),
+  ADD KEY idx_case_creditor (case_no,creditor_count);
+
 ALTER TABLE application_recovery_creditor_guaranteed_debts
   ADD PRIMARY KEY (debt_no),
   ADD KEY idx_case_creditor (case_no,creditor_count);
@@ -1690,9 +1757,17 @@ ALTER TABLE application_recovery_creditor_other_claims
   ADD PRIMARY KEY (claim_no),
   ADD KEY idx_case_creditor (case_no,creditor_count);
 
+ALTER TABLE application_recovery_creditor_other_debts
+  ADD PRIMARY KEY (debt_no),
+  ADD KEY idx_case_creditor (case_no,creditor_count);
+
 ALTER TABLE application_recovery_creditor_settings
   ADD PRIMARY KEY (setting_no),
   ADD UNIQUE KEY unique_case_setting (case_no);
+
+ALTER TABLE application_recovery_creditor_undetermined_claims
+  ADD PRIMARY KEY (claim_no),
+  ADD KEY idx_case_creditor (case_no,creditor_count);
 
 ALTER TABLE application_recovery_family_members
   ADD PRIMARY KEY (member_no),
@@ -2026,14 +2101,26 @@ ALTER TABLE application_recovery_creditor
 ALTER TABLE application_recovery_creditor_appendix
   MODIFY appendix_no int(11) NOT NULL AUTO_INCREMENT;
 
+ALTER TABLE application_recovery_creditor_assigned_claims
+  MODIFY claim_no int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE application_recovery_creditor_disputed_claims
+  MODIFY claim_no int(11) NOT NULL AUTO_INCREMENT;
+
 ALTER TABLE application_recovery_creditor_guaranteed_debts
   MODIFY debt_no int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE application_recovery_creditor_other_claims
   MODIFY claim_no int(11) NOT NULL AUTO_INCREMENT;
 
+ALTER TABLE application_recovery_creditor_other_debts
+  MODIFY debt_no int(11) NOT NULL AUTO_INCREMENT;
+
 ALTER TABLE application_recovery_creditor_settings
   MODIFY setting_no int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE application_recovery_creditor_undetermined_claims
+  MODIFY claim_no int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE application_recovery_family_members
   MODIFY member_no int(11) NOT NULL AUTO_INCREMENT;
@@ -2238,11 +2325,23 @@ ALTER TABLE application_recovery_creditor
 ALTER TABLE application_recovery_creditor_appendix
   ADD CONSTRAINT fk_mortgage_creditor FOREIGN KEY (case_no,creditor_count) REFERENCES application_recovery_creditor (case_no, creditor_count) ON DELETE CASCADE;
 
+ALTER TABLE application_recovery_creditor_assigned_claims
+  ADD CONSTRAINT fk_assigned_claims_creditor FOREIGN KEY (case_no,creditor_count) REFERENCES application_recovery_creditor (case_no, creditor_count) ON DELETE CASCADE;
+
+ALTER TABLE application_recovery_creditor_disputed_claims
+  ADD CONSTRAINT fk_disputed_claims_creditor FOREIGN KEY (case_no,creditor_count) REFERENCES application_recovery_creditor (case_no, creditor_count) ON DELETE CASCADE;
+
 ALTER TABLE application_recovery_creditor_guaranteed_debts
   ADD CONSTRAINT fk_guaranteed_debts_creditor FOREIGN KEY (case_no,creditor_count) REFERENCES application_recovery_creditor (case_no, creditor_count) ON DELETE CASCADE;
 
+ALTER TABLE application_recovery_creditor_other_debts
+  ADD CONSTRAINT fk_other_debts_creditor FOREIGN KEY (case_no,creditor_count) REFERENCES application_recovery_creditor (case_no, creditor_count) ON DELETE CASCADE;
+
 ALTER TABLE application_recovery_creditor_settings
   ADD CONSTRAINT application_recovery_creditor_settings_ibfk_1 FOREIGN KEY (case_no) REFERENCES case_management (case_no) ON DELETE CASCADE;
+
+ALTER TABLE application_recovery_creditor_undetermined_claims
+  ADD CONSTRAINT fk_undetermined_claims_creditor FOREIGN KEY (case_no,creditor_count) REFERENCES application_recovery_creditor (case_no, creditor_count) ON DELETE CASCADE;
 
 ALTER TABLE application_recovery_family_members
   ADD CONSTRAINT fk_family_case FOREIGN KEY (case_no) REFERENCES case_management (case_no) ON DELETE CASCADE;
