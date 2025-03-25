@@ -524,62 +524,122 @@ $(document).ready(function() {
 			return;
 		}
 
-		// 현재 원금과 이자 값 가져오기
-		const capital = $(`#principal${count}`).val().replace(/,/g, '');
-		const interest = $(`#interest${count}`).val().replace(/,/g, '');
-		
-		// 팝업 창 크기와 위치 설정
-		const width = 1200;
-		const height = 750;
-		const left = (screen.width - width) / 2;
-		const top = (screen.height - height) / 2;
+		// 채권자 정보가 저장되었는지 확인
+		$.ajax({
+			url: 'api/application_recovery/check_creditor_exists.php',
+			type: 'GET',
+			data: {
+				case_no: currentCaseNo,
+				creditor_count: count
+			},
+			success: function(response) {
+				if (response.exists) {
+					// 채권자 정보가 존재하면 부속서류 창 열기
+					const capital = $(`#principal${count}`).val().replace(/,/g, '');
+					const interest = $(`#interest${count}`).val().replace(/,/g, '');
+					
+					const width = 1200;
+					const height = 750;
+					const left = (screen.width - width) / 2;
+					const top = (screen.height - height) / 2;
 
-		// 팝업 창 열기 - type 파라미터 고정
-		window.open(
-			`api/application_recovery/appendix.php?case_no=${currentCaseNo}&count=${count}&capital=${capital}&interest=${interest}`,
-			'AppendixWindow',
-			`width=${width},height=${height},left=${left},top=${top},scrollbars=yes`
-		);
+					window.open(
+						`api/application_recovery/appendix.php?case_no=${currentCaseNo}&count=${count}&capital=${capital}&interest=${interest}`,
+						'AppendixWindow',
+						`width=${width},height=${height},left=${left},top=${top},scrollbars=yes`
+					);
+				} else {
+					// 채권자 정보가 없으면 저장 요청
+					alert('채권자 정보를 먼저 저장해주세요.');
+					$(`#saveCreditor${count}`).focus();
+				}
+			},
+			error: function() {
+				alert('서버 통신 중 오류가 발생했습니다.');
+			}
+		});
 	}
 
-    // 기타미확정채권 창 열기
-    function openOtherClaimWindow(count) {
-        if (!currentCaseNo) {
-            alert('사건을 먼저 선택해주세요.');
-            return;
-        }
+	// 다툼있는 채권 창 열기
+	function openOtherClaimWindow(count) {
+		if (!currentCaseNo) {
+			alert('사건을 먼저 선택해주세요.');
+			return;
+		}
 
-        const width = 1200;
-        const height = 750;
-        const left = (screen.width - width) / 2;
-        const top = (screen.height - height) / 2;
+		// 채권자 정보가 저장되었는지 확인
+		$.ajax({
+			url: 'api/application_recovery/check_creditor_exists.php',
+			type: 'GET',
+			data: {
+				case_no: currentCaseNo,
+				creditor_count: count
+			},
+			success: function(response) {
+				if (response.exists) {
+					// 채권자 정보가 존재하면 다툼있는 채권 창 열기
+					const width = 1200;
+					const height = 750;
+					const left = (screen.width - width) / 2;
+					const top = (screen.height - height) / 2;
 
-        window.open(
-            `api/application_recovery/other_claim.php?case_no=${currentCaseNo}&creditor_count=${count}`,
-            'OtherClaimWindow',
-            `width=${width},height=${height},left=${left},top=${top},scrollbars=yes`
-        );
-    }
+					window.open(
+						`api/application_recovery/other_claim.php?case_no=${currentCaseNo}&creditor_count=${count}`,
+						'OtherClaimWindow',
+						`width=${width},height=${height},left=${left},top=${top},scrollbars=yes`
+					);
+				} else {
+					// 채권자 정보가 없으면 저장 요청
+					alert('채권자 정보를 먼저 저장해주세요.');
+					$(`#saveCreditor${count}`).focus();
+				}
+			},
+			error: function() {
+				alert('서버 통신 중 오류가 발생했습니다.');
+			}
+		});
+	}
 
-    // 보증인채무 창 열기
-    function openGuaranteedDebtWindow(count) {
-        if (!currentCaseNo) {
-            alert('사건을 먼저 선택해주세요.');
-            return;
-        }
+	// 보증인채무 창 열기 (전부명령된 채권, 기타 포함)
+	function openGuaranteedDebtWindow(count) {
+		if (!currentCaseNo) {
+			alert('사건을 먼저 선택해주세요.');
+			return;
+		}
 
-        const width = 1200;
-        const height = 750;
-        const left = (screen.width - width) / 2;
-        const top = (screen.height - height) / 2;
+		// 채권자 정보가 저장되었는지 확인
+		$.ajax({
+			url: 'api/application_recovery/check_creditor_exists.php',
+			type: 'GET',
+			data: {
+				case_no: currentCaseNo,
+				creditor_count: count
+			},
+			success: function(response) {
+				if (response.exists) {
+					// 채권자 정보가 존재하면 보증인채무 창 열기
+					const width = 1200;
+					const height = 750;
+					const left = (screen.width - width) / 2;
+					const top = (screen.height - height) / 2;
 
-        window.open(
-            `api/application_recovery/guaranteed_debt.php?case_no=${currentCaseNo}&creditor_count=${count}`,
-            'GuaranteedDebtWindow',
-            `width=${width},height=${height},left=${left},top=${top},scrollbars=yes`
-        );
-    }
-	
+					window.open(
+						`api/application_recovery/guaranteed_debt.php?case_no=${currentCaseNo}&creditor_count=${count}`,
+						'GuaranteedDebtWindow',
+						`width=${width},height=${height},left=${left},top=${top},scrollbars=yes`
+					);
+				} else {
+					// 채권자 정보가 없으면 저장 요청
+					alert('채권자 정보를 먼저 저장해주세요.');
+					$(`#saveCreditor${count}`).focus();
+				}
+			},
+			error: function() {
+				alert('서버 통신 중 오류가 발생했습니다.');
+			}
+		});
+	}
+
 	// 부속서류 저장 메시지 리스너
 	window.addEventListener('message', function(event) {
 		// 부속서류 저장 이벤트 처리
@@ -594,6 +654,9 @@ $(document).ready(function() {
 			
 			// 부속서류 개수 새로고침
 			loadAppendixCount(count);
+			
+			// 금액 합계 재계산
+			calculateTotals();
 		}
 		
 		// 부속서류 삭제 이벤트 처리
@@ -605,6 +668,9 @@ $(document).ready(function() {
 			
 			// 부속서류 개수 새로고침
 			loadAppendixCount(count);
+			
+			// 금액 합계 재계산
+			calculateTotals();
 		}
 	});
 
