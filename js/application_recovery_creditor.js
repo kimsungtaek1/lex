@@ -560,8 +560,8 @@ $(document).ready(function() {
 		});
 	}
 
-	// 다툼있는 채권 창 열기
-	function openOtherClaimWindow(count) {
+	// 채권 관련 창 열기 통합 함수
+	function openClaimWindow(count, claimType) {
 		if (!currentCaseNo) {
 			alert('사건을 먼저 선택해주세요.');
 			return;
@@ -577,55 +577,53 @@ $(document).ready(function() {
 			},
 			success: function(response) {
 				if (response.exists) {
-					// 채권자 정보가 존재하면 다툼있는 채권 창 열기
+					// 채권자 정보가 존재하면 해당 창 열기
 					const width = 1200;
 					const height = 750;
 					const left = (screen.width - width) / 2;
 					const top = (screen.height - height) / 2;
-
+					
+					let pageUrl = '';
+					let windowName = '';
+					
+					// 채권 유형에 따라 페이지와 창 이름 설정
+					switch(claimType) {
+						case 'appendix':
+							pageUrl = `api/application_recovery/appendix.php?case_no=${currentCaseNo}&count=${count}`;
+							windowName = 'AppendixWindow';
+							// 필요시 전달할 파라미터 추가
+							const capital = $(`#principal${count}`).val().replace(/,/g, '');
+							const interest = $(`#interest${count}`).val().replace(/,/g, '');
+							pageUrl += `&capital=${capital}&interest=${interest}`;
+							break;
+						case 'disputed':
+							pageUrl = `api/application_recovery/other_claim.php?case_no=${currentCaseNo}&creditor_count=${count}`;
+							windowName = 'DisputedClaimWindow';
+							break;
+						case 'assigned':
+							pageUrl = `api/application_recovery/assigned_claim.php?case_no=${currentCaseNo}&creditor_count=${count}`;
+							windowName = 'AssignedClaimWindow';
+							break;
+						case 'otherDebt':
+							pageUrl = `api/application_recovery/other_debt.php?case_no=${currentCaseNo}&creditor_count=${count}`;
+							windowName = 'OtherDebtWindow';
+							break;
+						case 'undetermined':
+							pageUrl = `api/application_recovery/undetermined_claim.php?case_no=${currentCaseNo}&creditor_count=${count}`;
+							windowName = 'UndeterminedClaimWindow';
+							break;
+						case 'guaranteed':
+							pageUrl = `api/application_recovery/guaranteed_debt.php?case_no=${currentCaseNo}&creditor_count=${count}`;
+							windowName = 'GuaranteedDebtWindow';
+							break;
+						default:
+							alert('유효하지 않은 채권 유형입니다.');
+							return;
+					}
+					
 					window.open(
-						`api/application_recovery/other_claim.php?case_no=${currentCaseNo}&creditor_count=${count}`,
-						'OtherClaimWindow',
-						`width=${width},height=${height},left=${left},top=${top},scrollbars=yes`
-					);
-				} else {
-					// 채권자 정보가 없으면 저장 요청
-					alert('채권자 정보를 먼저 저장해주세요.');
-					$(`#saveCreditor${count}`).focus();
-				}
-			},
-			error: function() {
-				alert('서버 통신 중 오류가 발생했습니다.');
-			}
-		});
-	}
-
-	// 보증인채무 창 열기 (전부명령된 채권, 기타 포함)
-	function openGuaranteedDebtWindow(count) {
-		if (!currentCaseNo) {
-			alert('사건을 먼저 선택해주세요.');
-			return;
-		}
-
-		// 채권자 정보가 저장되었는지 확인
-		$.ajax({
-			url: 'api/application_recovery/check_creditor_exists.php',
-			type: 'GET',
-			data: {
-				case_no: currentCaseNo,
-				creditor_count: count
-			},
-			success: function(response) {
-				if (response.exists) {
-					// 채권자 정보가 존재하면 보증인채무 창 열기
-					const width = 1200;
-					const height = 750;
-					const left = (screen.width - width) / 2;
-					const top = (screen.height - height) / 2;
-
-					window.open(
-						`api/application_recovery/guaranteed_debt.php?case_no=${currentCaseNo}&creditor_count=${count}`,
-						'GuaranteedDebtWindow',
+						pageUrl,
+						windowName,
 						`width=${width},height=${height},left=${left},top=${top},scrollbars=yes`
 					);
 				} else {

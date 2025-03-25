@@ -133,11 +133,11 @@ window.creditorBoxTemplate = `<div class="creditor-box" data-count="{count}">
                     <div class="form-title form-notitle"><span>부속서류</span></div>
                     <div class="form-content">
                         <div class="form-group">
-                            <button type="button" class="btn-nomargin" onclick="openAppendixWindow({count})">선택</button>
+                            <button type="button" class="btn-nomargin" onclick="openClaimWindow({count}, 'appendix')">선택</button>
                             <span>1. 별제권부채권</span>
                         </div>
                         <div class="form-group">
-                            <button type="button" class="btn-nomargin" onclick="openDisputedClaimWindow({count})">선택</button>
+                            <button type="button" class="btn-nomargin" onclick="openClaimWindow({count}, 'disputed')">선택</button>
                             <span>2. 다툼있는 채권</span>
                         </div>
                     </div>
@@ -147,11 +147,11 @@ window.creditorBoxTemplate = `<div class="creditor-box" data-count="{count}">
                     <div class="form-title"></div>
                     <div class="form-content">
                         <div class="form-group">
-                            <button type="button" class="btn-nomargin" onclick="openAssignedClaimWindow({count})">선택</button>
+                            <button type="button" class="btn-nomargin" onclick="openClaimWindow({count}, 'assigned')">선택</button>
                             <span>3. 전부명령된 채권</span>
                         </div>
                         <div class="form-group">
-                            <button type="button" class="btn-nomargin" onclick="openOtherDebtWindow({count})">선택</button>
+                            <button type="button" class="btn-nomargin" onclick="openClaimWindow({count}, 'otherDebt')">선택</button>
                             <span>4. 기타(보증선 채무등)</span>
                         </div>
                     </div>
@@ -160,7 +160,7 @@ window.creditorBoxTemplate = `<div class="creditor-box" data-count="{count}">
                 <div class="form">
                     <div class="form-title"><span>기타미확정채권</span></div>
                     <div class="form-content">
-                        <button type="button" class="btn-nomargin" onclick="openUndeterminedClaimWindow({count})">선택</button>
+                        <button type="button" class="btn-nomargin" onclick="openClaimWindow({count}, 'undetermined')">선택</button>
                         <span>기타미확정채권(신탁재산 등)&ensp;|&ensp;</span><span id="otherClaimCount{count}"></span><span>개</span>
                     </div>
                 </div>
@@ -168,7 +168,7 @@ window.creditorBoxTemplate = `<div class="creditor-box" data-count="{count}">
                 <div class="form">
                     <div class="form-title"><span>보증인이 있는 채무</span></div>
                     <div class="form-content">
-                        <button type="button" class="btn-nomargin" onclick="openGuaranteedDebtWindow({count})">선택</button>
+                        <button type="button" class="btn-nomargin" onclick="openClaimWindow({count}, 'guaranteed')">선택</button>
                         <span>보증인이 있는 채무(가지번호)&ensp;|&ensp;</span>
                         <select class="form-select" id="guaranteedDebt{count}" name="guaranteedDebt">
                             <option value="미발생" selected>미발생</option>
