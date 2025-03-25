@@ -13,12 +13,11 @@ $case_no = $_POST['case_no'] ?? 0;
 $creditor_count = $_POST['creditor_count'] ?? 0;
 $claim_no = $_POST['claim_no'] ?? 0;
 
-$court_name = $_POST['court_name'] ?? '';
-$case_number = $_POST['case_number'] ?? '';
-$original_creditor = $_POST['original_creditor'] ?? '';
+// 필수 필드
+$court_case_number = $_POST['court_case_number'] ?? '';
 $debtor_name = $_POST['debtor_name'] ?? '';
-$order_amount = floatval($_POST['order_amount'] ?? 0);
-$order_date = $_POST['order_date'] ?? null;
+$service_date = $_POST['service_date'] ?? null;
+$confirmation_date = $_POST['confirmation_date'] ?? null;
 $claim_range = $_POST['claim_range'] ?? '';
 
 if (!$case_no || !$creditor_count) {
@@ -31,25 +30,23 @@ try {
 
 	if ($claim_no) {
 		// 수정
-		$stmt = $pdo->prepare("
+		$sql = "
 			UPDATE application_recovery_creditor_assigned_claims 
-			SET court_name = ?,
-				case_number = ?,
-				original_creditor = ?,
+			SET court_case_number = ?,
 				debtor_name = ?,
-				order_amount = ?,
-				order_date = ?,
+				service_date = ?,
+				confirmation_date = ?,
 				claim_range = ?,
 				updated_at = CURRENT_TIMESTAMP
 			WHERE claim_no = ? AND case_no = ? AND creditor_count = ?
-		");
+		";
+		
+		$stmt = $pdo->prepare($sql);
 		$stmt->execute([
-			$court_name,
-			$case_number,
-			$original_creditor,
+			$court_case_number,
 			$debtor_name,
-			$order_amount,
-			$order_date,
+			$service_date,
+			$confirmation_date,
 			$claim_range,
 			$claim_no,
 			$case_no,
@@ -57,21 +54,21 @@ try {
 		]);
 	} else {
 		// 신규 등록
-		$stmt = $pdo->prepare("
+		$sql = "
 			INSERT INTO application_recovery_creditor_assigned_claims 
-			(case_no, creditor_count, court_name, case_number, 
-			 original_creditor, debtor_name, order_amount, order_date, claim_range)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-		");
+			(case_no, creditor_count, court_case_number, debtor_name, service_date, 
+			 confirmation_date, claim_range, created_at, updated_at)
+			VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+		";
+		
+		$stmt = $pdo->prepare($sql);
 		$stmt->execute([
 			$case_no,
 			$creditor_count,
-			$court_name,
-			$case_number,
-			$original_creditor,
+			$court_case_number,
 			$debtor_name,
-			$order_amount,
-			$order_date,
+			$service_date,
+			$confirmation_date,
 			$claim_range
 		]);
 		$claim_no = $pdo->lastInsertId();

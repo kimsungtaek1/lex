@@ -11,19 +11,18 @@ $(document).ready(function() {
 
 // 폼 초기화
 function initializeForm() {
-	// 숫자 입력 필드 포맷팅
-	$('.number-input').each(function() {
-		formatNumber($(this));
+	// 텍스트 영역 자동 높이 조정
+	$('textarea').each(function() {
+		this.style.height = 'auto';
+		this.style.height = (this.scrollHeight) + 'px';
+	}).on('input', function() {
+		this.style.height = 'auto';
+		this.style.height = (this.scrollHeight) + 'px';
 	});
 }
 
 // 이벤트 리스너 등록
 function registerEventListeners() {
-	// 숫자 입력 필드 이벤트
-	$(document).on('input', '.number-input', function() {
-		formatNumber($(this));
-	});
-	
 	// 저장 버튼
 	$('#saveButton').on('click', saveForm);
 	
@@ -78,72 +77,42 @@ function loadClaimData() {
 
 // 폼 초기화
 function clearForm() {
-	$('#original_creditor').val('');
+	$('#court_case_number').val('');
 	$('#debtor_name').val('');
-	$('#court_name').val('');
-	$('#case_number').val('');
-	$('#order_amount').val('');
-	$('#order_date').val('');
-	$('#remark').val('');
+	$('#service_date').val('');
+	$('#confirmation_date').val('');
+	$('#claim_range').val('');
 }
 
 // 폼 데이터 채우기
 function fillFormData(data) {
-	$('#court_name').val(data.court_name || '');
-	$('#case_number').val(data.case_number || '');
-	$('#original_creditor').val(data.original_creditor || '');
+	$('#court_case_number').val(data.court_case_number || '');
 	$('#debtor_name').val(data.debtor_name || '');
-	$('#order_amount').val(formatNumberValue(data.order_amount));
-	$('#order_date').val(data.order_date || '');
+	$('#service_date').val(data.service_date || '');
+	$('#confirmation_date').val(data.confirmation_date || '');
 	$('#claim_range').val(data.claim_range || '');
-}
-
-// 숫자 포맷팅
-function formatNumber(input) {
-	if (!input || !input.val) return;
 	
-	let value = input.val();
-	if (!value) return;
-	
-	// 숫자와 소수점, 마이너스 기호만 남기고 모두 제거
-	value = value.replace(/[^\d.-]/g, '');
-	
-	if (value) {
-		try {
-			// 숫자로 변환 후 천단위 콤마 추가
-			value = Number(value).toLocaleString('ko-KR');
-			input.val(value);
-		} catch (e) {
-			console.error('숫자 변환 중 오류:', e);
-			input.val(''); // 오류 발생시 입력값 초기화
-		}
-	}
-}
-
-// 숫자 값 포맷팅
-function formatNumberValue(value) {
-	if (value === null || value === undefined || value === '') return '';
-	return Number(value).toLocaleString('ko-KR');
+	// 텍스트 영역 높이 조정
+	$('textarea').each(function() {
+		this.style.height = 'auto';
+		this.style.height = (this.scrollHeight) + 'px';
+	});
 }
 
 // 폼 저장
 function saveForm() {
-	const getNumber = function(selector) {
-		return parseFloat($(selector).val().replace(/,/g, '')) || 0;
-	};
-	
+	// 데이터 수집
 	const formData = {
 		case_no: currentCaseNo,
 		creditor_count: current_creditor_count,
-		court_name: $('#court_name').val(),
-		case_number: $('#case_number').val(),
-		original_creditor: $('#original_creditor').val(),
+		court_case_number: $('#court_case_number').val(),
 		debtor_name: $('#debtor_name').val(),
-		order_amount: getNumber('#order_amount'),
-		order_date: $('#order_date').val(),
+		service_date: $('#service_date').val(),
+		confirmation_date: $('#confirmation_date').val(),
 		claim_range: $('#claim_range').val()
 	};
 	
+	// claim_no가 있으면 추가
 	const claimNo = $('#claimNo').val();
 	if (claimNo) {
 		formData.claim_no = claimNo;
@@ -159,7 +128,7 @@ function saveForm() {
 				if (result.success) {
 					alert(result.message || '저장되었습니다.');
 					
-					// 부모 창에 메시지 전달
+					// 부모 창에 메시지 전달 - 버튼 색상 변경을 위한 정보 포함
 					window.opener.postMessage({
 						type: 'assignedClaimSaved', 
 						creditorCount: current_creditor_count,
@@ -171,7 +140,11 @@ function saveForm() {
 						$('#claimNo').val(result.claim_no);
 					}
 				} else {
+					console.error('저장 실패 응답:', result);
 					alert(result.message || '저장 중 오류가 발생했습니다.');
+					if (result.message) {
+						console.error('에러 메시지:', result.message);
+					}
 				}
 			} catch (e) {
 				console.error('저장 오류:', e);

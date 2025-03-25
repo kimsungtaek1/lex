@@ -26,23 +26,9 @@ $claim_no = isset($_GET['claim_no']) ? $_GET['claim_no'] : null;
 		<input type="hidden" id="claimNo" value="<?php echo $claim_no; ?>">
 		
 		<div class="form">
-			<div class="form-title"><span>명령법원</span></div>
+			<div class="form-title"><span>법원/사건번호</span></div>
 			<div class="form-content">
-				<input type="text" id="court_name" class="form-control">
-			</div>
-		</div>
-
-		<div class="form">
-			<div class="form-title"><span>사건번호</span></div>
-			<div class="form-content">
-				<input type="text" id="case_number" class="form-control">
-			</div>
-		</div>
-
-		<div class="form">
-			<div class="form-title"><span>원채권자</span></div>
-			<div class="form-content">
-				<input type="text" id="original_creditor" class="form-control">
+				<input type="text" id="court_case_number" class="form-control form-control-long">
 			</div>
 		</div>
 
@@ -54,24 +40,23 @@ $claim_no = isset($_GET['claim_no']) ? $_GET['claim_no'] : null;
 		</div>
 
 		<div class="form">
-			<div class="form-title"><span>전부명령 금액</span></div>
-			<div class="form-content form-row">
-				<input type="text" id="order_amount" class="form-control number-input">
-				<span>원</span>
+			<div class="form-title"><span>송달일자</span></div>
+			<div class="form-content">
+				<input type="date" id="service_date" class="form-control">
+			</div>
+		</div>
+		
+		<div class="form">
+			<div class="form-title"><span>확정일자</span></div>
+			<div class="form-content">
+				<input type="date" id="confirmation_date" class="form-control">
 			</div>
 		</div>
 
 		<div class="form">
-			<div class="form-title"><span>전부명령 일자</span></div>
+			<div class="form-title"><span>전부명령의 대상이 된<br>채권의 범위</span></div>
 			<div class="form-content">
-				<input type="date" id="order_date" class="form-control">
-			</div>
-		</div>
-
-		<div class="form">
-			<div class="form-title"><span>전부명령 채권 범위</span></div>
-			<div class="form-content">
-				<input type="text" id="claim_range" class="form-control" placeholder="전부명령 대상 채권의 범위를 상세히 기재"></input>
+				<textarea id="claim_range" class="form-control form-control-long" rows="3"></textarea>
 			</div>
 		</div>
 
