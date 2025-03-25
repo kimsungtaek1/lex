@@ -161,7 +161,7 @@ window.creditorBoxTemplate = `<div class="creditor-box" data-count="{count}">
                     <div class="form-title"><span>기타미확정채권</span></div>
                     <div class="form-content">
                         <button type="button" class="btn-nomargin" onclick="openClaimWindow({count}, 'undetermined')">선택</button>
-                        <span>기타미확정채권(신탁재산 등)&ensp;|&ensp;</span><span id="otherClaimCount{count}"></span><span>개</span>
+                        <span>기타미확정채권(신탁재산 등)&ensp;|&ensp;</span><span id="undeterminedCount{count}"></span><span>개</span>
                     </div>
                 </div>
 

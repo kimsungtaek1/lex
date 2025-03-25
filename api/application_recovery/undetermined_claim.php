@@ -9,48 +9,53 @@ include '../../config.php';
 
 $case_no = (int)$_GET['case_no'];
 $creditor_count = isset($_GET['creditor_count']) ? $_GET['creditor_count'] : null;
-$debt_no = isset($_GET['debt_no']) ? $_GET['debt_no'] : null;
+$claim_no = isset($_GET['claim_no']) ? $_GET['claim_no'] : null;
 ?>
 <!DOCTYPE html>
 <html>
 <head>
 	<meta charset="UTF-8">
-	<title>보증인이 있는 채무</title>
+	<title>기타미확정채권</title>
 	<link rel="stylesheet" href="../../css/appendix.css">
 </head>
 <body>
 <div class="content-wrapper">
-	<div class="appendix-title">부속서류&nbsp;&nbsp;|&nbsp;&nbsp;보증인이 있는 채무(가지번호)</div>
+	<div class="appendix-title">부속서류&nbsp;&nbsp;|&nbsp;&nbsp;기타미확정채권(신탁재산 등)</div>
 	
 	<div class="left-section">
-		<input type="hidden" id="debtNo" value="<?php echo $debt_no; ?>">
+		<input type="hidden" id="claimNo" value="<?php echo $claim_no; ?>">
 		
 		<div class="form">
-			<div class="form-title"><span>보증인명</span></div>
+			<div class="form-title"><span>채권종류</span></div>
 			<div class="form-content">
-				<input type="text" id="guarantor_name" class="form-control">
+				<select id="claim_type" class="form-control">
+					<option value="신탁재산">신탁재산</option>
+					<option value="조건부채권">조건부채권</option>
+					<option value="기한미확정채권">기한미확정채권</option>
+					<option value="기타">기타</option>
+				</select>
 			</div>
 		</div>
 
 		<div class="form">
-			<div class="form-title"><span>보증인 주소</span></div>
-			<div class="form-content">
-				<input type="text" id="guarantor_address" class="form-control form-control-long">
-			</div>
-		</div>
-
-		<div class="form">
-			<div class="form-title"><span>보증금액</span></div>
+			<div class="form-title"><span>금액</span></div>
 			<div class="form-content form-row">
-				<input type="text" id="guarantee_amount" class="form-control number-input">
+				<input type="text" id="amount" class="form-control number-input">
 				<span>원</span>
 			</div>
 		</div>
 
 		<div class="form">
-			<div class="form-title"><span>보증일자</span></div>
+			<div class="form-title"><span>채권설명</span></div>
 			<div class="form-content">
-				<input type="date" id="guarantee_date" class="form-control">
+				<textarea id="claim_description" class="form-control" rows="5"></textarea>
+			</div>
+		</div>
+
+		<div class="form">
+			<div class="form-title"><span>변제기</span></div>
+			<div class="form-content">
+				<input type="text" id="payment_term" class="form-control">
 			</div>
 		</div>
 
@@ -77,6 +82,6 @@ $debt_no = isset($_GET['debt_no']) ? $_GET['debt_no'] : null;
 	var currentCaseNo = <?php echo $_GET['case_no']; ?>;
 	var current_creditor_count = <?php echo isset($_GET['creditor_count']) && $_GET['creditor_count'] !== '' ? $_GET['creditor_count'] : 'null'; ?>;
 </script>
-<script src="../../js/guaranteed_debt.js"></script>
+<script src="../../js/undetermined_claim.js"></script>
 </body>
 </html>

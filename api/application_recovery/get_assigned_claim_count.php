@@ -20,7 +20,7 @@ if (!$case_no || !$creditor_count) {
 try {
 	$stmt = $pdo->prepare("
 		SELECT COUNT(*) as count
-		FROM application_recovery_creditor_guaranteed_debts
+		FROM application_recovery_creditor_assigned_claims
 		WHERE case_no = ? AND creditor_count = ?
 	");
 	

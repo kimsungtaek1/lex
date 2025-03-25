@@ -9,32 +9,30 @@ if (!isset($_SESSION['employee_no'])) {
 	exit;
 }
 
-$case_no = $_GET['case_no'] ?? 0;
-$creditor_count = $_GET['creditor_count'] ?? 0;
+$debt_no = $_POST['debt_no'] ?? 0;
 
-if (!$case_no || !$creditor_count) {
+if (!$debt_no) {
 	echo json_encode(['success' => false, 'message' => '필수 데이터가 누락되었습니다.']);
 	exit;
 }
 
 try {
 	$stmt = $pdo->prepare("
-		SELECT COUNT(*) as count
-		FROM application_recovery_creditor_guaranteed_debts
-		WHERE case_no = ? AND creditor_count = ?
+		DELETE FROM application_recovery_creditor_guaranteed_debts 
+		WHERE debt_no = ?
 	");
-	
-	$stmt->execute([$case_no, $creditor_count]);
-	$result = $stmt->fetch(PDO::FETCH_ASSOC);
+	$stmt->execute([$debt_no]);
 
 	echo json_encode([
 		'success' => true,
-		'count' => $result['count']
+		'message' => '삭제되었습니다.'
 	]);
 
 } catch (Exception $e) {
+	error_log("보증인채무 삭제 오류: " . $e->getMessage());
 	echo json_encode([
 		'success' => false,
-		'message' => '조회 중 오류가 발생했습니다.'
+		'message' => '삭제 중 오류가 발생했습니다.',
+		'error' => $e->getMessage()
 	]);
 }

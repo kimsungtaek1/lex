@@ -622,7 +622,6 @@ $(document).ready(function() {
 			
 			// 해당 채권자의 별제권부채권 버튼 색상 변경
 			if (hasData) {
-				// 수정된 선택자: 버튼에 ID 또는 직접적인 참조가 필요
 				$(`#openAppendix${count}`).addClass('btn-appendix-saved');
 			}
 			
@@ -671,19 +670,122 @@ $(document).ready(function() {
 			// 다툼있는 채권 개수 새로고침
 			loadOtherClaimCount(count);
 		}
+		
+		// 전부명령된 채권 저장 이벤트 처리
+		if (event.data.type === 'assignedClaimSaved') {
+			const count = event.data.creditorCount;
+			const hasData = event.data.hasData;
+			
+			if (hasData) {
+				$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).addClass('btn-claim-saved');
+			}
+			
+			// 개수 새로고침
+			loadAssignedClaimCount(count);
+		}
+		
+		// 전부명령된 채권 삭제 이벤트 처리
+		if (event.data.type === 'assignedClaimDeleted') {
+			const count = event.data.creditorCount;
+			
+			$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).removeClass('btn-claim-saved');
+			
+			// 개수 새로고침
+			loadAssignedClaimCount(count);
+		}
+		
+		// 기타채무 저장 이벤트 처리
+		if (event.data.type === 'otherDebtSaved') {
+			const count = event.data.creditorCount;
+			const hasData = event.data.hasData;
+			
+			if (hasData) {
+				$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).addClass('btn-claim-saved');
+			}
+			
+			// 개수 새로고침
+			loadOtherDebtCount(count);
+		}
+		
+		// 기타채무 삭제 이벤트 처리
+		if (event.data.type === 'otherDebtDeleted') {
+			const count = event.data.creditorCount;
+			
+			$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).removeClass('btn-claim-saved');
+			
+			// 개수 새로고침
+			loadOtherDebtCount(count);
+		}
+		
+		// 기타미확정채권 저장 이벤트 처리
+		if (event.data.type === 'undeterminedClaimSaved') {
+			const count = event.data.creditorCount;
+			const hasData = event.data.hasData;
+			
+			if (hasData) {
+				$(`button[onclick="openClaimWindow(${count}, 'undetermined')"]`).addClass('btn-claim-saved');
+			}
+			
+			// 개수 새로고침
+			loadUndeterminedClaimCount(count);
+		}
+		
+		// 기타미확정채권 삭제 이벤트 처리
+		if (event.data.type === 'undeterminedClaimDeleted') {
+			const count = event.data.creditorCount;
+			
+			$(`button[onclick="openClaimWindow(${count}, 'undetermined')"]`).removeClass('btn-claim-saved');
+			
+			// 개수 새로고침
+			loadUndeterminedClaimCount(count);
+		}
+		
+		// 보증인채무 저장 이벤트 처리
+		if (event.data.type === 'guaranteedDebtSaved') {
+			const count = event.data.creditorCount;
+			const hasData = event.data.hasData;
+			
+			if (hasData) {
+				$(`button[onclick="openClaimWindow(${count}, 'guaranteed')"]`).addClass('btn-claim-saved');
+			}
+			
+			// 개수 새로고침
+			loadGuaranteedDebtCount(count);
+		}
+		
+		// 보증인채무 삭제 이벤트 처리
+		if (event.data.type === 'guaranteedDebtDeleted') {
+			const count = event.data.creditorCount;
+			
+			$(`button[onclick="openClaimWindow(${count}, 'guaranteed')"]`).removeClass('btn-claim-saved');
+			
+			// 개수 새로고침
+			loadGuaranteedDebtCount(count);
+		}
 	});
 
-    // 부속정보 로드
-    function loadCreditorSpecificData(count) {
-        loadAppendixCount(count);
-        loadOtherClaimCount(count);
-        loadGuaranteedDebtCount(count);
-        
-        // 별제권부채권 데이터 확인 및 버튼 색상 설정
-        checkAppendixExists(count);
-        // 다툼있는 채권 데이터 확인 및 버튼 색상 설정
-        checkOtherClaimExists(count);
-    }
+	// 부속정보 로드
+	function loadCreditorSpecificData(count) {
+		loadAppendixCount(count);
+		loadOtherClaimCount(count);
+		loadAssignedClaimCount(count);
+		loadOtherDebtCount(count);
+		loadUndeterminedClaimCount(count);
+		loadGuaranteedDebtCount(count);
+		
+		// 별제권부채권 데이터 확인 및 버튼 색상 설정
+		checkAppendixExists(count);
+		// 다툼있는 채권 데이터 확인 및 버튼 색상 설정
+		checkOtherClaimExists(count);
+		// 전부명령된 채권 데이터 확인 및 버튼 색상 설정
+		checkAssignedClaimExists(count);
+		// 기타채무 데이터 확인 및 버튼 색상 설정
+		checkOtherDebtExists(count);
+		// 기타미확정채권 데이터 확인 및 버튼 색상 설정
+		checkUndeterminedClaimExists(count);
+		// 보증인채무 데이터 확인 및 버튼 색상 설정
+		checkGuaranteedDebtExists(count);
+	}
 
 	// 별제권부채권 데이터 존재 여부 확인
 	function checkAppendixExists(count) {
@@ -751,6 +853,137 @@ $(document).ready(function() {
 		});
 	}
 
+	function checkAssignedClaimExists(count) {
+		if (!currentCaseNo) return;
+		
+		$.ajax({
+			url: 'api/application_recovery/get_assigned_claims.php',
+			type: 'GET',
+			data: {
+				case_no: currentCaseNo,
+				creditor_count: count
+			},
+			success: function(response) {
+				try {
+					// 응답이 문자열이면 JSON으로 파싱
+					const data = typeof response === 'string' ? JSON.parse(response) : response;
+					
+					if (data.success && data.data && data.data.length > 0) {
+						// 데이터가 있으면 버튼 색상 변경
+						$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).addClass('btn-claim-saved');
+					} else {
+						// 데이터가 없으면 버튼 색상 원래대로
+						$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).removeClass('btn-claim-saved');
+					}
+				} catch (e) {
+					console.error('JSON 파싱 오류:', e);
+				}
+			},
+			error: function(xhr) {
+				console.error('서버 오류:', xhr.responseText);
+			}
+		});
+	}
+
+	// 기타채무 데이터 존재 여부 확인
+	function checkOtherDebtExists(count) {
+		if (!currentCaseNo) return;
+		
+		$.ajax({
+			url: 'api/application_recovery/get_other_debts.php',
+			type: 'GET',
+			data: {
+				case_no: currentCaseNo,
+				creditor_count: count
+			},
+			success: function(response) {
+				try {
+					// 응답이 문자열이면 JSON으로 파싱
+					const data = typeof response === 'string' ? JSON.parse(response) : response;
+					
+					if (data.success && data.data && data.data.length > 0) {
+						// 데이터가 있으면 버튼 색상 변경
+						$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).addClass('btn-claim-saved');
+					} else {
+						// 데이터가 없으면 버튼 색상 원래대로
+						$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).removeClass('btn-claim-saved');
+					}
+				} catch (e) {
+					console.error('JSON 파싱 오류:', e);
+				}
+			},
+			error: function(xhr) {
+				console.error('서버 오류:', xhr.responseText);
+			}
+		});
+	}
+
+	// 기타미확정채권 데이터 존재 여부 확인
+	function checkUndeterminedClaimExists(count) {
+		if (!currentCaseNo) return;
+		
+		$.ajax({
+			url: 'api/application_recovery/get_undetermined_claims.php',
+			type: 'GET',
+			data: {
+				case_no: currentCaseNo,
+				creditor_count: count
+			},
+			success: function(response) {
+				try {
+					// 응답이 문자열이면 JSON으로 파싱
+					const data = typeof response === 'string' ? JSON.parse(response) : response;
+					
+					if (data.success && data.data && data.data.length > 0) {
+						// 데이터가 있으면 버튼 색상 변경
+						$(`button[onclick="openClaimWindow(${count}, 'undetermined')"]`).addClass('btn-claim-saved');
+					} else {
+						// 데이터가 없으면 버튼 색상 원래대로
+						$(`button[onclick="openClaimWindow(${count}, 'undetermined')"]`).removeClass('btn-claim-saved');
+					}
+				} catch (e) {
+					console.error('JSON 파싱 오류:', e);
+				}
+			},
+			error: function(xhr) {
+				console.error('서버 오류:', xhr.responseText);
+			}
+		});
+	}
+
+	// 보증인채무 데이터 존재 여부 확인
+	function checkGuaranteedDebtExists(count) {
+		if (!currentCaseNo) return;
+		
+		$.ajax({
+			url: 'api/application_recovery/get_guaranteed_debts.php',
+			type: 'GET',
+			data: {
+				case_no: currentCaseNo,
+				creditor_count: count
+			},
+			success: function(response) {
+				try {
+					// 응답이 문자열이면 JSON으로 파싱
+					const data = typeof response === 'string' ? JSON.parse(response) : response;
+					
+					if (data.success && data.data && data.data.length > 0) {
+						// 데이터가 있으면 버튼 색상 변경
+						$(`button[onclick="openClaimWindow(${count}, 'guaranteed')"]`).addClass('btn-claim-saved');
+					} else {
+						// 데이터가 없으면 버튼 색상 원래대로
+						$(`button[onclick="openClaimWindow(${count}, 'guaranteed')"]`).removeClass('btn-claim-saved');
+					}
+				} catch (e) {
+					console.error('JSON 파싱 오류:', e);
+				}
+			},
+			error: function(xhr) {
+				console.error('서버 오류:', xhr.responseText);
+			}
+		});
+	}
+
     // 부속서류 개수 로드
     function loadAppendixCount(count) {
         if (!currentCaseNo) return;
@@ -783,7 +1016,7 @@ $(document).ready(function() {
             },
             success: function(response) {
                 if (response.success) {
-                    $(`#otherClaimCount${count}`).text(response.count);
+                    $(`#undeterminedCount${count}`).text(response.count);
                 }
             }
         });
@@ -807,6 +1040,63 @@ $(document).ready(function() {
             }
         });
     }
+
+	// 전부명령된 채권 개수 로드
+	function loadAssignedClaimCount(count) {
+		if (!currentCaseNo) return;
+		
+		$.ajax({
+			url: 'api/application_recovery/get_assigned_claim_count.php',
+			type: 'GET',
+			data: {
+				case_no: currentCaseNo,
+				creditor_count: count
+			},
+			success: function(response) {
+				if (response.success) {
+					$(`#assignedClaimCount${count}`).text(response.count);
+				}
+			}
+		});
+	}
+
+	// 기타채무 개수 로드
+	function loadOtherDebtCount(count) {
+		if (!currentCaseNo) return;
+		
+		$.ajax({
+			url: 'api/application_recovery/get_other_debt_count.php',
+			type: 'GET',
+			data: {
+				case_no: currentCaseNo,
+				creditor_count: count
+			},
+			success: function(response) {
+				if (response.success) {
+					$(`#otherDebtCount${count}`).text(response.count);
+				}
+			}
+		});
+	}
+
+	// 기타미확정채권 개수 로드
+	function loadUndeterminedClaimCount(count) {
+		if (!currentCaseNo) return;
+		
+		$.ajax({
+			url: 'api/application_recovery/get_undetermined_claim_count.php',
+			type: 'GET',
+			data: {
+				case_no: currentCaseNo,
+				creditor_count: count
+			},
+			success: function(response) {
+				if (response.success) {
+					$(`#undeterminedClaimCount${count}`).text(response.count);
+				}
+			}
+		});
+	}
 
     // 채권자 설정 저장 버튼 클릭 이벤트
     $('.btn-save-settings').click(function() {

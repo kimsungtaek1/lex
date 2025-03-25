@@ -9,48 +9,69 @@ include '../../config.php';
 
 $case_no = (int)$_GET['case_no'];
 $creditor_count = isset($_GET['creditor_count']) ? $_GET['creditor_count'] : null;
-$debt_no = isset($_GET['debt_no']) ? $_GET['debt_no'] : null;
+$claim_no = isset($_GET['claim_no']) ? $_GET['claim_no'] : null;
 ?>
 <!DOCTYPE html>
 <html>
 <head>
 	<meta charset="UTF-8">
-	<title>보증인이 있는 채무</title>
+	<title>전부명령된 채권</title>
 	<link rel="stylesheet" href="../../css/appendix.css">
 </head>
 <body>
 <div class="content-wrapper">
-	<div class="appendix-title">부속서류&nbsp;&nbsp;|&nbsp;&nbsp;보증인이 있는 채무(가지번호)</div>
+	<div class="appendix-title">부속서류 3&nbsp;&nbsp;|&nbsp;&nbsp;전부명령된 채권</div>
 	
 	<div class="left-section">
-		<input type="hidden" id="debtNo" value="<?php echo $debt_no; ?>">
+		<input type="hidden" id="claimNo" value="<?php echo $claim_no; ?>">
 		
 		<div class="form">
-			<div class="form-title"><span>보증인명</span></div>
+			<div class="form-title"><span>채권자</span></div>
 			<div class="form-content">
-				<input type="text" id="guarantor_name" class="form-control">
+				<input type="text" id="original_creditor" class="form-control">
 			</div>
 		</div>
 
 		<div class="form">
-			<div class="form-title"><span>보증인 주소</span></div>
+			<div class="form-title"><span>전부명령 채무자</span></div>
 			<div class="form-content">
-				<input type="text" id="guarantor_address" class="form-control form-control-long">
+				<input type="text" id="debtor_name" class="form-control">
 			</div>
 		</div>
 
 		<div class="form">
-			<div class="form-title"><span>보증금액</span></div>
+			<div class="form-title"><span>명령법원</span></div>
+			<div class="form-content">
+				<input type="text" id="court_name" class="form-control">
+			</div>
+		</div>
+
+		<div class="form">
+			<div class="form-title"><span>사건번호</span></div>
+			<div class="form-content">
+				<input type="text" id="case_number" class="form-control">
+			</div>
+		</div>
+
+		<div class="form">
+			<div class="form-title"><span>명령금액</span></div>
 			<div class="form-content form-row">
-				<input type="text" id="guarantee_amount" class="form-control number-input">
+				<input type="text" id="order_amount" class="form-control number-input">
 				<span>원</span>
 			</div>
 		</div>
 
 		<div class="form">
-			<div class="form-title"><span>보증일자</span></div>
+			<div class="form-title"><span>명령일자</span></div>
 			<div class="form-content">
-				<input type="date" id="guarantee_date" class="form-control">
+				<input type="date" id="order_date" class="form-control">
+			</div>
+		</div>
+
+		<div class="form">
+			<div class="form-title"><span>비고</span></div>
+			<div class="form-content">
+				<input type="text" id="remark" class="form-control form-control-long">
 			</div>
 		</div>
 
@@ -77,6 +98,6 @@ $debt_no = isset($_GET['debt_no']) ? $_GET['debt_no'] : null;
 	var currentCaseNo = <?php echo $_GET['case_no']; ?>;
 	var current_creditor_count = <?php echo isset($_GET['creditor_count']) && $_GET['creditor_count'] !== '' ? $_GET['creditor_count'] : 'null'; ?>;
 </script>
-<script src="../../js/guaranteed_debt.js"></script>
+<script src="../../js/assigned_claim.js"></script>
 </body>
 </html>
