@@ -18,6 +18,8 @@
 .form-title{width:20vw;color:#f3f3f3;background:#a7a7a7;border-bottom:1px solid #f3f3f3;display:flex;justify-content:center;align-items:center;position:relative}
 .form-title span{padding-left:10%;width:90%}
 .form-content{flex:1;display:flex;flex-direction:row;align-items: center;padding:0 2.5%;position:relative;background:#f7f7f7;border-bottom:1px solid #d4d4d4;height:4vw;}
+.form-notitle {border-bottom:none}
+.form-nocontent {border-bottom:none}
 .form-row{flex-direction:row;}
 
 .form:nth-child(1) .form-title{border-top-left-radius: 0.6vw;}
