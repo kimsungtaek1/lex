@@ -24,3 +24,16 @@ try {
 }
 ?>
 <link rel="stylesheet" href="../../css/appendix.css">
+<div class="content-wrapper">
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    var currentCaseNo = <?php echo $_GET['case_no']; ?>;
+    var current_creditor_count = <?php echo isset($_GET['count']) && $_GET['count'] !== '' ? $_GET['count'] : 'null'; ?>;
+    var selected_capital = <?php echo isset($_GET['capital']) && $_GET['capital'] !== '' ? $_GET['capital'] : 0; ?>;
+    var selected_interest = <?php echo isset($_GET['interest']) && $_GET['interest'] !== '' ? $_GET['interest'] : 0; ?>;
+</script>
+<script src="../../js/other_claim.js"></script>
+</body>
+</html>
