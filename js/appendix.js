@@ -146,7 +146,7 @@ function loadSavedData() {
 // 목적물 데이터 로드 및 선택기 표시
 function loadAndShowPropertySelector() {
 	$.ajax({
-		url: '../../api/application_recovery/get_assets.php',
+		url: '../../api/application_recovery/get_appendix.php',
 		method: 'GET',
 		data: { case_no: currentCaseNo },
 		success: function(response) {
