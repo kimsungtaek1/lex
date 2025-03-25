@@ -89,7 +89,7 @@ $(document).ready(function() {
 				window.location.href = 'schedule.php';
 				break;
 			case 'calendar':
-				window.location.href = 'index.php';
+				window.location.href = 'calendar.php';
 				break;
 			case 'chat':
 				window.location.href = 'chatbot.php';
