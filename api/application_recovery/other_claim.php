@@ -13,7 +13,7 @@ $claim_no = isset($_GET['claim_no']) ? $_GET['claim_no'] : null;
 ?>
 <link rel="stylesheet" href="../../css/appendix.css">
 <div class="content-wrapper">
-    <div class="appendix-title">부속서류 2. 다툼있는 채권</div>
+    <div class="appendix-title">부속서류 2&nbsp;&nbsp;|&nbsp;&nbsp;다툼있는 채권</div>
     
 	<div class="left-section">
 		<input type="hidden" id="claimNo" value="<?php echo $claim_no; ?>">
