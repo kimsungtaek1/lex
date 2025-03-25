@@ -13,7 +13,7 @@ $appendix_no = isset($_GET['appendix_no']) ? $_GET['appendix_no'] : null;
 ?>
 <link rel="stylesheet" href="../../css/appendix.css">
 <div class="content-wrapper">
-    <div class="appendix-title">부속서류 1. 별제권부채권</div>
+    <div class="appendix-title">부속서류 1&nbsp;&nbsp;|&nbsp;&nbsp;별제권부채권</div>
     <?php
     $query = "SELECT * FROM application_recovery_creditor_appendix 
               WHERE case_no = ? 
