@@ -78,18 +78,26 @@ function loadClaimData() {
 
 // 폼 초기화
 function clearForm() {
-	$('#claim_type').val('신탁재산');
-	$('#amount').val('');
-	$('#claim_description').val('');
-	$('#payment_term').val('');
+	$('#property_detail').val('');
+	$('#expected_value').val('');
+	$('#evaluation_rate').val('');
+	$('#trust_property_details').val('');
+	$('#priority_certificate_amount').val('');
+	$('#registration_date').val('');
+	$('#expected_payment').val('');
+	$('#unpaid_amount').val('');
 }
 
 // 폼 데이터 채우기
 function fillFormData(data) {
-	$('#claim_type').val(data.claim_type || '신탁재산');
-	$('#amount').val(formatNumberValue(data.amount));
-	$('#claim_description').val(data.description || '');
-	$('#payment_term').val(data.payment_term || '');
+	$('#property_detail').val(data.property_detail || '');
+	$('#expected_value').val(formatNumberValue(data.expected_value));
+	$('#evaluation_rate').val(data.evaluation_rate || '');
+	$('#trust_property_details').val(data.trust_property_details || '');
+	$('#priority_certificate_amount').val(formatNumberValue(data.priority_certificate_amount));
+	$('#registration_date').val(data.registration_date || '');
+	$('#expected_payment').val(formatNumberValue(data.expected_payment));
+	$('#unpaid_amount').val(formatNumberValue(data.unpaid_amount));
 }
 
 // 숫자 포맷팅
@@ -130,10 +138,14 @@ function saveForm() {
 	const formData = {
 		case_no: currentCaseNo,
 		creditor_count: current_creditor_count,
-		claim_type: $('#claim_type').val(),
-		amount: getNumber('#amount'),
-		description: $('#claim_description').val(),
-		payment_term: $('#payment_term').val()
+		property_detail: $('#property_detail').val(),
+		expected_value: getNumber('#expected_value'),
+		evaluation_rate: $('#evaluation_rate').val(),
+		trust_property_details: $('#trust_property_details').val(),
+		priority_certificate_amount: getNumber('#priority_certificate_amount'),
+		registration_date: $('#registration_date').val(),
+		expected_payment: getNumber('#expected_payment'),
+		unpaid_amount: getNumber('#unpaid_amount')
 	};
 	
 	// claim_no가 있으면 추가

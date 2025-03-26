@@ -1,4 +1,4 @@
-*{font-size:1.4vw;font-family: 'Pretendard';}
+*{font-size:1.3vw;font-family: 'Pretendard';}
 textarea{outline: none;}
 textarea{width:100%;height:3.8vw;resize:none;border:none;background:transparent;}
 .content-wrapper{display:flex;flex-direction:column;padding:0.5vw}
@@ -17,7 +17,7 @@ textarea{width:100%;height:3.8vw;resize:none;border:none;background:transparent;
 .form-header{background:#666;color:#fff;padding:1.5vh 2vw;font-size:1.4vw;font-weight:500;box-shadow: 0 0.7vh 0.7vh rgba(0,0,0,0.4);border-radius: 5px;}
 .form{display:flex}
 .form-title{width:20vw;color:#f3f3f3;background:#a7a7a7;border-bottom:1px solid #f3f3f3;display:flex;justify-content:center;align-items:center;position:relative}
-.form-title span{padding-left:10%;width:90%}
+.form-title span{padding-left:5%;width:95%}
 .form-content{flex:1;display:flex;flex-direction:row;align-items: center;padding:0 2.5%;position:relative;background:#f7f7f7;border-bottom:1px solid #d4d4d4;height:4vw;}
 .form-content-short5{width:5% !important}
 .form-notitle {border-bottom:none}

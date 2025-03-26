@@ -13,11 +13,15 @@ $case_no = $_POST['case_no'] ?? 0;
 $creditor_count = $_POST['creditor_count'] ?? 0;
 $claim_no = $_POST['claim_no'] ?? 0;
 
-// 필수 필드 확인
-$claim_type = $_POST['claim_type'] ?? '신탁재산';
-$amount = floatval($_POST['amount'] ?? 0);
-$description = $_POST['description'] ?? '';
-$payment_term = $_POST['payment_term'] ?? '';
+// 필드 값 추출
+$property_detail = $_POST['property_detail'] ?? '';
+$expected_value = floatval($_POST['expected_value'] ?? 0);
+$evaluation_rate = $_POST['evaluation_rate'] ?? '';
+$trust_property_details = $_POST['trust_property_details'] ?? '';
+$priority_certificate_amount = floatval($_POST['priority_certificate_amount'] ?? 0);
+$registration_date = $_POST['registration_date'] ?? '';
+$expected_payment = floatval($_POST['expected_payment'] ?? 0);
+$unpaid_amount = floatval($_POST['unpaid_amount'] ?? 0);
 
 if (!$case_no || !$creditor_count) {
 	echo json_encode(['success' => false, 'message' => '필수 데이터가 누락되었습니다.']);
@@ -32,16 +36,26 @@ try {
 		$stmt = $pdo->prepare("
 			UPDATE application_recovery_additional_claims 
 			SET claim_type = '기타미확정채권', 
-				amount = ?,
-				description = ?,
-				payment_term = ?,
+				property_detail = ?,
+				expected_value = ?,
+				evaluation_rate = ?,
+				trust_property_details = ?,
+				priority_certificate_amount = ?,
+				registration_date = ?,
+				expected_payment = ?,
+				unpaid_amount = ?,
 				updated_at = CURRENT_TIMESTAMP
 			WHERE claim_no = ? AND case_no = ? AND creditor_count = ?
 		");
 		$stmt->execute([
-			$amount,
-			$description,
-			$payment_term,
+			$property_detail,
+			$expected_value,
+			$evaluation_rate,
+			$trust_property_details,
+			$priority_certificate_amount,
+			$registration_date,
+			$expected_payment,
+			$unpaid_amount,
 			$claim_no,
 			$case_no,
 			$creditor_count
@@ -50,15 +64,22 @@ try {
 		// 신규 등록
 		$stmt = $pdo->prepare("
 			INSERT INTO application_recovery_additional_claims 
-			(case_no, creditor_count, claim_type, amount, description, payment_term, created_at, updated_at)
-			VALUES (?, ?, '기타미확정채권', ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+			(case_no, creditor_count, claim_type, property_detail, expected_value, evaluation_rate, 
+			trust_property_details, priority_certificate_amount, registration_date, expected_payment, 
+			unpaid_amount, created_at, updated_at)
+			VALUES (?, ?, '기타미확정채권', ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 		");
 		$stmt->execute([
 			$case_no,
 			$creditor_count,
-			$amount,
-			$description,
-			$payment_term
+			$property_detail,
+			$expected_value,
+			$evaluation_rate,
+			$trust_property_details,
+			$priority_certificate_amount,
+			$registration_date,
+			$expected_payment,
+			$unpaid_amount
 		]);
 		$claim_no = $pdo->lastInsertId();
 	}

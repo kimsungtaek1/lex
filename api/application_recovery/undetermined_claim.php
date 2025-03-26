@@ -31,36 +31,63 @@ $claim_no = isset($_GET['claim_no']) ? $_GET['claim_no'] : null;
 		<input type="hidden" id="claimNo" value="<?php echo $claim_no; ?>">
 		
 		<div class="form">
-			<div class="form-title"><span>채권종류</span></div>
+			<div class="form-title"><span>목적물</span></div>
 			<div class="form-content">
-				<select id="claim_type" class="form-control">
-					<option value="신탁재산">신탁재산</option>
-					<option value="조건부채권">조건부채권</option>
-					<option value="기한미확정채권">기한미확정채권</option>
-					<option value="기타">기타</option>
-				</select>
+				<input type="text" id="property_detail" class="form-control">
 			</div>
 		</div>
 
 		<div class="form">
-			<div class="form-title"><span>금액</span></div>
+			<div class="form-title"><span>환가예상액</span></div>
 			<div class="form-content form-row">
-				<input type="text" id="amount" class="form-control number-input">
+				<input type="text" id="expected_value" class="form-control number-input">
 				<span>원</span>
 			</div>
 		</div>
 
 		<div class="form">
-			<div class="form-title"><span>채권설명</span></div>
-			<div class="form-content">
-				<textarea id="claim_description" class="form-control" rows="5"></textarea>
+			<div class="form-title"><span>평가비율</span></div>
+			<div class="form-content form-row">
+				<input type="text" id="evaluation_rate" class="form-control">
+				<span>%</span>
 			</div>
 		</div>
 
 		<div class="form">
-			<div class="form-title"><span>변제기</span></div>
+			<div class="form-title"><span>신탁재산의 내용</span></div>
 			<div class="form-content">
-				<input type="text" id="payment_term" class="form-control">
+				<textarea id="trust_property_details" class="form-control" rows="3"></textarea>
+			</div>
+		</div>
+
+		<div class="form">
+			<div class="form-title"><span>우선수익권증서금액(담보액)</span></div>
+			<div class="form-content form-row">
+				<input type="text" id="priority_certificate_amount" class="form-control number-input">
+				<span>원</span>
+			</div>
+		</div>
+
+		<div class="form">
+			<div class="form-title"><span>등기(등록)일자</span></div>
+			<div class="form-content">
+				<input type="date" id="registration_date" class="form-control">
+			</div>
+		</div>
+
+		<div class="form">
+			<div class="form-title"><span>③ 신탁계약에 의한 처분으로<br>변제가 예상되는 채권액</span></div>
+			<div class="form-content form-row">
+				<input type="text" id="expected_payment" class="form-control number-input">
+				<span>원</span>
+			</div>
+		</div>
+
+		<div class="form">
+			<div class="form-title"><span>④ 신탁계약에 의한 처분으로도<br>변제 받을 수 없는 채권액</span></div>
+			<div class="form-content form-row">
+				<input type="text" id="unpaid_amount" class="form-control number-input">
+				<span>원</span>
 			</div>
 		</div>
 
