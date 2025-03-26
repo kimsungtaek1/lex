@@ -43,11 +43,13 @@ function loadDebtData() {
 			try {
 				const data = typeof response === 'string' ? JSON.parse(response) : response;
 				if (data.success && data.data && data.data.length > 0) {
+					console.log(data.data);
 					// 첫 번째 데이터로 폼 채우기
 					fillFormData(data.data[0]);
 					// debt_no 필드에 값 설정
 					$('#debtNo').val(data.data[0].debt_no);
 				} else {
+					console.log('없음');
 					clearForm(); // 데이터가 없으면 폼 초기화
 					setDefaultDescription(); // 기본 설명 텍스트 설정
 				}
