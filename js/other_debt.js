@@ -49,6 +49,7 @@ function loadDebtData() {
 					$('#debtNo').val(data.data[0].debt_no);
 				} else {
 					clearForm(); // 데이터가 없으면 폼 초기화
+					setDefaultDescription(); // 기본 설명 텍스트 설정
 				}
 			} catch (e) {
 				console.error('데이터 파싱 오류:', e);
@@ -63,16 +64,27 @@ function loadDebtData() {
 // 폼 초기화
 function clearForm() {
 	$('#hasMortgage').prop('checked', false);
+	$('#debtDescription').val('');
+}
+
+// 기본 설명 텍스트 설정
+function setDefaultDescription() {
+	if (current_creditor_count && principalAmount) {
+		const formattedPrincipal = Number(principalAmount).toLocaleString('ko-KR');
+		const descriptionText = `채권번호 (${current_creditor_count}) : 해당 채권사에 대한 원금 (${formattedPrincipal})원의 채무는 연대보증 채무이며 채권원인(으)로 발생한 채무입니다.`;
+		$('#debtDescription').val(descriptionText);
+	}
 }
 
 // 폼 데이터 채우기
 function fillFormData(data) {
 	$('#hasMortgage').prop('checked', data.has_mortgage == 1);
 	
-	// 채권 정보 텍스트 설정
-	if (current_creditor_count && principalAmount) {
-		const descriptionText = `채권번호 (${current_creditor_count}) : 해당 채권사에 대한 원금 (${principalAmount})원의 채무는 연대보증 채무이며 채권원인(으)로 발생한 채무입니다.`;
-		$('#debtDescription').val(descriptionText);
+	// 저장된 내용이 있으면 그대로 표시, 없으면 기본 텍스트 설정
+	if (data.debt_description) {
+		$('#debtDescription').val(data.debt_description);
+	} else {
+		setDefaultDescription();
 	}
 }
 
@@ -82,7 +94,8 @@ function saveForm() {
 	const formData = {
 		case_no: currentCaseNo,
 		creditor_count: current_creditor_count,
-		has_mortgage: $('#hasMortgage').prop('checked') ? 1 : 0
+		has_mortgage: $('#hasMortgage').prop('checked') ? 1 : 0,
+		debt_description: $('#debtDescription').val()
 	};
 	
 	// debt_no가 있으면 추가
