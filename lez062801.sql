@@ -1,5 +1,4 @@
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -952,15 +951,13 @@ CREATE TABLE application_recovery_creditor_appendix (
 
 CREATE TABLE application_recovery_creditor_assigned_claims (
   claim_no int(11) NOT NULL,
-  case_no int(11) NOT NULL,
-  creditor_count int(11) NOT NULL,
-  assignment_date date DEFAULT NULL,
-  original_creditor varchar(100) DEFAULT NULL,
-  assigned_creditor varchar(100) DEFAULT NULL,
-  amount int(11) DEFAULT 0,
-  assignment_reason text DEFAULT NULL,
-  court_name varchar(100) DEFAULT NULL,
-  court_case_number varchar(50) DEFAULT NULL,
+  case_no int(11) NOT NULL COMMENT '사건번호',
+  creditor_count int(11) NOT NULL COMMENT '채권자 번호',
+  court_case_number varchar(100) DEFAULT NULL COMMENT '법원/사건번호',
+  debtor_name varchar(100) DEFAULT NULL COMMENT '제3채무자명',
+  service_date date DEFAULT NULL COMMENT '송달일자',
+  confirmation_date date DEFAULT NULL COMMENT '확정일자',
+  claim_range text DEFAULT NULL COMMENT '전부명령의 대상이 된 채권의 범위',
   created_at datetime DEFAULT current_timestamp(),
   updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -1018,9 +1015,7 @@ CREATE TABLE application_recovery_creditor_other_debts (
   debt_no int(11) NOT NULL,
   case_no int(11) NOT NULL,
   creditor_count int(11) NOT NULL,
-  debt_description text DEFAULT NULL,
-  amount int(11) DEFAULT 0,
-  notes text DEFAULT NULL,
+  has_mortgage tinyint(1) DEFAULT 0 COMMENT '주채무자 소유 부동산에 근저당권 설정 여부',
   created_at datetime DEFAULT current_timestamp(),
   updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

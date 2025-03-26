@@ -73,7 +73,7 @@ function clearForm() {
 function setDefaultDescription() {
 	if (current_creditor_count && principalAmount) {
 		const formattedPrincipal = Number(principalAmount).toLocaleString('ko-KR');
-		const descriptionText = `채권번호 (${current_creditor_count}) : 해당 채권사에 대한 원금 (${formattedPrincipal})원의 채무는 연대보증 채무이며 채권원인(으)로 발생한 채무입니다.`;
+		const descriptionText = `채권번호 ${current_creditor_count} : 해당 채권사에 대한 원금 ${formattedPrincipal}원의 채무는 연대보증 채무이며 채권원인(으)로 발생한 채무입니다.`;
 		$('#debtDescription').val(descriptionText);
 	}
 }

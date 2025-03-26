@@ -1,6 +1,6 @@
 *{font-size:1.4vw;font-family: 'Pretendard';}
 textarea{outline: none;}
-textarea{width:100%;height:auto;resize:none;border:none;background:transparent;}
+textarea{width:100%;height:3.8vw;resize:none;border:none;background:transparent;}
 .content-wrapper{display:flex;flex-direction:column;padding:0.5vw}
 .appendix-title{background:#666;color:#1DFDBE;padding:1.5vh 2vw;font-size:1.4vw;font-weight:500;box-shadow: 0 0.7vh 0.7vh rgba(0,0,0,0.4);border-radius: 5px;}
 .appendix-table{width:100%;margin:2vh 0}

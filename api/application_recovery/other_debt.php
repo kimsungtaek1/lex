@@ -39,7 +39,7 @@ if ($creditor_count !== null && $principal > 0) { // creditor_count와 principal
 		<div class="form">
 			<div class="form-title form-notitle"><span>기타내역</span></div>
 			<div class="form-content">
-				<textarea id="debtDescription" rows="1"></textarea>
+				<textarea id="debtDescription" rows="2"></textarea>
 			</div>
 		</div>
 
