@@ -22,7 +22,6 @@ function getDatabaseSchema($pdo) {
                 $columns[] = [
                     'Field' => $columnData['Field'],
                     'Type' => $columnData['Type'],
-                    'Null' => $columnData['Null'],
                     'Key' => $columnData['Key'],
                     'Default' => $columnData['Default'],
                     'Extra' => $columnData['Extra']
