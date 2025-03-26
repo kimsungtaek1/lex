@@ -1,29 +1,13 @@
 $(document).ready(function() {
-	// 초기화
-	initializeForm();
+	// 저장된 데이터 불러오기
+	loadDebtData();
 	
 	// 이벤트 리스너 등록
 	registerEventListeners();
-	
-	// 저장된 데이터 불러오기
-	loadDebtData();
 });
-
-// 폼 초기화
-function initializeForm() {
-	// 숫자 입력 필드 포맷팅
-	$('.number-input').each(function() {
-		formatNumber($(this));
-	});
-}
 
 // 이벤트 리스너 등록
 function registerEventListeners() {
-	// 숫자 입력 필드 이벤트
-	$(document).on('input', '.number-input', function() {
-		formatNumber($(this));
-	});
-	
 	// 저장 버튼
 	$('#saveButton').on('click', saveForm);
 	
@@ -40,7 +24,7 @@ function registerEventListeners() {
 	});
 }
 
-// 저장된 채무 데이터 불러오기
+// 저장된 데이터 불러오기
 function loadDebtData() {
 	// 사건 및 채권자 번호가 없으면 데이터를 조회할 수 없음
 	if (!currentCaseNo || !current_creditor_count) {
@@ -78,68 +62,27 @@ function loadDebtData() {
 
 // 폼 초기화
 function clearForm() {
-	$('#guarantor_name').val('');
-	$('#debt_type').val('보증채무');
-	$('#debt_amount').val('');
-	$('#guarantee_date').val('');
-	$('#debt_content').val('');
-	$('#remark').val('');
+	$('#hasMortgage').prop('checked', false);
 }
 
 // 폼 데이터 채우기
 function fillFormData(data) {
-	$('#guarantor_name').val(data.guarantor_name || '');
-	$('#debt_type').val(data.debt_type || '보증채무');
-	$('#debt_amount').val(formatNumberValue(data.debt_amount));
-	$('#guarantee_date').val(data.guarantee_date || '');
-	$('#debt_content').val(data.debt_content || '');
-	$('#remark').val(data.remark || '');
-}
-
-// 숫자 포맷팅
-function formatNumber(input) {
-	if (!input || !input.val) return;
+	$('#hasMortgage').prop('checked', data.has_mortgage == 1);
 	
-	let value = input.val();
-	if (!value) return;
-	
-	// 숫자와 소수점, 마이너스 기호만 남기고 모두 제거
-	value = value.replace(/[^\d.-]/g, '');
-	
-	if (value) {
-		try {
-			// 숫자로 변환 후 천단위 콤마 추가
-			value = Number(value).toLocaleString('ko-KR');
-			input.val(value);
-		} catch (e) {
-			console.error('숫자 변환 중 오류:', e);
-			input.val(''); // 오류 발생시 입력값 초기화
-		}
+	// 채권 정보 텍스트 설정
+	if (current_creditor_count && principalAmount) {
+		const descriptionText = `채권번호 (${current_creditor_count}) : 해당 채권사에 대한 원금 (${principalAmount})원의 채무는 연대보증 채무이며 채권원인(으)로 발생한 채무입니다.`;
+		$('#debtDescription').val(descriptionText);
 	}
-}
-
-// 숫자 값 포맷팅
-function formatNumberValue(value) {
-	if (value === null || value === undefined || value === '') return '';
-	return Number(value).toLocaleString('ko-KR');
 }
 
 // 폼 저장
 function saveForm() {
-	const getNumber = function(selector) {
-		return parseFloat($(selector).val().replace(/,/g, '')) || 0;
-	};
-	
 	// 데이터 수집
 	const formData = {
 		case_no: currentCaseNo,
 		creditor_count: current_creditor_count,
-		guarantor_name: $('#guarantor_name').val(),
-		debt_type: $('#debt_type').val(),
-		debt_amount: getNumber('#debt_amount'),
-		guarantee_date: $('#guarantee_date').val(),
-		debt_content: $('#debt_content').val(),
-		remark: $('#remark').val()
+		has_mortgage: $('#hasMortgage').prop('checked') ? 1 : 0
 	};
 	
 	// debt_no가 있으면 추가

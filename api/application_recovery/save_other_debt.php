@@ -12,14 +12,7 @@ if (!isset($_SESSION['employee_no'])) {
 $case_no = $_POST['case_no'] ?? 0;
 $creditor_count = $_POST['creditor_count'] ?? 0;
 $debt_no = $_POST['debt_no'] ?? 0;
-
-// 필수 필드 확인
-$guarantor_name = $_POST['guarantor_name'] ?? '';
-$debt_type = $_POST['debt_type'] ?? '보증채무';
-$debt_amount = floatval($_POST['debt_amount'] ?? 0);
-$guarantee_date = $_POST['guarantee_date'] ?? null;
-$debt_content = $_POST['debt_content'] ?? '';
-$remark = $_POST['remark'] ?? '';
+$has_mortgage = isset($_POST['has_mortgage']) ? (int)$_POST['has_mortgage'] : 0;
 
 if (!$case_no || !$creditor_count) {
 	echo json_encode(['success' => false, 'message' => '필수 데이터가 누락되었습니다.']);
@@ -33,22 +26,12 @@ try {
 		// 수정
 		$stmt = $pdo->prepare("
 			UPDATE application_recovery_creditor_other_debts 
-			SET guarantor_name = ?, 
-				debt_type = ?,
-				debt_amount = ?,
-				guarantee_date = ?,
-				debt_content = ?,
-				remark = ?,
+			SET has_mortgage = ?,
 				updated_at = CURRENT_TIMESTAMP
 			WHERE debt_no = ? AND case_no = ? AND creditor_count = ?
 		");
 		$stmt->execute([
-			$guarantor_name,
-			$debt_type,
-			$debt_amount,
-			$guarantee_date,
-			$debt_content,
-			$remark,
+			$has_mortgage,
 			$debt_no,
 			$case_no,
 			$creditor_count
@@ -57,19 +40,13 @@ try {
 		// 신규 등록
 		$stmt = $pdo->prepare("
 			INSERT INTO application_recovery_creditor_other_debts 
-			(case_no, creditor_count, guarantor_name, debt_type, debt_amount, 
-			 guarantee_date, debt_content, remark, created_at, updated_at)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+			(case_no, creditor_count, has_mortgage, created_at, updated_at)
+			VALUES (?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 		");
 		$stmt->execute([
 			$case_no,
 			$creditor_count,
-			$guarantor_name,
-			$debt_type,
-			$debt_amount,
-			$guarantee_date,
-			$debt_content,
-			$remark
+			$has_mortgage
 		]);
 		$debt_no = $pdo->lastInsertId();
 	}
@@ -90,3 +67,4 @@ try {
 		'error' => $e->getMessage()
 	]);
 }
+?>

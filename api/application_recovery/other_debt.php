@@ -8,8 +8,19 @@ if (!isset($_SESSION['employee_no'])) {
 include '../../config.php';
 
 $case_no = (int)$_GET['case_no'];
-$creditor_count = isset($_GET['creditor_count']) ? $_GET['creditor_count'] : null;
+$creditor_count = isset($_GET['creditor_count']) ? (int)$_GET['creditor_count'] : null;
+$principal = isset($_GET['principal']) ? (float)$_GET['principal'] : 0; // 원금 파라미터 가져오기
 $debt_no = isset($_GET['debt_no']) ? $_GET['debt_no'] : null;
+
+// 원금 포맷팅 (천 단위 콤마)
+$formatted_principal = number_format($principal);
+
+// textarea에 들어갈 기본 문자열 생성
+$debt_description = "";
+if ($creditor_count !== null && $principal > 0) { // creditor_count와 principal 값이 유효할 때만 생성
+    $debt_description = "채권번호 ({$creditor_count}) : 해당 채권사에 대한 원금 ({$formatted_principal})원의 채무는 연대보증 채무이며 채권원인(으)로 발생한 채무입니다.";
+}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -28,14 +39,15 @@ $debt_no = isset($_GET['debt_no']) ? $_GET['debt_no'] : null;
 		<div class="form">
 			<div class="form-title form-notitle"><span>기타내역</span></div>
 			<div class="form-content">
-				채권번호 : 해당 채권사에 대한 원금 원의 채무는 연대보증 채무이며 채권원인(으)로 발생한 채무입니다.
+				<textarea id="debtDescription" rows="1"></textarea>
 			</div>
 		</div>
 
 		<div class="form">
 			<div class="form-title form-notitle"><span></span></div>
 			<div class="form-content">
-				주채무자 소유 부동산에 근저당권이 설정되어 있는 경우 
+				<input type="checkbox" id="hasMortgage">
+				<label for="hasMortgage">주채무자 소유 부동산에 근저당권이 설정되어 있는 경우</label>
 			</div>
 		</div>
 
@@ -68,6 +80,7 @@ $debt_no = isset($_GET['debt_no']) ? $_GET['debt_no'] : null;
 <script>
 	var currentCaseNo = <?php echo $_GET['case_no']; ?>;
 	var current_creditor_count = <?php echo isset($_GET['creditor_count']) && $_GET['creditor_count'] !== '' ? $_GET['creditor_count'] : 'null'; ?>;
+	var principalAmount = <?php echo isset($_GET['principal']) ? $_GET['principal'] : 'null'; ?>;
 </script>
 <script src="../../js/other_debt.js"></script>
 </body>

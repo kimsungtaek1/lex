@@ -563,7 +563,8 @@ $(document).ready(function() {
                             windowName = 'AssignedClaimWindow';
                             break;
                         case 'otherDebt':
-                            pageUrl = `api/application_recovery/other_debt.php?case_no=${currentCaseNo}&creditor_count=${count}`;
+                            const principal = parseFloat($(`#principal${count}`).val().replace(/,/g, '')) || 0;
+                            pageUrl = `api/application_recovery/other_debt.php?case_no=${currentCaseNo}&creditor_count=${count}&principal=${principal}`;
                             windowName = 'OtherDebtWindow';
                             break;
                         case 'undetermined':
