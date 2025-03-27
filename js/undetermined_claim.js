@@ -81,7 +81,7 @@ function fillFormData(data) {
 	$('#property_detail').val(data.property_detail || '');
 	$('#expected_value').val(formatNumberValue(data.expected_value));
 	$('#evaluation_rate').val(data.evaluation_rate || '');
-	$('#trust_property_details').val(data.trust_property_details || '담보신탁채권');
+	$('#trust_property_details').val(data.trust_property_details || '');
 	$('#priority_certificate_amount').val(formatNumberValue(data.priority_certificate_amount));
 	$('#registration_date').val(data.registration_date || '');
 	$('#expected_payment').val(formatNumberValue(data.expected_payment));
@@ -93,7 +93,7 @@ function clearForm() {
 	$('#property_detail').val('');
 	$('#expected_value').val('');
 	$('#evaluation_rate').val('');
-	$('#trust_property_details').val('담보신탁채권');
+	$('#trust_property_details').val('');
 	$('#priority_certificate_amount').val('');
 	$('#registration_date').val('');
 	$('#expected_payment').val('');
@@ -141,7 +141,7 @@ function saveForm() {
 		property_detail: $('#property_detail').val(),
 		expected_value: getNumber('#expected_value'),
 		evaluation_rate: $('#evaluation_rate').val(),
-		trust_property_details: $('#trust_property_details').val() || '담보신탁채권',
+		trust_property_details: $('#trust_property_details').val() || '',
 		priority_certificate_amount: getNumber('#priority_certificate_amount'),
 		registration_date: $('#registration_date').val(),
 		expected_payment: getNumber('#expected_payment'),
