@@ -23,7 +23,7 @@ $claim_no = isset($_GET['claim_no']) ? $_GET['claim_no'] : null;
 	<div class="appendix-title">부속서류&nbsp;&nbsp;|&nbsp;&nbsp;기타미확정채권(신탁재산 등)</div>
 	<div class="appendix-table" style="margin:2vh 0 0;">
         <div class="table-header">
-            <div class="col">신탁재산의 반영 (별제권부채권은 아니지만, 미확정채권에 반영해야 할 필요가 있는 경우 등)</div>
+            <div class="col">신탁재산의 반영 (별제권부채권은 아니지만, 미확정채권에 반영해야 할 필요가 있는 경우 등)</div>
         </div>
 	</div>
 	
@@ -56,7 +56,9 @@ $claim_no = isset($_GET['claim_no']) ? $_GET['claim_no'] : null;
 		<div class="form">
 			<div class="form-title"><span>신탁재산의 내용</span></div>
 			<div class="form-content">
-				<input type="text" id="trust_property_details" class="form-control">담보신탁채권
+				<select id="trust_property_details" class="form-control">
+					<option value="담보신탁채권">담보신탁채권</option>
+				</select>
 			</div>
 		</div>
 
