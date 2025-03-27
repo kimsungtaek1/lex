@@ -225,7 +225,7 @@ function renderGuarantorTable(debts) {
 	tbody.empty();
 	
 	if (!debts || debts.length === 0) {
-		tbody.append('<div class="no-data">등록된 보증인 채무가 없습니다.</div>');
+		tbody.append('<div class="no-data">보증인이 있는 채무 정보가 존재하지 않습니다. (회생신청자가 주채무자인 경우임)</div>');
 		return;
 	}
 	
