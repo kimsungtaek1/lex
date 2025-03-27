@@ -21,7 +21,20 @@ function initializeForm() {
 	
 	// 대위변제 선택 변경 시 헤더 텍스트와 채권원인 텍스트 업데이트
 	$('input[name="subrogation_type"]').change(function() {
+		// 선택된 라디오 버튼의 라벨에 data-selected 속성 추가
+		const selectedLabel = $(`label[for="${this.id}"]`);
+		$('label[for^="subrogation_"]').removeAttr('data-selected');
+		selectedLabel.attr('data-selected', 'true');
+		
 		updateSubrogationDisplay();
+	});
+	
+	// 장래구상권 선택 변경 시 시각적 표시 업데이트
+	$('input[name="future_right_type"]').change(function() {
+		// 선택된 라디오 버튼의 라벨에 data-selected 속성 추가
+		const selectedLabel = $(`label[for="${this.id}"]`);
+		$('label[for^="future_right_"]').removeAttr('data-selected');
+		selectedLabel.attr('data-selected', 'true');
 	});
 	
 	// 계산일자 변경 시 산정근거 자동 업데이트
@@ -31,6 +44,17 @@ function initializeForm() {
 	
 	// 페이지 로드 시 대위변제 텍스트 초기화
 	updateSubrogationDisplay();
+	
+	// 초기 라디오 버튼 상태 설정
+	const checkedSubrogation = $('input[name="subrogation_type"]:checked');
+	if(checkedSubrogation.length) {
+		$(`label[for="${checkedSubrogation.attr('id')}"]`).attr('data-selected', 'true');
+	}
+	
+	const checkedFutureRight = $('input[name="future_right_type"]:checked');
+	if(checkedFutureRight.length) {
+		$(`label[for="${checkedFutureRight.attr('id')}"]`).attr('data-selected', 'true');
+	}
 }
 
 // 대위변제 표시 및 채권원인 텍스트 업데이트
@@ -326,9 +350,18 @@ function clearForm() {
 	$('#interest_calculation').val('');
 	$('#calculation_date').val('');
 	$('#claim_content').val('보증채무를 대위변제할 경우 대위변제금액 및 이에 대한 대위변제일 이후의 민사 법정이율에 의한 이자');
+	
+	// 대위변제 선택 초기화
 	$('#subrogation_none').prop('checked', true);
+	$('label[for^="subrogation_"]').removeAttr('data-selected');
+	$('label[for="subrogation_none"]').attr('data-selected', 'true');
+	
 	$('#force_payment_plan').prop('checked', false);
+	
+	// 장래구상권 선택 초기화
 	$('input[name="future_right_type"]').prop('checked', false);
+	$('label[for^="future_right_"]').removeAttr('data-selected');
+	
 	$('#guarantor_name').val('');
 	$('#guarantor_address').val('');
 	$('#guarantee_amount').val('');
@@ -354,7 +387,12 @@ function fillFormData(data) {
 	$('#claim_content').val(data.claim_content || '보증채무를 대위변제할 경우 대위변제금액 및 이에 대한 대위변제일 이후의 민사 법정이율에 의한 이자');
 	
 	// 대위변제 선택
-	$(`input[name="subrogation_type"][value="${data.subrogation_type || '미발생'}"]`).prop('checked', true);
+	const subrogationType = data.subrogation_type || '미발생';
+	$(`input[name="subrogation_type"][value="${subrogationType}"]`).prop('checked', true);
+	
+	// 대위변제 라벨 시각적 표시 업데이트
+	$('label[for^="subrogation_"]').removeAttr('data-selected');
+	$(`label[for="subrogation_${subrogationType === '미발생' ? 'none' : subrogationType === '일부대위변제' ? 'partial' : 'full'}"]`).attr('data-selected', 'true');
 	
 	// 대위변제 표시 업데이트
 	updateSubrogationDisplay();
@@ -364,9 +402,15 @@ function fillFormData(data) {
 	
 	// 장래구상권 선택
 	if (data.future_right_type) {
-		$(`input[name="future_right_type"][value="${data.future_right_type}"]`).prop('checked', true);
+		const futureRightType = data.future_right_type;
+		$(`input[name="future_right_type"][value="${futureRightType}"]`).prop('checked', true);
+		
+		// 장래구상권 라벨 시각적 표시 업데이트
+		$('label[for^="future_right_"]').removeAttr('data-selected');
+		$(`label[for="future_right_${futureRightType === '포기' ? 'abandon' : 'claim'}"]`).attr('data-selected', 'true');
 	} else {
 		$('input[name="future_right_type"]').prop('checked', false);
+		$('label[for^="future_right_"]').removeAttr('data-selected');
 	}
 	
 	$('#guarantor_name').val(data.guarantor_name || '');
