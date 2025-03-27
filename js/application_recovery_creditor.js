@@ -626,9 +626,6 @@ $(document).ready(function() {
 				$(`#openAppendix${count}`).addClass('btn-appendix-saved');
 			}
 			
-			// 부속서류 개수 새로고침
-			loadAppendixCount(count);
-			
 			// 금액 합계 재계산
 			calculateTotals();
 		}
@@ -639,9 +636,6 @@ $(document).ready(function() {
 			
 			// 해당 채권자의 별제권부채권 버튼 색상 원래대로
 			$(`#openAppendix${count}`).removeClass('btn-appendix-saved');
-			
-			// 부속서류 개수 새로고침
-			loadAppendixCount(count);
 			
 			// 금액 합계 재계산
 			calculateTotals();
@@ -656,9 +650,6 @@ $(document).ready(function() {
 			if (hasData) {
 				$(`#openOtherClaim${count}`).addClass('btn-other-claim-saved');
 			}
-			
-			// 다툼있는 채권 개수 새로고침
-			loadOtherClaimCount(count);
 		}
 		
 		// 다툼있는 채권 삭제 이벤트 처리
@@ -667,9 +658,6 @@ $(document).ready(function() {
 			
 			// 해당 채권자의 다툼있는 채권 버튼 색상 원래대로
 			$(`#openOtherClaim${count}`).removeClass('btn-other-claim-saved');
-			
-			// 다툼있는 채권 개수 새로고침
-			loadOtherClaimCount(count);
 		}
 		
 		// 전부명령된 채권 저장 이벤트 처리
@@ -680,9 +668,6 @@ $(document).ready(function() {
 			if (hasData) {
 				$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).addClass('btn-claim-saved');
 			}
-			
-			// 개수 새로고침
-			loadAssignedClaimCount(count);
 		}
 		
 		// 전부명령된 채권 삭제 이벤트 처리
@@ -690,9 +675,6 @@ $(document).ready(function() {
 			const count = event.data.creditorCount;
 			
 			$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).removeClass('btn-claim-saved');
-			
-			// 개수 새로고침
-			loadAssignedClaimCount(count);
 		}
 		
 		// 기타채무 저장 이벤트 처리
@@ -703,9 +685,6 @@ $(document).ready(function() {
 			if (hasData) {
 				$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).addClass('btn-claim-saved');
 			}
-			
-			// 개수 새로고침
-			loadOtherDebtCount(count);
 		}
 		
 		// 기타채무 삭제 이벤트 처리
@@ -713,9 +692,6 @@ $(document).ready(function() {
 			const count = event.data.creditorCount;
 			
 			$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).removeClass('btn-claim-saved');
-			
-			// 개수 새로고침
-			loadOtherDebtCount(count);
 		}
 		
 		// 기타미확정채권 저장 이벤트 처리
@@ -767,10 +743,6 @@ $(document).ready(function() {
 
 	// 부속정보 로드
 	function loadCreditorSpecificData(count) {
-		loadAppendixCount(count);
-		loadOtherClaimCount(count);
-		loadAssignedClaimCount(count);
-		loadOtherDebtCount(count);
 		loadUndeterminedClaimCount(count);
 		loadGuaranteedDebtCount(count);
 		
@@ -985,44 +957,6 @@ $(document).ready(function() {
 		});
 	}
 
-    // 부속서류 개수 로드
-    function loadAppendixCount(count) {
-        if (!currentCaseNo) return;
-        
-        $.ajax({
-            url: 'api/application_recovery/get_appendix_count.php',
-            type: 'GET',
-            data: {
-                case_no: currentCaseNo,
-                creditor_count: count
-            },
-            success: function(response) {
-                if (response.success) {
-                    $(`#appendixCount${count}`).text(response.count);
-                }
-            }
-        });
-    }
-
-    // 다툼있는 채권 개수 로드
-    function loadOtherClaimCount(count) {
-        if (!currentCaseNo) return;
-        
-        $.ajax({
-            url: 'api/application_recovery/get_other_claim_count.php',
-            type: 'GET',
-            data: {
-                case_no: currentCaseNo,
-                creditor_count: count
-            },
-            success: function(response) {
-                if (response.success) {
-                    $(`#openOtherClaim${count}`).text(response.count);
-                }
-            }
-        });
-    }
-
     // 보증인채무 개수 로드
     function loadGuaranteedDebtCount(count) {
         if (!currentCaseNo) return;
@@ -1041,45 +975,7 @@ $(document).ready(function() {
             }
         });
     }
-
-	// 전부명령된 채권 개수 로드
-	function loadAssignedClaimCount(count) {
-		if (!currentCaseNo) return;
-		
-		$.ajax({
-			url: 'api/application_recovery/get_assigned_claim_count.php',
-			type: 'GET',
-			data: {
-				case_no: currentCaseNo,
-				creditor_count: count
-			},
-			success: function(response) {
-				if (response.success) {
-					$(`#assignedClaimCount${count}`).text(response.count);
-				}
-			}
-		});
-	}
-
-	// 기타채무 개수 로드
-	function loadOtherDebtCount(count) {
-		if (!currentCaseNo) return;
-		
-		$.ajax({
-			url: 'api/application_recovery/get_other_debt_count.php',
-			type: 'GET',
-			data: {
-				case_no: currentCaseNo,
-				creditor_count: count
-			},
-			success: function(response) {
-				if (response.success) {
-					$(`#otherDebtCount${count}`).text(response.count);
-				}
-			}
-		});
-	}
-
+	
 	// 기타미확정채권 개수 로드
 	function loadUndeterminedClaimCount(count) {
 		if (!currentCaseNo) return;
