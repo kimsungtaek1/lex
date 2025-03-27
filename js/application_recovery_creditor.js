@@ -1093,6 +1093,12 @@ $(document).ready(function() {
 			},
 			success: function(response) {
 				console.log(response);
+				if ($(`#undeterminedCount${count}`).length) {
+				  console.log(`요소 #undeterminedCount${count} 존재함`);
+				  $(`#undeterminedCount${count}`).text(response.count);
+				} else {
+				  console.log(`요소 #undeterminedCount${count} 없음`);
+				}
 				if (response.success) {
 					console.log('------'+response.count);
 					$(`#undeterminedClaimCount${count}`).text(response.count);
