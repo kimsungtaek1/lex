@@ -1092,8 +1092,8 @@ $(document).ready(function() {
 				creditor_count: count
 			},
 			success: function(response) {
-				if (response.success) {
-					$(`#undeterminedClaimCount${count}`).text(response.count);
+				if ($(`#undeterminedCount${count}`).length) {
+				  $(`#undeterminedCount${count}`).text(response.count);
 				}
 			}
 		});
