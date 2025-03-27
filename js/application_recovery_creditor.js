@@ -1004,7 +1004,7 @@ $(document).ready(function() {
         });
     }
 
-    // 기타미확정채권 개수 로드
+    // 다툼있는 채권 개수 로드
     function loadOtherClaimCount(count) {
         if (!currentCaseNo) return;
         
@@ -1092,6 +1092,7 @@ $(document).ready(function() {
 				creditor_count: count
 			},
 			success: function(response) {
+				console.log(response);
 				if (response.success) {
 					$(`#undeterminedClaimCount${count}`).text(response.count);
 				}
