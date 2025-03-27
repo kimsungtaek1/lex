@@ -41,6 +41,14 @@ function registerEventListeners() {
 	$('#closeButton').on('click', function() {
 		window.close();
 	});
+
+	// 체크박스가 항상 체크되도록 이벤트 가로채기
+	$('#trust_property_details').on('click', function(e) {
+		if ($(this).prop('checked') === false) {
+			e.preventDefault(); // 체크 해제 방지
+			$(this).prop('checked', true);
+		}
+	});
 }
 
 // 저장된 클레임 데이터 불러오기
