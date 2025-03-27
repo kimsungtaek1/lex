@@ -217,7 +217,7 @@ if (!$debt_no && $case_no && $creditor_count) {
 	</div>
 
 	<div class="appendix-table">
-        <div class="table-header">
+        <div class="table-header guarantor-table">
             <div class="col">|&nbsp;&nbsp;채권번호</div>
             <div class="col">|&nbsp;&nbsp;대위변제</div>
             <div class="col">|&nbsp;&nbsp;채권자정보 </div>
