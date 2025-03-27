@@ -76,26 +76,28 @@ function loadClaimData() {
 	});
 }
 
-// 폼 초기화
-function clearForm() {
-	$('#property_detail').val('');
-	$('#expected_value').val('');
-	$('#evaluation_rate').val('');
-	$('#priority_certificate_amount').val('');
-	$('#registration_date').val('');
-	$('#expected_payment').val('');
-	$('#unpaid_amount').val('');
-}
-
 // 폼 데이터 채우기
 function fillFormData(data) {
 	$('#property_detail').val(data.property_detail || '');
 	$('#expected_value').val(formatNumberValue(data.expected_value));
 	$('#evaluation_rate').val(data.evaluation_rate || '');
+	$('#trust_property_details').val(data.trust_property_details || '담보신탁채권');
 	$('#priority_certificate_amount').val(formatNumberValue(data.priority_certificate_amount));
 	$('#registration_date').val(data.registration_date || '');
 	$('#expected_payment').val(formatNumberValue(data.expected_payment));
 	$('#unpaid_amount').val(formatNumberValue(data.unpaid_amount));
+}
+
+// 폼 초기화
+function clearForm() {
+	$('#property_detail').val('');
+	$('#expected_value').val('');
+	$('#evaluation_rate').val('');
+	$('#trust_property_details').val('담보신탁채권');
+	$('#priority_certificate_amount').val('');
+	$('#registration_date').val('');
+	$('#expected_payment').val('');
+	$('#unpaid_amount').val('');
 }
 
 // 숫자 포맷팅
@@ -139,7 +141,7 @@ function saveForm() {
 		property_detail: $('#property_detail').val(),
 		expected_value: getNumber('#expected_value'),
 		evaluation_rate: $('#evaluation_rate').val(),
-		trust_property_details: $('#trust_property_details').val(),
+		trust_property_details: $('#trust_property_details').val() || '담보신탁채권',
 		priority_certificate_amount: getNumber('#priority_certificate_amount'),
 		registration_date: $('#registration_date').val(),
 		expected_payment: getNumber('#expected_payment'),

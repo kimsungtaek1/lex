@@ -57,7 +57,7 @@ $claim_no = isset($_GET['claim_no']) ? $_GET['claim_no'] : null;
 			<div class="form-title"><span>신탁재산의 내용</span></div>
 			<div class="form-content">
 				<select id="trust_property_details" class="form-control">
-					<option value="담보신탁채권">담보신탁채권</option>
+					<option value="담보신탁채권" selected>담보신탁채권</option>
 				</select>
 			</div>
 		</div>
