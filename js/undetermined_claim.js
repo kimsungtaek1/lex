@@ -81,7 +81,6 @@ function clearForm() {
 	$('#property_detail').val('');
 	$('#expected_value').val('');
 	$('#evaluation_rate').val('');
-	$('#trust_property_details').val('');
 	$('#priority_certificate_amount').val('');
 	$('#registration_date').val('');
 	$('#expected_payment').val('');
