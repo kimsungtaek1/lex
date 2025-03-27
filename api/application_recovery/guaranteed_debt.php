@@ -20,7 +20,7 @@ $debt_no = isset($_GET['debt_no']) ? $_GET['debt_no'] : null;
 </head>
 <body>
 <div class="content-wrapper">
-	<div class="appendix-title">부속서류&nbsp;&nbsp;|&nbsp;&nbsp;보증인이 있는 채무(가지번호)</div>
+	<div class="appendix-title">보증인이 있는 채무(가지번호)&nbsp;&nbsp;|&nbsp;&nbsp;<span id="">미발생</span></div>
 	
 	<div class="left-section">
 		<input type="hidden" id="debtNo" value="<?php echo $debt_no; ?>">
