@@ -160,6 +160,7 @@ function saveForm() {
 		data: formData,
 		success: function(response) {
 			try {
+				console.log(formData);
 				const result = typeof response === 'string' ? JSON.parse(response) : response;
 				if (result.success) {
 					alert(result.message || '저장되었습니다.');
