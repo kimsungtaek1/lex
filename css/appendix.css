@@ -80,4 +80,4 @@ label:has(+ input[type="checkbox"]:disabled:checked):after,label:has(+ input[typ
 .guarantor-table .col:nth-child(5) { flex: 1 }
 .no-data {background: #f7f7f7;text-align: center;padding: 2vw;color: #666;}
 
-.btn-search{margin-left:10px !important;min-width:5vw !important;}
+.btn-search{margin-left:10px !important;min-width:7vw !important;}
