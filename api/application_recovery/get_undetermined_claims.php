@@ -22,8 +22,7 @@ try {
 	$sql = "
 		SELECT *
 		FROM application_recovery_creditor_undetermined_claims
-		WHERE case_no = ? AND creditor_count = ?'
-	";
+		WHERE case_no = ? AND creditor_count = ? ";
 	$params = [$case_no, $creditor_count];
 	
 	// claim_no가 있는 경우 해당 claim_no에 대한 데이터만 조회
