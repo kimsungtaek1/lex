@@ -73,25 +73,7 @@ label:has(+ input[type="checkbox"]:disabled:checked):before,label:has(+ input[ty
 label:has(+ input[type="checkbox"]:disabled:checked):after,label:has(+ input[type="radio"]:disabled:checked):after,input[type="checkbox"]:disabled:checked+label:after,input[type="radio"]:disabled:checked+label:after{border-color:#999}
 
 
-.guarantor-table {
-	width: 100%;
-	margin-top: 2vw;
-	background: #f7f7f7;
-}
-.guarantor-table .table-header {
-	display: flex;
-	background-color: #666;
-	padding: 1vw 0;
-}
-.guarantor-table .table-row {
-	display: flex;
-	padding: 10px 0;
-	border-bottom: 1px solid #ddd;
-}
-.guarantor-table .col {
-	padding: 0 10px;
-	box-sizing: border-box;
-}
+
 .guarantor-table .col:nth-child(1) { flex: 1 }
 .guarantor-table .col:nth-child(2) { flex: 1 }
 .guarantor-table .col:nth-child(3) { flex: 3 }

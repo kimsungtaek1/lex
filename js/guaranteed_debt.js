@@ -225,7 +225,7 @@ function renderGuarantorTable(debts) {
 	tbody.empty();
 	
 	if (!debts || debts.length === 0) {
-		tbody.append('<tr><td colspan="5" class="no-data">등록된 보증인 채무가 없습니다.</td></tr>');
+		tbody.append('<div class="no-data">등록된 보증인 채무가 없습니다.</div>');
 		return;
 	}
 	
