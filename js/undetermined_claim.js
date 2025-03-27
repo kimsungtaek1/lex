@@ -15,6 +15,9 @@ function initializeForm() {
 	$('.number-input').each(function() {
 		formatNumber($(this));
 	});
+	
+	// 체크박스는 항상 체크된 상태로 유지
+	$('#trust_property_details').prop('checked', true);
 }
 
 // 이벤트 리스너 등록
@@ -81,7 +84,10 @@ function fillFormData(data) {
 	$('#property_detail').val(data.property_detail || '');
 	$('#expected_value').val(formatNumberValue(data.expected_value));
 	$('#evaluation_rate').val(data.evaluation_rate || '');
-	$('#trust_property_details').val(data.trust_property_details || '');
+	
+	// 체크박스는 항상 체크된 상태로 유지
+	$('#trust_property_details').prop('checked', true);
+	
 	$('#priority_certificate_amount').val(formatNumberValue(data.priority_certificate_amount));
 	$('#registration_date').val(data.registration_date || '');
 	$('#expected_payment').val(formatNumberValue(data.expected_payment));
@@ -93,7 +99,10 @@ function clearForm() {
 	$('#property_detail').val('');
 	$('#expected_value').val('');
 	$('#evaluation_rate').val('');
-	$('#trust_property_details').val('');
+	
+	// 체크박스는 항상 체크된 상태로 유지
+	$('#trust_property_details').prop('checked', true);
+	
 	$('#priority_certificate_amount').val('');
 	$('#registration_date').val('');
 	$('#expected_payment').val('');
@@ -141,7 +150,10 @@ function saveForm() {
 		property_detail: $('#property_detail').val(),
 		expected_value: getNumber('#expected_value'),
 		evaluation_rate: $('#evaluation_rate').val(),
-		trust_property_details: $('#trust_property_details').val() || '',
+		
+		// 체크박스 값은 항상 'Y'로 설정
+		trust_property_details: 'Y',
+		
 		priority_certificate_amount: getNumber('#priority_certificate_amount'),
 		registration_date: $('#registration_date').val(),
 		expected_payment: getNumber('#expected_payment'),

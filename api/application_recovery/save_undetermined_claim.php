@@ -17,7 +17,10 @@ $claim_no = $_POST['claim_no'] ?? 0;
 $property_detail = $_POST['property_detail'] ?? '';
 $expected_value = floatval($_POST['expected_value'] ?? 0);
 $evaluation_rate = $_POST['evaluation_rate'] ?? '';
-$trust_property_details = $_POST['trust_property_details'] ?? '';
+
+// trust_property_details는 항상 'Y'로 설정
+$trust_property_details = 'Y';
+
 $priority_certificate_amount = floatval($_POST['priority_certificate_amount'] ?? 0);
 $registration_date = $_POST['registration_date'] ?? '';
 $expected_payment = floatval($_POST['expected_payment'] ?? 0);
