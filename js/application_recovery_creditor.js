@@ -1017,7 +1017,7 @@ $(document).ready(function() {
             },
             success: function(response) {
                 if (response.success) {
-                    $(`#undeterminedCount${count}`).text(response.count);
+                    $(`#openOtherClaim${count}`).text(response.count);
                 }
             }
         });
@@ -1094,6 +1094,7 @@ $(document).ready(function() {
 			success: function(response) {
 				console.log(response);
 				if (response.success) {
+					console.log('------'.response.count);
 					$(`#undeterminedClaimCount${count}`).text(response.count);
 				}
 			}
