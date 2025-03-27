@@ -103,3 +103,20 @@ label:has(+ input[type="checkbox"]:disabled:checked):after,label:has(+ input[typ
 	padding: 2vw;
 	color: #666;
 }
+
+.subrogation-group {
+	display: flex;
+	align-items: center;
+	margin-bottom: 10px;
+}
+.subrogation-group input {
+	margin-right: 5px;
+}
+.future-right-group {
+	display: flex;
+	align-items: center;
+	margin-bottom: 10px;
+}
+.future-right-group input {
+	margin-right: 5px;
+}

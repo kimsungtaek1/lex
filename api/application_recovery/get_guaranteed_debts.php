@@ -32,6 +32,9 @@ try {
 		$params[] = $debt_no;
 	}
 	
+	// 정렬 추가
+	$sql .= " ORDER BY debt_no ASC";
+	
 	$stmt = $pdo->prepare($sql);
 	$stmt->execute($params);
 	$debts = $stmt->fetchAll(PDO::FETCH_ASSOC);
