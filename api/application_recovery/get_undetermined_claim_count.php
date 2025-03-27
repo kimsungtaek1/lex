@@ -21,7 +21,7 @@ try {
 	$stmt = $pdo->prepare("
 		SELECT COUNT(*) as count
 		FROM application_recovery_creditor_undetermined_claims
-		WHERE case_no = ? AND creditor_count = ? AND claim_type = '기타미확정채권'
+		WHERE case_no = ? AND creditor_count = ?
 	");
 	
 	$stmt->execute([$case_no, $creditor_count]);
