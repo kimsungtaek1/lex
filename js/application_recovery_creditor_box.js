@@ -161,7 +161,8 @@ window.creditorBoxTemplate = `<div class="creditor-box" data-count="{count}">
                     <div class="form-title"><span>기타미확정채권</span></div>
                     <div class="form-content">
                         <button type="button" class="btn-nomargin" onclick="openClaimWindow({count}, 'undetermined')">선택</button>
-                        <span>기타미확정채권(신탁재산 등)&ensp;|&ensp;</span><span id="undeterminedCount{count}"></span><span>개</span>
+                        <span>기타미확정채권(신탁재산 등)&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+						<span id="undeterminedCount{count}"></span><span>개</span>
                     </div>
                 </div>
 
@@ -169,7 +170,7 @@ window.creditorBoxTemplate = `<div class="creditor-box" data-count="{count}">
                     <div class="form-title"><span>보증인이 있는 채무</span></div>
                     <div class="form-content">
                         <button type="button" class="btn-nomargin" onclick="openClaimWindow({count}, 'guaranteed')">선택</button>
-                        <span>보증인이 있는 채무(가지번호)&ensp;|&ensp;</span>
+                        <span>보증인이 있는 채무(가지번호)&nbsp;&nbsp;|&nbsp;&nbsp;</span>
                         <span id="guaranteedDebtCount{count}"></span><span>개</span>
                     </div>
                 </div>
