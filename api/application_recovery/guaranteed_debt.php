@@ -41,7 +41,10 @@ if (!$debt_no && $case_no && $creditor_count) {
 		<div class="form">
 			<div class="form-title"><span>채권번호</span></div>
 			<div class="form-content">
-				<input type="text" id="debtNumber" value="<?php echo $nextNumber; ?>" class="form-control" readonly>
+				<!-- 수정: 채권자번호-보증인채무번호 형태로 표시 -->
+				<input type="text" id="creditorCount" value="<?php echo $creditor_count; ?>" class="form-control form-content-short5 txt-center" readonly>
+				<span>-</span>
+				<input type="text" id="debtNumber" value="<?php echo $nextNumber; ?>" class="form-control form-content-short5 txt-center" readonly>
 			</div>
 		</div>
 		
@@ -80,21 +83,18 @@ if (!$debt_no && $case_no && $creditor_count) {
 					<option value="국가">국가</option>
 					<option value="지방자치단체">지방자치단체</option>
 				</select>
+				<!-- 수정: 금융기관명 필드를 채권자 정보 옆으로 이동 -->
+				<input type="text" id="financial_institution" placeholder="금융기관명" class="form-control">
 				<button type="button" class="btn btn-long btn-financial-institution" data-count="<?php echo $creditor_count; ?>">금융기관 검색</button>
 			</div>
 		</div>
 		
 		<div class="form">
-			<div class="form-title"><span>금융기관명</span></div>
-			<div class="form-content">
-				<input type="text" id="financial_institution" class="form-control">
-			</div>
-		</div>
-		
-		<div class="form">
 			<div class="form-title"><span>주소</span></div>
-			<div class="form-content">
+			<div class="form-content form-row">
 				<input type="text" id="address" class="form-control form-control-long">
+				<!-- 수정: 주소 입력 필드 우측에 주소찾기 버튼 추가 -->
+				<button type="button" class="btn btn-search address-search" data-target="address">주소찾기</button>
 			</div>
 		</div>
 		
@@ -115,7 +115,8 @@ if (!$debt_no && $case_no && $creditor_count) {
 		<div class="form">
 			<div class="form-title"><span>채권원인</span></div>
 			<div class="form-content">
-				<input type="text" id="claim_reason" class="form-control form-control-long">
+				<!-- 수정: 자동 텍스트가 추가될 부분 -->
+				<input type="text" id="claim_reason" class="form-control form-control-long" placeholder="채무자의 <?php echo $creditor_count; ?>번 채무를 연대보증">
 			</div>
 		</div>
 		

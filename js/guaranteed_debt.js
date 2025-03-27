@@ -19,15 +19,42 @@ function initializeForm() {
 		formatNumber($(this));
 	});
 	
-	// 대위변제 선택 변경 시 헤더 텍스트 업데이트
+	// 대위변제 선택 변경 시 헤더 텍스트와 채권원인 텍스트 업데이트
 	$('input[name="subrogation_type"]').change(function() {
-		$('#subrogationDisplay').text($(this).val());
+		updateSubrogationDisplay();
 	});
 	
 	// 계산일자 변경 시 산정근거 자동 업데이트
 	$('#calculation_date').change(function() {
 		updateCalculations();
 	});
+	
+	// 페이지 로드 시 대위변제 텍스트 초기화
+	updateSubrogationDisplay();
+}
+
+// 대위변제 표시 및 채권원인 텍스트 업데이트
+function updateSubrogationDisplay() {
+	const subrogationType = $('input[name="subrogation_type"]:checked').val();
+	$('#subrogationDisplay').text(subrogationType);
+	
+	// 채권원인 텍스트 업데이트
+	let claimReasonText = `채무자의 ${current_creditor_count}번 채무를 연대보증`;
+	
+	// 미발생이 아닌 경우에만 추가 텍스트 적용
+	if (subrogationType !== '미발생') {
+		claimReasonText += ` (${subrogationType})`;
+	}
+	
+	// 기존 값이 있는 경우 기본 텍스트로 변경하지 않음
+	if (!$('#claim_reason').val() || $('#claim_reason').val() === `채무자의 ${current_creditor_count}번 채무를 연대보증` || 
+		$('#claim_reason').val() === `채무자의 ${current_creditor_count}번 채무를 연대보증 (일부대위변제)` || 
+		$('#claim_reason').val() === `채무자의 ${current_creditor_count}번 채무를 연대보증 (전부대위변제)`) {
+		$('#claim_reason').val(claimReasonText);
+	}
+	
+	// placeholder 업데이트
+	$('#claim_reason').attr('placeholder', claimReasonText);
 }
 
 // 이벤트 리스너 등록
@@ -40,6 +67,11 @@ function registerEventListeners() {
 	// 금융기관 검색 버튼
 	$('.btn-financial-institution').on('click', function() {
 		openFinancialInstitutionSearch();
+	});
+	
+	// 주소 검색 버튼
+	$('.address-search').on('click', function() {
+		searchAddress();
 	});
 	
 	// 저장 버튼
@@ -69,6 +101,37 @@ function registerEventListeners() {
 		if (confirm('정말 삭제하시겠습니까?')) {
 			deleteDebt(debtNo);
 		}
+	});
+}
+
+// 주소 검색 함수
+function searchAddress() {
+	const width = 500;
+	const height = 500;
+	const left = (window.screen.width / 2) - (width / 2);
+	const top = (window.screen.height / 2) - (height / 2);
+
+	new daum.Postcode({
+		width: width,
+		height: height,
+		oncomplete: function(data) {
+			$('#address').val(data.address);
+			
+			// 팝업 창 닫기
+			const frame = document.getElementsByClassName('daum_postcode_layer')[0];
+			if (frame) {
+				frame.style.display = 'none';
+			}
+		},
+		onclose: function() {
+			const frame = document.getElementsByClassName('daum_postcode_layer')[0];
+			if (frame) {
+				frame.remove();
+			}
+		}
+	}).open({
+		left: left,
+		top: top
 	});
 }
 
@@ -232,7 +295,7 @@ function renderGuarantorTable(debts) {
 	debts.forEach(function(debt, index) {
 		const row = `
 			<tr>
-				<td>${index + 1}</td>
+				<td>${current_creditor_count}-${index + 1}</td>
 				<td>${debt.subrogation_type || '미발생'}</td>
 				<td>${debt.financial_institution || ''}</td>
 				<td>${debt.address || ''}</td>
@@ -253,7 +316,10 @@ function clearForm() {
 	$('#address').val('');
 	$('#phone').val('');
 	$('#fax').val('');
-	$('#claim_reason').val('');
+	
+	// 채권원인 초기화 (대위변제 타입에 따라)
+	updateSubrogationDisplay();
+	
 	$('#principal').val('');
 	$('#principal_calculation').val('');
 	$('#interest').val('');
@@ -267,6 +333,8 @@ function clearForm() {
 	$('#guarantor_address').val('');
 	$('#guarantee_amount').val('');
 	$('#guarantee_date').val('');
+	
+	// 대위변제 표시 업데이트
 	$('#subrogationDisplay').text('미발생');
 }
 
@@ -287,7 +355,9 @@ function fillFormData(data) {
 	
 	// 대위변제 선택
 	$(`input[name="subrogation_type"][value="${data.subrogation_type || '미발생'}"]`).prop('checked', true);
-	$('#subrogationDisplay').text(data.subrogation_type || '미발생');
+	
+	// 대위변제 표시 업데이트
+	updateSubrogationDisplay();
 	
 	// 강제 기재 여부
 	$('#force_payment_plan').prop('checked', data.force_payment_plan == 1);
