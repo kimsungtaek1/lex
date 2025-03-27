@@ -170,11 +170,6 @@ window.creditorBoxTemplate = `<div class="creditor-box" data-count="{count}">
                     <div class="form-content">
                         <button type="button" class="btn-nomargin" onclick="openClaimWindow({count}, 'guaranteed')">선택</button>
                         <span>보증인이 있는 채무(가지번호)&ensp;|&ensp;</span>
-                        <select class="form-select" id="guaranteedDebt{count}" name="guaranteedDebt">
-                            <option value="미발생" selected>미발생</option>
-                            <option value="일부대위변제">일부대위변제</option>
-                            <option value="전부대위변제" >전부대위변제</option>
-                        </select>
                         <span>&ensp;|&ensp;</span><span id="guaranteedDebtCount{count}"></span><span>개</span>
                     </div>
                 </div>
