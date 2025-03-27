@@ -83,7 +83,7 @@ if (!$debt_no && $case_no && $creditor_count) {
 					<option value="국가">국가</option>
 					<option value="지방자치단체">지방자치단체</option>
 				</select>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				&nbsp;&nbsp;&nbsp;&nbsp;
 				<input type="text" id="financial_institution" placeholder="금융기관명" class="form-control">
 				<button type="button" class="btn btn-long btn-financial-institution" data-count="<?php echo $creditor_count; ?>">금융기관 검색</button>
 			</div>
