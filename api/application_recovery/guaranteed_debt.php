@@ -52,14 +52,20 @@ if (!$debt_no && $case_no && $creditor_count) {
 			<div class="form-title"><span>대위변제선택</span></div>
 			<div class="form-content">
 				<div class="subrogation-group">
-					<input type="radio" id="subrogation_none" name="subrogation_type" value="미발생" checked>
-					<label for="subrogation_none">미발생</label>
+					<div class="radio-wrap">
+						<input type="radio" id="subrogation_none" name="subrogation_type" value="미발생" checked>
+						<label for="subrogation_none">미발생</label>
+					</div>
 					
-					<input type="radio" id="subrogation_partial" name="subrogation_type" value="일부대위변제">
-					<label for="subrogation_partial">일부대위변제</label>
+					<div class="radio-wrap">
+						<input type="radio" id="subrogation_partial" name="subrogation_type" value="일부대위변제">
+						<label for="subrogation_partial">일부대위변제</label>
+					</div>
 					
-					<input type="radio" id="subrogation_full" name="subrogation_type" value="전부대위변제">
-					<label for="subrogation_full">전부대위변제</label>
+					<div class="radio-wrap">
+						<input type="radio" id="subrogation_full" name="subrogation_type" value="전부대위변제">
+						<label for="subrogation_full">전부대위변제</label>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -162,11 +168,15 @@ if (!$debt_no && $case_no && $creditor_count) {
 			<div class="form-title"><span>장래구상권</span></div>
 			<div class="form-content">
 				<div class="future-right-group">
-					<input type="radio" id="future_right_abandon" name="future_right_type" value="포기">
-					<label for="future_right_abandon">포기</label>
+					<div class="radio-wrap">
+						<input type="radio" id="future_right_abandon" name="future_right_type" value="포기">
+						<label for="future_right_abandon">포기</label>
+					</div>
 					
-					<input type="radio" id="future_right_claim" name="future_right_type" value="청구">
-					<label for="future_right_claim">청구</label>
+					<div class="radio-wrap">
+						<input type="radio" id="future_right_claim" name="future_right_type" value="청구">
+						<label for="future_right_claim">청구</label>
+					</div>
 				</div>
 			</div>
 		</div>

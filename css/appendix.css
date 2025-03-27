@@ -81,3 +81,5 @@ label:has(+ input[type="checkbox"]:disabled:checked):after,label:has(+ input[typ
 .no-data {background: #f7f7f7;text-align: center;padding: 2vw;color: #666;}
 
 .btn-search{margin-left:10px !important;min-width:7vw !important;}
+
+.radio-wrap {display: inline-block;margin-right: 20px;}
