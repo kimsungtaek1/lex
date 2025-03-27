@@ -603,18 +603,6 @@ CREATE TABLE application_recovery (
   income_source varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE application_recovery_additional_claims (
-  claim_no int(11) NOT NULL,
-  case_no int(11) NOT NULL,
-  creditor_count int(11) NOT NULL,
-  claim_type varchar(100) DEFAULT NULL COMMENT '채권종류',
-  amount int(11) DEFAULT NULL COMMENT '금액',
-  description text DEFAULT NULL COMMENT '설명',
-  payment_term varchar(100) DEFAULT NULL COMMENT '변제기',
-  created_at datetime DEFAULT current_timestamp(),
-  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 CREATE TABLE application_recovery_asset_attached_deposits (
   asset_no int(11) NOT NULL,
   property_no int(11) NOT NULL,
@@ -1034,14 +1022,17 @@ CREATE TABLE application_recovery_creditor_undetermined_claims (
   claim_no int(11) NOT NULL,
   case_no int(11) NOT NULL,
   creditor_count int(11) NOT NULL,
-  claim_description text DEFAULT NULL,
-  estimated_amount int(11) DEFAULT 0,
-  determination_criteria text DEFAULT NULL,
-  determination_date date DEFAULT NULL,
-  status varchar(50) DEFAULT NULL,
-  created_at datetime DEFAULT current_timestamp(),
-  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  property_detail text DEFAULT NULL,
+  expected_value decimal(15,2) DEFAULT NULL,
+  evaluation_rate varchar(10) DEFAULT NULL,
+  trust_property_details text DEFAULT NULL,
+  priority_certificate_amount decimal(15,2) DEFAULT NULL,
+  registration_date date DEFAULT NULL,
+  expected_payment decimal(15,2) DEFAULT NULL,
+  unpaid_amount decimal(15,2) DEFAULT NULL,
+  created_at timestamp NOT NULL DEFAULT current_timestamp(),
+  updated_at timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 CREATE TABLE application_recovery_family_members (
   member_no int(11) NOT NULL,
@@ -1652,9 +1643,6 @@ ALTER TABLE application_recovery
   ADD KEY case_no (case_no),
   ADD KEY assigned_employee (assigned_employee);
 
-ALTER TABLE application_recovery_additional_claims
-  ADD PRIMARY KEY (claim_no);
-
 ALTER TABLE application_recovery_asset_attached_deposits
   ADD PRIMARY KEY (asset_no),
   ADD KEY case_no (case_no);
@@ -1761,8 +1749,7 @@ ALTER TABLE application_recovery_creditor_settings
   ADD UNIQUE KEY unique_case_setting (case_no);
 
 ALTER TABLE application_recovery_creditor_undetermined_claims
-  ADD PRIMARY KEY (claim_no),
-  ADD KEY idx_case_creditor (case_no,creditor_count);
+  ADD PRIMARY KEY (claim_no);
 
 ALTER TABLE application_recovery_family_members
   ADD PRIMARY KEY (member_no),
@@ -2029,9 +2016,6 @@ ALTER TABLE application_income_living_expense_standard
 
 ALTER TABLE application_recovery
   MODIFY recovery_no int(11) NOT NULL AUTO_INCREMENT;
-
-ALTER TABLE application_recovery_additional_claims
-  MODIFY claim_no int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE application_recovery_asset_attached_deposits
   MODIFY asset_no int(11) NOT NULL AUTO_INCREMENT;
@@ -2334,9 +2318,6 @@ ALTER TABLE application_recovery_creditor_other_debts
 
 ALTER TABLE application_recovery_creditor_settings
   ADD CONSTRAINT application_recovery_creditor_settings_ibfk_1 FOREIGN KEY (case_no) REFERENCES case_management (case_no) ON DELETE CASCADE;
-
-ALTER TABLE application_recovery_creditor_undetermined_claims
-  ADD CONSTRAINT fk_undetermined_claims_creditor FOREIGN KEY (case_no,creditor_count) REFERENCES application_recovery_creditor (case_no, creditor_count) ON DELETE CASCADE;
 
 ALTER TABLE application_recovery_family_members
   ADD CONSTRAINT fk_family_case FOREIGN KEY (case_no) REFERENCES case_management (case_no) ON DELETE CASCADE;
