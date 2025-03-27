@@ -21,8 +21,8 @@ if (!$case_no || !$creditor_count) {
 try {
 	$sql = "
 		SELECT *
-		FROM application_recovery_additional_claims
-		WHERE case_no = ? AND creditor_count = ? AND claim_type = '기타미확정채권'
+		FROM application_recovery_creditor_undetermined_claims
+		WHERE case_no = ? AND creditor_count = ?'
 	";
 	$params = [$case_no, $creditor_count];
 	

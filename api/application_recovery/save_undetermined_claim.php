@@ -34,9 +34,8 @@ try {
 	if ($claim_no) {
 		// 수정
 		$stmt = $pdo->prepare("
-			UPDATE application_recovery_additional_claims 
-			SET claim_type = '기타미확정채권', 
-				property_detail = ?,
+			UPDATE application_recovery_creditor_undetermined_claims 
+			SET property_detail = ?,
 				expected_value = ?,
 				evaluation_rate = ?,
 				trust_property_details = ?,
@@ -63,11 +62,11 @@ try {
 	} else {
 		// 신규 등록
 		$stmt = $pdo->prepare("
-			INSERT INTO application_recovery_additional_claims 
-			(case_no, creditor_count, claim_type, property_detail, expected_value, evaluation_rate, 
+			INSERT INTO application_recovery_creditor_undetermined_claims 
+			(case_no, creditor_count, property_detail, expected_value, evaluation_rate, 
 			trust_property_details, priority_certificate_amount, registration_date, expected_payment, 
 			unpaid_amount, created_at, updated_at)
-			VALUES (?, ?, '기타미확정채권', ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 		");
 		$stmt->execute([
 			$case_no,

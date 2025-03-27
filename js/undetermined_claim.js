@@ -58,6 +58,8 @@ function loadClaimData() {
 		success: function(response) {
 			try {
 				const data = typeof response === 'string' ? JSON.parse(response) : response;
+
+				console.log(data);
 				if (data.success && data.data && data.data.length > 0) {
 					// 첫 번째 데이터로 폼 채우기
 					fillFormData(data.data[0]);

@@ -18,7 +18,7 @@ if (!$claim_no) {
 
 try {
 	$stmt = $pdo->prepare("
-		DELETE FROM application_recovery_additional_claims 
+		DELETE FROM application_recovery_creditor_undetermined_claims 
 		WHERE claim_no = ?
 	");
 	$stmt->execute([$claim_no]);

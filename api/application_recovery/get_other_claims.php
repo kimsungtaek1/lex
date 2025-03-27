@@ -1,5 +1,4 @@
 <?php
-// get_other_claims.php
 session_start();
 require_once '../../config.php';
 
@@ -27,6 +26,12 @@ try {
 	";
 	$params = [$case_no, $creditor_count];
 	
+	// claim_no가 있는 경우 해당 claim_no에 대한 데이터만 조회
+	if ($claim_no) {
+		$sql .= " AND claim_no = ?";
+		$params[] = $claim_no;
+	}
+	
 	$stmt = $pdo->prepare($sql);
 	$stmt->execute($params);
 	$claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -37,11 +42,10 @@ try {
 	]);
 
 } catch (Exception $e) {
-	error_log("다툼있는 채권 조회 오류: " . $e->getMessage());
+	error_log("기타미확정채권 조회 오류: " . $e->getMessage());
 	echo json_encode([
 		'success' => false,
 		'message' => '조회 중 오류가 발생했습니다.',
 		'error' => $e->getMessage()
 	]);
 }
-?>
