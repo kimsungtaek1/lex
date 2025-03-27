@@ -1094,7 +1094,7 @@ $(document).ready(function() {
 			success: function(response) {
 				console.log(response);
 				if (response.success) {
-					console.log('------'.response.count);
+					console.log('------'+response.count);
 					$(`#undeterminedClaimCount${count}`).text(response.count);
 				}
 			}
