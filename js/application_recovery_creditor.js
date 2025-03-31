@@ -683,6 +683,8 @@ function launchClaimWindow(count, claimType) {
 				$(`#openOtherClaim${count}`).removeClass('btn-other-claim-saved');
 				$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).removeClass('btn-claim-saved');
 				$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'undetermined')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'guaranteed')"]`).removeClass('btn-claim-saved');
 			}
 		}
 		
@@ -713,6 +715,8 @@ function launchClaimWindow(count, claimType) {
 				$(`#openAppendix${count}`).removeClass('btn-appendix-saved');
 				$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).removeClass('btn-claim-saved');
 				$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'undetermined')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'guaranteed')"]`).removeClass('btn-claim-saved');
 			}
 		}
 		
@@ -739,6 +743,8 @@ function launchClaimWindow(count, claimType) {
 				$(`#openAppendix${count}`).removeClass('btn-appendix-saved');
 				$(`#openOtherClaim${count}`).removeClass('btn-other-claim-saved');
 				$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'undetermined')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'guaranteed')"]`).removeClass('btn-claim-saved');
 			}
 		}
 		
@@ -764,6 +770,8 @@ function launchClaimWindow(count, claimType) {
 				$(`#openAppendix${count}`).removeClass('btn-appendix-saved');
 				$(`#openOtherClaim${count}`).removeClass('btn-other-claim-saved');
 				$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'undetermined')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'guaranteed')"]`).removeClass('btn-claim-saved');
 			}
 		}
 		
@@ -786,8 +794,11 @@ function launchClaimWindow(count, claimType) {
 			
 			// 다른 채권 유형 버튼 색상 원래대로 되돌리기 (필요한 경우)
 			if (clearOthers) {
-				// 기타미확정채권은 다른 채권과 상호 배타적일 수 있으므로
-				// 필요한 경우 여기에 코드 추가
+				$(`#openAppendix${count}`).removeClass('btn-appendix-saved');
+				$(`#openOtherClaim${count}`).removeClass('btn-other-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'guaranteed')"]`).removeClass('btn-claim-saved');
 			}
 			
 			// 개수 새로고침
@@ -814,6 +825,15 @@ function launchClaimWindow(count, claimType) {
 				$(`button[onclick="openClaimWindow(${count}, 'guaranteed')"]`).addClass('btn-claim-saved');
 			}
 			
+			// 다른 채권 유형 버튼 색상 원래대로 되돌리기
+			if (clearOthers) {
+				$(`#openAppendix${count}`).removeClass('btn-appendix-saved');
+				$(`#openOtherClaim${count}`).removeClass('btn-other-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'undetermined')"]`).removeClass('btn-claim-saved');
+			}
+			
 			// 개수 새로고침
 			loadGuaranteedDebtCount(count);
 		}
@@ -837,6 +857,7 @@ function launchClaimWindow(count, claimType) {
 			calculateTotals();
 		}
 	});
+
 	
 	// 모든 채권 유형 상태 확인 및 버튼 색상 업데이트
 	function updateAllClaimButtonsStatus(count) {
