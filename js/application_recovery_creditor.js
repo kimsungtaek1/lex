@@ -300,7 +300,6 @@ $(document).ready(function() {
                 console.error('채권자 번호를 찾을 수 없습니다');
                 return;
             }
-            console.log('복사 시도:', originalCount);
             const data = getCreditorData(originalCount);
             addNewCreditor(data);
         });
@@ -668,7 +667,6 @@ function launchClaimWindow(count, claimType) {
 
 	// 메시지 이벤트 리스너
 	window.addEventListener('message', function(event) {
-		console.log('수신된 메시지:', event.data);
 		
 		// 다툼있는 채권 저장 이벤트 처리
 		if (event.data.type === 'otherClaimSaved') {
