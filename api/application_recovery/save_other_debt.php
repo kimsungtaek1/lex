@@ -13,6 +13,7 @@ $case_no = $_POST['case_no'] ?? 0;
 $creditor_count = $_POST['creditor_count'] ?? 0;
 $debt_no = $_POST['debt_no'] ?? 0;
 $has_mortgage = isset($_POST['has_mortgage']) ? (int)$_POST['has_mortgage'] : 0;
+$debt_description = $_POST['debt_description'] ?? '';
 
 if (!$case_no || !$creditor_count) {
 	echo json_encode(['success' => false, 'message' => '필수 데이터가 누락되었습니다.']);
@@ -22,16 +23,31 @@ if (!$case_no || !$creditor_count) {
 try {
 	$pdo->beginTransaction();
 
+	// 먼저 다른 채권 유형 데이터를 모두 삭제
+	// 1. 별제권부채권 삭제
+	$stmt = $pdo->prepare("DELETE FROM application_recovery_creditor_appendix WHERE case_no = ? AND creditor_count = ?");
+	$stmt->execute([$case_no, $creditor_count]);
+	
+	// 2. 다툼있는 채권 삭제
+	$stmt = $pdo->prepare("DELETE FROM application_recovery_creditor_other_claims WHERE case_no = ? AND creditor_count = ?");
+	$stmt->execute([$case_no, $creditor_count]);
+	
+	// 3. 전부명령된 채권 삭제
+	$stmt = $pdo->prepare("DELETE FROM application_recovery_creditor_assigned_claims WHERE case_no = ? AND creditor_count = ?");
+	$stmt->execute([$case_no, $creditor_count]);
+
 	if ($debt_no) {
 		// 수정
 		$stmt = $pdo->prepare("
 			UPDATE application_recovery_creditor_other_debts 
 			SET has_mortgage = ?,
+				debt_description = ?,
 				updated_at = CURRENT_TIMESTAMP
 			WHERE debt_no = ? AND case_no = ? AND creditor_count = ?
 		");
 		$stmt->execute([
 			$has_mortgage,
+			$debt_description,
 			$debt_no,
 			$case_no,
 			$creditor_count
@@ -40,13 +56,14 @@ try {
 		// 신규 등록
 		$stmt = $pdo->prepare("
 			INSERT INTO application_recovery_creditor_other_debts 
-			(case_no, creditor_count, has_mortgage, created_at, updated_at)
-			VALUES (?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+			(case_no, creditor_count, has_mortgage, debt_description, created_at, updated_at)
+			VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 		");
 		$stmt->execute([
 			$case_no,
 			$creditor_count,
-			$has_mortgage
+			$has_mortgage,
+			$debt_description
 		]);
 		$debt_no = $pdo->lastInsertId();
 	}

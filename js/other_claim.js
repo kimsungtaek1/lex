@@ -162,7 +162,7 @@ function saveForm() {
     const formData = {
         case_no: currentCaseNo,
         creditor_count: current_creditor_count,
-        claim_type: '다툼있는채권', // 기본값 설정
+        claim_type: '다툼있는채권', 
         creditor_principal: getNumber('#creditor_principal'),
         creditor_interest: getNumber('#creditor_interest'),
         undisputed_principal: getNumber('#undisputed_principal'),
@@ -179,32 +179,6 @@ function saveForm() {
         formData.claim_no = claimNo;
     }
     
-    // 저장하기 전에 먼저 다른 채권 유형 데이터를 삭제
-    $.ajax({
-        url: '../../api/application_recovery/clear_other_claims.php',
-        method: 'POST',
-        data: {
-            case_no: currentCaseNo,
-            creditor_count: current_creditor_count,
-            exclude_type: 'other_claim'
-        },
-        success: function(clearResponse) {
-            console.log('다른 채권 유형 삭제 결과:', clearResponse);
-            
-            // 다른 채권 유형 삭제 후 현재 채권 데이터 저장
-            saveClaimData(formData);
-        },
-        error: function(xhr, status, error) {
-            console.error('다른 채권 유형 삭제 중 오류:', xhr.responseText);
-            
-            // 오류가 발생해도 저장 시도
-            saveClaimData(formData);
-        }
-    });
-}
-
-// 채권 데이터 저장 함수
-function saveClaimData(formData) {
     $.ajax({
         url: '../../api/application_recovery/save_other_claim.php',
         method: 'POST',
@@ -220,7 +194,7 @@ function saveClaimData(formData) {
                         type: 'otherClaimSaved', 
                         creditorCount: current_creditor_count,
                         hasData: true,
-                        clearOthers: true
+                        clearOthers: true // 다른 채권 버튼 색상을 원래대로 되돌리기 위한 플래그
                     }, '*');
                     
                     // claim_no 업데이트
@@ -240,7 +214,6 @@ function saveClaimData(formData) {
         },
         error: function(xhr) {
             console.error('서버 오류:', xhr.responseText);
-            alert('서버와의 통신 중 오류가 발생했습니다.');
         }
     });
 }

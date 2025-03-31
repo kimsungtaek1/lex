@@ -11,8 +11,8 @@ if (!isset($_SESSION['employee_no'])) {
 
 $case_no = $_POST['case_no'] ?? 0;
 $creditor_count = $_POST['creditor_count'] ?? 0;
-$claim_type = $_POST['claim_type'] ?? '다툼있는채권';
 $claim_no = $_POST['claim_no'] ?? 0;
+$claim_type = $_POST['claim_type'] ?? '다툼있는채권';
 
 // 필수 필드
 $creditor_principal = $_POST['creditor_principal'] ?? 0;
@@ -31,6 +31,19 @@ if (!$case_no || !$creditor_count) {
 
 try {
 	$pdo->beginTransaction();
+	
+	// 먼저 다른 채권 유형 데이터를 모두 삭제
+	// 1. 별제권부채권 삭제
+	$stmt = $pdo->prepare("DELETE FROM application_recovery_creditor_appendix WHERE case_no = ? AND creditor_count = ?");
+	$stmt->execute([$case_no, $creditor_count]);
+	
+	// 2. 전부명령된 채권 삭제
+	$stmt = $pdo->prepare("DELETE FROM application_recovery_creditor_assigned_claims WHERE case_no = ? AND creditor_count = ?");
+	$stmt->execute([$case_no, $creditor_count]);
+	
+	// 3. 기타 채무 삭제
+	$stmt = $pdo->prepare("DELETE FROM application_recovery_creditor_other_debts WHERE case_no = ? AND creditor_count = ?");
+	$stmt->execute([$case_no, $creditor_count]);
 
 	if ($claim_no) {
 		// 수정

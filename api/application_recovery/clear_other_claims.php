@@ -19,7 +19,7 @@ if (!$case_no || !$creditor_count) {
 }
 
 // 디버깅 로그 추가
-error_log("clear_other_claims.php 호출: case_no=$case_no, creditor_count=$creditor_count, exclude_type=$exclude_type");
+writeLog("clear_other_claims.php 호출: case_no=$case_no, creditor_count=$creditor_count, exclude_type=$exclude_type");
 
 try {
     $pdo->beginTransaction();
