@@ -952,10 +952,10 @@ function launchClaimWindow(count, claimType) {
 					
 					if (data.success && data.data && data.data.length > 0) {
 						// 데이터가 있으면 버튼 색상 변경
-						$(`#openAppendix${count}`).addClass('btn-appendix-saved');
+						$(`#openAppendix${count}`).addClass('btn-claim-saved');
 					} else {
 						// 데이터가 없으면 버튼 색상 원래대로
-						$(`#openAppendix${count}`).removeClass('btn-appendix-saved');
+						$(`#openAppendix${count}`).removeClass('btn-claim-saved');
 					}
 				} catch (e) {
 					console.error('JSON 파싱 오류:', e);
@@ -985,10 +985,10 @@ function launchClaimWindow(count, claimType) {
 					
 					if (data.success && data.data && data.data.length > 0) {
 						// 데이터가 있으면 버튼 색상 변경
-						$(`#openOtherClaim${count}`).addClass('btn-other-claim-saved');
+						$(`#openOtherClaim${count}`).addClass('btn-claim-saved');
 					} else {
 						// 데이터가 없으면 버튼 색상 원래대로
-						$(`#openOtherClaim${count}`).removeClass('btn-other-claim-saved');
+						$(`#openOtherClaim${count}`).removeClass('btn-claim-saved');
 					}
 				} catch (e) {
 					console.error('JSON 파싱 오류:', e);
@@ -1000,6 +1000,7 @@ function launchClaimWindow(count, claimType) {
 		});
 	}
 
+	// 전부명령된 채권 데이터 존재 여부 확인
 	function checkAssignedClaimExists(count) {
 		if (!currentCaseNo) return;
 		
