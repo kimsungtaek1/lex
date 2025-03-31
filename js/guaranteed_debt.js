@@ -515,7 +515,11 @@ function formatDate(date) {
 // 폼 저장
 function saveForm() {
 	const getNumber = function(selector) {
-		return parseFloat($(selector).val().replace(/,/g, '')) || 0;
+		const val = $(selector).val();
+		if (val === '장래구상권 미발생' || val === '미발생') {
+			return 0;
+		}
+		return parseFloat(val.replace(/,/g, '')) || 0;
 	};
 	
 	// 데이터 수집
@@ -540,8 +544,23 @@ function saveForm() {
 		default_rate: $('#default_rate').val(),
 		calculation_date: $('#calculation_date').val(),
 		claim_content: $('#claim_content').val(),
-		future_right_type: $('input[name="future_right_type"]:checked').val() || null
+		future_right_type: null // 기본값을 null로 설정
 	};
+	
+	// future_right_type 값 처리
+	const selectedFutureRightType = $('input[name="future_right_type"]:checked').val();
+	// 값이 있고 유효한 경우에만 포함 (ENUM 컬럼 오류 방지)
+	if (selectedFutureRightType && ['포기', '청구'].includes(selectedFutureRightType)) {
+		formData.future_right_type = selectedFutureRightType;
+	}
+	
+	// 대위변제 유형이 "미발생"인 경우, 특별 처리
+	if (formData.subrogation_type === '미발생') {
+		formData.principal = 0;
+		formData.interest = 0;
+		// 미발생 시에는 장래구상권 값 자체를 null로 설정 (DB 오류 방지)
+		formData.future_right_type = null;
+	}
 	
 	// 필수 필드 체크
 	if (!formData.financial_institution) {
@@ -555,6 +574,8 @@ function saveForm() {
 	if (debtNo) {
 		formData.debt_no = debtNo;
 	}
+	
+	console.log('전송할 데이터:', formData); // 디버깅용
 	
 	$.ajax({
 		url: '../../api/application_recovery/save_guaranteed_debt.php',
@@ -592,7 +613,8 @@ function saveForm() {
 			}
 		},
 		error: function(xhr) {
-			console.error('서버 오류:', xhr.responseText);
+			console.error('서버 오류:', xhr.status, xhr.statusText);
+			console.error('응답 내용:', xhr.responseText);
 		}
 	});
 }
