@@ -616,26 +616,23 @@ $(document).ready(function() {
 	window.addEventListener('message', function(event) {
 		console.log('수신된 메시지:', event.data);
 		
-		// 부속서류 저장 이벤트 처리
-		if (event.data.type === 'appendixSaved') {
+		// 다툼있는 채권 저장 이벤트 처리
+		if (event.data.type === 'otherClaimSaved') {
 			const count = event.data.creditorCount;
 			const hasData = event.data.hasData;
 			const clearOthers = event.data.clearOthers || false;
 			
-			// 해당 채권자의 별제권부채권 버튼 색상 변경
+			// 해당 채권자의 다툼있는 채권 버튼 색상 변경
 			if (hasData) {
-				$(`#openAppendix${count}`).addClass('btn-appendix-saved');
+				$(`#openOtherClaim${count}`).addClass('btn-other-claim-saved');
 			}
 			
 			// 다른 채권 유형 버튼 색상 원래대로 되돌리기
 			if (clearOthers) {
-				$(`#openOtherClaim${count}`).removeClass('btn-other-claim-saved');
+				$(`#openAppendix${count}`).removeClass('btn-appendix-saved');
 				$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).removeClass('btn-claim-saved');
 				$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).removeClass('btn-claim-saved');
 			}
-			
-			// 금액 합계 재계산
-			calculateTotals();
 		}
 		
 		// 부속서류 삭제 이벤트 처리
