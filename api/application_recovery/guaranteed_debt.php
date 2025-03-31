@@ -126,6 +126,23 @@ if (!$debt_no && $case_no && $creditor_count) {
 			</div>
 		</div>
 		
+		<!-- 추가된 필드: 원채권 잔액 (대위변제 선택 시) -->
+		<div class="form subrogation-field" style="display: none;">
+			<div class="form-title"><span>원채권 잔액<br>(원금+이자)</span></div>
+			<div class="form-content form-row">
+				<input type="text" id="original_debt_balance" class="form-control number-input">
+				<span>원</span>
+			</div>
+		</div>
+		
+		<!-- 추가된 필드: 원시채권 부연설명 (대위변제 선택 시) -->
+		<div class="form subrogation-field" style="display: none;">
+			<div class="form-title"><span>원시채권<br>부연설명</span></div>
+			<div class="form-content">
+				<textarea id="original_debt_description" class="form-control" rows="2"></textarea>
+			</div>
+		</div>
+		
 		<div class="form">
 			<div class="form-title"><span>원금</span></div>
 			<div class="form-content form-row">
@@ -157,10 +174,20 @@ if (!$debt_no && $case_no && $creditor_count) {
 			</div>
 		</div>
 		
+		<!-- 추가된 필드: 연체이율 -->
+		<div class="form">
+			<div class="form-title form-notitle"><span>연체이율</span></div>
+			<div class="form-content form-nocontent">
+				<span>연&nbsp;&nbsp;&nbsp;</span><input type="number" id="default_rate" name="default_rate" class="form-control" step="0.1" min="0" max="100" placeholder="약정이자">
+				<span>%</span>
+			</div>
+		</div>
+		
 		<div class="form">
 			<div class="form-title"><span>채권내용</span></div>
 			<div class="form-content">
 				<textarea id="claim_content" class="form-control" rows="2">보증채무를 대위변제할 경우 대위변제금액 및 이에 대한 대위변제일 이후의 민사 법정이율에 의한 이자</textarea>
+				<button type="button" class="btn btn-secondary auto-fill">자동입력</button>
 			</div>
 		</div>
 		
@@ -178,35 +205,6 @@ if (!$debt_no && $case_no && $creditor_count) {
 						<label for="future_right_claim">청구</label>
 					</div>
 				</div>
-			</div>
-		</div>
-		
-		<div class="form">
-			<div class="form-title"><span>보증인명</span></div>
-			<div class="form-content">
-				<input type="text" id="guarantor_name" class="form-control">
-			</div>
-		</div>
-
-		<div class="form">
-			<div class="form-title"><span>보증인 주소</span></div>
-			<div class="form-content">
-				<input type="text" id="guarantor_address" class="form-control form-control-long">
-			</div>
-		</div>
-
-		<div class="form">
-			<div class="form-title"><span>보증금액</span></div>
-			<div class="form-content form-row">
-				<input type="text" id="guarantee_amount" class="form-control number-input">
-				<span>원</span>
-			</div>
-		</div>
-
-		<div class="form">
-			<div class="form-title"><span>보증일자</span></div>
-			<div class="form-content">
-				<input type="date" id="guarantee_date" class="form-control">
 			</div>
 		</div>
 
