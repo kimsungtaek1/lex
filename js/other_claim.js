@@ -193,8 +193,7 @@ function saveForm() {
                     window.opener.postMessage({
                         type: 'otherClaimSaved', 
                         creditorCount: current_creditor_count,
-                        hasData: true,
-                        clearOthers: true // 다른 채권 버튼 색상을 원래대로 되돌리기 위한 플래그
+                        hasData: true
                     }, '*');
                     
                     // claim_no 업데이트
