@@ -667,21 +667,20 @@ function launchClaimWindow(count, claimType) {
 
 	// 메시지 이벤트 리스너
 	window.addEventListener('message', function(event) {
-		
-		// 다툼있는 채권 저장 이벤트 처리
-		if (event.data.type === 'otherClaimSaved') {
+		// 부속서류 저장 이벤트 처리
+		if (event.data.type === 'appendixSaved') {
 			const count = event.data.creditorCount;
 			const hasData = event.data.hasData;
 			const clearOthers = event.data.clearOthers || false;
 			
-			// 해당 채권자의 다툼있는 채권 버튼 색상 변경
+			// 해당 채권자의 별제권부채권 버튼 색상 변경
 			if (hasData) {
-				$(`#openOtherClaim${count}`).addClass('btn-other-claim-saved');
+				$(`#openAppendix${count}`).addClass('btn-appendix-saved');
 			}
 			
 			// 다른 채권 유형 버튼 색상 원래대로 되돌리기
 			if (clearOthers) {
-				$(`#openAppendix${count}`).removeClass('btn-appendix-saved');
+				$(`#openOtherClaim${count}`).removeClass('btn-other-claim-saved');
 				$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).removeClass('btn-claim-saved');
 				$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).removeClass('btn-claim-saved');
 			}
@@ -779,9 +778,16 @@ function launchClaimWindow(count, claimType) {
 		if (event.data.type === 'undeterminedClaimSaved') {
 			const count = event.data.creditorCount;
 			const hasData = event.data.hasData;
+			const clearOthers = event.data.clearOthers || false;
 			
 			if (hasData) {
 				$(`button[onclick="openClaimWindow(${count}, 'undetermined')"]`).addClass('btn-claim-saved');
+			}
+			
+			// 다른 채권 유형 버튼 색상 원래대로 되돌리기 (필요한 경우)
+			if (clearOthers) {
+				// 기타미확정채권은 다른 채권과 상호 배타적일 수 있으므로
+				// 필요한 경우 여기에 코드 추가
 			}
 			
 			// 개수 새로고침
@@ -802,6 +808,7 @@ function launchClaimWindow(count, claimType) {
 		if (event.data.type === 'guaranteedDebtSaved') {
 			const count = event.data.creditorCount;
 			const hasData = event.data.hasData;
+			const clearOthers = event.data.clearOthers || false;
 			
 			if (hasData) {
 				$(`button[onclick="openClaimWindow(${count}, 'guaranteed')"]`).addClass('btn-claim-saved');
@@ -819,6 +826,15 @@ function launchClaimWindow(count, claimType) {
 			
 			// 개수 새로고침
 			loadGuaranteedDebtCount(count);
+		}
+		
+		// 채권 데이터가 변경될 때 합계 계산 갱신
+		if (event.data.type && (
+			event.data.type.includes('Saved') || 
+			event.data.type.includes('Deleted')
+		)) {
+			// 금액 합계 재계산
+			calculateTotals();
 		}
 	});
 	
