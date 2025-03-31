@@ -217,7 +217,8 @@ function saveForm() {
 							window.opener.postMessage({
 								type: 'otherClaimSaved', 
 								creditorCount: current_creditor_count,
-								hasData: true
+								hasData: true,
+								clearOthers: true // 오류 발생해도 다른 채권 버튼 색상을 원래대로 되돌리기
 							}, '*');
 						}
 					});
