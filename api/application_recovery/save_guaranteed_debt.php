@@ -28,17 +28,16 @@ $address = $_POST['address'] ?? '';
 $phone = $_POST['phone'] ?? '';
 $fax = $_POST['fax'] ?? '';
 $claim_reason = $_POST['claim_reason'] ?? '';
+$original_debt_balance = floatval($_POST['original_debt_balance'] ?? 0);
+$original_debt_description = $_POST['original_debt_description'] ?? '';
 $principal = floatval($_POST['principal'] ?? 0);
 $principal_calculation = $_POST['principal_calculation'] ?? '';
 $interest = floatval($_POST['interest'] ?? 0);
 $interest_calculation = $_POST['interest_calculation'] ?? '';
+$default_rate = floatval($_POST['default_rate'] ?? 0);
 $calculation_date = $_POST['calculation_date'] ?? null;
 $claim_content = $_POST['claim_content'] ?? '';
 $future_right_type = $_POST['future_right_type'] ?? null;
-$guarantor_name = $_POST['guarantor_name'] ?? '';
-$guarantor_address = $_POST['guarantor_address'] ?? '';
-$guarantee_amount = floatval($_POST['guarantee_amount'] ?? 0);
-$guarantee_date = $_POST['guarantee_date'] ?? null;
 
 try {
 	$pdo->beginTransaction();
@@ -55,16 +54,15 @@ try {
 				phone = ?,
 				fax = ?,
 				claim_reason = ?,
+				original_debt_balance = ?,
+				original_debt_description = ?,
 				principal = ?,
 				principal_calculation = ?,
 				interest = ?,
 				interest_calculation = ?,
+				default_rate = ?,
 				claim_content = ?,
 				future_right_type = ?,
-				guarantor_name = ?,
-				guarantor_address = ?,
-				guarantee_amount = ?,
-				guarantee_date = ?,
 				updated_at = CURRENT_TIMESTAMP
 			WHERE debt_no = ? AND case_no = ? AND creditor_count = ?
 		");
@@ -77,16 +75,15 @@ try {
 			$phone,
 			$fax,
 			$claim_reason,
+			$original_debt_balance,
+			$original_debt_description,
 			$principal,
 			$principal_calculation,
 			$interest,
 			$interest_calculation,
+			$default_rate,
 			$claim_content,
 			$future_right_type,
-			$guarantor_name,
-			$guarantor_address,
-			$guarantee_amount,
-			$guarantee_date,
 			$debt_no,
 			$case_no,
 			$creditor_count
@@ -97,10 +94,10 @@ try {
 			INSERT INTO application_recovery_creditor_guaranteed_debts 
 			(case_no, creditor_count, subrogation_type, force_payment_plan, entity_type, 
 			 financial_institution, address, phone, fax, claim_reason, 
-			 principal, principal_calculation, interest, interest_calculation, claim_content, 
-			 future_right_type, guarantor_name, guarantor_address, guarantee_amount, guarantee_date, 
-			 created_at, updated_at)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+			 original_debt_balance, original_debt_description,
+			 principal, principal_calculation, interest, interest_calculation, default_rate, claim_content, 
+			 future_right_type, created_at, updated_at)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 		");
 		$stmt->execute([
 			$case_no,
@@ -113,16 +110,15 @@ try {
 			$phone,
 			$fax,
 			$claim_reason,
+			$original_debt_balance,
+			$original_debt_description,
 			$principal,
 			$principal_calculation,
 			$interest,
 			$interest_calculation,
+			$default_rate,
 			$claim_content,
-			$future_right_type,
-			$guarantor_name,
-			$guarantor_address,
-			$guarantee_amount,
-			$guarantee_date
+			$future_right_type
 		]);
 		$debt_no = $pdo->lastInsertId();
 	}

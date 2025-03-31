@@ -176,9 +176,9 @@ if (!$debt_no && $case_no && $creditor_count) {
 		
 		<!-- 추가된 필드: 연체이율 -->
 		<div class="form">
-			<div class="form-title form-notitle"><span>연체이율</span></div>
-			<div class="form-content form-nocontent">
-				<span>연&nbsp;&nbsp;&nbsp;</span><input type="number" id="default_rate" name="default_rate" class="form-control" step="0.1" min="0" max="100" placeholder="약정이자">
+			<div class="form-title"><span>연체이율</span></div>
+			<div class="form-content">
+				<span>연&nbsp;&nbsp;&nbsp;</span><input type="number" id="default_rate" name="default_rate" class="form-control form-content-short5" step="0.1" min="0" max="100" placeholder="">
 				<span>%</span>
 			</div>
 		</div>
@@ -187,7 +187,7 @@ if (!$debt_no && $case_no && $creditor_count) {
 			<div class="form-title"><span>채권내용</span></div>
 			<div class="form-content">
 				<textarea id="claim_content" class="form-control" rows="2">보증채무를 대위변제할 경우 대위변제금액 및 이에 대한 대위변제일 이후의 민사 법정이율에 의한 이자</textarea>
-				<button type="button" class="btn btn-secondary auto-fill">자동입력</button>
+				<button type="button" class="btn btn-secondary btn-search auto-fill">자동입력</button>
 			</div>
 		</div>
 		

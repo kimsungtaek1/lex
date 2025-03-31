@@ -22,6 +22,7 @@ function initializeForm() {
 	// 대위변제 선택 변경 시 헤더 텍스트와 채권원인 텍스트 업데이트
 	$('input[name="subrogation_type"]').off('change').on('change', function() {
 		updateSubrogationDisplay();
+		toggleSubrogationFields();
 	});
 	
 	// 계산일자 변경 시 산정근거 자동 업데이트
@@ -31,6 +32,7 @@ function initializeForm() {
 	
 	// 페이지 로드 시 대위변제 텍스트 초기화
 	updateSubrogationDisplay();
+	toggleSubrogationFields();
 }
 
 // 대위변제 표시 및 채권원인 텍스트 업데이트
@@ -55,6 +57,18 @@ function updateSubrogationDisplay() {
 	
 	// placeholder 업데이트
 	$('#claim_reason').attr('placeholder', claimReasonText);
+}
+
+// 대위변제 옵션에 따라 관련 필드 표시/숨김
+function toggleSubrogationFields() {
+	const subrogationType = $('input[name="subrogation_type"]:checked').val();
+	
+	// 일부대위변제 또는 전부대위변제일 때만 관련 필드 표시
+	if (subrogationType === '일부대위변제' || subrogationType === '전부대위변제') {
+		$('.subrogation-field').show();
+	} else {
+		$('.subrogation-field').hide();
+	}
 }
 
 // 이벤트 리스너 등록
@@ -102,6 +116,50 @@ function registerEventListeners() {
 			deleteDebt(debtNo);
 		}
 	});
+	
+	// 자동입력 버튼 클릭 이벤트
+	$('.auto-fill').on('click', function() {
+		autoFillClaimContent();
+	});
+}
+
+// 자동입력 버튼 기능
+function autoFillClaimContent() {
+	const principal = parseFloat($('#principal').val().replace(/,/g, '')) || 0;
+	const interest = parseFloat($('#interest').val().replace(/,/g, '')) || 0;
+	const defaultRate = $('#default_rate').val();
+	
+	const calculationDate = $('#principal_calculation').val().match(/\d{4}\.\d{2}\.\d{2}/);
+	if (!calculationDate) {
+		alert('채권현재액 산정근거에 유효한 날짜가 없습니다.');
+		return;
+	}
+	
+	const nextDay = addOneDay(calculationDate[0]);
+	
+	// 대위변제 유형에 따라 다른 내용 설정
+	const subrogationType = $('input[name="subrogation_type"]:checked').val();
+	
+	if (subrogationType === '미발생') {
+		const content = `보증채무를 대위변제할 경우 대위변제금액 및 이에 대한 대위변제일 이후의 민사 법정이율에 의한 이자`;
+		$('#claim_content').val(content);
+	} else {
+		const content = `원리금 ${numberWithCommas(principal + interest)}원 및 그 중 원금 ${numberWithCommas(principal)}원에 대한 ${nextDay}부터 완제일까지 연 ${defaultRate}%의 비율에 의한 지연손해금`;
+		$('#claim_content').val(content);
+	}
+}
+
+// 하루 추가
+function addOneDay(dateString) {
+	const parts = dateString.split('.');
+	const date = new Date(parts[0], parts[1] - 1, parts[2]);
+	date.setDate(date.getDate() + 1);
+	return formatDate(date);
+}
+
+// 숫자 콤마 추가
+function numberWithCommas(x) {
+	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 // 주소 검색 함수
@@ -294,16 +352,16 @@ function renderGuarantorTable(debts) {
 	
 	debts.forEach(function(debt, index) {
 		const row = `
-			<tr>
-				<td>${current_creditor_count}-${index + 1}</td>
-				<td>${debt.subrogation_type || '미발생'}</td>
-				<td>${debt.financial_institution || ''}</td>
-				<td>${debt.address || ''}</td>
-				<td class="edit-buttons">
+			<div class="table-row">
+				<div class="col">${current_creditor_count}-${index + 1}</div>
+				<div class="col">${debt.subrogation_type || '미발생'}</div>
+				<div class="col">${debt.financial_institution || ''}</div>
+				<div class="col">${debt.address || ''}</div>
+				<div class="col">
 					<button type="button" class="edit-debt" data-debt-no="${debt.debt_no}">수정</button>
 					<button type="button" class="delete-debt" data-debt-no="${debt.debt_no}">삭제</button>
-				</td>
-			</tr>
+				</div>
+			</div>
 		`;
 		tbody.append(row);
 	});
@@ -320,6 +378,11 @@ function clearForm() {
 	// 채권원인 초기화
 	$('#claim_reason').val(`채무자의 ${current_creditor_count}번 채무를 연대보증`);
 	
+	// 새로 추가된 필드 초기화
+	$('#original_debt_balance').val('');
+	$('#original_debt_description').val('');
+	$('#default_rate').val('');
+	
 	$('#principal').val('');
 	$('#principal_calculation').val('');
 	$('#interest').val('');
@@ -335,13 +398,9 @@ function clearForm() {
 	// 장래구상권 선택 초기화
 	$('input[name="future_right_type"]').prop('checked', false);
 	
-	$('#guarantor_name').val('');
-	$('#guarantor_address').val('');
-	$('#guarantee_amount').val('');
-	$('#guarantee_date').val('');
-	
 	// 대위변제 표시 업데이트
 	updateSubrogationDisplay();
+	toggleSubrogationFields();
 }
 
 // 폼 데이터 채우기
@@ -352,6 +411,12 @@ function fillFormData(data) {
 	$('#phone').val(formatPhoneNumber(data.phone || ''));
 	$('#fax').val(data.fax || '');
 	$('#claim_reason').val(data.claim_reason || '');
+	
+	// 새로 추가된 필드 데이터 채우기
+	$('#original_debt_balance').val(formatNumberValue(data.original_debt_balance));
+	$('#original_debt_description').val(data.original_debt_description || '');
+	$('#default_rate').val(data.default_rate || '');
+	
 	$('#principal').val(formatNumberValue(data.principal));
 	$('#principal_calculation').val(data.principal_calculation || '');
 	$('#interest').val(formatNumberValue(data.interest));
@@ -375,11 +440,6 @@ function fillFormData(data) {
 	} else {
 		$('input[name="future_right_type"]').prop('checked', false);
 	}
-	
-	$('#guarantor_name').val(data.guarantor_name || '');
-	$('#guarantor_address').val(data.guarantor_address || '');
-	$('#guarantee_amount').val(formatNumberValue(data.guarantee_amount));
-	$('#guarantee_date').val(data.guarantee_date ? data.guarantee_date.split(' ')[0] : '');
 }
 
 // 숫자 포맷팅
@@ -445,23 +505,23 @@ function saveForm() {
 		phone: $('#phone').val().replace(/-/g, ''),
 		fax: $('#fax').val(),
 		claim_reason: $('#claim_reason').val(),
+		// 새로 추가된 필드
+		original_debt_balance: getNumber('#original_debt_balance'),
+		original_debt_description: $('#original_debt_description').val(),
 		principal: getNumber('#principal'),
 		principal_calculation: $('#principal_calculation').val(),
 		interest: getNumber('#interest'),
 		interest_calculation: $('#interest_calculation').val(),
+		default_rate: $('#default_rate').val(),
 		calculation_date: $('#calculation_date').val(),
 		claim_content: $('#claim_content').val(),
-		future_right_type: $('input[name="future_right_type"]:checked').val() || null,
-		guarantor_name: $('#guarantor_name').val(),
-		guarantor_address: $('#guarantor_address').val(),
-		guarantee_amount: getNumber('#guarantee_amount'),
-		guarantee_date: $('#guarantee_date').val()
+		future_right_type: $('input[name="future_right_type"]:checked').val() || null
 	};
 	
 	// 필수 필드 체크
-	if (!formData.guarantor_name) {
-		alert('보증인명은 필수 입력 항목입니다.');
-		$('#guarantor_name').focus();
+	if (!formData.financial_institution) {
+		alert('금융기관명은 필수 입력 항목입니다.');
+		$('#financial_institution').focus();
 		return;
 	}
 	
