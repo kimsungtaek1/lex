@@ -122,7 +122,7 @@ function saveForm() {
 						data: {
 							case_no: currentCaseNo,
 							creditor_count: current_creditor_count,
-							exclude_type: 'other_claim'
+							exclude_type: 'other_debt'
 						},
 						success: function(clearResponse) {
 							// 부모 창에 메시지 전달 - 버튼 색상 변경을 위한 정보 포함
