@@ -534,121 +534,187 @@ $(document).ready(function() {
 			},
 			success: function(response) {
 				if (response.exists) {
-					// 부속서류와 기타미확정채권 간의 상호 배타적 선택 체크
-				if (claimType === 'appendix') {
-					// 기타미확정채권이 있는지 확인
-					$.ajax({
-						url: 'api/application_recovery/get_undetermined_claims.php',
-						type: 'GET',
-						data: {
-							case_no: currentCaseNo,
-							creditor_count: count
-						},
-						success: function(result) {
-							const data = typeof result === 'string' ? JSON.parse(result) : result;
-							if (data.success && data.data && data.data.length > 0) {
-								alert('기타미확정채권이 등록되어 있습니다. 부속서류를 등록하기 위해서는 먼저 기타미확정채권을 삭제해주세요.');
-								return;
-							} else {
-								// 기타미확정채권이 없으면 부속서류 창 열기
-								launchClaimWindow(count, claimType);
+					// 부속서류 관련 창들(appendix, disputed, assigned, otherDebt)과 
+					// 기타미확정채권(undetermined)은 상호 배타적
+					
+					// 1. 부속서류 관련 창을 열려고 할 때
+					if (['appendix', 'disputed', 'assigned', 'otherDebt'].includes(claimType)) {
+						// 기타미확정채권이 있는지 확인
+						$.ajax({
+							url: 'api/application_recovery/get_undetermined_claims.php',
+							type: 'GET',
+							data: {
+								case_no: currentCaseNo,
+								creditor_count: count
+							},
+							success: function(result) {
+								const data = typeof result === 'string' ? JSON.parse(result) : result;
+								if (data.success && data.data && data.data.length > 0) {
+									alert('기타미확정채권이 등록되어 있습니다. 부속서류를 등록하기 위해서는 먼저 기타미확정채권을 삭제해주세요.');
+									return;
+								} else {
+									// 기타미확정채권이 없으면 선택한 창 열기
+									launchClaimWindow(count, claimType);
+								}
+							},
+							error: function() {
+								alert('서버 통신 중 오류가 발생했습니다.');
 							}
-						},
-						error: function() {
-							alert('서버 통신 중 오류가 발생했습니다.');
-						}
-					});
-				} else if (claimType === 'undetermined') {
-					// 부속서류가 있는지 확인
-					$.ajax({
-						url: 'api/application_recovery/get_appendix_data.php',
-						type: 'GET',
-						data: {
-							case_no: currentCaseNo,
-							creditor_count: count
-						},
-						success: function(result) {
-							const data = typeof result === 'string' ? JSON.parse(result) : result;
-							if (data.success && data.data && data.data.length > 0) {
-								alert('부속서류가 등록되어 있습니다. 기타미확정채권을 등록하기 위해서는 먼저 부속서류를 삭제해주세요.');
-								return;
-							} else {
-								// 부속서류가 없으면 기타미확정채권 창 열기
-								launchClaimWindow(count, claimType);
+						});
+					} 
+					// 2. 기타미확정채권 창을 열려고 할 때
+					else if (claimType === 'undetermined') {
+						// 부속서류 관련 창들 데이터가 있는지 확인
+						// 1. 별제권부채권
+						$.ajax({
+							url: 'api/application_recovery/get_appendix_data.php',
+							type: 'GET',
+							data: {
+								case_no: currentCaseNo,
+								creditor_count: count
+							},
+							success: function(result) {
+								const data = typeof result === 'string' ? JSON.parse(result) : result;
+								if (data.success && data.data && data.data.length > 0) {
+									alert('부속서류가 등록되어 있습니다. 기타미확정채권을 등록하기 위해서는 먼저 부속서류를 삭제해주세요.');
+									return;
+								} else {
+									// 2. 다툼있는 채권 확인
+									$.ajax({
+										url: 'api/application_recovery/get_other_claims.php',
+										type: 'GET',
+										data: {
+											case_no: currentCaseNo,
+											creditor_count: count
+										},
+										success: function(result) {
+											const data = typeof result === 'string' ? JSON.parse(result) : result;
+											if (data.success && data.data && data.data.length > 0) {
+												alert('다툼있는 채권이 등록되어 있습니다. 기타미확정채권을 등록하기 위해서는 먼저 다툼있는 채권을 삭제해주세요.');
+												return;
+											} else {
+												// 3. 전부명령된 채권 확인
+												$.ajax({
+													url: 'api/application_recovery/get_assigned_claims.php',
+													type: 'GET',
+													data: {
+														case_no: currentCaseNo,
+														creditor_count: count
+													},
+													success: function(result) {
+														const data = typeof result === 'string' ? JSON.parse(result) : result;
+														if (data.success && data.data && data.data.length > 0) {
+															alert('전부명령된 채권이 등록되어 있습니다. 기타미확정채권을 등록하기 위해서는 먼저 전부명령된 채권을 삭제해주세요.');
+															return;
+														} else {
+															// 4. 기타채무 확인
+															$.ajax({
+																url: 'api/application_recovery/get_other_debts.php',
+																type: 'GET',
+																data: {
+																	case_no: currentCaseNo,
+																	creditor_count: count
+																},
+																success: function(result) {
+																	const data = typeof result === 'string' ? JSON.parse(result) : result;
+																	if (data.success && data.data && data.data.length > 0) {
+																		alert('기타채무가 등록되어 있습니다. 기타미확정채권을 등록하기 위해서는 먼저 기타채무를 삭제해주세요.');
+																		return;
+																	} else {
+																		// 모든 부속서류가 없으면 기타미확정채권 창 열기
+																		launchClaimWindow(count, claimType);
+																	}
+																},
+																error: function() {
+																	alert('서버 통신 중 오류가 발생했습니다.');
+																}
+															});
+														}
+													},
+													error: function() {
+														alert('서버 통신 중 오류가 발생했습니다.');
+													}
+												});
+											}
+										},
+										error: function() {
+											alert('서버 통신 중 오류가 발생했습니다.');
+										}
+									});
+								}
+							},
+							error: function() {
+								alert('서버 통신 중 오류가 발생했습니다.');
 							}
-						},
-						error: function() {
-							alert('서버 통신 중 오류가 발생했습니다.');
-						}
-					});
+						});
+					} else {
+						// 보증인채무 등 다른 창은 제약 없이 그냥 열기
+						launchClaimWindow(count, claimType);
+					}
 				} else {
-					// 다른 창은 그냥 열기
-					launchClaimWindow(count, claimType);
+					// 채권자 정보가 없으면 저장 요청
+					alert('채권자 정보를 먼저 저장해주세요.');
+					$(`#saveCreditor${count}`).focus();
 				}
-			} else {
-				// 채권자 정보가 없으면 저장 요청
-				alert('채권자 정보를 먼저 저장해주세요.');
-				$(`#saveCreditor${count}`).focus();
+			},
+			error: function() {
+				alert('서버 통신 중 오류가 발생했습니다.');
 			}
-		},
-		error: function() {
-			alert('서버 통신 중 오류가 발생했습니다.');
-		}
-	});
-}
-
-// 실제 창 열기 기능을 수행하는 함수
-function launchClaimWindow(count, claimType) {
-	const width = 1200;
-	const height = 750;
-	const left = (screen.width - width) / 2;
-	const top = (screen.height - height) / 2;
-	
-	let pageUrl = '';
-	let windowName = '';
-	
-	// 채권 유형에 따라 페이지와 창 이름 설정
-	switch(claimType) {
-		case 'appendix':
-			pageUrl = `api/application_recovery/appendix.php?case_no=${currentCaseNo}&count=${count}`;
-			windowName = 'AppendixWindow';
-			// 필요시 전달할 파라미터 추가
-			const capital = $(`#principal${count}`).val().replace(/,/g, '');
-			const interest = $(`#interest${count}`).val().replace(/,/g, '');
-			pageUrl += `&capital=${capital}&interest=${interest}`;
-			break;
-		case 'disputed':
-			pageUrl = `api/application_recovery/other_claim.php?case_no=${currentCaseNo}&creditor_count=${count}`;
-			windowName = 'DisputedClaimWindow';
-			break;
-		case 'assigned':
-			pageUrl = `api/application_recovery/assigned_claim.php?case_no=${currentCaseNo}&creditor_count=${count}`;
-			windowName = 'AssignedClaimWindow';
-			break;
-		case 'otherDebt':
-			const principal = parseFloat($(`#principal${count}`).val().replace(/,/g, '')) || 0;
-			pageUrl = `api/application_recovery/other_debt.php?case_no=${currentCaseNo}&creditor_count=${count}&principal=${principal}`;
-			windowName = 'OtherDebtWindow';
-			break;
-		case 'undetermined':
-			pageUrl = `api/application_recovery/undetermined_claim.php?case_no=${currentCaseNo}&creditor_count=${count}`;
-			windowName = 'UndeterminedClaimWindow';
-			break;
-		case 'guaranteed':
-			pageUrl = `api/application_recovery/guaranteed_debt.php?case_no=${currentCaseNo}&creditor_count=${count}`;
-			windowName = 'GuaranteedDebtWindow';
-			break;
-		default:
-			alert('유효하지 않은 채권 유형입니다.');
-			return;
+		});
 	}
-	
-	window.open(
-		pageUrl,
-		windowName,
-		`width=${width},height=${height},left=${left},top=${top},scrollbars=yes`
-	);
-}
+
+	// 실제 창 열기 기능을 수행하는 함수
+	function launchClaimWindow(count, claimType) {
+		const width = 1200;
+		const height = 750;
+		const left = (screen.width - width) / 2;
+		const top = (screen.height - height) / 2;
+		
+		let pageUrl = '';
+		let windowName = '';
+		
+		// 채권 유형에 따라 페이지와 창 이름 설정
+		switch(claimType) {
+			case 'appendix':
+				pageUrl = `api/application_recovery/appendix.php?case_no=${currentCaseNo}&count=${count}`;
+				windowName = 'AppendixWindow';
+				// 필요시 전달할 파라미터 추가
+				const capital = $(`#principal${count}`).val().replace(/,/g, '');
+				const interest = $(`#interest${count}`).val().replace(/,/g, '');
+				pageUrl += `&capital=${capital}&interest=${interest}`;
+				break;
+			case 'disputed':
+				pageUrl = `api/application_recovery/other_claim.php?case_no=${currentCaseNo}&creditor_count=${count}`;
+				windowName = 'DisputedClaimWindow';
+				break;
+			case 'assigned':
+				pageUrl = `api/application_recovery/assigned_claim.php?case_no=${currentCaseNo}&creditor_count=${count}`;
+				windowName = 'AssignedClaimWindow';
+				break;
+			case 'otherDebt':
+				const principal = parseFloat($(`#principal${count}`).val().replace(/,/g, '')) || 0;
+				pageUrl = `api/application_recovery/other_debt.php?case_no=${currentCaseNo}&creditor_count=${count}&principal=${principal}`;
+				windowName = 'OtherDebtWindow';
+				break;
+			case 'undetermined':
+				pageUrl = `api/application_recovery/undetermined_claim.php?case_no=${currentCaseNo}&creditor_count=${count}`;
+				windowName = 'UndeterminedClaimWindow';
+				break;
+			case 'guaranteed':
+				pageUrl = `api/application_recovery/guaranteed_debt.php?case_no=${currentCaseNo}&creditor_count=${count}`;
+				windowName = 'GuaranteedDebtWindow';
+				break;
+			default:
+				alert('유효하지 않은 채권 유형입니다.');
+				return;
+		}
+		
+		window.open(
+			pageUrl,
+			windowName,
+			`width=${width},height=${height},left=${left},top=${top},scrollbars=yes`
+		);
+	}
 
     // 부속서류 창 열기 (기존 함수 - 통합 함수 사용)
     function openAppendixWindow(count) {
