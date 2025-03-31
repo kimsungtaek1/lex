@@ -241,69 +241,7 @@ function appendDataToMainForm(property) {
 	}
 
 	// 데이터 저장 요청
-	saveFormData(formData);
-}
-
-// 데이터 저장 API 호출
-function saveFormData(formData) {
-	$.ajax({
-		url: '../../api/application_recovery/save_appendix.php',
-		method: 'POST',
-		data: {
-			case_no: currentCaseNo,
-			creditor_count: current_creditor_count,
-			...formData
-		},
-		success: function(response) {
-			try {
-				const result = typeof response === 'string' ? JSON.parse(response) : response;
-				if (result.status === 'success') {
-					alert(result.message || '저장되었습니다.');
-					
-					$.ajax({
-						url: '../../api/application_recovery/clear_other_claims.php',
-						method: 'POST',
-						data: {
-							case_no: currentCaseNo,
-							creditor_count: current_creditor_count,
-							exclude_type: 'appendix'
-						},
-						success: function(clearResponse) {
-							// 부모 창에 메시지 전달 - 버튼 색상 변경을 위한 정보 포함
-							window.opener.postMessage({
-								type: 'otherClaimSaved', 
-								creditorCount: current_creditor_count,
-								hasData: true,
-								clearOthers: true // 다른 채권 버튼 색상을 원래대로 되돌리기 위한 플래그
-							}, '*');
-							
-							// claim_no 업데이트
-							if (result.claim_no) {
-								$('#claimNo').val(result.claim_no);
-							}
-						},
-						error: function() {
-							// 오류가 발생해도 기본 메시지는 보냄
-							window.opener.postMessage({
-								type: 'otherClaimSaved', 
-								creditorCount: current_creditor_count,
-								hasData: true,
-								clearOthers: true // 오류 발생해도 다른 채권 버튼 색상을 원래대로 되돌리기
-							}, '*');
-						}
-					});
-				} else {
-					console.log('저장 실패 응답:', result);
-					alert('저장 중 오류가 발생했습니다.');
-				}
-			} catch (e) {
-				console.error('저장 오류:', e);
-			}
-		},
-		error: function(xhr) {
-			console.error('서버 오류:', xhr.responseText);
-		}
-	});
+	saveForm();
 }
 
 // 폼 데이터 채우기
@@ -482,106 +420,107 @@ function clearForm() {
 	$('input[type="date"]').val('');
 }
 
-// 폼 저장
 function saveForm() {
-	const appendixType = $('#appendixType').val() || '(근)저당권설정';
-	
-	// 필수 입력값 검증 강화
-	if (!validateForm(appendixType)) {
-		return;
-	}
+    const appendixType = $('#appendixType').val() || '(근)저당권설정';
+    
+    // 필수 입력값 검증 강화 - 선택적으로 활성화 가능
+    if (arguments.length === 0 || arguments[0] !== 'skipValidation') {
+        if (!validateForm(appendixType)) {
+            return;
+        }
+    }
 
-	const getIntValue = (selector) => {
-		const val = $(selector).val();
-		return val && val.trim() !== '' ? parseInt(val.replace(/,/g, '')) : null;
-	};
+    const getIntValue = (selector) => {
+        const val = $(selector).val();
+        return val && val.trim() !== '' ? parseInt(val.replace(/,/g, '')) : null;
+    };
 
-	// 기본 데이터
-	const formData = {
-		case_no: currentCaseNo,
-		creditor_count: current_creditor_count,
-		appendix_no: $('#mortgageNo').val() || current_creditor_count,
-		appendix_type: appendixType,
-		property_detail: $('#property_detail').val() || '',
-		expected_value: getIntValue('#expected_value'),
-		evaluation_rate: $('#evaluation_rate').val(),
-		secured_expected_claim: getIntValue('#secured_expected_claim'),
-		unsecured_remaining_claim: getIntValue('#unsecured_remaining_claim'),
-		rehabilitation_secured_claim: getIntValue('#rehabilitation_secured_claim')
-	};
-	
-	// 타입별 추가 필드 설정
-	const typeDataCollectors = {
-		'(근)저당권설정': () => ({
-			max_claim: getIntValue('#max_claim'),
-			registration_date: $('#registration_date').val() || null
-		}),
-		'질권설정/채권양도(전세보증금)': () => ({
-			pledge_deposit: getIntValue('#pledge_deposit'),
-			pledge_amount: getIntValue('#pledge_amount'),
-			lease_start_date: $('#lease_start_date').val() || null,
-			lease_end_date: $('#lease_end_date').val() || null
-		}),
-		'최우선변제임차권': () => ({
-			first_mortgage_date: $('#first_mortgage_date').val() || null,
-			region: $('#region').val() || null,
-			lease_deposit: getIntValue('#lease_deposit'),
-			top_priority_amount: getIntValue('#top_priority_amount'),
-			top_lease_start_date: $('#top_lease_start_date').val() || null,
-			top_lease_end_date: $('#top_lease_end_date').val() || null
-		}),
-		'우선변제임차권': () => ({
-			priority_deposit: getIntValue('#priority_deposit'),
-			priority_lease_start_date: $('#priority_lease_start_date').val() || null,
-			priority_lease_end_date: $('#priority_lease_end_date').val() || null,
-			fixed_date: $('#fixed_date').val() || null
-		})
-	};
-	
-	const collector = typeDataCollectors[appendixType];
-	if (collector) {
-		Object.assign(formData, collector());
-	}
+    // 기본 데이터
+    const formData = {
+        case_no: currentCaseNo,
+        creditor_count: current_creditor_count,
+        appendix_no: $('#mortgageNo').val() || '',
+        appendix_type: appendixType,
+        property_detail: $('#property_detail').val() || '',
+        expected_value: getIntValue('#expected_value'),
+        evaluation_rate: $('#evaluation_rate').val(),
+        secured_expected_claim: getIntValue('#secured_expected_claim'),
+        unsecured_remaining_claim: getIntValue('#unsecured_remaining_claim'),
+        rehabilitation_secured_claim: getIntValue('#rehabilitation_secured_claim')
+    };
+    
+    // 타입별 추가 필드 설정
+    const typeDataCollectors = {
+        '(근)저당권설정': () => ({
+            max_claim: getIntValue('#max_claim'),
+            registration_date: $('#registration_date').val() || null
+        }),
+        '질권설정/채권양도(전세보증금)': () => ({
+            pledge_deposit: getIntValue('#pledge_deposit'),
+            pledge_amount: getIntValue('#pledge_amount'),
+            lease_start_date: $('#lease_start_date').val() || null,
+            lease_end_date: $('#lease_end_date').val() || null
+        }),
+        '최우선변제임차권': () => ({
+            first_mortgage_date: $('#first_mortgage_date').val() || null,
+            region: $('#region').val() || null,
+            lease_deposit: getIntValue('#lease_deposit'),
+            top_priority_amount: getIntValue('#top_priority_amount'),
+            top_lease_start_date: $('#top_lease_start_date').val() || null,
+            top_lease_end_date: $('#top_lease_end_date').val() || null
+        }),
+        '우선변제임차권': () => ({
+            priority_deposit: getIntValue('#priority_deposit'),
+            priority_lease_start_date: $('#priority_lease_start_date').val() || null,
+            priority_lease_end_date: $('#priority_lease_end_date').val() || null,
+            fixed_date: $('#fixed_date').val() || null
+        })
+    };
+    
+    const collector = typeDataCollectors[appendixType];
+    if (collector) {
+        Object.assign(formData, collector());
+    }
 
-	$.ajax({
-		url: '../../api/application_recovery/save_appendix.php',
-		method: 'POST',
-		data: formData,
-		success: function(response) {
-			try {
-				const result = typeof response === 'string' ? JSON.parse(response) : response;
-				if (result.status === 'success') {
-					alert(result.message || '저장되었습니다.');
-					// 부모 창에 메시지 전송 및 데이터 전달
-					window.opener.postMessage({
-						type: 'appendixSaved', 
-						creditorCount: current_creditor_count,
-						hasData: true
-					}, '*');
-					
-					// 부모 창 새로고침
-					window.opener.location.reload();
-					
-					// 현재 창 새로고침 또는 닫기 (옵션에 따라 선택)
-					// window.close(); // 저장 후 창 닫기
-					location.reload(); // 저장 후 현재 창 새로고침
-				} else {
-					console.log('저장 실패 응답:', result);
-					alert('저장 중 오류가 발생했습니다.');
-					if (result.message) {
-						console.error('에러 메시지:', result.message);
-					}
-				}
-			} catch (e) {
-				console.error('저장 오류:', e);
-				alert('저장 처리 중 오류가 발생했습니다.');
-			}
-		},
-		error: function(xhr) {
-			console.error('서버 통신 오류:', xhr.responseText);
-			alert('서버와의 통신 중 오류가 발생했습니다.');
-		}
-	});
+    $.ajax({
+        url: '../../api/application_recovery/save_appendix.php',
+        method: 'POST',
+        data: formData,
+        success: function(response) {
+            try {
+                const result = typeof response === 'string' ? JSON.parse(response) : response;
+                if (result.status === 'success') {
+                    alert(result.message || '저장되었습니다.');
+                    
+                    // 부모 창에 메시지 전송 및 데이터 전달
+                    window.opener.postMessage({
+                        type: 'appendixSaved', 
+                        creditorCount: current_creditor_count,
+                        hasData: true,
+                        clearOthers: true
+                    }, '*');
+                    
+                    // appendix_no 업데이트
+                    if (result.appendix_no) {
+                        $('#mortgageNo').val(result.appendix_no);
+                    }
+                } else {
+                    console.log('저장 실패 응답:', result);
+                    alert('저장 중 오류가 발생했습니다.');
+                    if (result.message) {
+                        console.error('에러 메시지:', result.message);
+                    }
+                }
+            } catch (e) {
+                console.error('저장 오류:', e);
+                alert('저장 처리 중 오류가 발생했습니다.');
+            }
+        },
+        error: function(xhr) {
+            console.error('서버 통신 오류:', xhr.responseText);
+            alert('서버와의 통신 중 오류가 발생했습니다.');
+        }
+    });
 }
 
 // 폼 유효성 검사 함수 추가
