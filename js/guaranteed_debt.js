@@ -66,8 +66,28 @@ function toggleSubrogationFields() {
 	// 일부대위변제 또는 전부대위변제일 때만 관련 필드 표시
 	if (subrogationType === '일부대위변제' || subrogationType === '전부대위변제') {
 		$('.subrogation-field').show();
+		// 자동입력 버튼 표시
+		$('.auto-fill').show();
+		
+		// 원금과 이자 필드를 수정 가능하게 설정
+		$('#principal').prop('readonly', false);
+		$('#interest').prop('readonly', false);
+		
+		// 기존에 "장래구상권 미발생" 또는 "미발생"으로 설정된 값을 지운다
+		if ($('#principal').val() === '장래구상권 미발생') {
+			$('#principal').val('');
+		}
+		if ($('#interest').val() === '미발생') {
+			$('#interest').val('');
+		}
 	} else {
 		$('.subrogation-field').hide();
+		// 자동입력 버튼 숨김
+		$('.auto-fill').hide();
+		
+		// 원금과 이자 필드를 수정 불가능하게 설정하고 값 지정
+		$('#principal').val('장래구상권 미발생').prop('readonly', true);
+		$('#interest').val('미발생').prop('readonly', true);
 	}
 }
 
@@ -417,19 +437,24 @@ function fillFormData(data) {
 	$('#original_debt_description').val(data.original_debt_description || '');
 	$('#default_rate').val(data.default_rate || '');
 	
-	$('#principal').val(formatNumberValue(data.principal));
-	$('#principal_calculation').val(data.principal_calculation || '');
-	$('#interest').val(formatNumberValue(data.interest));
-	$('#interest_calculation').val(data.interest_calculation || '');
-	$('#calculation_date').val(data.calculation_date ? data.calculation_date.split(' ')[0] : '');
-	$('#claim_content').val(data.claim_content || '보증채무를 대위변제할 경우 대위변제금액 및 이에 대한 대위변제일 이후의 민사 법정이율에 의한 이자');
-	
-	// 대위변제 선택
+	// 대위변제 선택 (폼 필드에 데이터를 채우기 전에 먼저 처리)
 	if (data.subrogation_type) {
 		$(`input[name="subrogation_type"][value="${data.subrogation_type}"]`).prop('checked', true).trigger('change');
 	} else {
 		$('#subrogation_none').prop('checked', true).trigger('change');
 	}
+	
+	// 대위변제 타입이 '미발생'이 아닌 경우에만 실제 데이터로 채운다
+	if (data.subrogation_type && data.subrogation_type !== '미발생') {
+		$('#principal').val(formatNumberValue(data.principal));
+		$('#interest').val(formatNumberValue(data.interest));
+	}
+	// 미발생의 경우 toggleSubrogationFields에서 설정됨
+	
+	$('#principal_calculation').val(data.principal_calculation || '');
+	$('#interest_calculation').val(data.interest_calculation || '');
+	$('#calculation_date').val(data.calculation_date ? data.calculation_date.split(' ')[0] : '');
+	$('#claim_content').val(data.claim_content || '보증채무를 대위변제할 경우 대위변제금액 및 이에 대한 대위변제일 이후의 민사 법정이율에 의한 이자');
 	
 	// 강제 기재 여부
 	$('#force_payment_plan').prop('checked', data.force_payment_plan == 1);
