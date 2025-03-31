@@ -215,22 +215,48 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 				$pdf->MultiCell($col5_width, 16, $creditor['claim_content'], 1, 'L', false, 0, '', '', true, 0, false, true, 16, 'M');
 				
 				// 6. 부속서류 유무 행
-				// 부속서류 체크 - 실제 데이터 가져오기
-				$checkBox = '';
-				$stmt = $pdo->prepare("
+				$stmt_appendix = $pdo->prepare("
 					SELECT COUNT(*) as count FROM application_recovery_creditor_appendix 
 					WHERE case_no = ? AND creditor_count = ?
 				");
-				$stmt->execute([$case_no, $creditor['creditor_count']]);
-				$appendixCount = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
-				
-				// 체크박스 표시
-				if ($appendixCount > 0) {
-					$checkBox = "[ V]  부속서류\n[ 1, 2, 3, 4 ]";
-				} else {
-					$checkBox = "[  ]  부속서류\n[ 1, 2, 3, 4 ]";
-				}
+				$stmt_appendix->execute([$case_no, $creditor['creditor_count']]);
+				$appendixCount = $stmt_appendix->fetch(PDO::FETCH_ASSOC)['count'];
+
+				$stmt_disputed = $pdo->prepare("
+					SELECT COUNT(*) as count FROM application_recovery_creditor_other_claims 
+					WHERE case_no = ? AND creditor_count = ?
+				");
+				$stmt_disputed->execute([$case_no, $creditor['creditor_count']]);
+				$disputedCount = $stmt_disputed->fetch(PDO::FETCH_ASSOC)['count'];
+
+				$stmt_assigned = $pdo->prepare("
+					SELECT COUNT(*) as count FROM application_recovery_creditor_assigned_claims 
+					WHERE case_no = ? AND creditor_count = ?
+				");
+				$stmt_assigned->execute([$case_no, $creditor['creditor_count']]);
+				$assignedCount = $stmt_assigned->fetch(PDO::FETCH_ASSOC)['count'];
+
+				$stmt_other = $pdo->prepare("
+					SELECT COUNT(*) as count FROM application_recovery_creditor_other_debts 
+					WHERE case_no = ? AND creditor_count = ?
+				");
+				$stmt_other->execute([$case_no, $creditor['creditor_count']]);
+				$otherCount = $stmt_other->fetch(PDO::FETCH_ASSOC)['count'];
+
+				// 체크박스 라인 구성
+				$hasAppendix = ($appendixCount > 0 || $disputedCount > 0 || $assignedCount > 0 || $otherCount > 0);
+				$checkBox = $hasAppendix ? "[ V]  부속서류\n" : "[  ]  부속서류\n";
+
+				// 선택된 채권 유형에 따라 해당 번호 강조
+				$num1 = $appendixCount > 0 ? "①" : "1";
+				$num2 = $disputedCount > 0 ? "②" : "2";
+				$num3 = $assignedCount > 0 ? "③" : "3";
+				$num4 = $otherCount > 0 ? "④" : "4";
+
+				$checkBox .= "[ {$num1}, {$num2}, {$num3}, {$num4} ]";
+
 				$pdf->MultiCell($col6_width, 16, $checkBox, 1, 'C', false, 1, '', '', true, 0, false, true, 16, 'M');
+
 				
 				// 7. 채권현재액(원금) 행
 				$pdf->Cell($col1_width + $col2_width, 8, '', 0, 0); // 빈 셀 (채권번호, 채권자 자리)
