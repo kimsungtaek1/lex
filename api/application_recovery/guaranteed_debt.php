@@ -139,7 +139,7 @@ if (!$debt_no && $case_no && $creditor_count) {
 		<div class="form subrogation-field" style="display: none;">
 			<div class="form-title"><span>원시채권<br>부연설명</span></div>
 			<div class="form-content">
-				<textarea id="original_debt_description" class="form-control" rows="2"></textarea>
+				<textarea id="original_debt_description" class="form-control" rows="1"></textarea>
 			</div>
 		</div>
 		
@@ -186,7 +186,7 @@ if (!$debt_no && $case_no && $creditor_count) {
 		<div class="form">
 			<div class="form-title"><span>채권내용</span></div>
 			<div class="form-content">
-				<textarea id="claim_content" class="form-control" rows="2">보증채무를 대위변제할 경우 대위변제금액 및 이에 대한 대위변제일 이후의 민사 법정이율에 의한 이자</textarea>
+				<textarea id="claim_content" class="form-control" rows="1">보증채무를 대위변제할 경우 대위변제금액 및 이에 대한 대위변제일 이후의 민사 법정이율에 의한 이자</textarea>
 				<button type="button" class="btn btn-secondary btn-search auto-fill">자동입력</button>
 			</div>
 		</div>
