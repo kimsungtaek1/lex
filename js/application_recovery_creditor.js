@@ -675,7 +675,13 @@ function launchClaimWindow(count, claimType) {
 			
 			// 먼저 모든 채권 유형 버튼의 색상 클래스 제거 (동일 채권자에 대해)
 			if (clearOthers) {
-				$(`#openAppendix${count}, #openOtherClaim${count}, button[onclick*="openClaimWindow(${count},"]`).removeClass('btn-claim-saved');
+				// 모든 버튼에서 색상 클래스 제거 - 더 명확한 선택자 사용
+				$(`#openAppendix${count}`).removeClass('btn-claim-saved');
+				$(`#openOtherClaim${count}`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'undetermined')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'guaranteed')"]`).removeClass('btn-claim-saved');
 			}
 			
 			// 현재 저장된 채권 유형 버튼만 색상 클래스 추가
@@ -703,21 +709,19 @@ function launchClaimWindow(count, claimType) {
 			
 			// 먼저 모든 채권 유형 버튼의 색상 클래스 제거 (동일 채권자에 대해)
 			if (clearOthers) {
-				$(`#openAppendix${count}, #openOtherClaim${count}, button[onclick*="openClaimWindow(${count},"]`).removeClass('btn-claim-saved');
+				// 모든 버튼에서 색상 클래스 제거 - 더 명확한 선택자 사용
+				$(`#openAppendix${count}`).removeClass('btn-claim-saved');
+				$(`#openOtherClaim${count}`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'undetermined')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'guaranteed')"]`).removeClass('btn-claim-saved');
 			}
 			
 			// 현재 저장된 채권 유형 버튼만 색상 클래스 추가
 			if (hasData) {
 				$(`#openOtherClaim${count}`).addClass('btn-claim-saved');
 			}
-		}
-		
-		// 다툼있는 채권 삭제 이벤트 처리
-		if (event.data.type === 'otherClaimDeleted') {
-			const count = event.data.creditorCount;
-			
-			// 해당 채권자의 다툼있는 채권 버튼 색상 원래대로
-			$(`#openOtherClaim${count}`).removeClass('btn-claim-saved');
 		}
 		
 		// 전부명령된 채권 저장 이벤트 처리
@@ -728,20 +732,19 @@ function launchClaimWindow(count, claimType) {
 			
 			// 먼저 모든 채권 유형 버튼의 색상 클래스 제거 (동일 채권자에 대해)
 			if (clearOthers) {
-				$(`#openAppendix${count}, #openOtherClaim${count}, button[onclick*="openClaimWindow(${count},"]`).removeClass('btn-claim-saved');
+				// 모든 버튼에서 색상 클래스 제거 - 더 명확한 선택자 사용
+				$(`#openAppendix${count}`).removeClass('btn-claim-saved');
+				$(`#openOtherClaim${count}`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'undetermined')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'guaranteed')"]`).removeClass('btn-claim-saved');
 			}
 			
 			// 현재 저장된 채권 유형 버튼만 색상 클래스 추가
 			if (hasData) {
 				$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).addClass('btn-claim-saved');
 			}
-		}
-		
-		// 전부명령된 채권 삭제 이벤트 처리
-		if (event.data.type === 'assignedClaimDeleted') {
-			const count = event.data.creditorCount;
-			
-			$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).removeClass('btn-claim-saved');
 		}
 		
 		// 기타채무 저장 이벤트 처리
@@ -752,20 +755,19 @@ function launchClaimWindow(count, claimType) {
 			
 			// 먼저 모든 채권 유형 버튼의 색상 클래스 제거 (동일 채권자에 대해)
 			if (clearOthers) {
-				$(`#openAppendix${count}, #openOtherClaim${count}, button[onclick*="openClaimWindow(${count},"]`).removeClass('btn-claim-saved');
+				// 모든 버튼에서 색상 클래스 제거 - 더 명확한 선택자 사용
+				$(`#openAppendix${count}`).removeClass('btn-claim-saved');
+				$(`#openOtherClaim${count}`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'undetermined')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'guaranteed')"]`).removeClass('btn-claim-saved');
 			}
 			
 			// 현재 저장된 채권 유형 버튼만 색상 클래스 추가
 			if (hasData) {
 				$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).addClass('btn-claim-saved');
 			}
-		}
-		
-		// 기타채무 삭제 이벤트 처리
-		if (event.data.type === 'otherDebtDeleted') {
-			const count = event.data.creditorCount;
-			
-			$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).removeClass('btn-claim-saved');
 		}
 		
 		// 기타미확정채권 저장 이벤트 처리
@@ -776,23 +778,19 @@ function launchClaimWindow(count, claimType) {
 			
 			// 먼저 모든 채권 유형 버튼의 색상 클래스 제거 (동일 채권자에 대해)
 			if (clearOthers) {
-				$(`#openAppendix${count}, #openOtherClaim${count}, button[onclick*="openClaimWindow(${count},"]`).removeClass('btn-claim-saved');
+				// 모든 버튼에서 색상 클래스 제거 - 더 명확한 선택자 사용
+				$(`#openAppendix${count}`).removeClass('btn-claim-saved');
+				$(`#openOtherClaim${count}`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'undetermined')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'guaranteed')"]`).removeClass('btn-claim-saved');
 			}
 			
 			// 현재 저장된 채권 유형 버튼만 색상 클래스 추가
 			if (hasData) {
 				$(`button[onclick="openClaimWindow(${count}, 'undetermined')"]`).addClass('btn-claim-saved');
 			}
-			
-			// 개수 새로고침
-			loadUndeterminedClaimCount(count);
-		}
-		
-		// 기타미확정채권 삭제 이벤트 처리
-		if (event.data.type === 'undeterminedClaimDeleted') {
-			const count = event.data.creditorCount;
-			
-			$(`button[onclick="openClaimWindow(${count}, 'undetermined')"]`).removeClass('btn-claim-saved');
 			
 			// 개수 새로고침
 			loadUndeterminedClaimCount(count);
@@ -806,23 +804,19 @@ function launchClaimWindow(count, claimType) {
 			
 			// 먼저 모든 채권 유형 버튼의 색상 클래스 제거 (동일 채권자에 대해)
 			if (clearOthers) {
-				$(`#openAppendix${count}, #openOtherClaim${count}, button[onclick*="openClaimWindow(${count},"]`).removeClass('btn-claim-saved');
+				// 모든 버튼에서 색상 클래스 제거 - 더 명확한 선택자 사용
+				$(`#openAppendix${count}`).removeClass('btn-claim-saved');
+				$(`#openOtherClaim${count}`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'undetermined')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'guaranteed')"]`).removeClass('btn-claim-saved');
 			}
 			
 			// 현재 저장된 채권 유형 버튼만 색상 클래스 추가
 			if (hasData) {
 				$(`button[onclick="openClaimWindow(${count}, 'guaranteed')"]`).addClass('btn-claim-saved');
 			}
-			
-			// 개수 새로고침
-			loadGuaranteedDebtCount(count);
-		}
-		
-		// 보증인채무 삭제 이벤트 처리
-		if (event.data.type === 'guaranteedDebtDeleted') {
-			const count = event.data.creditorCount;
-			
-			$(`button[onclick="openClaimWindow(${count}, 'guaranteed')"]`).removeClass('btn-claim-saved');
 			
 			// 개수 새로고침
 			loadGuaranteedDebtCount(count);
