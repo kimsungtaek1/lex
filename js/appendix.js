@@ -496,7 +496,7 @@ function saveForm() {
                     window.opener.postMessage({
                         type: 'appendixSaved', 
                         creditorCount: current_creditor_count,
-                        hasData: true
+                        hasData: true,
                     }, '*');
                     
                     // appendix_no 업데이트
