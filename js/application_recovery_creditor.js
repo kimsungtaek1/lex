@@ -620,10 +620,18 @@ $(document).ready(function() {
 		if (event.data.type === 'appendixSaved') {
 			const count = event.data.creditorCount;
 			const hasData = event.data.hasData;
+			const clearOthers = event.data.clearOthers || false;
 			
 			// 해당 채권자의 별제권부채권 버튼 색상 변경
 			if (hasData) {
 				$(`#openAppendix${count}`).addClass('btn-appendix-saved');
+			}
+			
+			// 다른 채권 유형 버튼 색상 원래대로 되돌리기
+			if (clearOthers) {
+				$(`#openOtherClaim${count}`).removeClass('btn-other-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).removeClass('btn-claim-saved');
 			}
 			
 			// 금액 합계 재계산
@@ -645,10 +653,18 @@ $(document).ready(function() {
 		if (event.data.type === 'otherClaimSaved') {
 			const count = event.data.creditorCount;
 			const hasData = event.data.hasData;
+			const clearOthers = event.data.clearOthers || false;
 			
 			// 해당 채권자의 다툼있는 채권 버튼 색상 변경
 			if (hasData) {
 				$(`#openOtherClaim${count}`).addClass('btn-other-claim-saved');
+			}
+			
+			// 다른 채권 유형 버튼 색상 원래대로 되돌리기
+			if (clearOthers) {
+				$(`#openAppendix${count}`).removeClass('btn-appendix-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).removeClass('btn-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).removeClass('btn-claim-saved');
 			}
 		}
 		
@@ -664,9 +680,17 @@ $(document).ready(function() {
 		if (event.data.type === 'assignedClaimSaved') {
 			const count = event.data.creditorCount;
 			const hasData = event.data.hasData;
+			const clearOthers = event.data.clearOthers || false;
 			
 			if (hasData) {
 				$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).addClass('btn-claim-saved');
+			}
+			
+			// 다른 채권 유형 버튼 색상 원래대로 되돌리기
+			if (clearOthers) {
+				$(`#openAppendix${count}`).removeClass('btn-appendix-saved');
+				$(`#openOtherClaim${count}`).removeClass('btn-other-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).removeClass('btn-claim-saved');
 			}
 		}
 		
@@ -681,9 +705,17 @@ $(document).ready(function() {
 		if (event.data.type === 'otherDebtSaved') {
 			const count = event.data.creditorCount;
 			const hasData = event.data.hasData;
+			const clearOthers = event.data.clearOthers || false;
 			
 			if (hasData) {
 				$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).addClass('btn-claim-saved');
+			}
+			
+			// 다른 채권 유형 버튼 색상 원래대로 되돌리기
+			if (clearOthers) {
+				$(`#openAppendix${count}`).removeClass('btn-appendix-saved');
+				$(`#openOtherClaim${count}`).removeClass('btn-other-claim-saved');
+				$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).removeClass('btn-claim-saved');
 			}
 		}
 		
@@ -740,6 +772,83 @@ $(document).ready(function() {
 			loadGuaranteedDebtCount(count);
 		}
 	});
+	
+	// 모든 채권 유형 상태 확인 및 버튼 색상 업데이트
+	function updateAllClaimButtonsStatus(count) {
+		// 별제권부채권 확인
+		$.ajax({
+			url: 'api/application_recovery/get_appendix_data.php',
+			type: 'GET',
+			data: {
+				case_no: currentCaseNo,
+				creditor_count: count
+			},
+			success: function(response) {
+				const data = typeof response === 'string' ? JSON.parse(response) : response;
+				if (data.success && data.data && data.data.length > 0) {
+					$(`#openAppendix${count}`).addClass('btn-appendix-saved');
+				} else {
+					$(`#openAppendix${count}`).removeClass('btn-appendix-saved');
+				}
+			}
+		});
+		
+		// 다툼있는 채권 확인
+		$.ajax({
+			url: 'api/application_recovery/get_other_claims.php',
+			type: 'GET',
+			data: {
+				case_no: currentCaseNo,
+				creditor_count: count
+			},
+			success: function(response) {
+				const data = typeof response === 'string' ? JSON.parse(response) : response;
+				if (data.success && data.data && data.data.length > 0) {
+					$(`#openOtherClaim${count}`).addClass('btn-other-claim-saved');
+				} else {
+					$(`#openOtherClaim${count}`).removeClass('btn-other-claim-saved');
+				}
+			}
+		});
+		
+		// 전부명령된 채권 확인
+		$.ajax({
+			url: 'api/application_recovery/get_assigned_claims.php',
+			type: 'GET',
+			data: {
+				case_no: currentCaseNo,
+				creditor_count: count
+			},
+			success: function(response) {
+				const data = typeof response === 'string' ? JSON.parse(response) : response;
+				if (data.success && data.data && data.data.length > 0) {
+					$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).addClass('btn-claim-saved');
+				} else {
+					$(`button[onclick="openClaimWindow(${count}, 'assigned')"]`).removeClass('btn-claim-saved');
+				}
+			}
+		});
+		
+		// 기타채무 확인
+		$.ajax({
+			url: 'api/application_recovery/get_other_debts.php',
+			type: 'GET',
+			data: {
+				case_no: currentCaseNo,
+				creditor_count: count
+			},
+			success: function(response) {
+				const data = typeof response === 'string' ? JSON.parse(response) : response;
+				if (data.success && data.data && data.data.length > 0) {
+					$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).addClass('btn-claim-saved');
+				} else {
+					$(`button[onclick="openClaimWindow(${count}, 'otherDebt')"]`).removeClass('btn-claim-saved');
+				}
+			}
+		});
+	}
+
+
 
 	// 부속정보 로드
 	function loadCreditorSpecificData(count) {
@@ -1198,6 +1307,7 @@ $(document).ready(function() {
     window.loadCreditorSettings = loadCreditorSettings;
     window.searchAddress = searchAddress;
     window.loadCreditors = loadCreditors;
+	window.updateAllClaimButtonsStatus = updateAllClaimButtonsStatus;
     window.formatNumber = function(input) {
         if (!input || !input.value) return;
         

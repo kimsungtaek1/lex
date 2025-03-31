@@ -259,13 +259,38 @@ function saveFormData(formData) {
 				const result = typeof response === 'string' ? JSON.parse(response) : response;
 				if (result.status === 'success') {
 					alert(result.message || '저장되었습니다.');
-					// 저장 성공 메시지 전달 (상태 정보 추가)
-					window.opener.postMessage({
-						type: 'appendixSaved', 
-						creditorCount: current_creditor_count,
-						hasData: true // 데이터가 있음을 표시
-					}, '*');
-					location.reload();
+					
+					// 다른 채권 유형 데이터 삭제 API 호출
+					$.ajax({
+						url: '../../api/application_recovery/clear_other_claims.php',
+						method: 'POST',
+						data: {
+							case_no: currentCaseNo,
+							creditor_count: current_creditor_count,
+							exclude_type: 'appendix'
+						},
+						success: function(clearResponse) {
+							// 부모 창에 메시지 전달 - 버튼 색상 변경을 위한 정보 포함
+							window.opener.postMessage({
+								type: 'appendixSaved', 
+								creditorCount: current_creditor_count,
+								hasData: true,
+								clearOthers: true // 다른 채권 버튼 색상을 원래대로 되돌리기 위한 플래그
+							}, '*');
+							
+							location.reload();
+						},
+						error: function() {
+							// 오류가 발생해도 기본 메시지는 보냄
+							window.opener.postMessage({
+								type: 'appendixSaved', 
+								creditorCount: current_creditor_count,
+								hasData: true
+							}, '*');
+							
+							location.reload();
+						}
+					});
 				} else {
 					console.log('저장 실패 응답:', result);
 					alert('저장 중 오류가 발생했습니다.');

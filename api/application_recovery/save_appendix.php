@@ -1,120 +1,216 @@
 <?php
-include '../../config.php';
+session_start();
+require_once '../../config.php';
 
-// 기본 필드 설정
-$data = [
-	'case_no' => (int)$_POST['case_no'],
-	'creditor_count' => (int)$_POST['creditor_count'],
-	'appendix_type' => $_POST['appendix_type'] ?? '(근)저당권설정',
-	'property_detail' => $_POST['property_detail'],
-	'expected_value' => isset($_POST['expected_value']) ? (float)str_replace(',', '', $_POST['expected_value']) : null,
-	'evaluation_rate' => isset($_POST['evaluation_rate']) ? (float)$_POST['evaluation_rate'] : null,
-	'secured_expected_claim' => isset($_POST['secured_expected_claim']) ? (float)str_replace(',', '', $_POST['secured_expected_claim']) : null,
-	'unsecured_remaining_claim' => isset($_POST['unsecured_remaining_claim']) ? (float)str_replace(',', '', $_POST['unsecured_remaining_claim']) : null,
-	'rehabilitation_secured_claim' => isset($_POST['rehabilitation_secured_claim']) ? (float)str_replace(',', '', $_POST['rehabilitation_secured_claim']) : null
-];
+header('Content-Type: application/json');
 
-// 타입에 따른 추가 필드 설정
-switch ($data['appendix_type']) {
-	case '(근)저당권설정':
-		$data['max_claim'] = isset($_POST['max_claim']) ? (float)str_replace(',', '', $_POST['max_claim']) : null;
-		$data['registration_date'] = $_POST['registration_date'] ?? null;
-		break;
-	case '질권설정/채권양도(전세보증금)':
-		$data['pledge_deposit'] = isset($_POST['pledge_deposit']) ? (float)str_replace(',', '', $_POST['pledge_deposit']) : null;
-		$data['pledge_amount'] = isset($_POST['pledge_amount']) ? (float)str_replace(',', '', $_POST['pledge_amount']) : null;
-		$data['lease_start_date'] = $_POST['lease_start_date'] ?? null;
-		$data['lease_end_date'] = $_POST['lease_end_date'] ?? null;
-		break;
-	case '최우선변제임차권':
-		$data['first_mortgage_date'] = $_POST['first_mortgage_date'] ?? null;
-		$data['region'] = $_POST['region'] ?? null;
-		$data['lease_deposit'] = isset($_POST['lease_deposit']) ? (float)str_replace(',', '', $_POST['lease_deposit']) : null;
-		$data['top_priority_amount'] = isset($_POST['top_priority_amount']) ? (float)str_replace(',', '', $_POST['top_priority_amount']) : null;
-		$data['top_lease_start_date'] = $_POST['top_lease_start_date'] ?? null;
-		$data['top_lease_end_date'] = $_POST['top_lease_end_date'] ?? null;
-		break;
-	case '우선변제임차권':
-		$data['priority_deposit'] = isset($_POST['priority_deposit']) ? (float)str_replace(',', '', $_POST['priority_deposit']) : null;
-		$data['priority_lease_start_date'] = $_POST['priority_lease_start_date'] ?? null;
-		$data['priority_lease_end_date'] = $_POST['priority_lease_end_date'] ?? null;
-		$data['fixed_date'] = $_POST['fixed_date'] ?? null;
-		break;
+if (!isset($_SESSION['employee_no'])) {
+	echo json_encode(['status' => 'error', 'message' => '권한이 없습니다.']);
+	exit;
 }
+
+// 필수 파라미터 확인
+$case_no = isset($_POST['case_no']) ? intval($_POST['case_no']) : 0;
+$creditor_count = isset($_POST['creditor_count']) ? intval($_POST['creditor_count']) : 0;
+$appendix_no = isset($_POST['appendix_no']) ? intval($_POST['appendix_no']) : 0;
+
+if (!$case_no || !$creditor_count) {
+	echo json_encode(['status' => 'error', 'message' => '필수 데이터가 누락되었습니다.']);
+	exit;
+}
+
+// 채권 유형 및 기본 데이터
+$appendix_type = isset($_POST['appendix_type']) ? $_POST['appendix_type'] : '(근)저당권설정';
+$property_detail = isset($_POST['property_detail']) ? $_POST['property_detail'] : '';
+$expected_value = isset($_POST['expected_value']) ? intval(str_replace(',', '', $_POST['expected_value'])) : 0;
+$evaluation_rate = isset($_POST['evaluation_rate']) ? $_POST['evaluation_rate'] : null;
+$secured_expected_claim = isset($_POST['secured_expected_claim']) ? intval(str_replace(',', '', $_POST['secured_expected_claim'])) : 0;
+$unsecured_remaining_claim = isset($_POST['unsecured_remaining_claim']) ? intval(str_replace(',', '', $_POST['unsecured_remaining_claim'])) : 0;
+$rehabilitation_secured_claim = isset($_POST['rehabilitation_secured_claim']) ? intval(str_replace(',', '', $_POST['rehabilitation_secured_claim'])) : 0;
+
+// 유형별 추가 데이터
+$max_claim = isset($_POST['max_claim']) ? intval(str_replace(',', '', $_POST['max_claim'])) : null;
+$registration_date = isset($_POST['registration_date']) && !empty($_POST['registration_date']) ? $_POST['registration_date'] : null;
+
+$pledge_deposit = isset($_POST['pledge_deposit']) ? intval(str_replace(',', '', $_POST['pledge_deposit'])) : 0;
+$pledge_amount = isset($_POST['pledge_amount']) ? intval(str_replace(',', '', $_POST['pledge_amount'])) : 0;
+$lease_start_date = isset($_POST['lease_start_date']) && !empty($_POST['lease_start_date']) ? $_POST['lease_start_date'] : null;
+$lease_end_date = isset($_POST['lease_end_date']) && !empty($_POST['lease_end_date']) ? $_POST['lease_end_date'] : null;
+
+$first_mortgage_date = isset($_POST['first_mortgage_date']) && !empty($_POST['first_mortgage_date']) ? $_POST['first_mortgage_date'] : null;
+$region = isset($_POST['region']) ? $_POST['region'] : null;
+$lease_deposit = isset($_POST['lease_deposit']) ? intval(str_replace(',', '', $_POST['lease_deposit'])) : 0;
+$top_priority_amount = isset($_POST['top_priority_amount']) ? intval(str_replace(',', '', $_POST['top_priority_amount'])) : 0;
+$top_lease_start_date = isset($_POST['top_lease_start_date']) && !empty($_POST['top_lease_start_date']) ? $_POST['top_lease_start_date'] : null;
+$top_lease_end_date = isset($_POST['top_lease_end_date']) && !empty($_POST['top_lease_end_date']) ? $_POST['top_lease_end_date'] : null;
+
+$priority_deposit = isset($_POST['priority_deposit']) ? intval(str_replace(',', '', $_POST['priority_deposit'])) : 0;
+$priority_lease_start_date = isset($_POST['priority_lease_start_date']) && !empty($_POST['priority_lease_start_date']) ? $_POST['priority_lease_start_date'] : null;
+$priority_lease_end_date = isset($_POST['priority_lease_end_date']) && !empty($_POST['priority_lease_end_date']) ? $_POST['priority_lease_end_date'] : null;
+$fixed_date = isset($_POST['fixed_date']) && !empty($_POST['fixed_date']) ? $_POST['fixed_date'] : null;
 
 try {
 	$pdo->beginTransaction();
 	
-	// 부모 레코드(application_recovery_creditor) 존재 확인
-	$checkParentSql = "SELECT creditor_no FROM application_recovery_creditor 
-					  WHERE case_no = ? AND creditor_count = ?";
-	$checkParentStmt = $pdo->prepare($checkParentSql);
-	$checkParentStmt->execute([$data['case_no'], $data['creditor_count']]);
-	$parentExists = $checkParentStmt->fetchColumn();
+	// 기존 데이터 확인
+	$check_sql = "
+		SELECT appendix_no 
+		FROM application_recovery_creditor_appendix 
+		WHERE case_no = ? AND creditor_count = ?
+	";
+	$check_stmt = $pdo->prepare($check_sql);
+	$check_stmt->execute([$case_no, $creditor_count]);
+	$existing_data = $check_stmt->fetch(PDO::FETCH_ASSOC);
 	
-	if (!$parentExists) {
-		// 부모 레코드가 없는 경우, 에러 반환
-		throw new Exception("채권자 정보가 존재하지 않습니다. 먼저 채권자 정보를 저장해주세요.");
-	}
-	
-	// 기존 데이터 확인 (appendix_no 가져오기)
-	$checkSql = "SELECT appendix_no FROM application_recovery_creditor_appendix 
-				 WHERE case_no = ? AND creditor_count = ? LIMIT 1";
-	$checkStmt = $pdo->prepare($checkSql);
-	$checkStmt->execute([$data['case_no'], $data['creditor_count']]);
-	$existingRecord = $checkStmt->fetch(PDO::FETCH_ASSOC);
-
-	// SQL 쿼리 생성
-	if ($existingRecord) {
-		// 기존 appendix_no 사용
-		$appendix_no = $existingRecord['appendix_no'];
+	if ($existing_data) {
+		// 기존 데이터 업데이트
+		$update_sql = "
+			UPDATE application_recovery_creditor_appendix
+			SET appendix_type = ?,
+				property_detail = ?,
+				expected_value = ?,
+				evaluation_rate = ?,
+				max_claim = ?,
+				registration_date = ?,
+				secured_expected_claim = ?,
+				unsecured_remaining_claim = ?,
+				rehabilitation_secured_claim = ?,
+				pledge_deposit = ?,
+				pledge_amount = ?,
+				lease_start_date = ?,
+				lease_end_date = ?,
+				first_mortgage_date = ?,
+				region = ?,
+				lease_deposit = ?,
+				top_priority_amount = ?,
+				top_lease_start_date = ?,
+				top_lease_end_date = ?,
+				priority_deposit = ?,
+				priority_lease_start_date = ?,
+				priority_lease_end_date = ?,
+				fixed_date = ?,
+				updated_at = NOW()
+			WHERE case_no = ? AND creditor_count = ?
+		";
 		
-		// 업데이트 쿼리 생성
-		$sql = "UPDATE application_recovery_creditor_appendix SET ";
-		$updateFields = [];
-		$params = [];
+		$update_stmt = $pdo->prepare($update_sql);
+		$update_stmt->execute([
+			$appendix_type,
+			$property_detail,
+			$expected_value,
+			$evaluation_rate,
+			$max_claim,
+			$registration_date,
+			$secured_expected_claim,
+			$unsecured_remaining_claim,
+			$rehabilitation_secured_claim,
+			$pledge_deposit,
+			$pledge_amount,
+			$lease_start_date,
+			$lease_end_date,
+			$first_mortgage_date,
+			$region,
+			$lease_deposit,
+			$top_priority_amount,
+			$top_lease_start_date,
+			$top_lease_end_date,
+			$priority_deposit,
+			$priority_lease_start_date,
+			$priority_lease_end_date,
+			$fixed_date,
+			$case_no,
+			$creditor_count
+		]);
 		
-		foreach ($data as $key => $value) {
-			if ($key !== 'case_no' && $key !== 'creditor_count') {
-				$updateFields[] = "$key = ?";
-				$params[] = $value;
-			}
-		}
-		
-		$sql .= implode(', ', $updateFields);
-		$sql .= " WHERE appendix_no = ? AND case_no = ? AND creditor_count = ?";
-		$params[] = $appendix_no;
-		$params[] = $data['case_no'];
-		$params[] = $data['creditor_count'];
+		$appendix_no = $existing_data['appendix_no'];
+		$message = '부속서류가 업데이트되었습니다.';
 	} else {
-		// 삽입 쿼리 생성
-		$fields = array_keys($data);
-		$placeholders = array_fill(0, count($fields), '?');
+		// 새 데이터 추가
+		$insert_sql = "
+			INSERT INTO application_recovery_creditor_appendix (
+				case_no, 
+				creditor_count, 
+				appendix_type, 
+				property_detail,
+				expected_value,
+				evaluation_rate,
+				max_claim,
+				registration_date,
+				secured_expected_claim,
+				unsecured_remaining_claim,
+				rehabilitation_secured_claim,
+				pledge_deposit,
+				pledge_amount,
+				lease_start_date,
+				lease_end_date,
+				first_mortgage_date,
+				region,
+				lease_deposit,
+				top_priority_amount,
+				top_lease_start_date,
+				top_lease_end_date,
+				priority_deposit,
+				priority_lease_start_date,
+				priority_lease_end_date,
+				fixed_date,
+				created_at,
+				updated_at
+			) VALUES (
+				?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+				?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+				?, ?, ?, ?, ?, NOW(), NOW()
+			)
+		";
 		
-		$sql = "INSERT INTO application_recovery_creditor_appendix (" . implode(', ', $fields) . ") 
-				VALUES (" . implode(', ', $placeholders) . ")";
-		$params = array_values($data);
+		$insert_stmt = $pdo->prepare($insert_sql);
+		$insert_stmt->execute([
+			$case_no,
+			$creditor_count,
+			$appendix_type,
+			$property_detail,
+			$expected_value,
+			$evaluation_rate,
+			$max_claim,
+			$registration_date,
+			$secured_expected_claim,
+			$unsecured_remaining_claim,
+			$rehabilitation_secured_claim,
+			$pledge_deposit,
+			$pledge_amount,
+			$lease_start_date,
+			$lease_end_date,
+			$first_mortgage_date,
+			$region,
+			$lease_deposit,
+			$top_priority_amount,
+			$top_lease_start_date,
+			$top_lease_end_date,
+			$priority_deposit,
+			$priority_lease_start_date,
+			$priority_lease_end_date,
+			$fixed_date
+		]);
+		
+		$appendix_no = $pdo->lastInsertId();
+		$message = '부속서류가 등록되었습니다.';
 	}
-
-	// 쿼리 실행
-	$stmt = $pdo->prepare($sql);
-	$stmt->execute($params);
 	
 	$pdo->commit();
 	
 	echo json_encode([
 		'status' => 'success',
-		'message' => '데이터가 성공적으로 저장되었습니다',
-		'data' => $data,
-		'is_update' => isset($existingRecord)
+		'message' => $message,
+		'appendix_no' => $appendix_no
 	]);
+	
 } catch (Exception $e) {
 	$pdo->rollBack();
-	error_log($e->getMessage());
+	error_log("부속서류 저장 오류: " . $e->getMessage());
+	
 	echo json_encode([
-		'status' => 'error', 
-		'message' => $e->getMessage(),
-		'data' => $data
+		'status' => 'error',
+		'message' => '저장 중 오류가 발생했습니다.',
+		'error' => $e->getMessage()
 	]);
 }
 ?>
