@@ -1,47 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부속서류 1</title>
+    <link rel="stylesheet" href="../../css/appendix.css">
+</head>
+<body>
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 session_start();
 if (!isset($_SESSION['employee_no'])) {
-    exit("권한이 없습니다.");
+    exit('<div class="error-message">권한이 없습니다.</div></body></html>');
 }
 include '../../config.php';
 
-$case_no = (int)$_GET['case_no'];
-$creditor_count = isset($_GET['count']) ? $_GET['count'] : null;
-$appendix_no = isset($_GET['appendix_no']) ? $_GET['appendix_no'] : null;
+$case_no = isset($_GET['case_no']) ? (int)$_GET['case_no'] : 0; // case_no가 없을 경우 기본값 0 설정 또는 오류 처리
+$creditor_count = isset($_GET['count']) && $_GET['count'] !== '' ? (int)$_GET['count'] : null;
+$appendix_no = isset($_GET['appendix_no']) ? (int)$_GET['appendix_no'] : 0;
+
+if ($case_no === 0) {
+    exit('<div class="error-message">사건 번호가 유효하지 않습니다.</div></body></html>');
+}
 ?>
-<link rel="stylesheet" href="../../css/appendix.css">
 <div class="content-wrapper">
     <div class="appendix-title">부속서류 1&nbsp;&nbsp;|&nbsp;&nbsp;별제권부채권</div>
     <?php
+    // creditor_count가 null이 아닐 경우 해당 값으로 필터링, null일 경우 모든 creditor_count 조회
     $query = "SELECT * FROM application_recovery_creditor_appendix 
-              WHERE case_no = ? 
-              AND (? IS NULL OR creditor_count = ?)
-              AND (? IS NULL OR appendix_no = ?)
-              ORDER BY creditor_count ASC";
-              
+              WHERE case_no = ?";
+    $params = [$case_no];
+
     $stmt = $pdo->prepare($query);
     if (!$stmt) {
-        die(json_encode([
-            'status' => 'error',
-            'message' => '쿼리 준비 실패: ' . $pdo->errorInfo()[2]
-        ]));
+        exit('<div class="error-message">데이터베이스 오류(prepare): ' . htmlspecialchars($pdo->errorInfo()[2]) . '</div></body></html>');
     }
-    
-    if (!$stmt->execute([$case_no, $creditor_count, $creditor_count, $appendix_no, $appendix_no])) {
-        die(json_encode([
-            'status' => 'error',
-            'message' => '쿼리 실행 실패: ' . $stmt->errorInfo()[2]
-        ]));
+
+    if (!$stmt->execute($params)) {
+        exit('<div class="error-message">데이터베이스 오류(execute): ' . htmlspecialchars($stmt->errorInfo()[2]) . '</div></body></html>');
     }
-    
-    $result = $stmt;
-    $rowCount = $stmt->rowCount();
-    
-    if ($rowCount === 0) {
-        echo '<div class="no-data">데이터가 없습니다</div>';
-    }
+
+    $result = $stmt; // PDOStatement 객체
+    $rowCount = $stmt->rowCount(); // 가져온 행 수
     ?>
     
     <div class="appendix-table">
@@ -54,17 +55,24 @@ $appendix_no = isset($_GET['appendix_no']) ? $_GET['appendix_no'] : null;
             <div class="col">|&nbsp;&nbsp;➃없을채권액</div>
             <div class="col">|&nbsp;&nbsp;➄회생채권액</div>
         </div>
-        <?php while($row = $result->fetch()): ?>
-        <div class="table-row">
-            <div class="col"><?= $row['creditor_count'] ?></div>
-            <div class="col"><?= $row['property_detail'] ?></div>
-            <div class="col"><?= number_format($row['expected_value']) ?></div>
-            <div class="col"><?= $row['evaluation_rate'] ?>%</div>
-            <div class="col"><?= number_format($row['secured_expected_claim']) ?></div>
-            <div class="col"><?= number_format($row['unsecured_remaining_claim']) ?></div>
-            <div class="col"><?= number_format($row['rehabilitation_secured_claim']) ?></div>
-        </div>
-        <?php endwhile; ?>
+		<?php
+		    if ($rowCount === 0) {
+				echo '<div class="no-data">데이터가 없습니다</div>';
+            } else {
+                // PDOStatement::fetchAll() 사용 권장 (메모리 사용량 주의) 또는 기존 fetch() 루프 유지
+                while($row = $result->fetch(PDO::FETCH_ASSOC)): ?>
+                <div class="table-row">
+                    <div class="col"><?= htmlspecialchars($row['creditor_count'] ?? '') ?></div>
+                    <div class="col"><?= htmlspecialchars($row['property_detail'] ?? '') ?></div>
+                    <div class="col"><?= number_format((float)($row['expected_value'] ?? 0)) ?></div>
+                    <div class="col"><?= htmlspecialchars($row['evaluation_rate'] ?? '') ?>%</div>
+                    <div class="col"><?= number_format((float)($row['secured_expected_claim'] ?? 0)) ?></div>
+                    <div class="col"><?= number_format((float)($row['unsecured_remaining_claim'] ?? 0)) ?></div>
+                    <div class="col"><?= number_format((float)($row['rehabilitation_secured_claim'] ?? 0)) ?></div>
+                </div>
+                <?php endwhile;
+            }
+        ?>
     </div>
     <div class="form-header" id="appendixTypeHeader"></div>
 	<div class="left-section">
@@ -253,13 +261,12 @@ $appendix_no = isset($_GET['appendix_no']) ? $_GET['appendix_no'] : null;
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<input type="hidden" id="mortgageNo" value="<?php echo isset($_GET['appendix_no']) ? $_GET['appendix_no'] : ''; ?>">
 <script>
-    var currentCaseNo = <?php echo $_GET['case_no']; ?>;
-    var current_creditor_count = <?php echo isset($_GET['count']) && $_GET['count'] !== '' ? $_GET['count'] : 'null'; ?>;
-    var selected_capital = <?php echo isset($_GET['capital']) && $_GET['capital'] !== '' ? $_GET['capital'] : 0; ?>;
-    var selected_interest = <?php echo isset($_GET['interest']) && $_GET['interest'] !== '' ? $_GET['interest'] : 0; ?>;
+    // PHP 변수를 안전하게 JavaScript로 전달
+    var currentCaseNo = <?php echo json_encode($case_no); ?>;
+	var appendixNo = <?php echo json_encode($appendix_no); ?>;
+    var current_creditor_count = <?php echo json_encode($creditor_count); ?>; // null 또는 정수
+    var selected_capital = <?php echo json_encode(isset($_GET['capital']) && $_GET['capital'] !== '' ? (float)$_GET['capital'] : 0); ?>;
 </script>
 <script src="../../js/appendix.js"></script>
-</body>
 </html>

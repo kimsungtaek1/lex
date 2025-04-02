@@ -12,7 +12,6 @@ if (!isset($_SESSION['employee_no'])) {
 // 필수 파라미터 확인
 $case_no = isset($_POST['case_no']) ? intval($_POST['case_no']) : 0;
 $creditor_count = isset($_POST['creditor_count']) ? intval($_POST['creditor_count']) : 0;
-$appendix_no = isset($_POST['appendix_no']) ? intval($_POST['appendix_no']) : 0;
 
 if (!$case_no || !$creditor_count) {
 	echo json_encode(['status' => 'error', 'message' => '필수 데이터가 누락되었습니다.']);
@@ -135,7 +134,6 @@ try {
 			$creditor_count
 		]);
 		
-		$appendix_no = $existing_data['appendix_no'];
 		$message = '부속서류가 업데이트되었습니다.';
 	} else {
 		// 새 데이터 추가
@@ -204,7 +202,6 @@ try {
 			$fixed_date
 		]);
 		
-		$appendix_no = $pdo->lastInsertId();
 		$message = '부속서류가 등록되었습니다.';
 	}
 	
@@ -213,7 +210,6 @@ try {
 	echo json_encode([
 		'status' => 'success',
 		'message' => $message,
-		'appendix_no' => $appendix_no
 	]);
 	
 } catch (Exception $e) {

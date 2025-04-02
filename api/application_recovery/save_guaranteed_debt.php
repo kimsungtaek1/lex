@@ -38,6 +38,7 @@ $default_rate = floatval($_POST['default_rate'] ?? 0);
 $calculation_date = $_POST['calculation_date'] ?? null;
 $claim_content = $_POST['claim_content'] ?? '';
 $future_right_type = $_POST['future_right_type'] ?? null;
+$debt_number = $_POST['debt_number'] ?? ''; // 채무번호 추가
 
 try {
 	$pdo->beginTransaction();
@@ -63,6 +64,7 @@ try {
 				default_rate = ?,
 				claim_content = ?,
 				future_right_type = ?,
+				debt_number = ?, -- 채무번호 추가
 				updated_at = CURRENT_TIMESTAMP
 			WHERE debt_no = ? AND case_no = ? AND creditor_count = ?
 		");
@@ -84,6 +86,7 @@ try {
 			$default_rate,
 			$claim_content,
 			$future_right_type,
+			$debt_number, // 채무번호 추가
 			$debt_no,
 			$case_no,
 			$creditor_count
@@ -92,12 +95,12 @@ try {
 		// 신규 등록
 		$stmt = $pdo->prepare("
 			INSERT INTO application_recovery_creditor_guaranteed_debts 
-			(case_no, creditor_count, subrogation_type, force_payment_plan, entity_type, 
-			 financial_institution, address, phone, fax, claim_reason, 
+			(case_no, creditor_count, subrogation_type, force_payment_plan, entity_type,
+			 financial_institution, address, phone, fax, claim_reason,
 			 original_debt_balance, original_debt_description,
-			 principal, principal_calculation, interest, interest_calculation, default_rate, claim_content, 
-			 future_right_type, created_at, updated_at)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+			 principal, principal_calculation, interest, interest_calculation, default_rate, claim_content,
+			 future_right_type, debt_number, created_at, updated_at) -- 채무번호 추가
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) -- 채무번호 추가
 		");
 		$stmt->execute([
 			$case_no,
@@ -118,7 +121,8 @@ try {
 			$interest_calculation,
 			$default_rate,
 			$claim_content,
-			$future_right_type
+			$future_right_type,
+			$debt_number // 채무번호 추가
 		]);
 		$debt_no = $pdo->lastInsertId();
 	}

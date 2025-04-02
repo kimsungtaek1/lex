@@ -11,7 +11,6 @@ if (!isset($_POST['case_no']) || !isset($_POST['creditor_count'])) {
 
 $case_no = (int)$_POST['case_no'];
 $creditor_count = (int)$_POST['creditor_count'];
-$appendix_no = isset($_POST['appendix_no']) && $_POST['appendix_no'] ? (int)$_POST['appendix_no'] : null;
 
 try {
 	$pdo->beginTransaction();
@@ -20,12 +19,6 @@ try {
 	$sql = "DELETE FROM application_recovery_creditor_appendix 
 			WHERE case_no = ? AND creditor_count = ?";
 	$params = [$case_no, $creditor_count];
-	
-	// appendix_no가 있는 경우 조건 추가
-	if ($appendix_no) {
-		$sql .= " AND appendix_no = ?";
-		$params[] = $appendix_no;
-	}
 	
 	$stmt = $pdo->prepare($sql);
 	$result = $stmt->execute($params);

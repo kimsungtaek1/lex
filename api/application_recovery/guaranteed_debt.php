@@ -233,7 +233,7 @@ if (!$debt_no && $case_no && $creditor_count) {
             <div class="col">|&nbsp;&nbsp;주소</div>
             <div class="col">|&nbsp;&nbsp;편집</div>
         </div>
-		<div id="guarantorTableBody">
+		<div id="guarantorTableBody" class="guarantor-table">
         </div>
 	</div>
 </div>

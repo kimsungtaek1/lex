@@ -4,7 +4,6 @@ include '../../config.php';
     $data = [
         'case_no' => (int)$_POST['case_no'],
         'creditor_count' => (int)$_POST['creditor_count'],
-        'appendix_no' => isset($_POST['appendix_no']) && $_POST['appendix_no'] !== '' ? (int)$_POST['appendix_no'] : null,
         'property_detail' => $_POST['property_detail'],
         'expected_value' => isset($_POST['expected_value']) ? (float)$_POST['expected_value'] : null,
         'evaluation_rate' => isset($_POST['evaluation_rate']) ? (float)$_POST['evaluation_rate'] : null,
