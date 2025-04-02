@@ -970,6 +970,7 @@ CREATE TABLE application_recovery_creditor_guaranteed_debts (
   debt_no int(11) NOT NULL,
   case_no int(11) NOT NULL,
   creditor_count int(11) NOT NULL,
+  debt_number int(11) NOT NULL,
   subrogation_type enum('미발생','일부대위변제','전부대위변제') NOT NULL DEFAULT '미발생' COMMENT '대위변제 유형',
   force_payment_plan tinyint(1) DEFAULT 0 COMMENT '변제계획안 강제기재',
   entity_type enum('자연인','법인','권리능력없는법인','국가','지방자치단체') DEFAULT '법인' COMMENT '인격구분',
@@ -1012,6 +1013,7 @@ CREATE TABLE application_recovery_creditor_other_debts (
   debt_no int(11) NOT NULL,
   case_no int(11) NOT NULL,
   creditor_count int(11) NOT NULL,
+  debt_description text NOT NULL,
   has_mortgage tinyint(1) DEFAULT 0 COMMENT '주채무자 소유 부동산에 근저당권 설정 여부',
   created_at datetime DEFAULT current_timestamp(),
   updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
