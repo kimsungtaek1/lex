@@ -17,8 +17,7 @@ if (!isset($_SESSION['employee_no'])) {
 include '../../config.php';
 
 $case_no = isset($_GET['case_no']) ? (int)$_GET['case_no'] : 0; // case_no가 없을 경우 기본값 0 설정 또는 오류 처리
-$creditor_count = isset($_GET['count']) && $_GET['count'] !== '' ? (int)$_GET['count'] : null;
-$appendix_no = isset($_GET['appendix_no']) ? (int)$_GET['appendix_no'] : 0;
+$creditor_count = isset($_GET['creditor_count']) && $_GET['creditor_count'] !== '' ? (int)$_GET['creditor_count'] : null;
 
 if ($case_no === 0) {
     exit('<div class="error-message">사건 번호가 유효하지 않습니다.</div></body></html>');
@@ -264,7 +263,6 @@ if ($case_no === 0) {
 <script>
     // PHP 변수를 안전하게 JavaScript로 전달
     var currentCaseNo = <?php echo json_encode($case_no); ?>;
-	var appendixNo = <?php echo json_encode($appendix_no); ?>;
     var current_creditor_count = <?php echo json_encode($creditor_count); ?>; // null 또는 정수
     var selected_capital = <?php echo json_encode(isset($_GET['capital']) && $_GET['capital'] !== '' ? (float)$_GET['capital'] : 0); ?>;
 </script>

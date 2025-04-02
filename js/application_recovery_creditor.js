@@ -676,7 +676,7 @@ $(document).ready(function() {
 		// 채권 유형에 따라 페이지와 창 이름 설정
 		switch(claimType) {
 			case 'appendix':
-				pageUrl = `api/application_recovery/appendix.php?case_no=${currentCaseNo}&count=${count}`;
+				pageUrl = `api/application_recovery/appendix.php?case_no=${currentCaseNo}&creditor_count=${count}`;
 				windowName = 'AppendixWindow';
 				// 필요시 전달할 파라미터 추가
 				const capital = $(`#principal${count}`).val().replace(/,/g, '');

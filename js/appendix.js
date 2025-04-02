@@ -125,7 +125,6 @@ function handleEvaluationRateInput() {
 // 기존 데이터 로드
 function loadSavedData() {
 	if (!currentCaseNo || !current_creditor_count) {
-		console.error('필수 파라미터 누락: case_no 또는 current_creditor_count');
 		return;
 	}
 
@@ -139,9 +138,8 @@ function loadSavedData() {
 		success: function(response) {
 			try {
 				const data = typeof response === 'string' ? JSON.parse(response) : response;
-				console.log(data);
 				if (data.success) {
-					if (data.data && data.data.length > 0) {
+					if (data.data && data.data.length > 0 && data.data[0].creditor_count==current_creditor_count && data.data[0].appendix_type!='') {
 						fillFormData(data.data[0]);
 					} else {
 						clearForm();
@@ -178,9 +176,9 @@ function loadAndShowPropertySelector() {
 
 // 팝업에서 선택된 부속서류 데이터로 폼 채우기
 function fillSelectedAppendixData(data) {
-	// console.log("Filling form with selected data:", data); // 디버깅용 로그
-	// 기존 폼 데이터 초기화 (선택적)
-	// clearForm(); 
+	if(!data){
+		return;
+	}//test
 
 	// 타입 설정 및 UI 조정
 	const appendixType = data.appendix_type || '(근)저당권설정';
