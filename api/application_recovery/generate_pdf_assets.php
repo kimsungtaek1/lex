@@ -421,10 +421,11 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 				$pdf->Cell($note_col1_width, $cell_height, '환가 예상액', 1, 0, 'C');
 				$pdf->Cell($note_col2_width, $cell_height, number_format($real_estate['property_expected_value'] ?? 0)."원", 1, 1, 'L');
 				
-				// 담보권 설정 정보
+				// 담보권이 설정된 경우 그 종류 및 담보액
 				$pdf->SetXY($x, $y + ($cell_height * 5));
-				$pdf->Cell($note_col1_width, $cell_height, '담보권 종류/담보액', 1, 0, 'C');
+				$pdf->Cell($note_col1_width, $cell_height, '담보권이 설정된 경우 그 종류 및 담보액', 1, 0, 'C');
 				$securityInfo = "";
+				
 				if ($real_estate['property_security_type']) {
 					$securityInfo = $real_estate['property_security_type'] . " - " . number_format($real_estate['property_secured_debt'] ?? 0) . "원";
 				}
