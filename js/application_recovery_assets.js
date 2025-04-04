@@ -822,6 +822,28 @@ addVehicleBlock(data = {}) {
 		block.find(".vehicle_liquidation_value").val(this.formatMoney(calculatedValue));
 	  }
 	});
+	
+	// 자동차 섹션에 배우자명의 체크박스 이벤트 추가
+	block.find(".vehicle_spouse_owned").on("change", function() {
+	  // 배우자명의 체크박스가 해제되면 부연설명 내용 삭제
+	  if (!$(this).is(":checked")) {
+		block.find(".vehicle_liquidation_explain").val("");
+	  }
+	  
+	  // 청산가치 자동 계산 (수동계산이 아닐 경우)
+	  if (!block.find(".vehicle_manual_calc").is(":checked")) {
+		const expectedValue = this.unformatMoney(block.find(".vehicle_expected_value").val());
+		const financialBalance = this.unformatMoney(block.find(".vehicle_financial_balance").val());
+		let calculatedValue = Math.max(0, expectedValue - financialBalance);
+		
+		// 배우자명의일 경우 1/2로 계산
+		if ($(this).is(":checked")) {
+		  calculatedValue = Math.floor(calculatedValue / 2);
+		}
+		
+		block.find(".vehicle_liquidation_value").val(this.formatMoney(calculatedValue));
+	  }
+	}.bind(this));
   
   block.find(".vehicle_max_bond, .vehicle_expected_value, .vehicle_financial_balance, .vehicle_liquidation_value")
        .on("input", (e) => {
@@ -1284,32 +1306,67 @@ addRealEstateBlock(data = {}) {
   $("#real_estate_assets_container").append(html);
   const block = $("#" + blockId);
   
-  // 수동 계산 체크박스에 이벤트 추가
-  block.find(".property_manual_calc").on("change", () => {
-    const liquidationInput = block.find(".property_liquidation_value");
-    if (block.find(".property_manual_calc").is(":checked")) {
-      liquidationInput.prop("readonly", false);
-    } else {
-      liquidationInput.prop("readonly", true);
-      // 자동계산 로직 구현 (환가예상액 - 피담보채무액 - 보증금채무액을 계산)
-      const expectedValue = this.unformatMoney(block.find(".property_expected_value").val());
-      const securedDebt = this.unformatMoney(block.find(".property_secured_debt").val());
-      const depositDebt = this.unformatMoney(block.find(".property_deposit_debt").val());
-      const calculatedValue = Math.max(0, expectedValue - securedDebt - depositDebt);
-      liquidationInput.val(this.formatMoney(calculatedValue));
-    }
-  });
-  
-  // 환가예상액, 피담보채무액, 보증금채무액 입력 시 자동 계산 이벤트 추가
-  block.find(".property_expected_value, .property_secured_debt, .property_deposit_debt").on("input", () => {
-    if (!block.find(".property_manual_calc").is(":checked")) {
-      const expectedValue = this.unformatMoney(block.find(".property_expected_value").val());
-      const securedDebt = this.unformatMoney(block.find(".property_secured_debt").val());
-      const depositDebt = this.unformatMoney(block.find(".property_deposit_debt").val());
-      const calculatedValue = Math.max(0, expectedValue - securedDebt - depositDebt);
-      block.find(".property_liquidation_value").val(this.formatMoney(calculatedValue));
-    }
-  });
+	// 부동산 섹션의 청산가치 자동 계산 로직 수정
+	block.find(".property_manual_calc").on("change", () => {
+	  const liquidationInput = block.find(".property_liquidation_value");
+	  if (block.find(".property_manual_calc").is(":checked")) {
+		liquidationInput.prop("readonly", false);
+	  } else {
+		liquidationInput.prop("readonly", true);
+		// 자동계산 로직: 환가예상액 - 피담보채무액 - 보증금채무액
+		const expectedValue = this.unformatMoney(block.find(".property_expected_value").val());
+		const securedDebt = this.unformatMoney(block.find(".property_secured_debt").val());
+		const depositDebt = this.unformatMoney(block.find(".property_deposit_debt").val());
+		let calculatedValue = Math.max(0, expectedValue - securedDebt - depositDebt);
+		
+		// 배우자명의일 경우 1/2로 계산
+		if (block.find(".property_spouse_owned").is(":checked")) {
+		  calculatedValue = Math.floor(calculatedValue / 2);
+		}
+		
+		liquidationInput.val(this.formatMoney(calculatedValue));
+	  }
+	});
+
+	// 환가예상액, 피담보채무액, 보증금채무액, 배우자명의 체크박스 변경 시 자동 계산 이벤트 수정
+	block.find(".property_expected_value, .property_secured_debt, .property_deposit_debt, .property_spouse_owned").on("input change", () => {
+	  if (!block.find(".property_manual_calc").is(":checked")) {
+		const expectedValue = this.unformatMoney(block.find(".property_expected_value").val());
+		const securedDebt = this.unformatMoney(block.find(".property_secured_debt").val());
+		const depositDebt = this.unformatMoney(block.find(".property_deposit_debt").val());
+		let calculatedValue = Math.max(0, expectedValue - securedDebt - depositDebt);
+		
+		// 배우자명의일 경우 1/2로 계산
+		if (block.find(".property_spouse_owned").is(":checked")) {
+		  calculatedValue = Math.floor(calculatedValue / 2);
+		}
+		
+		block.find(".property_liquidation_value").val(this.formatMoney(calculatedValue));
+	  }
+	});
+	
+	// 부동산 섹션에 배우자명의 체크박스 이벤트 추가
+	block.find(".property_spouse_owned").on("change", function() {
+	  // 배우자명의 체크박스가 해제되면 부연설명 내용 삭제
+	  if (!$(this).is(":checked")) {
+		block.find(".property_liquidation_explain").val("");
+	  }
+	  
+	  // 청산가치 자동 계산 (수동계산이 아닐 경우)
+	  if (!block.find(".property_manual_calc").is(":checked")) {
+		const expectedValue = this.unformatMoney(block.find(".property_expected_value").val());
+		const securedDebt = this.unformatMoney(block.find(".property_secured_debt").val());
+		const depositDebt = this.unformatMoney(block.find(".property_deposit_debt").val());
+		let calculatedValue = Math.max(0, expectedValue - securedDebt - depositDebt);
+		
+		// 배우자명의일 경우 1/2로 계산
+		if ($(this).is(":checked")) {
+		  calculatedValue = Math.floor(calculatedValue / 2);
+		}
+		
+		block.find(".property_liquidation_value").val(this.formatMoney(calculatedValue));
+	  }
+	}.bind(this));
   
   block.find(".property_area, .property_expected_value, .property_secured_debt, .property_deposit_debt, .property_liquidation_value")
        .on("input", (e) => {
