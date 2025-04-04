@@ -695,166 +695,169 @@ class AssetManager {
   }
 
 // 4. 자동차 섹션
+// 자동차 섹션 블록 추가 메서드
 addVehicleBlock(data = {}) {
-  this.assetCounters.vehicle++;
-  const blockId = "vehicle_block_" + this.assetCounters.vehicle;
-  const propertyNo = data.property_no || this.assetCounters.vehicle;
-  const isManualCalc = data.is_manual_calc === "Y";
-  const html = `
-    <div class="asset-block vehicle-block" id="${blockId}">
-      <input type="hidden" class="vehicle_asset_no" value="${data.asset_no || ""}">
-      <input type="hidden" class="vehicle_property_no" value="${propertyNo}">
-      <div class="content-wrapper">
-        <div class="left-section">
-          <div class="form">
-            <div class="form-title"><span>차량 정보</span></div>
-            <div class="form-content">
-              <input type="text" class="vehicle_info input100" value="${data.vehicle_info || ""}" placeholder="차량번호, 연식, 모델(예:123가4567, 2020년형, 아반떼)">
+    this.assetCounters.vehicle++;
+    const blockId = "vehicle_block_" + this.assetCounters.vehicle;
+    const propertyNo = data.property_no || this.assetCounters.vehicle;
+    const html = `
+        <div class="asset-block vehicle-block" id="${blockId}">
+            <input type="hidden" class="vehicle_asset_no" value="${data.asset_no || ""}">
+            <input type="hidden" class="vehicle_property_no" value="${propertyNo}">
+            <div class="content-wrapper">
+                <div class="left-section">
+                    <div class="form">
+                        <div class="form-title"><span>차량 정보</span></div>
+                        <div class="form-content">
+                            <input type="text" class="vehicle_info input100" value="${data.vehicle_info || ""}" placeholder="차량번호, 연식, 모델(예:123가4567, 2020년형, 아반떼)">
+                        </div>
+                        <div class="form-content checkbox-right">
+                            <input type="checkbox" id="${blockId}_vehicle_spouse_owned" class="vehicle_spouse_owned" ${data.is_spouse == 1 ? "checked" : ""}>
+                            <label for="${blockId}_vehicle_spouse_owned">배우자명의</label>
+                        </div>
+                    </div>
+                    <div class="form">
+                        <div class="form-title"><span>담보권 종류</span></div>
+                        <div class="form-content">
+                            <input type="text" class="vehicle_security_type" value="${data.security_type || ""}">
+                        </div>
+                    </div>
+                    <div class="form">
+                        <div class="form-title"><span>채권(최고)액</span></div>
+                        <div class="form-content">
+                            <input type="text" class="vehicle_max_bond" value="${data.max_bond ? this.formatMoney(data.max_bond) : ""}">원
+                        </div>
+                    </div>
+                    <div class="form">
+                        <div class="form-title"><span>환가 예상액</span></div>
+                        <div class="form-content">
+                            <input type="text" class="vehicle_expected_value" value="${data.expected_value ? this.formatMoney(data.expected_value) : ""}">원
+                        </div>
+                    </div>
+                    <div class="form">
+                        <div class="form-title"><span>채무 잔액</span></div>
+                        <div class="form-content">
+                            <input type="text" class="vehicle_financial_balance" value="${data.financial_balance ? this.formatMoney(data.financial_balance) : ""}">원
+                        </div>
+                    </div>
+                </div>
+                <div class="right-section">
+                    <div class="form">
+                        <div class="form-title form-notitle"><span>청산가치 판단금액</span></div>
+                        <div class="form-content">
+                            <input type="text" class="vehicle_liquidation_value input86" value="${data.liquidation_value ? this.formatMoney(data.liquidation_value) : ""}">원
+                            <div class="form-content checkbox-right">
+                                <input type="checkbox" id="${blockId}_vehicle_manual_calc" class="vehicle_manual_calc" ${data.is_manual_calc==="Y" ? "checked" : ""}>
+                                <label for="${blockId}_vehicle_manual_calc">수동계산</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form">
+                        <div class="form-title"><span></span></div>
+                        <div class="form-content">
+                            부연설명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="vehicle_liquidation_explain" value="${data.explanation || ""}">
+                        </div>
+                    </div>
+                    <div class="form">
+                        <div class="form-title"><span>압류 유무</span></div>
+                        <div class="form-content">
+                            <div class="radio">
+                                <input type="radio" id="${blockId}_vehicle_seizure_yes" name="vehicle_seizure_${blockId}" value="Y" ${data.hasOwnProperty("is_seized") && data.is_seized==="Y" ? "checked" : ""}>
+                                <label for="${blockId}_vehicle_seizure_yes">유</label>
+                                <input type="radio" id="${blockId}_vehicle_seizure_no" name="vehicle_seizure_${blockId}" value="N" ${data.hasOwnProperty("is_seized") && data.is_seized==="N" ? "checked" : ""}>
+                                <label for="${blockId}_vehicle_seizure_no">무</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form">
+                        <div class="form-title form-notitle"><span></span></div>
+                        <div class="form-content form-nocontent"></div>
+                    </div>
+                    <div class="form">
+                        <div class="form-title"></div>
+                        <div class="form-content btn-right">
+                            <button type="button" class="btn-delete vehicle_delete_btn">삭제</button>
+                            <button type="button" class="btn-save vehicle_save_btn">저장</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-content checkbox-right">
-              <input type="checkbox" id="${blockId}_vehicle_spouse_owned" class="vehicle_spouse_owned" ${data.is_spouse == 1 ? "checked" : ""}>
-              <label for="${blockId}_vehicle_spouse_owned">배우자명의</label>
-            </div>
-          </div>
-          <div class="form">
-            <div class="form-title"><span>담보권 종류</span></div>
-            <div class="form-content">
-              <input type="text" class="vehicle_security_type" value="${data.security_type || ""}">
-            </div>
-          </div>
-          <div class="form">
-            <div class="form-title"><span>채권(최고)액</span></div>
-            <div class="form-content">
-              <input type="text" class="vehicle_max_bond" value="${data.max_bond ? this.formatMoney(data.max_bond) : ""}">원
-            </div>
-          </div>
-          <div class="form">
-            <div class="form-title"><span>환가 예상액</span></div>
-            <div class="form-content">
-              <input type="text" class="vehicle_expected_value" value="${data.expected_value ? this.formatMoney(data.expected_value) : ""}">원
-            </div>
-          </div>
-          <div class="form">
-            <div class="form-title"><span>채무 잔액</span></div>
-            <div class="form-content">
-              <input type="text" class="vehicle_financial_balance" value="${data.financial_balance ? this.formatMoney(data.financial_balance) : ""}">원
-            </div>
-          </div>
         </div>
-        <div class="right-section">
-          <div class="form">
-            <div class="form-title form-notitle"><span>청산가치 판단금액</span></div>
-            <div class="form-content">
-              <input type="text" class="vehicle_liquidation_value input86" value="${data.liquidation_value ? this.formatMoney(data.liquidation_value) : ""}" ${isManualCalc ? "" : "readonly"}>원
-            </div>
-            <div class="form-content checkbox-right">
-              <input type="checkbox" id="${blockId}_vehicle_manual_calc" class="vehicle_manual_calc" ${isManualCalc ? "checked" : ""}>
-              <label for="${blockId}_vehicle_manual_calc">수동계산</label>
-            </div>
-          </div>
-          <div class="form">
-            <div class="form-title"><span></span></div>
-            <div class="form-content">
-              부연설명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="vehicle_liquidation_explain" value="${data.explanation || ""}">
-            </div>
-          </div>
-          <div class="form">
-            <div class="form-title"><span>압류 유무</span></div>
-            <div class="form-content">
-              <div class="radio">
-                <input type="radio" id="${blockId}_vehicle_seizure_yes" name="vehicle_seizure_${blockId}" value="Y" ${data.hasOwnProperty("is_seized") && data.is_seized==="Y" ? "checked" : ""}>
-                <label for="${blockId}_vehicle_seizure_yes">유</label>
-                <input type="radio" id="${blockId}_vehicle_seizure_no" name="vehicle_seizure_${blockId}" value="N" ${data.hasOwnProperty("is_seized") && data.is_seized==="N" ? "checked" : ""}>
-                <label for="${blockId}_vehicle_seizure_no">무</label>
-              </div>
-            </div>
-          </div>
-          <div class="form">
-            <div class="form-title form-notitle"><span></span></div>
-            <div class="form-content form-nocontent"></div>
-          </div>
-          <div class="form">
-            <div class="form-title"></div>
-            <div class="form-content btn-right">
-              <button type="button" class="btn-delete vehicle_delete_btn">삭제</button>
-              <button type="button" class="btn-save vehicle_save_btn">저장</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-  $("#vehicle_assets_container").append(html);
-  const block = $("#" + blockId);
-  
-	block.find(".vehicle_manual_calc").on("change", () => {
-	  const liquidationInput = block.find(".vehicle_liquidation_value");
-	  if (block.find(".vehicle_manual_calc").is(":checked")) {
-		liquidationInput.prop("readonly", false);
-	  } else {
-		liquidationInput.prop("readonly", true);
-		// 자동계산 로직: 환가예상액 - 채무잔액
-		const expectedValue = this.unformatMoney(block.find(".vehicle_expected_value").val());
-		const financialBalance = this.unformatMoney(block.find(".vehicle_financial_balance").val());
-		let calculatedValue = Math.max(0, expectedValue - financialBalance);
-		
-		// 배우자명의일 경우 1/2로 계산
-		if (block.find(".vehicle_spouse_owned").is(":checked")) {
-		  calculatedValue = Math.floor(calculatedValue / 2);
-		}
-		
-		liquidationInput.val(this.formatMoney(calculatedValue));
-	  }
-	});
+    `;
+    $("#vehicle_assets_container").append(html);
+    const block = $("#" + blockId);
+    
+    // 숫자 입력 포맷팅
+    block.find(".vehicle_max_bond, .vehicle_expected_value, .vehicle_financial_balance, .vehicle_liquidation_value")
+         .on("input", (e) => {
+        const val = e.target.value.replace(/[^\d]/g, "");
+        e.target.value = this.formatMoney(val);
+    });
 
-	// 환가예상액, 채무잔액, 배우자명의 체크박스 변경 시 자동 계산 이벤트 수정
-	block.find(".vehicle_expected_value, .vehicle_financial_balance, .vehicle_spouse_owned").on("input change", () => {
-	  if (!block.find(".vehicle_manual_calc").is(":checked")) {
-		const expectedValue = this.unformatMoney(block.find(".vehicle_expected_value").val());
-		const financialBalance = this.unformatMoney(block.find(".vehicle_financial_balance").val());
-		let calculatedValue = Math.max(0, expectedValue - financialBalance);
-		
-		// 배우자명의일 경우 1/2로 계산
-		if (block.find(".vehicle_spouse_owned").is(":checked")) {
-		  calculatedValue = Math.floor(calculatedValue / 2);
-		}
-		
-		block.find(".vehicle_liquidation_value").val(this.formatMoney(calculatedValue));
-	  }
-	});
-	
-	// 자동차 섹션에 배우자명의 체크박스 이벤트 추가
-	block.find(".vehicle_spouse_owned").on("change", function() {
-	  if ($(this).is(":checked")) {
-		block.find(".vehicle_liquidation_explain").val("배우자명의 재산으로서 채무액을 공제한 환가예상액의 1/2 반영함");
-	  } else {
-		block.find(".vehicle_liquidation_explain").val("");
-	  }
-	  
-	  // 청산가치 자동 계산 (수동계산이 아닐 경우)
-	  if (!block.find(".vehicle_manual_calc").is(":checked")) {
-		const expectedValue = this.unformatMoney(block.find(".vehicle_expected_value").val());
-		const financialBalance = this.unformatMoney(block.find(".vehicle_financial_balance").val());
-		let calculatedValue = Math.max(0, expectedValue - financialBalance);
-		
-		// 배우자명의일 경우 1/2로 계산
-		if ($(this).is(":checked")) {
-		  calculatedValue = Math.floor(calculatedValue / 2);
-		}
-		
-		block.find(".vehicle_liquidation_value").val(this.formatMoney(calculatedValue));
-	  }
-	}.bind(this));
-  
-  block.find(".vehicle_max_bond, .vehicle_expected_value, .vehicle_financial_balance, .vehicle_liquidation_value")
-       .on("input", (e) => {
-    const val = e.target.value.replace(/[^\d]/g, "");
-    e.target.value = this.formatMoney(val);
-  });
-  block.find(".vehicle_save_btn").on("click", () => this.saveVehicleBlock(block));
-  block.find(".vehicle_delete_btn").on("click", () => this.deleteVehicleBlock(block));
+    // 배우자 명의 및 청산가치 자동 계산 이벤트 핸들러
+    block.find(".vehicle_spouse_owned").on("change", function() {
+        if ($(this).is(":checked")) {
+            block.find(".vehicle_liquidation_explain").val("배우자명의 재산으로서 채무액을 공제한 환가예상액의 1/2 반영함");
+        } else {
+            block.find(".vehicle_liquidation_explain").val("");
+        }
+        
+        // 청산가치 자동 계산 (수동계산이 아닐 경우)
+        if (!block.find(".vehicle_manual_calc").is(":checked")) {
+            const expectedValue = this.unformatMoney(block.find(".vehicle_expected_value").val());
+            const financialBalance = this.unformatMoney(block.find(".vehicle_financial_balance").val());
+            let calculatedValue = Math.max(0, expectedValue - financialBalance);
+            
+            // 배우자명의일 경우 1/2로 계산
+            if ($(this).is(":checked")) {
+                calculatedValue = Math.floor(calculatedValue / 2);
+            }
+            
+            block.find(".vehicle_liquidation_value").val(this.formatMoney(calculatedValue));
+        }
+    }.bind(this));
+
+    // 저장 및 삭제 버튼 이벤트 핸들러
+    block.find(".vehicle_save_btn").on("click", () => this.saveVehicleBlock(block));
+    block.find(".vehicle_delete_btn").on("click", () => this.deleteVehicleBlock(block));
+
+    // 수동계산 체크박스 이벤트 핸들러 추가
+    block.find(".vehicle_manual_calc").on("change", function() {
+        if (!$(this).is(":checked")) {
+            // 수동계산 해제 시 자동 계산
+            const expectedValue = this.unformatMoney(block.find(".vehicle_expected_value").val());
+            const financialBalance = this.unformatMoney(block.find(".vehicle_financial_balance").val());
+            const isSpouseOwned = block.find(".vehicle_spouse_owned").is(":checked");
+            
+            let calculatedValue = Math.max(0, expectedValue - financialBalance);
+            
+            // 배우자명의일 경우 1/2로 계산
+            if (isSpouseOwned) {
+                calculatedValue = Math.floor(calculatedValue / 2);
+            }
+            
+            block.find(".vehicle_liquidation_value").val(this.formatMoney(calculatedValue));
+        }
+    }.bind(this));
+
+    // 환가예상액, 채무잔액 변경 시 자동 계산
+    block.find(".vehicle_expected_value, .vehicle_financial_balance").on("input", function() {
+        if (!block.find(".vehicle_manual_calc").is(":checked")) {
+            const expectedValue = this.unformatMoney(block.find(".vehicle_expected_value").val());
+            const financialBalance = this.unformatMoney(block.find(".vehicle_financial_balance").val());
+            const isSpouseOwned = block.find(".vehicle_spouse_owned").is(":checked");
+            
+            let calculatedValue = Math.max(0, expectedValue - financialBalance);
+            
+            // 배우자명의일 경우 1/2로 계산
+            if (isSpouseOwned) {
+                calculatedValue = Math.floor(calculatedValue / 2);
+            }
+            
+            block.find(".vehicle_liquidation_value").val(this.formatMoney(calculatedValue));
+        }
+    }.bind(this));
 }
-
 saveVehicleBlock(block) {
   const caseNo = window.currentCaseNo;
   const assetNo = block.find(".vehicle_asset_no").val();
