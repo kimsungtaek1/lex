@@ -754,7 +754,7 @@ class AssetManager {
             <div class="form">
               <div class="form-title"><span></span></div>
               <div class="form-content">
-                부연설명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="vehicle_liquidation_explain" value="${data.explanation || ""}">
+                부연설명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="vehicle_liquidation_explain  form-content-justify" value="${data.explanation || ""}">
               </div>
             </div>
             <div class="form">
@@ -1037,7 +1037,7 @@ class AssetManager {
             <div class="form">
               <div class="form-title"><span></span></div>
               <div class="form-content">
-                부연설명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="rent_liquidation_explain" value="${data.explanation || ""}">
+                부연설명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="rent_liquidation_explain form-content-justify" value="${data.explanation || ""}">
               </div>
             </div>
             <div class="form">
@@ -1313,7 +1313,7 @@ class AssetManager {
             <div class="form">
               <div class="form-title"><span></span></div>
               <div class="form-content">
-                부연설명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="property_liquidation_explain" value="${data.property_liquidation_explain || ""}">
+                부연설명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="property_liquidation_explain  form-content-justify" value="${data.property_liquidation_explain || ""}">
               </div>
             </div>
             <div class="form">
@@ -1939,7 +1939,7 @@ class AssetManager {
             </div>
             <div class="form">
               <div class="form-title form-notitle"><span>청산가치 판단금액</span></div>
-              <div class="form-content form-nocontent">
+              <div class="form-content">
                 <input type="text" class="severance_deduction_amount" value="${data.deduction_amount ? this.formatMoney(data.deduction_amount) : ""}" placeholder="">원 제외 (압류할 수 없는 퇴직금)
               </div>
             </div>
