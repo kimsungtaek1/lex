@@ -745,7 +745,7 @@ addVehicleBlock(data = {}) {
                     <div class="form">
                         <div class="form-title form-notitle"><span>청산가치 판단금액</span></div>
                         <div class="form-content">
-                            <input type="text" class="vehicle_liquidation_value input86" value="${data.liquidation_value ? this.formatMoney(data.liquidation_value) : ""}">원
+                            <input type="text" class="vehicle_liquidation_value" value="${data.liquidation_value ? this.formatMoney(data.liquidation_value) : ""}">원
                             <div class="form-content checkbox-right">
                                 <input type="checkbox" id="${blockId}_vehicle_manual_calc" class="vehicle_manual_calc" ${data.is_manual_calc==="Y" ? "checked" : ""}>
                                 <label for="${blockId}_vehicle_manual_calc">수동계산</label>
@@ -755,7 +755,7 @@ addVehicleBlock(data = {}) {
                     <div class="form">
                         <div class="form-title"><span></span></div>
                         <div class="form-content">
-                            부연설명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="vehicle_liquidation_explain" value="${data.explanation || ""}">
+                            부연설명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="vehicle_liquidation_explain form-content-justify" value="${data.explanation || ""}">
                         </div>
                     </div>
                     <div class="form">
@@ -794,12 +794,15 @@ addVehicleBlock(data = {}) {
         e.target.value = this.formatMoney(val);
     });
 
-    // 배우자 명의 및 청산가치 자동 계산 이벤트 핸들러
-    block.find(".vehicle_spouse_owned").on("change", function() {
-        if ($(this).is(":checked")) {
-            block.find(".vehicle_liquidation_explain").val("배우자명의 재산으로서 채무액을 공제한 환가예상액의 1/2 반영함");
+    // 배우자 명의 및 청산가치 자동 계산 이벤트 핸들러 (화살표 함수 사용)
+    block.find(".vehicle_spouse_owned").on("change", (event) => { // 화살표 함수로 변경
+        const isChecked = $(event.currentTarget).is(":checked"); // event.currentTarget 사용
+        const explanationInput = block.find(".vehicle_liquidation_explain");
+
+        if (isChecked) {
+            explanationInput.val("배우자명의 재산으로서 채무액을 공제한 환가예상액의 1/2 반영함");
         } else {
-            block.find(".vehicle_liquidation_explain").val("");
+            explanationInput.val("");
         }
         
         // 청산가치 자동 계산 (수동계산이 아닐 경우)
@@ -809,13 +812,14 @@ addVehicleBlock(data = {}) {
             let calculatedValue = Math.max(0, expectedValue - financialBalance);
             
             // 배우자명의일 경우 1/2로 계산
-            if ($(this).is(":checked")) {
+            if (isChecked) {
                 calculatedValue = Math.floor(calculatedValue / 2);
             }
             
-            block.find(".vehicle_liquidation_value").val(this.formatMoney(calculatedValue));
+            // 'this'는 AssetManager 인스턴스를 가리킴 (화살표 함수 특성)
+            block.find(".vehicle_liquidation_value").val(this.formatMoney(calculatedValue)); 
         }
-    }.bind(this));
+    }); // .bind(this) 제거
 
     // 저장 및 삭제 버튼 이벤트 핸들러
     block.find(".vehicle_save_btn").on("click", () => this.saveVehicleBlock(block));
@@ -1257,12 +1261,12 @@ addRealEstateBlock(data = {}) {
         <div class="right-section">
           <div class="form">
             <div class="form-title form-notitle"><span>청산가치 판단금액</span></div>
-            <div class="form-content form-nocontent">
+            <div class="form-content">
               <input type="text" class="property_liquidation_value" value="${data.property_liquidation_value ? this.formatMoney(data.property_liquidation_value) : ""}" ${isManualCalc ? "" : "readonly"}>원
-            </div>
-            <div class="form-content checkbox-right">
-              <input type="checkbox" id="${blockId}_property_manual_calc" class="property_manual_calc" ${isManualCalc ? "checked" : ""}>
-              <label for="${blockId}_property_manual_calc">수동계산</label>
+			  <div class="form-content checkbox-right">
+				  <input type="checkbox" id="${blockId}_property_manual_calc" class="property_manual_calc" ${isManualCalc ? "checked" : ""}>
+				  <label for="${blockId}_property_manual_calc">수동계산</label>
+				</div>
             </div>
           </div>
           <div class="form">
@@ -1274,7 +1278,7 @@ addRealEstateBlock(data = {}) {
           <div class="form">
             <div class="form-title"><span></span></div>
             <div class="form-content">
-              부연설명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="property_liquidation_explain" value="${data.property_liquidation_explain || ""}">
+              부연설명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="property_liquidation_explain form-content-justify" value="${data.property_liquidation_explain || ""}">
             </div>
           </div>
           <div class="form">
@@ -1349,29 +1353,33 @@ addRealEstateBlock(data = {}) {
 	  }
 	});
 	
-	// 부동산 섹션에 배우자명의 체크박스 이벤트 추가
-	block.find(".property_spouse_owned").on("change", function() {
-	  if ($(this).is(":checked")) {
-		block.find(".property_liquidation_explain").val("배우자명의 재산으로서 채무액을 공제한 환가예상액의 1/2 반영함");
-	  } else {
-		block.find(".property_liquidation_explain").val("");
-	  }
+	// 부동산 섹션에 배우자명의 체크박스 이벤트 추가 (화살표 함수 사용)
+	block.find(".property_spouse_owned").on("change", (event) => { // 화살표 함수로 변경
+        const isChecked = $(event.currentTarget).is(":checked"); // event.currentTarget 사용
+        const explanationInput = block.find(".property_liquidation_explain");
+
+        if (isChecked) {
+            explanationInput.val("배우자명의 재산으로서 채무액을 공제한 환가예상액의 1/2 반영함");
+        } else {
+            explanationInput.val("");
+        }
   
-	  // 청산가치 자동 계산 (수동계산이 아닐 경우)
-	  if (!block.find(".property_manual_calc").is(":checked")) {
-		const expectedValue = this.unformatMoney(block.find(".property_expected_value").val());
-		const securedDebt = this.unformatMoney(block.find(".property_secured_debt").val());
-		const depositDebt = this.unformatMoney(block.find(".property_deposit_debt").val());
-		let calculatedValue = Math.max(0, expectedValue - securedDebt - depositDebt);
-		
-		// 배우자명의일 경우 1/2로 계산
-		if ($(this).is(":checked")) {
-		  calculatedValue = Math.floor(calculatedValue / 2);
-		}
-		
-		block.find(".property_liquidation_value").val(this.formatMoney(calculatedValue));
-	  }
-	}.bind(this));
+        // 청산가치 자동 계산 (수동계산이 아닐 경우)
+        if (!block.find(".property_manual_calc").is(":checked")) {
+            const expectedValue = this.unformatMoney(block.find(".property_expected_value").val());
+            const securedDebt = this.unformatMoney(block.find(".property_secured_debt").val());
+            const depositDebt = this.unformatMoney(block.find(".property_deposit_debt").val());
+            let calculatedValue = Math.max(0, expectedValue - securedDebt - depositDebt);
+            
+            // 배우자명의일 경우 1/2로 계산
+            if (isChecked) {
+                calculatedValue = Math.floor(calculatedValue / 2);
+            }
+            
+            // 'this'는 AssetManager 인스턴스를 가리킴 (화살표 함수 특성)
+            block.find(".property_liquidation_value").val(this.formatMoney(calculatedValue));
+        }
+	}); // .bind(this) 제거
   
   block.find(".property_area, .property_expected_value, .property_secured_debt, .property_deposit_debt, .property_liquidation_value")
        .on("input", (e) => {
