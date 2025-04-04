@@ -754,7 +754,7 @@ class AssetManager {
             <div class="form">
               <div class="form-title"><span></span></div>
               <div class="form-content">
-                부연설명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="vehicle_liquidation_explain" value="${data.explanation || ""}">
+                부연설명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="vehicle_liquidation_explain  form-content-justify" value="${data.explanation || ""}">
               </div>
             </div>
             <div class="form">
@@ -929,7 +929,7 @@ class AssetManager {
             <div class="form">
               <div class="form-title"><span></span></div>
               <div class="form-content">
-                부연설명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="rent_liquidation_explain" value="${data.explanation || ""}">
+                부연설명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="rent_liquidation_explain  form-content-justify" value="${data.explanation || ""}">
               </div>
             </div>
             <div class="form">
@@ -1130,7 +1130,7 @@ class AssetManager {
 				<div class="form">
 				  <div class="form-title"><span></span></div>
 				  <div class="form-content">
-					부연설명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="property_liquidation_explain" value="${data.property_liquidation_explain || ""}">
+					부연설명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="property_liquidation_explain form-content-justify" value="${data.property_liquidation_explain || ""}">
 				  </div>
 				</div>
 				<div class="form">
