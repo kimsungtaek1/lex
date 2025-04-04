@@ -1,4 +1,5 @@
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -798,6 +799,7 @@ CREATE TABLE application_recovery_asset_real_estate (
   property_deposit_debt int(11) DEFAULT 0,
   property_liquidation_value int(11) DEFAULT 0,
   property_liquidation_explain text DEFAULT NULL COMMENT '부연설명',
+  is_manual_calc enum('Y','N') DEFAULT 'N' COMMENT '수동계산여부',
   is_seized enum('Y','N') NOT NULL DEFAULT 'N' COMMENT '압류여부',
   created_at datetime DEFAULT current_timestamp(),
   updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
