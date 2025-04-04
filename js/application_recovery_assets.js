@@ -1197,6 +1197,8 @@ class AssetManager {
 	  const securedDebt = this.unformatMoney(block.find(".property_secured_debt").val());
 	  const depositDebt = this.unformatMoney(block.find(".property_deposit_debt").val());
 	  
+	  console.log(isSpouseOwned+' '+expectedValue+' '+securedDebt+' '+depositDebt+' ');
+	  
 	  const totalDebt = securedDebt + depositDebt;
 	  let liquidationValue = expectedValue - totalDebt;
 	  
