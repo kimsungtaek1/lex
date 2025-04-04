@@ -695,10 +695,11 @@ class AssetManager {
   }
 
   // 4. 자동차 섹션
-  addVehicleBlock(data = {}) {
-    this.assetCounters.vehicle++;
-    const blockId = "vehicle_block_" + this.assetCounters.vehicle;
-    const propertyNo = data.property_no || this.assetCounters.vehicle;
+addVehicleBlock(data = {}) {
+	this.assetCounters.vehicle++;
+	const blockId = "vehicle_block_" + this.assetCounters.vehicle;
+	const propertyNo = data.property_no || this.assetCounters.vehicle;
+	const isManualCalc = data.is_manual_calc === "Y";
     const html = `
       <div class="asset-block vehicle-block" id="${blockId}">
         <input type="hidden" class="vehicle_asset_no" value="${data.asset_no || ""}">
@@ -741,16 +742,16 @@ class AssetManager {
             </div>
           </div>
           <div class="right-section">
-            <div class="form">
-              <div class="form-title form-notitle"><span>청산가치 판단금액</span></div>
-              <div class="form-content">
-                <input type="text" class="vehicle_liquidation_value input86" value="${data.liquidation_value ? this.formatMoney(data.liquidation_value) : ""}">원
-              </div>
-              <div class="form-content checkbox-right">
-                <input type="checkbox" id="${blockId}_vehicle_manual_calc" class="vehicle_manual_calc" ${data.is_manual_calc==="Y" ? "checked" : ""}>
-                <label for="${blockId}_vehicle_manual_calc">수동계산</label>
-              </div>
-            </div>
+			  <div class="form">
+				<div class="form-title form-notitle"><span>청산가치 판단금액</span></div>
+				<div class="form-content">
+				  <input type="text" class="vehicle_liquidation_value input86" value="${data.liquidation_value ? this.formatMoney(data.liquidation_value) : ""}" ${isManualCalc ? "" : "readonly"}>원
+				</div>
+				<div class="form-content checkbox-right">
+				  <input type="checkbox" id="${blockId}_vehicle_manual_calc" class="vehicle_manual_calc" ${isManualCalc ? "checked" : ""}>
+				  <label for="${blockId}_vehicle_manual_calc">수동계산</label>
+				</div>
+			  </div>
             <div class="form">
               <div class="form-title"><span></span></div>
               <div class="form-content">
@@ -783,93 +784,42 @@ class AssetManager {
         </div>
       </div>
     `;
-    $("#vehicle_assets_container").append(html);
-    const block = $("#" + blockId);
-    block.find(".vehicle_max_bond, .vehicle_expected_value, .vehicle_financial_balance, .vehicle_liquidation_value")
-         .on("input", (e) => {
-      const val = e.target.value.replace(/[^\d]/g, "");
-      e.target.value = this.formatMoney(val);
-    });
-    
-    // 배우자명의 체크박스 이벤트 리스너 추가
-    block.find(".vehicle_spouse_owned").on("change", () => {
-      // 수동계산이 체크되어 있지 않은 경우에만 자동 계산
-      if (!block.find(".vehicle_manual_calc").is(":checked")) {
-        const isSpouseOwned = block.find(".vehicle_spouse_owned").is(":checked");
-        const expectedValue = this.unformatMoney(block.find(".vehicle_expected_value").val()) || 0;
-        const financialBalance = this.unformatMoney(block.find(".vehicle_financial_balance").val()) || 0;
-        
-        if (isSpouseOwned) {
-          // (환가예상액 - 담보채무액) / 2 계산
-          const netValue = Math.max(0, expectedValue - financialBalance);
-          const liquidationValue = Math.floor(netValue / 2);
-          
-          // UI 업데이트
-          block.find(".vehicle_liquidation_value").val(this.formatMoney(liquidationValue));
-          block.find(".vehicle_liquidation_explain").val("배우자명의 재산으로서 채무액을 공제한 환가예상액의 1/2 반영함");
-        } else {
-          // 배우자명의가 아닌 경우 환가예상액 - 담보채무액
-          const netValue = Math.max(0, expectedValue - financialBalance);
-          block.find(".vehicle_liquidation_value").val(this.formatMoney(netValue));
-          block.find(".vehicle_liquidation_explain").val("");
-        }
-      }
-    });
-    
-    // 수동계산 체크박스 이벤트 리스너 추가
-    block.find(".vehicle_manual_calc").on("change", () => {
-      const isManualCalc = block.find(".vehicle_manual_calc").is(":checked");
-      
-      if (!isManualCalc) {
-        // 수동계산이 체크 해제되면 자동 계산 실행
-        const isSpouseOwned = block.find(".vehicle_spouse_owned").is(":checked");
-        const expectedValue = this.unformatMoney(block.find(".vehicle_expected_value").val()) || 0;
-        const financialBalance = this.unformatMoney(block.find(".vehicle_financial_balance").val()) || 0;
-        
-        if (isSpouseOwned) {
-          // (환가예상액 - 담보채무액) / 2 계산
-          const netValue = Math.max(0, expectedValue - financialBalance);
-          const liquidationValue = Math.floor(netValue / 2);
-          
-          // UI 업데이트
-          block.find(".vehicle_liquidation_value").val(this.formatMoney(liquidationValue));
-          block.find(".vehicle_liquidation_explain").val("배우자명의 재산으로서 채무액을 공제한 환가예상액의 1/2 반영함");
-        } else {
-          // 배우자명의가 아닌 경우 환가예상액 - 담보채무액
-          const netValue = Math.max(0, expectedValue - financialBalance);
-          block.find(".vehicle_liquidation_value").val(this.formatMoney(netValue));
-          block.find(".vehicle_liquidation_explain").val("");
-        }
-      }
-    });
-    
-    // 환가예상액 및 채무잔액 변경 이벤트 리스너 추가
-    block.find(".vehicle_expected_value, .vehicle_financial_balance").on("change", () => {
-      // 수동계산이 체크되어 있지 않은 경우에만 자동 계산
-      if (!block.find(".vehicle_manual_calc").is(":checked")) {
-        const isSpouseOwned = block.find(".vehicle_spouse_owned").is(":checked");
-        const expectedValue = this.unformatMoney(block.find(".vehicle_expected_value").val()) || 0;
-        const financialBalance = this.unformatMoney(block.find(".vehicle_financial_balance").val()) || 0;
-        
-        if (isSpouseOwned) {
-          // (환가예상액 - 담보채무액) / 2 계산
-          const netValue = Math.max(0, expectedValue - financialBalance);
-          const liquidationValue = Math.floor(netValue / 2);
-          
-          // UI 업데이트
-          block.find(".vehicle_liquidation_value").val(this.formatMoney(liquidationValue));
-          block.find(".vehicle_liquidation_explain").val("배우자명의 재산으로서 채무액을 공제한 환가예상액의 1/2 반영함");
-        } else {
-          // 배우자명의가 아닌 경우 환가예상액 - 담보채무액
-          const netValue = Math.max(0, expectedValue - financialBalance);
-          block.find(".vehicle_liquidation_value").val(this.formatMoney(netValue));
-          block.find(".vehicle_liquidation_explain").val("");
-        }
-      }
-    });
-    
-    block.find(".vehicle_save_btn").on("click", () => this.saveVehicleBlock(block));
-    block.find(".vehicle_delete_btn").on("click", () => this.deleteVehicleBlock(block));
+	  $("#vehicle_assets_container").append(html);
+	  const block = $("#" + blockId);
+	  
+	  // 수동 계산 체크박스에 이벤트 추가
+	  block.find(".vehicle_manual_calc").on("change", function() {
+		const liquidationInput = block.find(".vehicle_liquidation_value");
+		if ($(this).is(":checked")) {
+		  liquidationInput.prop("readonly", false);
+		} else {
+		  liquidationInput.prop("readonly", true);
+		  // 자동계산 로직 구현 (환가예상액 - 채무잔액을 계산)
+		  const expectedValue = parseInt(block.find(".vehicle_expected_value").val().replace(/,/g, "")) || 0;
+		  const financialBalance = parseInt(block.find(".vehicle_financial_balance").val().replace(/,/g, "")) || 0;
+		  const calculatedValue = Math.max(0, expectedValue - financialBalance);
+		  liquidationInput.val(this.formatMoney(calculatedValue));
+		}
+	  });
+	  
+	  // 환가예상액, 채무잔액 입력 시 자동 계산 이벤트 추가
+	  block.find(".vehicle_expected_value, .vehicle_financial_balance").on("input", function() {
+		if (!block.find(".vehicle_manual_calc").is(":checked")) {
+		  const expectedValue = parseInt(block.find(".vehicle_expected_value").val().replace(/,/g, "")) || 0;
+		  const financialBalance = parseInt(block.find(".vehicle_financial_balance").val().replace(/,/g, "")) || 0;
+		  const calculatedValue = Math.max(0, expectedValue - financialBalance);
+		  block.find(".vehicle_liquidation_value").val(this.formatMoney(calculatedValue));
+		}
+	  }.bind(this));
+	  
+	  // 기존 이벤트 핸들러는 유지
+	  block.find(".vehicle_max_bond, .vehicle_expected_value, .vehicle_financial_balance, .vehicle_liquidation_value")
+		   .on("input", (e) => {
+		const val = e.target.value.replace(/[^\d]/g, "");
+		e.target.value = this.formatMoney(val);
+	  });
+	  block.find(".vehicle_save_btn").on("click", () => this.saveVehicleBlock(block));
+	  block.find(".vehicle_delete_btn").on("click", () => this.deleteVehicleBlock(block));
   }
 
   saveVehicleBlock(block) {
@@ -904,21 +854,21 @@ class AssetManager {
       block.find(".vehicle_liquidation_explain").val(explanation);
     }
     
-    const data = {
-      asset_type: "vehicle",
-      case_no: caseNo,
-      vehicle_info: block.find(".vehicle_info").val().trim(),
-      is_spouse: isSpouseOwned ? 1 : 0,
-      security_type: block.find(".vehicle_security_type").val().trim(),
-      max_bond: this.unformatMoney(block.find(".vehicle_max_bond").val()),
-      expected_value: expectedValue,
-      financial_balance: financialBalance,
-      liquidation_value: liquidationValue,
-      explanation: explanation,
-      is_manual_calc: isManualCalc ? "Y" : "N",
-      is_seized: block.find(`input[name="vehicle_seizure_${block.attr("id")}"]:checked`).val() || "N",
-      property_no: block.find(".vehicle_property_no").val() || this.assetCounters.vehicle
-    };
+	  const data = {
+		asset_type: "vehicle",
+		case_no: caseNo,
+		vehicle_info: block.find(".vehicle_info").val().trim(),
+		is_spouse: block.find(".vehicle_spouse_owned").is(":checked") ? 1 : 0,
+		security_type: block.find(".vehicle_security_type").val().trim(),
+		max_bond: this.unformatMoney(block.find(".vehicle_max_bond").val()),
+		expected_value: this.unformatMoney(block.find(".vehicle_expected_value").val()),
+		financial_balance: this.unformatMoney(block.find(".vehicle_financial_balance").val()),
+		liquidation_value: this.unformatMoney(block.find(".vehicle_liquidation_value").val()),
+		explanation: block.find(".vehicle_liquidation_explain").val().trim(),
+		is_manual_calc: block.find(".vehicle_manual_calc").is(":checked") ? "Y" : "N",
+		is_seized: block.find(`input[name="vehicle_seizure_${block.attr("id")}"]:checked`).val() || "N",
+		property_no: block.find(".vehicle_property_no").val() || this.assetCounters.vehicle
+	  };
     if (assetNo) data.asset_no = assetNo;
     
     $.ajax({
@@ -1224,6 +1174,7 @@ class AssetManager {
 	  this.assetCounters.real_estate++;
 	  const blockId = "real_estate_block_" + this.assetCounters.real_estate;
 	  const propertyNo = data.property_no || this.assetCounters.real_estate;
+	  const isManualCalc = data.is_manual_calc === "Y";
 	  const html = `
 		<div class="asset-block real-estate-block" id="${blockId}">
 		  <input type="hidden" class="real_estate_asset_no" value="${data.asset_no || ""}">
@@ -1300,11 +1251,11 @@ class AssetManager {
 			<div class="right-section">
 			  <div class="form">
 				<div class="form-title form-notitle"><span>청산가치 판단금액</span></div>
-				<div class="form-content">
-				  <input type="text" class="property_liquidation_value input86" value="${data.property_liquidation_value ? this.formatMoney(data.property_liquidation_value) : ""}">원
+				<div class="form-content form-nocontent">
+				  <input type="text" class="property_liquidation_value" value="${data.property_liquidation_value ? this.formatMoney(data.property_liquidation_value) : ""}" ${isManualCalc ? "" : "readonly"}>원
 				</div>
 				<div class="form-content checkbox-right">
-				  <input type="checkbox" id="${blockId}_property_manual_calc" class="property_manual_calc" ${data.is_manual_calc==="Y" ? "checked" : ""}>
+				  <input type="checkbox" id="${blockId}_property_manual_calc" class="property_manual_calc" ${isManualCalc ? "checked" : ""}>
 				  <label for="${blockId}_property_manual_calc">수동계산</label>
 				</div>
 			  </div>
@@ -1352,6 +1303,35 @@ class AssetManager {
 	  `;
 	  $("#real_estate_assets_container").append(html);
 	  const block = $("#" + blockId);
+	  
+	  // 수동 계산 체크박스에 이벤트 추가
+	  block.find(".property_manual_calc").on("change", function() {
+		const liquidationInput = block.find(".property_liquidation_value");
+		if ($(this).is(":checked")) {
+		  liquidationInput.prop("readonly", false);
+		} else {
+		  liquidationInput.prop("readonly", true);
+		  // 자동계산 로직 구현 (환가예상액 - 피담보채무액 - 보증금채무액을 계산)
+		  const expectedValue = parseInt(block.find(".property_expected_value").val().replace(/,/g, "")) || 0;
+		  const securedDebt = parseInt(block.find(".property_secured_debt").val().replace(/,/g, "")) || 0;
+		  const depositDebt = parseInt(block.find(".property_deposit_debt").val().replace(/,/g, "")) || 0;
+		  const calculatedValue = Math.max(0, expectedValue - securedDebt - depositDebt);
+		  liquidationInput.val(this.formatMoney(calculatedValue));
+		}
+	  });
+	  
+	  // 환가예상액, 피담보채무액, 보증금채무액 입력 시 자동 계산 이벤트 추가
+	  block.find(".property_expected_value, .property_secured_debt, .property_deposit_debt").on("input", function() {
+		if (!block.find(".property_manual_calc").is(":checked")) {
+		  const expectedValue = parseInt(block.find(".property_expected_value").val().replace(/,/g, "")) || 0;
+		  const securedDebt = parseInt(block.find(".property_secured_debt").val().replace(/,/g, "")) || 0;
+		  const depositDebt = parseInt(block.find(".property_deposit_debt").val().replace(/,/g, "")) || 0;
+		  const calculatedValue = Math.max(0, expectedValue - securedDebt - depositDebt);
+		  block.find(".property_liquidation_value").val(this.formatMoney(calculatedValue));
+		}
+	  }.bind(this));
+	  
+	  // 기존 이벤트 핸들러는 유지
 	  block.find(".property_area, .property_expected_value, .property_secured_debt, .property_deposit_debt, .property_liquidation_value")
 		   .on("input", (e) => {
 		const val = e.target.value.replace(/[^\d]/g, "");
