@@ -787,30 +787,41 @@ addVehicleBlock(data = {}) {
   $("#vehicle_assets_container").append(html);
   const block = $("#" + blockId);
   
-  // 수동 계산 체크박스에 이벤트 추가
-  block.find(".vehicle_manual_calc").on("change", () => {
-    const liquidationInput = block.find(".vehicle_liquidation_value");
-    if (block.find(".vehicle_manual_calc").is(":checked")) {
-      liquidationInput.prop("readonly", false);
-    } else {
-      liquidationInput.prop("readonly", true);
-      // 자동계산 로직 구현 (환가예상액 - 채무잔액을 계산)
-      const expectedValue = this.unformatMoney(block.find(".vehicle_expected_value").val());
-      const financialBalance = this.unformatMoney(block.find(".vehicle_financial_balance").val());
-      const calculatedValue = Math.max(0, expectedValue - financialBalance);
-      liquidationInput.val(this.formatMoney(calculatedValue));
-    }
-  });
-  
-  // 환가예상액, 채무잔액 입력 시 자동 계산 이벤트 추가
-  block.find(".vehicle_expected_value, .vehicle_financial_balance").on("input", () => {
-    if (!block.find(".vehicle_manual_calc").is(":checked")) {
-      const expectedValue = this.unformatMoney(block.find(".vehicle_expected_value").val());
-      const financialBalance = this.unformatMoney(block.find(".vehicle_financial_balance").val());
-      const calculatedValue = Math.max(0, expectedValue - financialBalance);
-      block.find(".vehicle_liquidation_value").val(this.formatMoney(calculatedValue));
-    }
-  });
+	block.find(".vehicle_manual_calc").on("change", () => {
+	  const liquidationInput = block.find(".vehicle_liquidation_value");
+	  if (block.find(".vehicle_manual_calc").is(":checked")) {
+		liquidationInput.prop("readonly", false);
+	  } else {
+		liquidationInput.prop("readonly", true);
+		// 자동계산 로직: 환가예상액 - 채무잔액
+		const expectedValue = this.unformatMoney(block.find(".vehicle_expected_value").val());
+		const financialBalance = this.unformatMoney(block.find(".vehicle_financial_balance").val());
+		let calculatedValue = Math.max(0, expectedValue - financialBalance);
+		
+		// 배우자명의일 경우 1/2로 계산
+		if (block.find(".vehicle_spouse_owned").is(":checked")) {
+		  calculatedValue = Math.floor(calculatedValue / 2);
+		}
+		
+		liquidationInput.val(this.formatMoney(calculatedValue));
+	  }
+	});
+
+	// 환가예상액, 채무잔액, 배우자명의 체크박스 변경 시 자동 계산 이벤트 수정
+	block.find(".vehicle_expected_value, .vehicle_financial_balance, .vehicle_spouse_owned").on("input change", () => {
+	  if (!block.find(".vehicle_manual_calc").is(":checked")) {
+		const expectedValue = this.unformatMoney(block.find(".vehicle_expected_value").val());
+		const financialBalance = this.unformatMoney(block.find(".vehicle_financial_balance").val());
+		let calculatedValue = Math.max(0, expectedValue - financialBalance);
+		
+		// 배우자명의일 경우 1/2로 계산
+		if (block.find(".vehicle_spouse_owned").is(":checked")) {
+		  calculatedValue = Math.floor(calculatedValue / 2);
+		}
+		
+		block.find(".vehicle_liquidation_value").val(this.formatMoney(calculatedValue));
+	  }
+	});
   
   block.find(".vehicle_max_bond, .vehicle_expected_value, .vehicle_financial_balance, .vehicle_liquidation_value")
        .on("input", (e) => {
