@@ -302,7 +302,7 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 				$pdf->Cell($note_col1_width, $cell_height, '임차지', 1, 0, 'C');
 				$isBusinessUse = isset($rent['is_business_place']) && $rent['is_business_place'] == 'Y';
 				$checkBox = $isBusinessUse ? '[ V]' : '[  ]';
-				$pdf->Cell($note_col2_width, $cell_height, $rent['rent_location'] . " {$checkBox} 영업장", 1, 1, 'L');
+				$pdf->Cell($note_col2_width, $cell_height, $rent['rent_location'] . "   영업장{$checkBox}", 1, 1, 'L');
 				
 				// 보증금 및 월세 (4개 컬럼으로 나누기)
 				$pdf->SetXY($x, $y + $cell_height);
@@ -320,12 +320,12 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 				$pdf->Cell($sub_col_width * 2, $cell_height, number_format($rent['contract_deposit']).'원'.' 배우자명의'.$spouseCheckBox, 1, 0, 'R');
 				
 				// 2 번째 컬럼: "월세" 라벨
-				$pdf->SetXY($start_x + $sub_col_width * 1.5, $y + $cell_height);
-				$pdf->Cell($sub_col_width, $cell_height, '월세', 1, 0, 'C');
+				$pdf->SetXY($start_x + $sub_col_width * 2, $y + $cell_height);
+				$pdf->Cell($sub_col_width * 0.5, $cell_height, '월세', 1, 0, 'C');
 				
 				// 3 번째 컬럼: 월세 금액
 				$pdf->SetXY($start_x + $sub_col_width * 2.5, $y + $cell_height);
-				$pdf->Cell($sub_col_width * 2, $cell_height, number_format($rent['monthly_rent']).'원', 1, 0, 'R');
+				$pdf->Cell($sub_col_width * 1.5, $cell_height, number_format($rent['monthly_rent']).'원', 1, 0, 'R');
 				
 				// Y 위치 재설정
 				$pdf->SetXY($x, $y + $cell_height * 2);
@@ -336,23 +336,23 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 				
 				// 차이나는 이유
 				$pdf->SetXY($x, $y + ($cell_height * 3));
-				$pdf->Cell($note_col1_width, $cell_height, '차이나는 이유', 1, 0, 'C');
-				$pdf->Cell($note_col2_width, $cell_height, $rent['difference_reason'] ?? '', 1, 1, 'L');
+				$pdf->Cell($note_col1_width, $cell_height * 2, '차이나는 이유', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height * 2, $rent['difference_reason'] ?? '', 1, 1, 'L');
 				
 				// 압류할 수 없는 최우선 변제 보증금
-				$pdf->SetXY($x, $y + ($cell_height * 4));
+				$pdf->SetXY($x, $y + ($cell_height * 5));
 				$pdf->Cell($note_col1_width, $cell_height, '최우선변제보증금', 1, 0, 'C');
 				$pdf->Cell($note_col2_width, $cell_height, number_format($rent['priority_deposit'] ?? 0).'원', 1, 1, 'L');
 				
 				// 청산가치 판단금액
-				$pdf->SetXY($x, $y + ($cell_height * 5));
+				$pdf->SetXY($x, $y + ($cell_height * 6));
 				$pdf->Cell($note_col1_width, $cell_height, '청산가치판단금액', 1, 0, 'C');
 				$pdf->Cell($note_col2_width, $cell_height, number_format($rent['liquidation_value']).'원', 1, 1, 'L');
 				
 				// 부연설명
-				$pdf->SetXY($x, $y + ($cell_height * 6));
-				$pdf->Cell($note_col1_width, $cell_height, '부연설명', 1, 0, 'C');
-				$pdf->Cell($note_col2_width, $cell_height, $rent['explanation'] ?? '', 1, 1, 'L');
+				$pdf->SetXY($x, $y + ($cell_height * 7));
+				$pdf->Cell($note_col1_width, $cell_height * 2, '부연설명', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height * 2, $rent['explanation'] ?? '', 1, 1, 'L');
 				
 				// Y 위치 조정하여 다음 항목 출력 준비
 				$pdf->SetY($y + 60);
@@ -382,42 +382,47 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 				$real_estate_total += $real_estate['property_liquidation_value'];
 				
 				// 새 페이지 확인
-				if ($pdf->GetY() + 40 > $pdf->getPageHeight() - 20) {
+				if ($pdf->GetY() + 64 > $pdf->getPageHeight() - 20) {
 					$pdf->AddPage();
 				}
 				
-				$pdf->MultiCell($col1_width, 40, "부동산 #".($index+1)."\n(환가 예상액에서 피담보채권을 뺀 금액을 금액란에 적는다.)", 1, 'C', false, 0, '', '', true, 0, false, true, 40, 'M');
-				$pdf->MultiCell($col2_width, 40, number_format($real_estate['property_liquidation_value']), 1, 'R', false, 0, '', '', true, 0, false, true, 40, 'M');
-				$pdf->MultiCell($col3_width, 40, $real_estate['is_seized'] ?? 'N', 1, 'C', false, 0, '', '', true, 0, false, true, 40, 'M');
+				$pdf->MultiCell($col1_width, 64, "부동산 #".($index+1)."\n(환가 예상액에서 피담보채권을 뺀 금액을 금액란에 적는다.)", 1, 'C', false, 0, '', '', true, 0, false, true, 64, 'M');
+				$pdf->MultiCell($col2_width, 64, number_format($real_estate['property_liquidation_value']), 1, 'R', false, 0, '', '', true, 0, false, true, 64, 'M');
+				$pdf->MultiCell($col3_width, 64, $real_estate['is_seized'] ?? 'N', 1, 'C', false, 0, '', '', true, 0, false, true, 64, 'M');
 				
 				// 비고 셀 시작 위치 저장
 				$x = $pdf->GetX();
 				$y = $pdf->GetY();
 				
 				// 열 너비 계산
-				$cell_height = 40 / 5; // 5개 항목을 넣기 위해 높이 조정
+				$cell_height = 64 / 8; // 8개 항목을 넣기 위해 높이 조정
 				
-				// 소재지, 면적
-				$pdf->Cell($note_col1_width, $cell_height, '소재지, 면적', 1, 0, 'C');
-				$pdf->Cell($note_col2_width, $cell_height, $real_estate['property_location'] . ", " . number_format($real_estate['property_area']) . "㎡", 1, 1, 'L');
+				// 소재지
+				$pdf->Cell($note_col1_width, $cell_height, '소재지', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, $real_estate['property_location'], 1, 1, 'L');
+				
+				// 면적
+				$pdf->SetXY($x, $y + $cell_height);
+				$pdf->Cell($note_col1_width, $cell_height, '면적', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, number_format($real_estate['property_area']) . "㎡", 1, 1, 'L');
 				
 				// 부동산의 종류
-				$pdf->SetXY($x, $y + $cell_height);
+				$pdf->SetXY($x, $y + ($cell_height * 2));
 				$pdf->Cell($note_col1_width, $cell_height, '부동산의 종류', 1, 0, 'C');
 				$pdf->Cell($note_col2_width, $cell_height, $real_estate['property_type'] ?? '', 1, 1, 'L');
 				
 				// 권리의 종류
-				$pdf->SetXY($x, $y + ($cell_height * 2));
+				$pdf->SetXY($x, $y + ($cell_height * 3));
 				$pdf->Cell($note_col1_width, $cell_height, '권리의 종류', 1, 0, 'C');
 				$pdf->Cell($note_col2_width, $cell_height, $real_estate['property_right_type'] ?? '', 1, 1, 'L');
 				
 				// 환가 예상액
-				$pdf->SetXY($x, $y + ($cell_height * 3));
+				$pdf->SetXY($x, $y + ($cell_height * 4));
 				$pdf->Cell($note_col1_width, $cell_height, '환가 예상액', 1, 0, 'C');
 				$pdf->Cell($note_col2_width, $cell_height, number_format($real_estate['property_expected_value'] ?? 0)."원", 1, 1, 'L');
 				
 				// 담보권 설정 정보
-				$pdf->SetXY($x, $y + ($cell_height * 4));
+				$pdf->SetXY($x, $y + ($cell_height * 5));
 				$pdf->Cell($note_col1_width, $cell_height, '담보권 종류/담보액', 1, 0, 'C');
 				$securityInfo = "";
 				if ($real_estate['property_security_type']) {
@@ -426,7 +431,7 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 				$pdf->Cell($note_col2_width, $cell_height, $securityInfo, 1, 1, 'L');
 				
 				// Y 위치 조정하여 다음 항목 출력 준비
-				$pdf->SetY($y + 40);
+				$pdf->SetY($y + 64);
 			}
 		} else {
 			// 부동산 데이터가 없는 경우
