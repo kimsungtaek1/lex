@@ -825,8 +825,9 @@ addVehicleBlock(data = {}) {
 	
 	// 자동차 섹션에 배우자명의 체크박스 이벤트 추가
 	block.find(".vehicle_spouse_owned").on("change", function() {
-	  // 배우자명의 체크박스가 해제되면 부연설명 내용 삭제
-	  if (!$(this).is(":checked")) {
+	  if ($(this).is(":checked")) {
+		block.find(".vehicle_liquidation_explain").val("배우자명의 재산으로서 채무액을 공제한 환가예상액의 1/2 반영함");
+	  } else {
 		block.find(".vehicle_liquidation_explain").val("");
 	  }
 	  
@@ -1347,11 +1348,12 @@ addRealEstateBlock(data = {}) {
 	
 	// 부동산 섹션에 배우자명의 체크박스 이벤트 추가
 	block.find(".property_spouse_owned").on("change", function() {
-	  // 배우자명의 체크박스가 해제되면 부연설명 내용 삭제
-	  if (!$(this).is(":checked")) {
+	  if ($(this).is(":checked")) {
+		block.find(".property_liquidation_explain").val("배우자명의 재산으로서 채무액을 공제한 환가예상액의 1/2 반영함");
+	  } else {
 		block.find(".property_liquidation_explain").val("");
-		}
-	  
+	  }
+  
 	  // 청산가치 자동 계산 (수동계산이 아닐 경우)
 	  if (!block.find(".property_manual_calc").is(":checked")) {
 		const expectedValue = this.unformatMoney(block.find(".property_expected_value").val());
