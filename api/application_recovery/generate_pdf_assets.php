@@ -4,42 +4,43 @@ if (!defined('INCLUDED_FROM_MAIN')) {
 }
 
 function generatePdfAssets($pdf, $pdo, $case_no) {
-	// A4 용지에 맞게 여백 설정
-	$pdf->SetMargins(15, 15, 15);
-	$pdf->SetAutoPageBreak(true, 15);
-	
-	// 새 페이지 추가
 	$pdf->AddPage();
-	
-	// 문서 제목
 	$pdf->SetFont('cid0kr', 'B', 14);
-	$pdf->Cell(0, 10, '재 산 목 록', 0, 1, 'C');
+	$pdf->Cell(0, 8, '재 산 목 록', 0, 1, 'C');
 	$pdf->Ln(5);
+	$pdf->SetFont('cid0kr', '', 8);
 	
-	// 헤더 및 테이블 설정
-	$pdf->SetFont('cid0kr', 'B', 9);
+	// 테이블 헤더 설정
 	$pdf->SetFillColor(240, 240, 240);
 	
 	// 열 너비 설정
-	$col1_width = 40; // 명칭
-	$col2_width = 30; // 금액 또는 시가
-	$col3_width = 20; // 압류유무
-	$col4_width = 85; // 비고
+	$col1_width = 25; // 명칭
+	$col2_width = 25; // 금액 또는 시가
+	$col3_width = 15; // 압류유무
+	$col4_width = 115; // 비고
 	
-	// 테이블 헤더
-	$pdf->Cell($col1_width, 8, '명 칭', 1, 0, 'C', true);
-	$pdf->Cell($col2_width, 8, '금액 또는 시가', 1, 0, 'C', true);
-	$pdf->Cell($col3_width, 8, '압류등 유무', 1, 0, 'C', true);
-	$pdf->Cell($col4_width, 8, '비 고', 1, 1, 'C', true);
+	// 비고 내부 컬럼 설정
+	$note_col1_width = 25; // 비고 제목 컬럼
+	$note_col2_width = $col4_width - $note_col1_width; // 비고 내용 컬럼
 	
-	$pdf->SetFont('cid0kr', '', 9);
-	
+	// 행 높이
+	$row_height = 8;
+
+	// 헤더 출력
+	$pdf->MultiCell($col1_width, 10, "명칭", 1, 'C', true, 0, '', '', true, 0, false, true, 10, 'M');
+	$pdf->MultiCell($col2_width, 10, "금액 또는 시가\n(단위: 원)", 1, 'C', true, 0, '', '', true, 0, false, true, 10, 'M');
+	$pdf->MultiCell($col3_width, 10, "압류 등\n유무", 1, 'C', true, 0, '', '', true, 0, false, true, 10, 'M');
+	$pdf->MultiCell($col4_width, 10, "비고", 1, 'C', true, 1, '', '', true, 0, false, true, 10, 'M');
+		
 	try {
 		// 현금
+		$pdf->Cell($col1_width, $row_height, '현금', 1, 0, 'C');
+		
+		// 현금 데이터 조회
 		$stmt = $pdo->prepare("
 			SELECT SUM(liquidation_value) as total, 
-				   GROUP_CONCAT(property_detail SEPARATOR ', ') as details,
-				   MAX(is_seized) as is_seized
+				   MAX(is_seized) as is_seized,
+				   GROUP_CONCAT(property_detail SEPARATOR ', ') as details
 			FROM application_recovery_asset_cash 
 			WHERE case_no = ?
 		");
@@ -47,15 +48,19 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		$cash = $stmt->fetch(PDO::FETCH_ASSOC);
 		
 		$cash_total = $cash['total'] ?? 0;
-		$cash_details = $cash['details'] ?? '';
 		$cash_seized = $cash['is_seized'] ?? 'N';
+		$cash_details = $cash['details'] ?? '';
 		
-		$pdf->Cell($col1_width, 8, '현금', 1, 0, 'L');
-		$pdf->Cell($col2_width, 8, number_format($cash_total).'원', 1, 0, 'R');
-		$pdf->Cell($col3_width, 8, $cash_seized, 1, 0, 'C');
-		$pdf->Cell($col4_width, 8, $cash_details, 1, 1, 'L');
+		$pdf->Cell($col2_width, $row_height, number_format($cash_total), 1, 0, 'R');
+		$pdf->Cell($col3_width, $row_height, $cash_seized, 1, 0, 'C');
 		
-		// 예금 데이터 조회
+		// 비고 컬럼 나누기
+		$x = $pdf->GetX();
+		$y = $pdf->GetY();
+		$pdf->Cell($note_col1_width, $row_height, '상세정보', 1, 0, 'C');
+		$pdf->Cell($note_col2_width, $row_height, $cash_details, 1, 1, 'L');
+		
+		// 예금 데이터 개별 조회
 		$stmt = $pdo->prepare("
 			SELECT *
 			FROM application_recovery_asset_deposits
@@ -64,41 +69,59 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		");
 		$stmt->execute([$case_no]);
 		$deposits = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		
+
 		// 예금 총액 계산
 		$deposit_total = 0;
-		$deposit_deduction_total = 0;
 		foreach ($deposits as $deposit) {
-			$deposit_total += $deposit['deposit_amount'] ?? 0;
-			$deposit_deduction_total += $deposit['deduction_amount'] ?? 0;
+			$deposit_total += $deposit['deposit_amount'];
 		}
-		
-		// 청산가치 계산 (예치금액 - 공제금액)
-		$deposit_liquidation = max(0, $deposit_total - $deposit_deduction_total);
-		
+
 		// 각 예금 데이터별로 개별 테이블 생성
 		if (count($deposits) > 0) {
 			foreach ($deposits as $index => $deposit) {
-				$pdf->Cell($col1_width, 24, '예금', 1, 0, 'L');
-				$pdf->Cell($col2_width, 24, number_format($deposit['deposit_amount'] ?? 0).'원', 1, 0, 'R');
-				$pdf->Cell($col3_width, 24, $deposit['is_seized'] ?? 'N', 1, 0, 'C');
+				// 새 페이지 확인 - 현재 페이지에 충분한 공간이 없으면 새 페이지 추가
+				if ($pdf->GetY() + 25 > $pdf->getPageHeight() - 20) {
+					$pdf->AddPage();
+				}
 				
-				// 예금 비고 내용 구성
-				$notes = '';
-				$notes .= "금융기관명 ".$deposit['bank_name']."\n";
-				$notes .= "계좌번호 ".$deposit['account_number']."\n";
-				$notes .= "잔고 ".number_format($deposit['deposit_amount'] ?? 0)."원";
+				$pdf->Cell($col1_width, 25, '예금 #'.($index+1), 1, 0, 'C');
+				$pdf->Cell($col2_width, 25, number_format($deposit['deposit_amount']), 1, 0, 'R');
+				$pdf->Cell($col3_width, 25, $deposit['is_seized'] ?? 'N', 1, 0, 'C');
 				
-				$pdf->MultiCell($col4_width, 24, $notes, 1, 'L', false, 1);
+				// 비고 셀 시작 위치 저장
+				$x = $pdf->GetX();
+				$y = $pdf->GetY();
+				
+				// 열 너비 계산
+				$cell_height = 25 / 3;
+				
+				// 첫 번째 행 - 금융기관명
+				$pdf->Cell($note_col1_width, $cell_height, '금융기관명', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, $deposit['bank_name'] ?? '', 1, 1, 'L');
+				
+				// 두 번째 행 - 계좌번호
+				$pdf->SetXY($x, $y + $cell_height);
+				$pdf->Cell($note_col1_width, $cell_height, '계좌번호', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, $deposit['account_number'] ?? '상세내역 별첨', 1, 1, 'L');
+				
+				// 세 번째 행 - 잔고
+				$pdf->SetXY($x, $y + ($cell_height * 2));
+				$pdf->Cell($note_col1_width, $cell_height, '잔고', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, number_format($deposit['deposit_amount']).'원', 1, 1, 'L');
+				
+				// Y 위치 조정하여 다음 항목 출력 준비
+				$pdf->SetY($y + 25);
 			}
 		} else {
-			$pdf->Cell($col1_width, 8, '예금', 1, 0, 'L');
-			$pdf->Cell($col2_width, 8, '0원', 1, 0, 'R');
+			// 예금 데이터가 없는 경우
+			$pdf->Cell($col1_width, 8, '예금', 1, 0, 'C');
+			$pdf->Cell($col2_width, 8, '0', 1, 0, 'R');
 			$pdf->Cell($col3_width, 8, '', 1, 0, 'C');
-			$pdf->Cell($col4_width, 8, '해당 없음', 1, 1, 'L');
+			$pdf->Cell($note_col1_width, 8, '해당 여부', 1, 0, 'C');
+			$pdf->Cell($note_col2_width, 8, '해당 없음', 1, 1, 'L');
 		}
 		
-		// 보험 데이터 조회
+		// 보험 데이터 개별 조회
 		$stmt = $pdo->prepare("
 			SELECT *
 			FROM application_recovery_asset_insurance
@@ -107,47 +130,64 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		");
 		$stmt->execute([$case_no]);
 		$insurances = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		
-		// 보험 총액 및 보장성보험 총액 계산
+
+		// 보험 총액 계산
 		$insurance_total = 0;
-		$coverage_insurance_total = 0;
 		foreach ($insurances as $insurance) {
-			$insurance_total += $insurance['refund_amount'] ?? 0;
-			if ($insurance['is_coverage'] === 'Y') {
-				$coverage_insurance_total += $insurance['refund_amount'] ?? 0;
-			}
+			$insurance_total += $insurance['refund_amount'];
 		}
-		
-		// 보장성보험 공제금액 (1,500,000원)
-		$coverage_deduction = 1500000;
-		
-		// 보험 청산가치 계산 (보장성보험 총액 - 공제금액) + 일반보험 총액
-		$insurance_liquidation = max(0, $coverage_insurance_total - $coverage_deduction) + ($insurance_total - $coverage_insurance_total);
-		
+
 		// 각 보험 데이터별로 개별 테이블 생성
 		if (count($insurances) > 0) {
 			foreach ($insurances as $index => $insurance) {
-				$pdf->Cell($col1_width, 24, '보험', 1, 0, 'L');
-				$pdf->Cell($col2_width, 24, number_format($insurance['refund_amount'] ?? 0).'원', 1, 0, 'R');
-				$pdf->Cell($col3_width, 24, $insurance['is_seized'] ?? 'N', 1, 0, 'C');
+				// 새 페이지 확인 - 현재 페이지에 충분한 공간이 없으면 새 페이지 추가
+				if ($pdf->GetY() + 32 > $pdf->getPageHeight() - 20) {
+					$pdf->AddPage();
+				}
 				
-				// 보험 비고 내용 구성
-				$notes = '';
-				$notes .= "보장성보험여부 ".($insurance['is_coverage'] === 'Y' ? '예' : '아니오')."\n";
-				$notes .= "보험회사명 ".$insurance['company_name']."\n";
-				$notes .= "증권번호 ".$insurance['securities_number']."\n";
-				$notes .= "해약환급금 ".number_format($insurance['refund_amount'] ?? 0)."원";
+				$pdf->Cell($col1_width, 32, '보험 #'.($index+1), 1, 0, 'C');
+				$pdf->Cell($col2_width, 32, number_format($insurance['refund_amount']), 1, 0, 'R');
+				$pdf->Cell($col3_width, 32, $insurance['is_seized'] ?? 'N', 1, 0, 'C');
 				
-				$pdf->MultiCell($col4_width, 24, $notes, 1, 'L', false, 1);
+				// 비고 셀 시작 위치 저장
+				$x = $pdf->GetX();
+				$y = $pdf->GetY();
+				
+				// 열 너비 계산
+				$cell_height = 32 / 4;
+				
+				// 보장성 보험여부
+				$pdf->Cell($note_col1_width, $cell_height, '보장성보험여부', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, $insurance['is_coverage'] ?? '', 1, 1, 'L');
+
+				// 보험회사명
+				$pdf->SetXY($x, $y + $cell_height);
+				$pdf->Cell($note_col1_width, $cell_height, '보험회사명', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, $insurance['company_name'] ?? '', 1, 1, 'L');
+
+				// 증권번호
+				$pdf->SetXY($x, $y + ($cell_height * 2));
+				$pdf->Cell($note_col1_width, $cell_height, '증권번호', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, $insurance['securities_number'] ?? '상세내역 별첨', 1, 1, 'L');
+
+				// 해약환급금
+				$pdf->SetXY($x, $y + ($cell_height * 3));
+				$pdf->Cell($note_col1_width, $cell_height, '해약환급금', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, number_format($insurance['refund_amount']).'원', 1, 1, 'L');
+								
+				// Y 위치 조정하여 다음 항목 출력 준비
+				$pdf->SetY($y + 32);
 			}
 		} else {
-			$pdf->Cell($col1_width, 8, '보험', 1, 0, 'L');
-			$pdf->Cell($col2_width, 8, '0원', 1, 0, 'R');
+			// 보험 데이터가 없는 경우
+			$pdf->Cell($col1_width, 8, '보험', 1, 0, 'C');
+			$pdf->Cell($col2_width, 8, '0', 1, 0, 'R');
 			$pdf->Cell($col3_width, 8, '', 1, 0, 'C');
-			$pdf->Cell($col4_width, 8, '해당 없음', 1, 1, 'L');
+			$pdf->Cell($note_col1_width, 8, '해당 여부', 1, 0, 'C');
+			$pdf->Cell($note_col2_width, 8, '해당 없음', 1, 1, 'L');
 		}
 		
-		// 자동차 데이터 조회
+		// 자동차
 		$stmt = $pdo->prepare("
 			SELECT *
 			FROM application_recovery_asset_vehicles
@@ -155,39 +195,73 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		");
 		$stmt->execute([$case_no]);
 		$vehicles = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		
-		// 자동차 총액 계산
+
 		$vehicle_total = 0;
 		foreach ($vehicles as $vehicle) {
-			$vehicle_total += $vehicle['liquidation_value'] ?? 0;
+			$vehicle_total += $vehicle['liquidation_value'];
 		}
-		
+
 		// 각 자동차 데이터별로 개별 테이블 행 생성
 		if (count($vehicles) > 0) {
 			foreach ($vehicles as $index => $vehicle) {
-				$pdf->Cell($col1_width, 28, '자동차(오토바이 포함)', 1, 0, 'L');
-				$pdf->Cell($col2_width, 28, number_format($vehicle['liquidation_value'] ?? 0).'원', 1, 0, 'R');
-				$pdf->Cell($col3_width, 28, $vehicle['is_seized'] ?? 'N', 1, 0, 'C');
+				// 새 페이지 확인 - 현재 페이지에 충분한 공간이 없으면 새 페이지 추가
+				if ($pdf->GetY() + 40 > $pdf->getPageHeight() - 20) {
+					$pdf->AddPage();
+				}
 				
-				// 자동차 비고 내용 구성
-				$notes = '';
-				$notes .= "차종/연식: ".$vehicle['vehicle_info']."\n";
-				$notes .= "채권(최고)액: ".number_format($vehicle['max_bond'] ?? 0)."원 ";
-				$notes .= "    담보권종류 : ".$vehicle['security_type']."\n";
-				$notes .= "환가예상액: ".number_format($vehicle['expected_value'] ?? 0)."원 ";
-				$notes .= "    채무잔액: ".number_format($vehicle['financial_balance'] ?? 0)."원\n";
-				$notes .= $vehicle['explanation'] ?? '';
+				$pdf->MultiCell($col1_width, 40, '자동차 #'.($index+1)."\n(오토바이 포함)", 1, 'C', false, 0, '', '', true, 0, false, true, 40, 'M');
+				$pdf->MultiCell($col2_width, 40, number_format($vehicle['liquidation_value']), 1, 'R', false, 0, '', '', true, 0, false, true, 40, 'M');
+				$pdf->MultiCell($col3_width, 40, $vehicle['is_seized'] ?? 'N', 1, 'C', false, 0, '', '', true, 0, false, true, 40, 'M');
 				
-				$pdf->MultiCell($col4_width, 28, $notes, 1, 'L', false, 1);
+				// 비고 셀 시작 위치 저장
+				$x = $pdf->GetX();
+				$y = $pdf->GetY();
+				
+				// 열 너비 계산 (비고 내 항목명을 위한 공간 할당)
+				$cell_height = 40 / 6; // 6개 항목을 넣기 위해 높이 조정
+				
+				// 차량정보
+				$pdf->Cell($note_col1_width, $cell_height, '차량정보', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, $vehicle['vehicle_info'] ?? '', 1, 1, 'L');
+				
+				// 담보권종류
+				$pdf->SetXY($x, $y + $cell_height);
+				$pdf->Cell($note_col1_width, $cell_height, '담보권종류', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, $vehicle['security_type'] ?? '', 1, 1, 'L');
+				
+				// 채권(최고)액
+				$pdf->SetXY($x, $y + ($cell_height * 2));
+				$pdf->Cell($note_col1_width, $cell_height, '채권(최고)액', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, ($vehicle['max_bond'] ? number_format($vehicle['max_bond']).'원' : ''), 1, 1, 'L');
+				
+				// 환가예상액
+				$pdf->SetXY($x, $y + ($cell_height * 3));
+				$pdf->Cell($note_col1_width, $cell_height, '환가예상액', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, number_format($vehicle['expected_value']).'원', 1, 1, 'L');
+				
+				// 채무잔액
+				$pdf->SetXY($x, $y + ($cell_height * 4));
+				$pdf->Cell($note_col1_width, $cell_height, '채무잔액', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, ($vehicle['financial_balance'] ? number_format($vehicle['financial_balance']).'원' : ''), 1, 1, 'L');
+				
+				// 청산가치판단금액
+				$pdf->SetXY($x, $y + ($cell_height * 5));
+				$pdf->Cell($note_col1_width, $cell_height, '청산가치판단금액', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, number_format($vehicle['liquidation_value']).'원', 1, 1, 'L');
+				
+				// Y 위치 조정하여 다음 항목 출력 준비
+				$pdf->SetY($y + 40);
 			}
 		} else {
-			$pdf->Cell($col1_width, 8, '자동차', 1, 0, 'L');
-			$pdf->Cell($col2_width, 8, '0원', 1, 0, 'R');
+			// 자동차 데이터가 없는 경우
+			$pdf->Cell($col1_width, 8, '자동차', 1, 0, 'C');
+			$pdf->Cell($col2_width, 8, '0', 1, 0, 'R');
 			$pdf->Cell($col3_width, 8, '', 1, 0, 'C');
-			$pdf->Cell($col4_width, 8, '해당 없음', 1, 1, 'L');
+			$pdf->Cell($note_col1_width, 8, '해당 여부', 1, 0, 'C');
+			$pdf->Cell($note_col2_width, 8, '해당 없음', 1, 1, 'L');
 		}
 		
-		// 임차보증금 데이터 조회
+		// 임차보증금
 		$stmt = $pdo->prepare("
 			SELECT *
 			FROM application_recovery_asset_rent_deposits
@@ -196,37 +270,113 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		$stmt->execute([$case_no]);
 		$rent_deposits = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
-		// 임차보증금 총액 계산
 		$rent_total = 0;
 		foreach ($rent_deposits as $rent) {
-			$rent_total += $rent['liquidation_value'] ?? 0;
+			$rent_total += $rent['liquidation_value'];
 		}
 		
 		// 각 임차보증금 데이터별로 개별 테이블 행 생성
 		if (count($rent_deposits) > 0) {
 			foreach ($rent_deposits as $index => $rent) {
-				$pdf->Cell($col1_width, 30, "임차보증금\n(반환받을금액\n".number_format($rent['refund_deposit'] ?? 0)."원)", 1, 0, 'L');
-				$pdf->Cell($col2_width, 30, number_format($rent['liquidation_value'] ?? 0).'원', 1, 0, 'R');
-				$pdf->Cell($col3_width, 30, $rent['is_seized'] ?? 'N', 1, 0, 'C');
+				// 새 페이지 확인 - 현재 페이지에 충분한 공간이 없으면 새 페이지 추가
+				if ($pdf->GetY() + 60 > $pdf->getPageHeight() - 20) {
+					$pdf->AddPage();
+				}
 				
-				// 임차보증금 비고 내용 구성
-				$notes = '';
-				$notes .= "임차물건 ".$rent['rent_location']."\n";
-				$notes .= "보증금 및월세 보증금 ".number_format($rent['contract_deposit'] ?? 0)."원 월세 ".number_format($rent['monthly_rent'] ?? 0)."원\n";
-				$notes .= "차이 나는사유 ".$rent['difference_reason']."\n";
-				$notes .= "압류할수 없는 보증금 ".number_format($rent['priority_deposit'] ?? 0)."원\n";
-				$notes .= $rent['explanation'] ?? '';
+				$pdf->MultiCell($col1_width, 60, "임차보증금 #".($index+1)."\n(반환받을 금액을 금액란에 적는다.)", 1, 'C', false, 0, '', '', true, 0, false, true, 60, 'M');
+				$pdf->MultiCell($col2_width, 60, number_format($rent['liquidation_value']), 1, 'R', false, 0, '', '', true, 0, false, true, 60, 'M');
+				$pdf->MultiCell($col3_width, 60, $rent['is_seized'] ?? 'N', 1, 'C', false, 0, '', '', true, 0, false, true, 60, 'M');
 				
-				$pdf->MultiCell($col4_width, 30, $notes, 1, 'L', false, 1);
+				// 비고 셀 시작 위치 저장
+				$x = $pdf->GetX();
+				$y = $pdf->GetY();
+				
+				// 열 너비 계산 (비고 내 항목명을 위한 공간 할당)
+				$cell_height = 60 / 9; // 9개 항목을 넣기 위해 높이 조정
+				
+				// 임차지
+				$pdf->Cell($note_col1_width, $cell_height, '임차지', 1, 0, 'C');
+				$isBusinessUse = isset($rent['is_business_place']) && $rent['is_business_place'] == 'Y';
+				$checkBox = $isBusinessUse ? '[ V]' : '[  ]';
+				$pdf->Cell($note_col2_width, $cell_height, $rent['rent_location'] . " {$checkBox} 영업장", 1, 1, 'L');
+				
+				// 보증금 및 월세 (5개 컬럼으로 나누기)
+				$pdf->SetXY($x, $y + $cell_height);
+				$pdf->Cell($note_col1_width, $cell_height, '보증금 및 월세', 1, 0, 'C');
+				
+				// 5개 컬럼으로 나누기 위한 너비 계산
+				$sub_col_width = $note_col2_width / 5;
+				$start_x = $x + $note_col1_width;
+				
+				// 첫 번째 컬럼: "보증금" 라벨
+				$pdf->SetXY($start_x, $y + $cell_height);
+				$pdf->Cell($sub_col_width, $cell_height, '보증금', 1, 0, 'C');
+				
+				// 두 번째 컬럼: 보증금 금액
+				$pdf->SetXY($start_x + $sub_col_width, $y + $cell_height);
+				$pdf->Cell($sub_col_width * 1.5, $cell_height, number_format($rent['contract_deposit']).'원', 1, 0, 'R');
+				
+				// 세 번째 컬럼: "월세" 라벨
+				$pdf->SetXY($start_x + $sub_col_width * 2.5, $y + $cell_height);
+				$pdf->Cell($sub_col_width, $cell_height, '월세', 1, 0, 'C');
+				
+				// 네 번째 컬럼: 월세 금액
+				$pdf->SetXY($start_x + $sub_col_width * 3.5, $y + $cell_height);
+				$pdf->Cell($sub_col_width * 1.5, $cell_height, number_format($rent['monthly_rent']).'원', 1, 0, 'R');
+				
+				// Y 위치 재설정
+				$pdf->SetXY($x, $y + $cell_height * 2);
+				
+				// 반환받을 보증금
+				$pdf->Cell($note_col1_width, $cell_height, '반환받을 보증금', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, number_format($rent['refund_deposit'] ?? 0).'원', 1, 1, 'L');
+				
+				// 차이나는 이유
+				$pdf->SetXY($x, $y + ($cell_height * 3));
+				$pdf->Cell($note_col1_width, $cell_height, '차이나는 이유', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, $rent['difference_reason'] ?? '', 1, 1, 'L');
+				
+				// 압류할 수 없는 최우선 변제 보증금
+				$pdf->SetXY($x, $y + ($cell_height * 4));
+				$pdf->Cell($note_col1_width, $cell_height, '최우선변제보증금', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, number_format($rent['priority_deposit'] ?? 0).'원', 1, 1, 'L');
+				
+				// 청산가치 판단금액
+				$pdf->SetXY($x, $y + ($cell_height * 5));
+				$pdf->Cell($note_col1_width, $cell_height, '청산가치판단금액', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, number_format($rent['liquidation_value']).'원', 1, 1, 'L');
+				
+				// 부연설명
+				$pdf->SetXY($x, $y + ($cell_height * 6));
+				$pdf->Cell($note_col1_width, $cell_height, '부연설명', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, $rent['explanation'] ?? '', 1, 1, 'L');
+				
+				// 배우자명의 여부
+				$pdf->SetXY($x, $y + ($cell_height * 7));
+				$pdf->Cell($note_col1_width, $cell_height, '배우자명의', 1, 0, 'C');
+				$isSpouseOwned = isset($rent['is_deposit_spouse']) && $rent['is_deposit_spouse'] == 1;
+				$spouseCheckBox = $isSpouseOwned ? '[ V]' : '[  ]';
+				$pdf->Cell($note_col2_width, $cell_height, $spouseCheckBox.' 배우자명의', 1, 1, 'L');
+				
+				// 영업장 여부
+				$pdf->SetXY($x, $y + ($cell_height * 8));
+				$pdf->Cell($note_col1_width, $cell_height, '영업장 여부', 1, 0, 'C');
+				$businessCheckBox = $isBusinessUse ? '[ V]' : '[  ]';
+				$pdf->Cell($note_col2_width, $cell_height, $businessCheckBox.' 영업장', 1, 1, 'L');
+				
+				// Y 위치 조정하여 다음 항목 출력 준비
+				$pdf->SetY($y + 60);
 			}
 		} else {
-			$pdf->Cell($col1_width, 8, '임차보증금', 1, 0, 'L');
-			$pdf->Cell($col2_width, 8, '0원', 1, 0, 'R');
+			// 임차보증금 데이터가 없는 경우
+			$pdf->Cell($col1_width, 8, '임차보증금', 1, 0, 'C');
+			$pdf->Cell($col2_width, 8, '0', 1, 0, 'R');
 			$pdf->Cell($col3_width, 8, '', 1, 0, 'C');
-			$pdf->Cell($col4_width, 8, '해당 없음', 1, 1, 'L');
+			$pdf->Cell($note_col1_width, 8, '해당 여부', 1, 0, 'C');
+			$pdf->Cell($note_col2_width, 8, '해당 없음', 1, 1, 'L');
 		}
 		
-		// 부동산 데이터 조회
+		// 부동산
 		$stmt = $pdo->prepare("
 			SELECT *
 			FROM application_recovery_asset_real_estate
@@ -235,523 +385,741 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		$stmt->execute([$case_no]);
 		$real_estates = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
-		// 부동산 총액 계산
 		$real_estate_total = 0;
-		foreach ($real_estates as $real_estate) {
-			$real_estate_total += $real_estate['property_liquidation_value'] ?? 0;
-		}
 		
-		// 각 부동산 데이터별로 개별 테이블 행 생성
 		if (count($real_estates) > 0) {
-			$pdf->Cell($col1_width, 32, "부동산(환가예상액에서\n피담보채권을\n뺀금액을\n금액란에적는다)", 1, 0, 'L');
-			$pdf->Cell($col2_width, 32, number_format($real_estate_total).'원', 1, 0, 'R');
-			$pdf->Cell($col3_width, 32, ($real_estates[0]['is_seized'] ?? 'N'), 1, 0, 'C');
-			
-			// 첫 번째 부동산 정보만 표시 (여러 개 있을 경우)
-			$real_estate = $real_estates[0];
-			
-			// 부동산 비고 내용 구성
-			$notes = '';
-			$notes .= "소재지 ".$real_estate['property_location']."\n";
-			$notes .= "부동산의종류 ";
-			
-			// 부동산 종류 체크박스 표시
-			$type = $real_estate['property_type'] ?? '';
-			$notes .= "토지(".($type == '토지' ? '✓' : ' ')."), ";
-			$notes .= "건물(".($type == '건물' ? '✓' : ' ')."), ";
-			$notes .= "토지+건물(".($type == '토지, 건물' ? '✓' : ' ')."), ";
-			$notes .= "집합건물(".($type == '집합건물' ? '✓' : ' ').")\n";
-			
-			$notes .= "면적 ".number_format($real_estate['property_area'] ?? 0)."㎡\n";
-			$notes .= "권리의 종류 ".$real_estate['property_right_type']."\n";
-			$notes .= "환가예상액 ".number_format($real_estate['property_expected_value'] ?? 0)."원\n";
-			
-			if (!empty($real_estate['property_security_type'])) {
-				$notes .= "담보권 설정된경우 그 종류및 담보액 ".$real_estate['property_security_type'];
+			foreach ($real_estates as $index => $real_estate) {
+				$real_estate_total += $real_estate['property_liquidation_value'];
+				
+				// 새 페이지 확인
+				if ($pdf->GetY() + 40 > $pdf->getPageHeight() - 20) {
+					$pdf->AddPage();
+				}
+				
+				$pdf->MultiCell($col1_width, 40, "부동산 #".($index+1)."\n(환가 예상액에서 피담보채권을 뺀 금액을 금액란에 적는다.)", 1, 'C', false, 0, '', '', true, 0, false, true, 40, 'M');
+				$pdf->MultiCell($col2_width, 40, number_format($real_estate['property_liquidation_value']), 1, 'R', false, 0, '', '', true, 0, false, true, 40, 'M');
+				$pdf->MultiCell($col3_width, 40, $real_estate['is_seized'] ?? 'N', 1, 'C', false, 0, '', '', true, 0, false, true, 40, 'M');
+				
+				// 비고 셀 시작 위치 저장
+				$x = $pdf->GetX();
+				$y = $pdf->GetY();
+				
+				// 열 너비 계산
+				$cell_height = 40 / 5; // 5개 항목을 넣기 위해 높이 조정
+				
+				// 소재지, 면적
+				$pdf->Cell($note_col1_width, $cell_height, '소재지, 면적', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, $real_estate['property_location'] . ", " . number_format($real_estate['property_area']) . "㎡", 1, 1, 'L');
+				
+				// 부동산의 종류
+				$pdf->SetXY($x, $y + $cell_height);
+				$pdf->Cell($note_col1_width, $cell_height, '부동산의 종류', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, $real_estate['property_type'] ?? '', 1, 1, 'L');
+				
+				// 권리의 종류
+				$pdf->SetXY($x, $y + ($cell_height * 2));
+				$pdf->Cell($note_col1_width, $cell_height, '권리의 종류', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, $real_estate['property_right_type'] ?? '', 1, 1, 'L');
+				
+				// 환가 예상액
+				$pdf->SetXY($x, $y + ($cell_height * 3));
+				$pdf->Cell($note_col1_width, $cell_height, '환가 예상액', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, number_format($real_estate['property_expected_value'] ?? 0)."원", 1, 1, 'L');
+				
+				// 담보권 설정 정보
+				$pdf->SetXY($x, $y + ($cell_height * 4));
+				$pdf->Cell($note_col1_width, $cell_height, '담보권 종류/담보액', 1, 0, 'C');
+				$securityInfo = "";
+				if ($real_estate['property_security_type']) {
+					$securityInfo = $real_estate['property_security_type'] . " - " . number_format($real_estate['property_secured_debt'] ?? 0) . "원";
+				}
+				$pdf->Cell($note_col2_width, $cell_height, $securityInfo, 1, 1, 'L');
+				
+				// Y 위치 조정하여 다음 항목 출력 준비
+				$pdf->SetY($y + 40);
 			}
-			
-			$pdf->MultiCell($col4_width, 32, $notes, 1, 'L', false, 1);
 		} else {
-			$pdf->Cell($col1_width, 8, '부동산', 1, 0, 'L');
-			$pdf->Cell($col2_width, 8, '0원', 1, 0, 'R');
+			// 부동산 데이터가 없는 경우
+			$pdf->Cell($col1_width, 8, '부동산', 1, 0, 'C');
+			$pdf->Cell($col2_width, 8, '0', 1, 0, 'R');
 			$pdf->Cell($col3_width, 8, '', 1, 0, 'C');
-			$pdf->Cell($col4_width, 8, '해당 없음', 1, 1, 'L');
+			$pdf->Cell($note_col1_width, 8, '해당 여부', 1, 0, 'C');
+			$pdf->Cell($note_col2_width, 8, '해당 없음', 1, 1, 'L');
 		}
 		
-		// 사업용 설비 데이터 조회
+		// 사업용 설비
 		$stmt = $pdo->prepare("
-			SELECT SUM(total) as total_sum,
-				   GROUP_CONCAT(item_name SEPARATOR ', ') as items,
-				   GROUP_CONCAT(quantity SEPARATOR ', ') as quantities,
-				   GROUP_CONCAT(purchase_date SEPARATOR ', ') as dates,
-				   GROUP_CONCAT(used_price SEPARATOR ', ') as prices
+			SELECT *
 			FROM application_recovery_asset_business
 			WHERE case_no = ?
 		");
 		$stmt->execute([$case_no]);
-		$business = $stmt->fetch(PDO::FETCH_ASSOC);
+		$business_equipments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
-		$business_total = $business['total_sum'] ?? 0;
-		$business_items = $business['items'] ?? '';
-		$business_quantities = $business['quantities'] ?? '';
-		$business_dates = $business['dates'] ?? '';
-		$business_prices = $business['prices'] ?? '';
+		$business_total = 0;
+		$business_items = [];
+		$business_dates = [];
+		$business_quantities = [];
+		$business_prices = [];
 		
-		$pdf->Cell($col1_width, 20, "사업용 설비.재고품.\n비품 등", 1, 0, 'L');
-		$pdf->Cell($col2_width, 20, number_format($business_total).'원', 1, 0, 'R');
-		$pdf->Cell($col3_width, 20, '', 1, 0, 'C');
-		
-		// 사업용 설비 비고 내용
-		$notes = '';
-		if (!empty($business_items)) {
-			$notes .= "품목,개수 ".$business_items;
-			if (!empty($business_quantities)) {
-				$notes .= " ".$business_quantities;
-			}
-			$notes .= "\n";
-			$notes .= "구입시기 ".$business_dates."\n";
-			$notes .= "평가액 ".number_format($business_prices)."원";
-		} else {
-			$notes = '해당 없음';
+		foreach ($business_equipments as $equipment) {
+			$business_total += $equipment['total'] ?? 0;
+			$business_items[] = $equipment['item_name'] ?? '';
+			$business_dates[] = $equipment['purchase_date'] ?? '';
+			$business_quantities[] = $equipment['quantity'] ?? 0;
+			$business_prices[] = $equipment['used_price'] ?? 0;
 		}
 		
-		$pdf->MultiCell($col4_width, 20, $notes, 1, 'L', false, 1);
+		// 사업용 설비 출력
+		if (count($business_equipments) > 0) {
+			// 새 페이지 확인
+			if ($pdf->GetY() + 25 > $pdf->getPageHeight() - 20) {
+				$pdf->AddPage();
+			}
+			
+			$pdf->MultiCell($col1_width, 25, "사업용 설비,\n재고품, 비품 등", 1, 'C', false, 0, '', '', true, 0, false, true, 25, 'M');
+			$pdf->MultiCell($col2_width, 25, number_format($business_total), 1, 'R', false, 0, '', '', true, 0, false, true, 25, 'M');
+			$pdf->MultiCell($col3_width, 25, '', 1, 'C', false, 0, '', '', true, 0, false, true, 25, 'M');
+			
+			// 비고 셀 시작 위치 저장
+			$x = $pdf->GetX();
+			$y = $pdf->GetY();
+			
+			// 열 너비 계산
+			$cell_height = 25 / 3; // 3개 항목을 넣기 위해 높이 조정
+			
+			// 품목, 개수
+			$pdf->Cell($note_col1_width, $cell_height, '품목, 개수', 1, 0, 'C');
+			$items_text = implode(', ', $business_items);
+			$quantities_text = implode(', ', $business_quantities);
+			$pdf->Cell($note_col2_width, $cell_height, $items_text . " (" . $quantities_text . "개)", 1, 1, 'L');
+			
+			// 구입 시기
+			$pdf->SetXY($x, $y + $cell_height);
+			$pdf->Cell($note_col1_width, $cell_height, '구입 시기', 1, 0, 'C');
+			$pdf->Cell($note_col2_width, $cell_height, implode(', ', $business_dates), 1, 1, 'L');
+			
+			// 평가액
+			$pdf->SetXY($x, $y + ($cell_height * 2));
+			$pdf->Cell($note_col1_width, $cell_height, '평가액', 1, 0, 'C');
+			$pdf->Cell($note_col2_width, $cell_height, number_format($business_total) . "원", 1, 1, 'L');
+			
+			// Y 위치 조정하여 다음 항목 출력 준비
+			$pdf->SetY($y + 25);
+		} else {
+			// 사업용 설비 데이터가 없는 경우
+			$pdf->Cell($col1_width, 8, '사업용 설비', 1, 0, 'C');
+			$pdf->Cell($col2_width, 8, '0', 1, 0, 'R');
+			$pdf->Cell($col3_width, 8, '', 1, 0, 'C');
+			$pdf->Cell($note_col1_width, 8, '해당 여부', 1, 0, 'C');
+			$pdf->Cell($note_col2_width, 8, '해당 없음', 1, 1, 'L');
+		}
 		
-		// 대여금 채권 데이터 조회
+		// 대여금 채권
 		$stmt = $pdo->prepare("
-			SELECT SUM(liquidation_value) as total,
-				   GROUP_CONCAT(debtor_name SEPARATOR ', ') as debtors,
-				   GROUP_CONCAT(has_evidence SEPARATOR ', ') as evidences
+			SELECT *
 			FROM application_recovery_asset_loan_receivables
 			WHERE case_no = ?
 		");
 		$stmt->execute([$case_no]);
-		$loan = $stmt->fetch(PDO::FETCH_ASSOC);
+		$loan_receivables = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
-		$loan_total = $loan['total'] ?? 0;
-		$loan_debtors = $loan['debtors'] ?? '';
-		$loan_evidences = $loan['evidences'] ?? '';
-		
-		$pdf->Cell($col1_width, 8, '대여금 채권', 1, 0, 'L');
-		$pdf->Cell($col2_width, 8, number_format($loan_total).'원', 1, 0, 'R');
-		$pdf->Cell($col3_width, 8, '', 1, 0, 'C');
-		
-		// 대여금 채권 비고 내용
-		$notes = '';
-		if (!empty($loan_debtors)) {
-			$debtors_array = explode(', ', $loan_debtors);
-			$evidences_array = explode(', ', $loan_evidences);
-			
-			$debtor_text = "상대방 채무자: ".$debtors_array[0];
-			$evidence_checked = (isset($evidences_array[0]) && $evidences_array[0] === 'Y') ? '■' : '□';
-			$notes .= $debtor_text." ".$evidence_checked." 진술서 별첨";
-		} else {
-			$notes = '해당 없음';
+		$loan_total = 0;
+		foreach ($loan_receivables as $loan) {
+			$loan_total += $loan['liquidation_value'] ?? 0;
 		}
 		
-		$pdf->Cell($col4_width, 8, $notes, 1, 1, 'L');
+		// 대여금 채권 출력
+		if (count($loan_receivables) > 0) {
+			foreach ($loan_receivables as $index => $loan) {
+				// 새 페이지 확인
+				if ($pdf->GetY() + 15 > $pdf->getPageHeight() - 20) {
+					$pdf->AddPage();
+				}
+				
+				$pdf->Cell($col1_width, 15, '대여금 채권 #'.($index+1), 1, 0, 'C');
+				$pdf->Cell($col2_width, 15, number_format($loan['liquidation_value'] ?? 0), 1, 0, 'R');
+				$pdf->Cell($col3_width, 15, $loan['is_seized'] ?? 'N', 1, 0, 'C');
+				
+				// 비고 셀 시작 위치 저장
+				$x = $pdf->GetX();
+				$y = $pdf->GetY();
+				
+				// 열 너비 계산
+				$cell_height = 15;
+				
+				// 상대방 채무자
+				$pdf->Cell($note_col1_width, $cell_height, '상대방 채무자', 1, 0, 'C');
+				$evidence_text = ($loan['has_evidence'] == 'Y') ? '[ V] 소명자료 별첨' : '[  ] 소명자료 별첨';
+				$pdf->Cell($note_col2_width, $cell_height, $loan['debtor_name'] . " " . $evidence_text, 1, 1, 'L');
+				
+				// Y 위치 조정하여 다음 항목 출력 준비
+				$pdf->SetY($y + 15);
+			}
+		} else {
+			// 대여금 채권 데이터가 없는 경우
+			$pdf->Cell($col1_width, 8, '대여금 채권', 1, 0, 'C');
+			$pdf->Cell($col2_width, 8, '0', 1, 0, 'R');
+			$pdf->Cell($col3_width, 8, '', 1, 0, 'C');
+			$pdf->Cell($note_col1_width, 8, '해당 여부', 1, 0, 'C');
+			$pdf->Cell($note_col2_width, 8, '해당 없음', 1, 1, 'L');
+		}
 		
-		// 매출금 채권 데이터 조회
+		// 매출금 채권
 		$stmt = $pdo->prepare("
-			SELECT SUM(liquidation_value) as total,
-				   GROUP_CONCAT(debtor_name SEPARATOR ', ') as debtors,
-				   GROUP_CONCAT(has_evidence SEPARATOR ', ') as evidences
+			SELECT *
 			FROM application_recovery_asset_sales_receivables
 			WHERE case_no = ?
 		");
 		$stmt->execute([$case_no]);
-		$sales = $stmt->fetch(PDO::FETCH_ASSOC);
+		$sales_receivables = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
-		$sales_total = $sales['total'] ?? 0;
-		$sales_debtors = $sales['debtors'] ?? '';
-		$sales_evidences = $sales['evidences'] ?? '';
-		
-		$pdf->Cell($col1_width, 8, '매출금 채권', 1, 0, 'L');
-		$pdf->Cell($col2_width, 8, number_format($sales_total).'원', 1, 0, 'R');
-		$pdf->Cell($col3_width, 8, '', 1, 0, 'C');
-		
-		// 매출금 채권 비고 내용
-		$notes = '';
-		if (!empty($sales_debtors)) {
-			$debtors_array = explode(', ', $sales_debtors);
-			$evidences_array = explode(', ', $sales_evidences);
-			
-			$debtor_text = "상대방 채무자: ".$debtors_array[0];
-			$evidence_checked = (isset($evidences_array[0]) && $evidences_array[0] === 'Y') ? '■' : '□';
-			$notes .= $debtor_text." ".$evidence_checked." 진술서 별첨";
-		} else {
-			$notes = '해당 없음';
+		$sales_total = 0;
+		foreach ($sales_receivables as $sales) {
+			$sales_total += $sales['liquidation_value'] ?? 0;
 		}
 		
-		$pdf->Cell($col4_width, 8, $notes, 1, 1, 'L');
+		// 매출금 채권 출력
+		if (count($sales_receivables) > 0) {
+			foreach ($sales_receivables as $index => $sales) {
+				// 새 페이지 확인
+				if ($pdf->GetY() + 15 > $pdf->getPageHeight() - 20) {
+					$pdf->AddPage();
+				}
+				
+				$pdf->Cell($col1_width, 15, '매출금 채권 #'.($index+1), 1, 0, 'C');
+				$pdf->Cell($col2_width, 15, number_format($sales['liquidation_value'] ?? 0), 1, 0, 'R');
+				$pdf->Cell($col3_width, 15, $sales['is_seized'] ?? 'N', 1, 0, 'C');
+				
+				// 비고 셀 시작 위치 저장
+				$x = $pdf->GetX();
+				$y = $pdf->GetY();
+				
+				// 열 너비 계산
+				$cell_height = 15;
+				
+				// 상대방 채무자
+				$pdf->Cell($note_col1_width, $cell_height, '상대방 채무자', 1, 0, 'C');
+				$evidence_text = ($sales['has_evidence'] == 'Y') ? '[ V] 소명자료 별첨' : '[  ] 소명자료 별첨';
+				$pdf->Cell($note_col2_width, $cell_height, $sales['debtor_name'] . " " . $evidence_text, 1, 1, 'L');
+				
+				// Y 위치 조정하여 다음 항목 출력 준비
+				$pdf->SetY($y + 15);
+			}
+		} else {
+			// 매출금 채권 데이터가 없는 경우
+			$pdf->Cell($col1_width, 8, '매출금 채권', 1, 0, 'C');
+			$pdf->Cell($col2_width, 8, '0', 1, 0, 'R');
+			$pdf->Cell($col3_width, 8, '', 1, 0, 'C');
+			$pdf->Cell($note_col1_width, 8, '해당 여부', 1, 0, 'C');
+			$pdf->Cell($note_col2_width, 8, '해당 없음', 1, 1, 'L');
+		}
 		
-		// 예상 퇴직금 데이터 조회
+		// 예상 퇴직금
 		$stmt = $pdo->prepare("
-			SELECT SUM(expected_severance) as expected_total,
-				   SUM(deduction_amount) as deduction_total,
-				   SUM(liquidation_value) as liquidation_total,
-				   GROUP_CONCAT(workplace SEPARATOR ', ') as workplaces,
-				   MAX(is_seized) as is_seized
+			SELECT *
 			FROM application_recovery_asset_severance
 			WHERE case_no = ?
 		");
 		$stmt->execute([$case_no]);
-		$severance = $stmt->fetch(PDO::FETCH_ASSOC);
+		$severance_pays = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
-		$severance_expected = $severance['expected_total'] ?? 0;
-		$severance_deduction = $severance['deduction_total'] ?? 0;
-		$severance_liquidation = $severance['liquidation_total'] ?? 0;
-		$severance_workplaces = $severance['workplaces'] ?? '';
-		$severance_seized = $severance['is_seized'] ?? 'N';
+		$severance_total = 0;
+		$workplaces = [];
+		$severance_seized = 'N';
 		
-		$pdf->Cell($col1_width, 8, '예상 퇴직금', 1, 0, 'L');
-		$pdf->Cell($col2_width, 8, number_format($severance_liquidation).'원', 1, 0, 'R');
-		$pdf->Cell($col3_width, 8, $severance_seized, 1, 0, 'C');
+		foreach ($severance_pays as $severance) {
+			$severance_total += $severance['liquidation_value'] ?? 0;
+			if ($severance['workplace']) {
+				$workplaces[] = $severance['workplace'];
+			}
+			if ($severance['is_seized'] == 'Y') {
+				$severance_seized = 'Y';
+			}
+		}
 		
-		// 예상 퇴직금 비고 내용
-		$notes = "근무처: ".$severance_workplaces." (압류할 수 없는 퇴직금".number_format($severance_deduction)."원 제외)";
+		// 예상 퇴직금 출력
+		if (count($severance_pays) > 0) {
+			// 새 페이지 확인
+			if ($pdf->GetY() + $row_height > $pdf->getPageHeight() - 20) {
+				$pdf->AddPage();
+			}
+			
+			$pdf->Cell($col1_width, $row_height, '예상 퇴직금', 1, 0, 'C');
+			$pdf->Cell($col2_width, $row_height, number_format($severance_total), 1, 0, 'R');
+			$pdf->Cell($col3_width, $row_height, $severance_seized, 1, 0, 'C');
+			
+			// 비고 셀 시작 위치 저장
+			$x = $pdf->GetX();
+			$y = $pdf->GetY();
+			
+			// 근무처 정보
+			$pdf->Cell($note_col1_width, $row_height, '근무처', 1, 0, 'C');
+			$pdf->Cell($note_col2_width, $row_height, implode(', ', $workplaces) . " (압류할 수 없는 퇴직금 " . number_format($severance_pays[0]['deduction_amount'] ?? 0) . "원 제외)", 1, 1, 'L');
+			
+		} else {
+			// 예상 퇴직금 데이터가 없는 경우
+			$pdf->Cell($col1_width, 8, '예상 퇴직금', 1, 0, 'C');
+			$pdf->Cell($col2_width, 8, '0', 1, 0, 'R');
+			$pdf->Cell($col3_width, 8, '', 1, 0, 'C');
+			$pdf->Cell($note_col1_width, 8, '해당 여부', 1, 0, 'C');
+			$pdf->Cell($note_col2_width, 8, '해당 없음', 1, 1, 'L');
+		}
 		
-		$pdf->Cell($col4_width, 8, $notes, 1, 1, 'L');
-		
-		// (가)압류 적립금 데이터 조회
+		// (가)압류 적립금
 		$stmt = $pdo->prepare("
-			SELECT * FROM application_recovery_asset_attached_deposits
+			SELECT *
+			FROM application_recovery_asset_attached_deposits
 			WHERE case_no = ?
 		");
 		$stmt->execute([$case_no]);
 		$attached_deposit = $stmt->fetch(PDO::FETCH_ASSOC);
 		
 		if ($attached_deposit) {
-			$pdf->Cell($col1_width, 8, '(가)압류 적립금', 1, 0, 'L');
-			$pdf->Cell($col2_width, 8, number_format($attached_deposit['liquidation_value'] ?? 0).'원', 1, 0, 'R');
+			// 새 페이지 확인
+			if ($pdf->GetY() + $row_height > $pdf->getPageHeight() - 20) {
+				$pdf->AddPage();
+			}
+			
+			$pdf->Cell($col1_width, $row_height, '(가)압류 적립금', 1, 0, 'C');
+			$pdf->Cell($col2_width, $row_height, number_format($attached_deposit['liquidation_value'] ?? 0), 1, 0, 'R');
+			$pdf->Cell($col3_width, $row_height, '', 1, 0, 'C');
+			
+			// 비고 셀 출력
+			$pdf->Cell($note_col1_width, $row_height, '내용', 1, 0, 'C');
+			$pdf->Cell($note_col2_width, $row_height, $attached_deposit['seizure_content'] ?? '', 1, 1, 'L');
+			
+		} else {
+			// (가)압류 적립금 데이터가 없는 경우
+			$pdf->Cell($col1_width, 8, '(가)압류 적립금', 1, 0, 'C');
+			$pdf->Cell($col2_width, 8, '0', 1, 0, 'R');
 			$pdf->Cell($col3_width, 8, '', 1, 0, 'C');
-			$pdf->Cell($col4_width, 8, '내용: '.$attached_deposit['seizure_content'], 1, 1, 'L');
+			$pdf->Cell($note_col1_width, 8, '해당 여부', 1, 0, 'C');
+			$pdf->Cell($note_col2_width, 8, '해당 없음', 1, 1, 'L');
 		}
 		
-		// 공탁금 데이터 조회
+		// 공탁금
 		$stmt = $pdo->prepare("
-			SELECT * FROM application_recovery_asset_court_deposits
+			SELECT *
+			FROM application_recovery_asset_court_deposits
 			WHERE case_no = ?
 		");
 		$stmt->execute([$case_no]);
 		$court_deposit = $stmt->fetch(PDO::FETCH_ASSOC);
 		
 		if ($court_deposit) {
-			$pdf->Cell($col1_width, 8, '공탁금', 1, 0, 'L');
-			$pdf->Cell($col2_width, 8, number_format($court_deposit['liquidation_value'] ?? 0).'원', 1, 0, 'R');
+			// 새 페이지 확인
+			if ($pdf->GetY() + $row_height > $pdf->getPageHeight() - 20) {
+				$pdf->AddPage();
+			}
+			
+			$pdf->Cell($col1_width, $row_height, '공탁금', 1, 0, 'C');
+			$pdf->Cell($col2_width, $row_height, number_format($court_deposit['liquidation_value'] ?? 0), 1, 0, 'R');
+			$pdf->Cell($col3_width, $row_height, '', 1, 0, 'C');
+			
+			// 비고 셀 출력
+			$pdf->Cell($note_col1_width, $row_height, '내용', 1, 0, 'C');
+			$pdf->Cell($note_col2_width, $row_height, $court_deposit['seizure_content'] ?? '', 1, 1, 'L');
+			
+		} else {
+			// 공탁금 데이터가 없는 경우
+			$pdf->Cell($col1_width, 8, '공탁금', 1, 0, 'C');
+			$pdf->Cell($col2_width, 8, '0', 1, 0, 'R');
 			$pdf->Cell($col3_width, 8, '', 1, 0, 'C');
-			$pdf->Cell($col4_width, 8, '내용: '.$court_deposit['seizure_content'], 1, 1, 'L');
+			$pdf->Cell($note_col1_width, 8, '해당 여부', 1, 0, 'C');
+			$pdf->Cell($note_col2_width, 8, '해당 없음', 1, 1, 'L');
 		}
 		
-		// 기타 자산 데이터 조회
+		// 기타 자산
 		$stmt = $pdo->prepare("
-			SELECT SUM(liquidation_value) as total,
-				   GROUP_CONCAT(asset_content SEPARATOR ', ') as contents,
-				   MAX(is_seized) as is_seized
+			SELECT *
 			FROM application_recovery_asset_other
 			WHERE case_no = ?
 		");
 		$stmt->execute([$case_no]);
-		$other = $stmt->fetch(PDO::FETCH_ASSOC);
+		$other_assets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
-		$other_total = $other['total'] ?? 0;
-		$other_contents = $other['contents'] ?? '';
-		$other_seized = $other['is_seized'] ?? 'N';
+		$other_total = 0;
+		$other_contents = [];
+		$other_seized = 'N';
 		
-		$pdf->Cell($col1_width, 8, '기타(  )', 1, 0, 'L');
-		$pdf->Cell($col2_width, 8, number_format($other_total).'원', 1, 0, 'R');
-		$pdf->Cell($col3_width, 8, $other_seized, 1, 0, 'C');
-		$pdf->Cell($col4_width, 8, $other_contents, 1, 1, 'L');
+		foreach ($other_assets as $other) {
+			$other_total += $other['liquidation_value'] ?? 0;
+			if ($other['asset_content']) {
+				$other_contents[] = $other['asset_content'];
+			}
+			if ($other['is_seized'] == 'Y') {
+				$other_seized = 'Y';
+			}
+		}
+		
+		// 기타 자산 출력
+		if (count($other_assets) > 0) {
+			// 새 페이지 확인
+			if ($pdf->GetY() + $row_height > $pdf->getPageHeight() - 20) {
+				$pdf->AddPage();
+			}
+			
+			$pdf->Cell($col1_width, $row_height, '기타', 1, 0, 'C');
+			$pdf->Cell($col2_width, $row_height, number_format($other_total), 1, 0, 'R');
+			$pdf->Cell($col3_width, $row_height, $other_seized, 1, 0, 'C');
+			
+			// 비고 셀 출력
+			$pdf->Cell($note_col1_width, $row_height, '내용', 1, 0, 'C');
+			$pdf->Cell($note_col2_width, $row_height, implode(', ', $other_contents), 1, 1, 'L');
+			
+		} else {
+			// 기타 자산 데이터가 없는 경우
+			$pdf->Cell($col1_width, 8, '기타', 1, 0, 'C');
+			$pdf->Cell($col2_width, 8, '0', 1, 0, 'R');
+			$pdf->Cell($col3_width, 8, '', 1, 0, 'C');
+			$pdf->Cell($note_col1_width, 8, '해당 여부', 1, 0, 'C');
+			$pdf->Cell($note_col2_width, 8, '해당 없음', 1, 1, 'L');
+		}
 		
 		// 합계 계산
-		$total_assets = 
-			$cash_total + 
-			$deposit_total + 
-			$insurance_total + 
-			$vehicle_total + 
-			$rent_total + 
-			$real_estate_total + 
-			$business_total + 
-			$loan_total + 
-			$sales_total + 
-			$severance_liquidation + 
-			($attached_deposit['liquidation_value'] ?? 0) + 
-			($court_deposit['liquidation_value'] ?? 0) + 
-			$other_total;
+		$total_assets = $cash_total + $deposit_total + $insurance_total + $vehicle_total + 
+						$rent_total + $real_estate_total + $business_total + 
+						$loan_total + $sales_total + $severance_total;
 		
-		// 합계 행
-		$pdf->SetFont('cid0kr', 'B', 9);
-		$pdf->Cell($col1_width, 8, '합계', 1, 0, 'L');
-		$pdf->Cell($col2_width, 8, number_format($total_assets).'원', 1, 0, 'R');
-		$pdf->Cell($col3_width, 8, '', 1, 0, 'C');
-		$pdf->Cell($col4_width, 8, '', 1, 1, 'L');
+		if ($attached_deposit) {
+			$total_assets += $attached_deposit['liquidation_value'] ?? 0;
+		}
 		
-		$pdf->SetFont('cid0kr', '', 9);
+		if ($court_deposit) {
+			$total_assets += $court_deposit['liquidation_value'] ?? 0;
+		}
 		
-		// 면제재산 - 주거용 임차보증금 조회
+		$total_assets += $other_total;
+		
+		// 합계 출력
+		$pdf->Cell($col1_width, $row_height, '합계', 1, 0, 'C');
+		$pdf->Cell($col2_width, $row_height, number_format($total_assets), 1, 0, 'R');
+		$pdf->Cell($col3_width, $row_height, '', 1, 0, 'C');
+		$pdf->Cell($note_col1_width, $row_height, '', 1, 0, 'C');
+		$pdf->Cell($note_col2_width, $row_height, '', 1, 1, 'L');
+		
+		// 면제재산 - 임차보증금반환청구권
 		$stmt = $pdo->prepare("
-			SELECT SUM(exemption_amount) as total1,
-				   GROUP_CONCAT(lease_location SEPARATOR ', ') as locations
+			SELECT *
 			FROM application_recovery_asset_exemption1
 			WHERE case_no = ?
 		");
 		$stmt->execute([$case_no]);
-		$exemption1 = $stmt->fetch(PDO::FETCH_ASSOC);
+		$exemption1 = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
-		$exemption1_total = $exemption1['total1'] ?? 0;
-		$exemption1_locations = $exemption1['locations'] ?? '';
+		$exemption1_total = 0;
+		foreach ($exemption1 as $exempt) {
+			$exemption1_total += $exempt['exemption_amount'] ?? 0;
+		}
 		
-		// 면제재산 - 생계비 조회
+		// 면제재산 - 6개월간 생계비
 		$stmt = $pdo->prepare("
-			SELECT SUM(exemption_amount) as total2,
-				   GROUP_CONCAT(special_property_content SEPARATOR ', ') as contents
+			SELECT *
 			FROM application_recovery_asset_exemption2
 			WHERE case_no = ?
 		");
 		$stmt->execute([$case_no]);
-		$exemption2 = $stmt->fetch(PDO::FETCH_ASSOC);
+		$exemption2 = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
-		$exemption2_total = $exemption2['total2'] ?? 0;
-		$exemption2_contents = $exemption2['contents'] ?? '';
+		$exemption2_total = 0;
+		$exemption2_contents = [];
 		
-		// 면제재산 표시 - 주거용 임차보증금
-		// 면제재산 표시 - 주거용 임차보증금
+		foreach ($exemption2 as $exempt) {
+			$exemption2_total += $exempt['exemption_amount'] ?? 0;
+			if ($exempt['special_property_content']) {
+				$exemption2_contents[] = $exempt['special_property_content'];
+			}
+		}
+		
+		// 면제재산 - 임차보증금반환청구권 출력
 		if ($exemption1_total > 0) {
-			$pdf->Cell($col1_width, 8, '면제재산 결정신청 금액', 1, 0, 'L');
-			$pdf->Cell($col2_width, 8, number_format($exemption1_total).'원', 1, 0, 'R');
-			$pdf->Cell($col3_width, 8, '', 1, 0, 'C');
-			$pdf->Cell($col4_width, 8, '1. 주거용 임차보증금 반환청구권', 1, 1, 'L');
+			// 새 페이지 확인
+			if ($pdf->GetY() + $row_height > $pdf->getPageHeight() - 20) {
+				$pdf->AddPage();
+			}
+			
+			$pdf->Cell($col1_width, $row_height, '면제재산 결정신청 금액', 1, 0, 'C');
+			$pdf->Cell($col2_width, $row_height, number_format($exemption1_total), 1, 0, 'R');
+			$pdf->Cell($col3_width, $row_height, '', 1, 0, 'C');
+			
+			// 비고 셀 출력
+			$pdf->Cell($note_col1_width, $row_height, '면제재산 종류', 1, 0, 'C');
+			$pdf->Cell($note_col2_width, $row_height, '1. 주거용 임차보증금 반환청구권', 1, 1, 'L');
 		}
 		
-		// 면제재산 표시 - 생계비
+		// 면제재산 - 6개월간 생계비 출력
 		if ($exemption2_total > 0) {
-			$pdf->Cell($col1_width, 8, '면제재산 결정신청 금액', 1, 0, 'L');
-			$pdf->Cell($col2_width, 8, number_format($exemption2_total).'원', 1, 0, 'R');
-			$pdf->Cell($col3_width, 8, '', 1, 0, 'C');
-			$pdf->Cell($col4_width, 8, '2. 6개월간 생계비에 사용할 특정재산', 1, 1, 'L');
-		}
-		
-		// 청산가치 계산 (합계에서 면제재산 제외)
-		$liquidation_value = $total_assets - ($exemption1_total + $exemption2_total);
-		
-		// 청산가치 행
-		$pdf->SetFont('cid0kr', 'B', 9);
-		$pdf->Cell($col1_width, 8, '청산가치', 1, 0, 'L');
-		$pdf->Cell($col2_width, 8, number_format($liquidation_value).'원', 1, 0, 'R');
-		$pdf->Cell($col3_width, 8, '', 1, 0, 'C');
-		$pdf->Cell($col4_width, 8, '', 1, 1, 'L');
-		
-		// 예금 및 보험에 대한 청산가치 설명 추가
-		$pdf->SetFont('cid0kr', '', 8);
-		$pdf->Ln(2);
-		$pdf->MultiCell(0, 5, '*예금(청산가치) : '.number_format($deposit_liquidation).'원', 0, 'L');
-		$pdf->MultiCell(0, 5, '=[예치금액 합계: '.number_format($deposit_total).' - 공제금액: '.number_format($deposit_deduction_total).']', 0, 'L');
-		$pdf->MultiCell(0, 5, '*보험(청산가치): '.number_format($insurance_liquidation).'원', 0, 'L');
-		$pdf->MultiCell(0, 5, '=[{보장성: '.number_format($coverage_insurance_total).' - 공제금액: '.number_format($coverage_deduction).'} + '.number_format($insurance_total - $coverage_insurance_total).']', 0, 'L');
-		
-		// 면제재산 결정신청서 생성 (다음 페이지)
-		if ($exemption1_total > 0 || $exemption2_total > 0) {
-			$pdf->AddPage();
-			$pdf->SetFont('cid0kr', 'B', 12);
-			$pdf->Cell(0, 10, '면제재산 결정신청서', 0, 1, 'C');
-			$pdf->SetFont('cid0kr', '', 10);
-			
-			// 사건 정보 조회
-			$stmt = $pdo->prepare("
-				SELECT ar.*, cm.name, cm.case_number 
-				FROM application_recovery ar
-				JOIN case_management cm ON ar.case_no = cm.case_no
-				WHERE ar.case_no = ?
-			");
-			$stmt->execute([$case_no]);
-			$case_info = $stmt->fetch(PDO::FETCH_ASSOC);
-			
-			// 사건 기본 정보
-			$pdf->Cell(30, 8, '사 건', 0, 0, 'R');
-			$pdf->Cell(160, 8, (isset($case_info['case_year']) ? $case_info['case_year'].' ' : '').(isset($case_info['case_number']) ? $case_info['case_number'] : '').' 개인회생', 0, 1, 'L');
-			
-			$pdf->Cell(30, 8, '신 청 인 (채 무 자)', 0, 0, 'R');
-			$pdf->Cell(160, 8, $case_info['name'] ?? '', 0, 1, 'L');
-			
-			$pdf->Ln(5);
-			
-			// 면제재산 신청 안내문
-			$pdf->MultiCell(0, 6, '신청인은 채무자 회생 및 파산에 관한 법률 제580조 제3항,제1항 제1호,제383조 제2항에 따라', 0, 'L');
-			$pdf->MultiCell(0, 6, '채무자 소유의 별지 목록 기재 재산을 면제재산으로 정한다는 결정을 구합니다.', 0, 'L');
-			$pdf->Ln(2);
-			$pdf->MultiCell(0, 6, '(※아래 해당되는 부분에 ∨표를 하고, 면제재산결정 신청을 하는 재산목록 및 소명자료를', 0, 'L');
-			$pdf->MultiCell(0, 6, '첨부하시기 바랍니다.)', 0, 'L');
-			$pdf->Ln(3);
-			
-			// 1. 주거용건물 임차보증금 반환청구권 면제재산신청
-			$checkbox1 = $exemption1_total > 0 ? '■' : '□';
-			$pdf->Cell(5, 8, $checkbox1, 0, 0, 'C');
-			$pdf->Cell(5, 8, '1.', 0, 0, 'L');
-			$pdf->MultiCell(0, 8, '주거용건물 임차보증금반환청구권에 대한 면제재산결정 신청', 0, 'L');
-			$pdf->Cell(10, 6, '', 0, 0);
-			$pdf->MultiCell(0, 6, '(법 제580조 제3항, 제1항 제1호, 제383조 제2항 제1호)', 0, 'L');
-			
-			// 첨부 서류 안내
-			$pdf->Cell(10, 8, '', 0, 0);
-			$pdf->MultiCell(0, 8, '※ 첨부서류', 0, 'L');
-			$pdf->Cell(15, 6, '', 0, 0);
-			$pdf->MultiCell(0, 6, '가. 별지 면제재산목록 (채권자수 + 3부)', 0, 'L');
-			$pdf->Cell(15, 6, '', 0, 0);
-			$pdf->MultiCell(0, 6, '나. 소명자료 : □ 임대차계약서 1부', 0, 'L');
-			$pdf->Cell(15, 6, '', 0, 0);
-			$pdf->MultiCell(0, 6, '                  □ 주민등록등본 1통', 0, 'L');
-			$pdf->Cell(15, 6, '', 0, 0);
-			$pdf->MultiCell(0, 6, '                  □ 기타 [                  ] 통', 0, 'L');
-			
-			$pdf->Ln(3);
-			
-			// 2. 6개월간의 생계비 면제재산신청
-			$checkbox2 = $exemption2_total > 0 ? '■' : '□';
-			$pdf->Cell(5, 8, $checkbox2, 0, 0, 'C');
-			$pdf->Cell(5, 8, '2.', 0, 0, 'L');
-			$pdf->MultiCell(0, 8, '6개월간의 생계비에 사용할 특정재산에 대한 면제재산결정 신청', 0, 'L');
-			$pdf->Cell(10, 6, '', 0, 0);
-			$pdf->MultiCell(0, 6, '(법 제580조 제3항, 제1항 제1호, 제383조 제2항 제2호)', 0, 'L');
-			
-			// 첨부 서류 안내
-			$pdf->Cell(10, 8, '', 0, 0);
-			$pdf->MultiCell(0, 8, '※ 첨부서류', 0, 'L');
-			$pdf->Cell(15, 6, '', 0, 0);
-			$pdf->MultiCell(0, 6, '가. 별지 면제재산목록 (채권자수 + 3부)', 0, 'L');
-			$pdf->Cell(15, 6, '', 0, 0);
-			$pdf->MultiCell(0, 6, '나. 소명자료 : □ [                  ] 1통', 0, 'L');
-			$pdf->Cell(15, 6, '', 0, 0);
-			$pdf->MultiCell(0, 6, '                  □ 기타 [                  ] 통', 0, 'L');
-			
-			$pdf->Ln(10);
-			
-			// 현재 날짜
-			$current_date = date('Y. m. d.');
-			$pdf->Cell(0, 8, $current_date, 0, 1, 'C');
-			$pdf->Ln(10);
-			
-			// 신청인 서명란
-			$pdf->Cell(0, 8, '신 청 인(채 무 자) '.$case_info['name'].' (인)', 0, 1, 'C');
-			$pdf->Ln(5);
-			
-			// 제출처
-			$pdf->Cell(0, 8, ($case_info['court_name'] ?? '서울회생법원').' 귀중', 0, 1, 'C');
-			
-			// 면제재산 세부 목록 (다음 페이지)
-			if ($exemption1_total > 0) {
-				// 주거용 임차보증금 면제재산 상세 조회
-				$stmt = $pdo->prepare("
-					SELECT * FROM application_recovery_asset_exemption1
-					WHERE case_no = ? LIMIT 1
-				");
-				$stmt->execute([$case_no]);
-				$exempt_detail = $stmt->fetch(PDO::FETCH_ASSOC);
-				
-				if ($exempt_detail) {
-					$pdf->AddPage();
-					$pdf->SetFont('cid0kr', 'B', 12);
-					$pdf->Cell(0, 10, '목 록', 0, 1, 'C');
-					$pdf->SetFont('cid0kr', '', 10);
-					
-					// 주거용 임차보증금 면제재산 상세 정보 테이블
-					$pdf->Ln(5);
-					
-					// 면제재산 금액
-					$pdf->Cell(40, 8, '면제재산 금액', 1, 0, 'L');
-					$pdf->Cell(150, 8, '금 '.number_format($exemption1_total).' 원', 1, 1, 'L');
-					
-					// 주택임대차계약 내용
-					$pdf->Cell(40, 8, '주택임대차계약의 내용', 1, 0, 'L');
-					
-					// 임대차계약 상세 내용 문자열 구성
-					$contract_details = '';
-					$contract_details .= "①임대차계약일자 (".date('Y.m.d', strtotime($exempt_detail['contract_date'] ?? '')).")\n";
-					$contract_details .= "②임대차기간 (".date('Y.m.d', strtotime($exempt_detail['lease_start_date'] ?? ''))." 부터 ".date('Y.m.d', strtotime($exempt_detail['lease_end_date'] ?? ''))." 까지 )\n";
-					$contract_details .= "③임차목적물의 소재지(".$exempt_detail['lease_location'].")\n";
-					$contract_details .= "④임차보증금 (".number_format($exempt_detail['lease_deposit'] ?? 0)." 원 )\n";
-					$contract_details .= "⑤임료의 액수 및 연체기간(월 ".number_format($exempt_detail['rent_fee'] ?? 0)." 원,".$exempt_detail['overdue_months']." 개월간 연체 )\n";
-					$contract_details .= "⑥임대인의 성명 (".$exempt_detail['lessor_name'].")\n";
-					$contract_details .= "⑦주민등록일자 (".date('Y-m-d', strtotime($exempt_detail['registration_date'] ?? '')).")\n";
-					
-					// 확정일자 정보 추가
-					if ($exempt_detail['has_fixed_date'] === 'Y') {
-						$contract_details .= "⑧확정일자 (".date('Y.m.d', strtotime($exempt_detail['fixed_date'] ?? ''))." 확정일자받음 )";
-					} else {
-						$contract_details .= "⑧확정일자 (확정일자 없음)";
-					}
-					
-					// 소명자료 체크박스
-					$lease_contract_checked = $exempt_detail['lease_contract'] === 'Y' ? '■' : '□';
-					$resident_registration_checked = $exempt_detail['resident_registration'] === 'Y' ? '■' : '□';
-					$other_evidence_checked = $exempt_detail['other_evidence'] === 'Y' ? '■' : '□';
-					
-					$contract_details .= "\n".$lease_contract_checked." 임대차계약서 1부/ ".$resident_registration_checked." 주민등록등본 1통/ ".$other_evidence_checked." 기타 [".$exempt_detail['other_evidence_detail']."] 통";
-					
-					$pdf->MultiCell(150, 60, $contract_details, 1, 'L');
-				}
+			// 새 페이지 확인
+			if ($pdf->GetY() + $row_height > $pdf->getPageHeight() - 20) {
+				$pdf->AddPage();
 			}
 			
-			if ($exemption2_total > 0) {
-				// 생계비 특정재산 면제재산 목록 조회
-				$stmt = $pdo->prepare("
-					SELECT * FROM application_recovery_asset_exemption2
-					WHERE case_no = ?
-				");
-				$stmt->execute([$case_no]);
-				$exempt_special_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
-				
-				if (!empty($exempt_special_list)) {
-					if ($exemption1_total <= 0) {
-						// 임차보증금 면제재산이 없는 경우에만 새 페이지에 시작
-						$pdf->AddPage();
-						$pdf->SetFont('cid0kr', 'B', 12);
-						$pdf->Cell(0, 10, '목 록', 0, 1, 'C');
-						$pdf->SetFont('cid0kr', '', 10);
-					} else {
-						// 앞서 임차보증금 면제재산이 있었던 경우 간격 추가
-						$pdf->Ln(10);
-					}
-					
-					// 생계비 특정재산 면제재산 신청 체크박스
-					$pdf->Cell(5, 8, '□', 0, 0, 'C');
-					$pdf->MultiCell(0, 8, '6개월간의 생계비에 사용할 특정재산에 대한 면제재산결정 신청(법 제383조제2항 제2호)', 0, 'L');
-					
-					// 생계비 특정재산 테이블 헤더
-					$pdf->Ln(5);
-					$pdf->Cell(15, 8, '순번', 1, 0, 'C');
-					$pdf->Cell(60, 8, '특정재산의내용', 1, 0, 'C');
-					$pdf->Cell(40, 8, '소재지', 1, 0, 'C');
-					$pdf->Cell(30, 8, '추정시가', 1, 0, 'C');
-					$pdf->Cell(45, 8, '면제재산결정의 사유', 1, 1, 'C');
-					
-					// 생계비 특정재산 데이터 행
-					foreach ($exempt_special_list as $index => $exempt_special) {
-						$pdf->Cell(15, 8, ($index + 1), 1, 0, 'C');
-						$pdf->Cell(60, 8, $exempt_special['special_property_content'], 1, 0, 'L');
-						$pdf->Cell(40, 8, '', 1, 0, 'C'); // 소재지는 데이터 없음
-						$pdf->Cell(30, 8, number_format($exempt_special['exemption_amount']).'원', 1, 0, 'R');
-						$pdf->Cell(45, 8, '', 1, 1, 'L'); // 사유는 데이터 없음
-					}
-					
-					// 소명자료 안내
-					$evidence1 = !empty($exempt_special_list[0]['evidence1']) ? $exempt_special_list[0]['evidence1'] : '';
-					$evidence2 = !empty($exempt_special_list[0]['evidence2']) ? $exempt_special_list[0]['evidence2'] : '';
-					$evidence3 = !empty($exempt_special_list[0]['evidence3']) ? $exempt_special_list[0]['evidence3'] : '';
-					
-					$pdf->Ln(5);
-					$pdf->MultiCell(0, 8, "※ 소명자료: □ (".$evidence1.")보증서 1통/ □ 사진 1장/ □ 기타 [".$evidence2."] 통", 0, 'L');
-				}
+			$pdf->Cell($col1_width, $row_height, '면제재산 결정신청 금액', 1, 0, 'C');
+			$pdf->Cell($col2_width, $row_height, number_format($exemption2_total), 1, 0, 'R');
+			$pdf->Cell($col3_width, $row_height, '', 1, 0, 'C');
+			
+			// 비고 셀 출력
+			$pdf->Cell($note_col1_width, $row_height, '면제재산 종류', 1, 0, 'C');
+			$pdf->Cell($note_col2_width, $row_height, '2. 6개월간 생계비에 사용할 특정재산', 1, 1, 'L');
+		}
+		
+		// 청산가치 계산
+		$total_exemption = $exemption1_total + $exemption2_total;
+		$liquidation_value = $total_assets - $total_exemption;
+		
+		// 청산가치 출력
+		$pdf->Cell($col1_width, $row_height, '청산가치', 1, 0, 'C');
+		$pdf->Cell($col2_width, $row_height, number_format($liquidation_value), 1, 0, 'R');
+		$pdf->Cell($col3_width, $row_height, '', 1, 0, 'C');
+		
+		// 비고 셀 - 예금과 보험 청산가치 계산 내역
+		$pdf->Cell($note_col1_width, $row_height, '청산가치 계산', 1, 0, 'C');
+		
+		// 예금 청산가치 계산
+		$deposit_exemption = 1850000; // 압류금지 예금 (185만원)
+		$deposit_liquidation = $deposit_total - $deposit_exemption;
+		if ($deposit_liquidation < 0) $deposit_liquidation = 0;
+		
+		// 보험 청산가치 계산
+		$insurance_coverage_total = 0;
+		foreach ($insurances as $insurance) {
+			if ($insurance['is_coverage'] == 'Y') {
+				$insurance_coverage_total += $insurance['refund_amount'] ?? 0;
 			}
 		}
+		$insurance_exemption = 1500000; // 압류금지 보장성보험금 (150만원)
+		$insurance_liquidation = $insurance_coverage_total - $insurance_exemption;
+		if ($insurance_liquidation < 0) $insurance_liquidation = 0;
+		$insurance_liquidation += ($insurance_total - $insurance_coverage_total);
+		
+		$calculation_note = "*예금(청산가치) : " . number_format($deposit_liquidation) . "원\n";
+		$calculation_note .= "=[예치금액 합계: " . number_format($deposit_total) . " - 공제금액: " . number_format($deposit_exemption) . "]\n";
+		$calculation_note .= "*보험(청산가치): " . number_format($insurance_liquidation) . "원\n";
+		$calculation_note .= "=[{보장성: " . number_format($insurance_coverage_total) . " - 공제금액: " . number_format($insurance_exemption) . "} + " . number_format($insurance_total - $insurance_coverage_total) . "]";
+		
+		$pdf->MultiCell($note_col2_width, $row_height, $calculation_note, 1, 'L', false, 1, '', '', true, 0, false, true, $row_height * 4, 'T');
 		
 	} catch (Exception $e) {
-		$pdf->MultiCell(0, 10, 
+		$pdf->MultiCell(0, $row_height, 
 			"데이터 조회 중 오류가 발생했습니다:\n" . 
 			$e->getMessage() . 
 			"\n\n관리자에게 문의해 주시기 바랍니다.", 
 			0, 
 			'C'
 		);
+	}
+	
+	// 면제재산 결정신청서 추가
+	$pdf->AddPage();
+	$pdf->SetFont('cid0kr', 'B', 14);
+	$pdf->Cell(0, 8, '면제재산 결정신청서', 0, 1, 'C');
+	$pdf->Ln(5);
+	
+	// 사건 정보
+	$pdf->SetFont('cid0kr', '', 10);
+	
+	// 사건 정보 조회
+	$stmt = $pdo->prepare("
+		SELECT r.case_no, r.court_name, r.name
+		FROM application_recovery r
+		WHERE r.case_no = ?
+	");
+	$stmt->execute([$case_no]);
+	$case_info = $stmt->fetch(PDO::FETCH_ASSOC);
+	
+	$pdf->Cell(20, 8, '사 건', 0, 0, 'L');
+	$pdf->Cell(160, 8, '2025 개회 123호 개인회생', 0, 1, 'L');
+	
+	$pdf->Cell(20, 8, '신 청 인', 0, 0, 'L');
+	$pdf->Cell(20, 8, '(채 무 자)', 0, 0, 'L');
+	$pdf->Cell(140, 8, $case_info['name'] ?? '테스트', 0, 1, 'L');
+	
+	$pdf->Ln(5);
+	
+	$pdf->MultiCell(0, 8, 
+		"신청인은 채무자 회생 및 파산에 관한 법률 제580조 제3항,제1항 제1호,제383조 제2항에 따라\n".
+		"채무자 소유의 별지 목록 기재 재산을 면제재산으로 정한다는 결정을 구합니다.\n".
+		"(※아래 해당되는 부분에 ∨표를 하고, 면제재산결정 신청을 하는 재산목록 및 소명자료를\n".
+		"첨부하시기 바랍니다.)", 
+		0, 'L'
+	);
+	
+	$pdf->Ln(5);
+	
+	// 임차보증금 면제재산 표시
+	$checkbox1 = ($exemption1_total > 0) ? "■" : "□";
+	$pdf->Cell(10, 8, $checkbox1, 0, 0, 'C');
+	$pdf->Cell(170, 8, '1. 주거용건물 임차보증금반환청구권에 대한 면제재산결정 신청', 0, 1, 'L');
+	$pdf->Cell(190, 8, '(법 제580조 제3항, 제1항 제1호, 제383조 제2항 제1호)', 0, 1, 'L');
+	
+	$pdf->Cell(20, 8, '', 0, 0, 'L');
+	$pdf->Cell(170, 8, '※ 첨부서류', 0, 1, 'L');
+	$pdf->Cell(20, 8, '', 0, 0, 'L');
+	$pdf->Cell(170, 8, '가. 별지 면제재산목록 (채권자수 + 3부)', 0, 1, 'L');
+	$pdf->Cell(20, 8, '', 0, 0, 'L');
+	$pdf->Cell(10, 8, '나. 소명자료 : ', 0, 0, 'L');
+	
+	// 소명자료 체크박스
+	$contract_check = ($exemption1[0]['lease_contract'] ?? 'N') == 'Y' ? '■' : '□';
+	$resident_check = ($exemption1[0]['resident_registration'] ?? 'N') == 'Y' ? '■' : '□';
+	$other_check = ($exemption1[0]['other_evidence'] ?? 'N') == 'Y' ? '■' : '□';
+	
+	$pdf->Cell(10, 8, $contract_check, 0, 0, 'C');
+	$pdf->Cell(50, 8, '임대차계약서 1부', 0, 1, 'L');
+	$pdf->Cell(40, 8, '', 0, 0, 'L');
+	$pdf->Cell(10, 8, $resident_check, 0, 0, 'C');
+	$pdf->Cell(50, 8, '주민등록등본 1통', 0, 1, 'L');
+	$pdf->Cell(40, 8, '', 0, 0, 'L');
+	$pdf->Cell(10, 8, $other_check, 0, 0, 'C');
+	$pdf->Cell(20, 8, '기타 [', 0, 0, 'L');
+	$pdf->Cell(30, 8, $exemption1[0]['other_evidence_detail'] ?? '', 0, 0, 'C');
+	$pdf->Cell(10, 8, '] 통', 0, 1, 'L');
+	
+	$pdf->Ln(5);
+	
+	// 6개월간 생계비 면제재산 표시
+	$checkbox2 = ($exemption2_total > 0) ? "■" : "□";
+	$pdf->Cell(10, 8, $checkbox2, 0, 0, 'C');
+	$pdf->Cell(170, 8, '2. 6개월간의 생계비에 사용할 특정재산에 대한 면제재산결정 신청', 0, 1, 'L');
+	$pdf->Cell(190, 8, '(법 제580조 제3항, 제1항 제1호, 제383조 제2항 제2호)', 0, 1, 'L');
+	
+	$pdf->Cell(20, 8, '', 0, 0, 'L');
+	$pdf->Cell(170, 8, '※ 첨부서류', 0, 1, 'L');
+	$pdf->Cell(20, 8, '', 0, 0, 'L');
+	$pdf->Cell(170, 8, '가. 별지 면제재산목록 (채권자수 + 3부)', 0, 1, 'L');
+	$pdf->Cell(20, 8, '', 0, 0, 'L');
+	$pdf->Cell(10, 8, '나. 소명자료 : ', 0, 0, 'L');
+	
+	// 소명자료 체크박스
+	$evidence1_check = !empty($exemption2[0]['evidence1'] ?? '') ? '■' : '□';
+	$pdf->Cell(10, 8, $evidence1_check, 0, 0, 'C');
+	$pdf->Cell(10, 8, '[', 0, 0, 'L');
+	$pdf->Cell(40, 8, $exemption2[0]['evidence1'] ?? '', 0, 0, 'C');
+	$pdf->Cell(10, 8, '] 1통', 0, 1, 'L');
+	$pdf->Cell(40, 8, '', 0, 0, 'L');
+	$pdf->Cell(10, 8, '□', 0, 0, 'C');
+	$pdf->Cell(50, 8, '기타 [      ] 통', 0, 1, 'L');
+	
+	$pdf->Ln(20);
+	
+	// 날짜
+	$today = date('Y. m. d');
+	$pdf->Cell(0, 8, $today, 0, 1, 'R');
+	
+	$pdf->Ln(10);
+	
+	// 서명
+	$pdf->Cell(120, 8, '', 0, 0, 'L');
+	$pdf->Cell(25, 8, '신 청 인(채 무 자)', 0, 0, 'L');
+	$pdf->Cell(50, 8, $case_info['name'] ?? '테스트', 0, 0, 'L');
+	$pdf->Cell(5, 8, '(인)', 0, 1, 'L');
+	
+	$pdf->Ln(10);
+	
+	$pdf->Cell(0, 8, '서울회생법원 귀중', 0, 1, 'C');
+	
+	// 면제재산 목록 추가
+	if ($exemption1_total > 0 || $exemption2_total > 0) {
+		$pdf->AddPage();
+		$pdf->SetFont('cid0kr', 'B', 14);
+		$pdf->Cell(0, 8, '목 록', 0, 1, 'C');
+		$pdf->Ln(5);
+		
+		$pdf->SetFont('cid0kr', '', 10);
+		
+		// 임차보증금 면제재산
+		if ($exemption1_total > 0) {
+			$pdf->Cell(40, 8, '면제재산 금액', 0, 0, 'L');
+			$pdf->Cell(160, 8, '금 ' . number_format($exemption1_total) . ' 원', 0, 1, 'L');
+			
+			$pdf->Ln(5);
+			
+			// 주택임대차계약의 내용
+			$pdf->Cell(0, 8, '주택임대차계약의 내용', 0, 1, 'L');
+			
+			$pdf->Cell(40, 8, '①임대차계약일자', 0, 0, 'L');
+			$pdf->Cell(160, 8, '( ' . ($exemption1[0]['contract_date'] ?? '') . ' )', 0, 1, 'L');
+			
+			$pdf->Cell(40, 8, '②임대차기간', 0, 0, 'L');
+			$pdf->Cell(160, 8, '( ' . ($exemption1[0]['lease_start_date'] ?? '') . ' 부터 ' . ($exemption1[0]['lease_end_date'] ?? '') . ' 까지 )', 0, 1, 'L');
+			
+			$pdf->Cell(40, 8, '③임차목적물의 소재지', 0, 0, 'L');
+			$pdf->Cell(160, 8, '( ' . ($exemption1[0]['lease_location'] ?? '') . ' )', 0, 1, 'L');
+			
+			$pdf->Cell(40, 8, '④임차보증금', 0, 0, 'L');
+			$pdf->Cell(160, 8, '( ' . number_format($exemption1[0]['lease_deposit'] ?? 0) . ' 원 )', 0, 1, 'L');
+			
+			$pdf->Cell(40, 8, '⑤임료의 액수 및 연체기간', 0, 0, 'L');
+			$pdf->Cell(160, 8, '(월 ' . number_format($exemption1[0]['rent_fee'] ?? 0) . ' 원,' . ($exemption1[0]['overdue_months'] ?? '0') . ' 개월간 연체 )', 0, 1, 'L');
+			
+			$pdf->Cell(40, 8, '⑥임대인의 성명', 0, 0, 'L');
+			$pdf->Cell(160, 8, '( ' . ($exemption1[0]['lessor_name'] ?? '') . ' )', 0, 1, 'L');
+			
+			$pdf->Cell(40, 8, '⑦주민등록일자', 0, 0, 'L');
+			$pdf->Cell(160, 8, '( ' . ($exemption1[0]['registration_date'] ?? '') . ' )', 0, 1, 'L');
+			
+			$pdf->Cell(40, 8, '⑧확정일자', 0, 0, 'L');
+			$pdf->Cell(160, 8, '( ' . ($exemption1[0]['fixed_date'] ?? '') . ' 확정일자받음 )', 0, 1, 'L');
+			
+			// 소명자료 체크박스
+			$contract_check = ($exemption1[0]['lease_contract'] ?? 'N') == 'Y' ? '■' : '□';
+			$resident_check = ($exemption1[0]['resident_registration'] ?? 'N') == 'Y' ? '■' : '□';
+			$other_check = ($exemption1[0]['other_evidence'] ?? 'N') == 'Y' ? '■' : '□';
+			
+			$pdf->Cell(10, 8, $contract_check, 0, 0, 'C');
+			$pdf->Cell(50, 8, '임대차계약서 1부', 0, 0, 'L');
+			$pdf->Cell(5, 8, '/', 0, 0, 'C');
+			$pdf->Cell(10, 8, $resident_check, 0, 0, 'C');
+			$pdf->Cell(50, 8, '주민등록등본 1통', 0, 0, 'L');
+			$pdf->Cell(5, 8, '/', 0, 0, 'C');
+			$pdf->Cell(10, 8, $other_check, 0, 0, 'C');
+			$pdf->Cell(50, 8, '기타 [' . ($exemption1[0]['other_evidence_detail'] ?? '') . '] 통', 0, 1, 'L');
+			
+			$pdf->Ln(5);
+		}
+		
+		// 6개월간 생계비 면제재산
+		if ($exemption2_total > 0) {
+			$pdf->Cell(40, 8, '□6개월간의 생계비에 사용할 특정재산에 대한 면제재산결정 신청(법 제383조제2항 제2호)', 0, 1, 'L');
+			
+			$pdf->SetFont('cid0kr', '', 8);
+			
+			// 특정재산 테이블 헤더
+			$pdf->Cell(10, 8, '순번', 1, 0, 'C', true);
+			$pdf->Cell(60, 8, '특정재산의내용', 1, 0, 'C', true);
+			$pdf->Cell(60, 8, '소재지', 1, 0, 'C', true);
+			$pdf->Cell(30, 8, '추정시가', 1, 0, 'C', true);
+			$pdf->Cell(40, 8, '면제재산결정의 사유', 1, 1, 'C', true);
+			
+			// 특정재산 데이터
+			foreach ($exemption2 as $index => $exempt) {
+				$pdf->Cell(10, 8, ($index + 1), 1, 0, 'C');
+				$pdf->Cell(60, 8, $exempt['special_property_content'] ?? '', 1, 0, 'L');
+				$pdf->Cell(60, 8, '', 1, 0, 'C');
+				$pdf->Cell(30, 8, number_format($exempt['exemption_amount'] ?? 0) . '원', 1, 0, 'R');
+				$pdf->Cell(40, 8, '', 1, 1, 'C');
+			}
+			
+			$pdf->Ln(5);
+			
+			// 소명자료
+			$pdf->SetFont('cid0kr', '', 10);
+			$pdf->Cell(20, 8, '※ 소명자료:', 0, 0, 'L');
+			
+			$evidence1_check = !empty($exemption2[0]['evidence1'] ?? '') ? '■' : '□';
+			$evidence2_check = !empty($exemption2[0]['evidence2'] ?? '') ? '■' : '□';
+			$evidence3_check = !empty($exemption2[0]['evidence3'] ?? '') ? '■' : '□';
+			
+			$pdf->Cell(10, 8, $evidence1_check, 0, 0, 'C');
+			$pdf->Cell(50, 8, '( ' . ($exemption2[0]['evidence1'] ?? '') . ' )보증서 1통', 0, 0, 'L');
+			$pdf->Cell(5, 8, '/', 0, 0, 'C');
+			$pdf->Cell(10, 8, $evidence2_check, 0, 0, 'C');
+			$pdf->Cell(50, 8, '사진 1장', 0, 0, 'L');
+			$pdf->Cell(5, 8, '/', 0, 0, 'C');
+			$pdf->Cell(10, 8, $evidence3_check, 0, 0, 'C');
+			$pdf->Cell(30, 8, '기타 [' . ($exemption2[0]['evidence3'] ?? '') . '] 통', 0, 1, 'L');
+		}
 	}
 }
 ?>
