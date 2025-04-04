@@ -54,9 +54,9 @@ $pdf->SetKeywords('개인회생, 신청서, 자료');
 
 // 기본 설정
 $pdf->SetHeaderData('', 0, '', '', array(0, 0, 0), array(255, 255, 255));
-$pdf->setHeaderFont(Array('helvetica', '', 9));
-$pdf->setFooterFont(Array('helvetica', '', 8));
-$pdf->SetDefaultMonospacedFont('helvetica');
+$pdf->setHeaderFont(Array('helvetica', '', 9)); // 헤더 폰트 변경
+$pdf->setFooterFont(Array('helvetica', '', 8)); // 푸터 폰트 변경
+$pdf->SetDefaultMonospacedFont('helvetica'); // 기본 고정폭 폰트 변경
 $pdf->SetMargins(15, 15, 15);
 $pdf->SetHeaderMargin(5);
 $pdf->SetFooterMargin(10);

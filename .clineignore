@@ -1,37 +1,15 @@
-css/
-css/*
-page/
-page/*
-img/
-img/*
-file/
-file/*
-api/case_management/
-api/case_management/*
-api/chatbot/
-api/chatbot/*
-api/consult_manager/
-api/consult_manager/*
-api/consult_paper/
-api/consult_paper/*
-api/department/
-api/department/*
-api/employee/
-api/employee/*
-api/index/
-api/index/*
-api/inflow/
-api/inflow/*
-api/manager/
-api/manager/*
-api/position/
-api/position/*
-api/schedule/
-api/schedule/*
-api/sms/
-api/sms/*
-api/stats/
-api/stats/*
-api/application_bankruptcy/
-api/application_bankruptcy/*
+# 모든 폴더와 파일을 무시
+*
+*/
 
+# SQL 파일은 제외
+!*.sql
+
+# api/application_recovery/ 폴더는 제외
+!api/
+!api/tcpdf/
+!api/tcpdf/**
+!api/tcpdf/fonts/
+!api/tcpdf/fonts/**
+!api/application_recovery/
+!api/application_recovery/**
