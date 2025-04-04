@@ -249,6 +249,10 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 				$pdf->Cell($note_col1_width, $cell_height, '청산가치판단금액', 1, 0, 'C');
 				$pdf->Cell($note_col2_width, $cell_height, number_format($vehicle['liquidation_value']).'원', 1, 1, 'L');
 				
+				// 내용
+				$pdf->SetXY($x, $y + ($cell_height * 5));
+				$pdf->Cell($note_col1_width+$note_col2_width, $cell_height, $vehicle['explanation'], 1, 1, 'L');
+				
 				// Y 위치 조정하여 다음 항목 출력 준비
 				$pdf->SetY($y + 40);
 			}
