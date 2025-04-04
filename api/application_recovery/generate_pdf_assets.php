@@ -205,20 +205,20 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		if (count($vehicles) > 0) {
 			foreach ($vehicles as $index => $vehicle) {
 				// 새 페이지 확인 - 현재 페이지에 충분한 공간이 없으면 새 페이지 추가
-				if ($pdf->GetY() + 40 > $pdf->getPageHeight() - 20) {
+				if ($pdf->GetY() + 48 > $pdf->getPageHeight() - 20) {
 					$pdf->AddPage();
 				}
 				
-				$pdf->MultiCell($col1_width, 40, '자동차 #'.($index+1)."\n(오토바이 포함)", 1, 'C', false, 0, '', '', true, 0, false, true, 40, 'M');
-				$pdf->MultiCell($col2_width, 40, number_format($vehicle['liquidation_value']), 1, 'R', false, 0, '', '', true, 0, false, true, 40, 'M');
-				$pdf->MultiCell($col3_width, 40, $vehicle['is_seized'] ?? 'N', 1, 'C', false, 0, '', '', true, 0, false, true, 40, 'M');
+				$pdf->MultiCell($col1_width, 48, '자동차 #'.($index+1)."\n(오토바이 포함)", 1, 'C', false, 0, '', '', true, 0, false, true, 48, 'M');
+				$pdf->MultiCell($col2_width, 48, number_format($vehicle['liquidation_value']), 1, 'R', false, 0, '', '', true, 0, false, true, 48, 'M');
+				$pdf->MultiCell($col3_width, 48, $vehicle['is_seized'] ?? 'N', 1, 'C', false, 0, '', '', true, 0, false, true, 48, 'M');
 				
 				// 비고 셀 시작 위치 저장
 				$x = $pdf->GetX();
 				$y = $pdf->GetY();
 				
 				// 열 너비 계산 (비고 내 항목명을 위한 공간 할당)
-				$cell_height = 40 / 6; // 6개 항목을 넣기 위해 높이 조정
+				$cell_height = 48 / 7; // 7개 항목을 넣기 위해 높이 조정
 				
 				// 차량정보
 				$pdf->Cell($note_col1_width, $cell_height, '차량정보', 1, 0, 'C');
@@ -250,11 +250,11 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 				$pdf->Cell($note_col2_width, $cell_height, number_format($vehicle['liquidation_value']).'원', 1, 1, 'L');
 				
 				// 내용
-				$pdf->SetXY($x, $y + ($cell_height * 5));
+				$pdf->SetXY($x, $y + ($cell_height * 6));
 				$pdf->Cell($note_col1_width+$note_col2_width, $cell_height, $vehicle['explanation'], 1, 1, 'L');
 				
 				// Y 위치 조정하여 다음 항목 출력 준비
-				$pdf->SetY($y + 40);
+				$pdf->SetY($y + 48);
 			}
 		} else {
 			// 자동차 데이터가 없는 경우
@@ -304,29 +304,28 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 				$checkBox = $isBusinessUse ? '[ V]' : '[  ]';
 				$pdf->Cell($note_col2_width, $cell_height, $rent['rent_location'] . " {$checkBox} 영업장", 1, 1, 'L');
 				
-				// 보증금 및 월세 (5개 컬럼으로 나누기)
+				// 보증금 및 월세 (4개 컬럼으로 나누기)
 				$pdf->SetXY($x, $y + $cell_height);
-				$pdf->Cell($note_col1_width, $cell_height, '보증금 및 월세', 1, 0, 'C');
+				$pdf->Cell($note_col1_width, $cell_height, '보증금', 1, 0, 'C');
 				
-				// 5개 컬럼으로 나누기 위한 너비 계산
-				$sub_col_width = $note_col2_width / 5;
+				// 4개 컬럼으로 나누기 위한 너비 계산
+				$sub_col_width = $note_col2_width / 4;
 				$start_x = $x + $note_col1_width;
 				
-				// 첫 번째 컬럼: "보증금" 라벨
+				$isSpouseOwned = isset($rent['is_deposit_spouse']) && $rent['is_deposit_spouse'] == 1;
+				$spouseCheckBox = $isSpouseOwned ? '[ V]' : '[  ]';
+				
+				// 1 번째 컬럼: 보증금 금액
 				$pdf->SetXY($start_x, $y + $cell_height);
-				$pdf->Cell($sub_col_width, $cell_height, '보증금', 1, 0, 'C');
+				$pdf->Cell($sub_col_width * 2, $cell_height, number_format($rent['contract_deposit']).'원'.' 배우자명의'.$spouseCheckBox, 1, 0, 'R');
 				
-				// 두 번째 컬럼: 보증금 금액
-				$pdf->SetXY($start_x + $sub_col_width, $y + $cell_height);
-				$pdf->Cell($sub_col_width * 1.5, $cell_height, number_format($rent['contract_deposit']).'원', 1, 0, 'R');
-				
-				// 세 번째 컬럼: "월세" 라벨
-				$pdf->SetXY($start_x + $sub_col_width * 2.5, $y + $cell_height);
+				// 2 번째 컬럼: "월세" 라벨
+				$pdf->SetXY($start_x + $sub_col_width * 1.5, $y + $cell_height);
 				$pdf->Cell($sub_col_width, $cell_height, '월세', 1, 0, 'C');
 				
-				// 네 번째 컬럼: 월세 금액
-				$pdf->SetXY($start_x + $sub_col_width * 3.5, $y + $cell_height);
-				$pdf->Cell($sub_col_width * 1.5, $cell_height, number_format($rent['monthly_rent']).'원', 1, 0, 'R');
+				// 3 번째 컬럼: 월세 금액
+				$pdf->SetXY($start_x + $sub_col_width * 2.5, $y + $cell_height);
+				$pdf->Cell($sub_col_width * 2, $cell_height, number_format($rent['monthly_rent']).'원', 1, 0, 'R');
 				
 				// Y 위치 재설정
 				$pdf->SetXY($x, $y + $cell_height * 2);
@@ -354,19 +353,6 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 				$pdf->SetXY($x, $y + ($cell_height * 6));
 				$pdf->Cell($note_col1_width, $cell_height, '부연설명', 1, 0, 'C');
 				$pdf->Cell($note_col2_width, $cell_height, $rent['explanation'] ?? '', 1, 1, 'L');
-				
-				// 배우자명의 여부
-				$pdf->SetXY($x, $y + ($cell_height * 7));
-				$pdf->Cell($note_col1_width, $cell_height, '배우자명의', 1, 0, 'C');
-				$isSpouseOwned = isset($rent['is_deposit_spouse']) && $rent['is_deposit_spouse'] == 1;
-				$spouseCheckBox = $isSpouseOwned ? '[ V]' : '[  ]';
-				$pdf->Cell($note_col2_width, $cell_height, $spouseCheckBox.' 배우자명의', 1, 1, 'L');
-				
-				// 영업장 여부
-				$pdf->SetXY($x, $y + ($cell_height * 8));
-				$pdf->Cell($note_col1_width, $cell_height, '영업장 여부', 1, 0, 'C');
-				$businessCheckBox = $isBusinessUse ? '[ V]' : '[  ]';
-				$pdf->Cell($note_col2_width, $cell_height, $businessCheckBox.' 영업장', 1, 1, 'L');
 				
 				// Y 위치 조정하여 다음 항목 출력 준비
 				$pdf->SetY($y + 60);
