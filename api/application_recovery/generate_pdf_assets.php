@@ -313,11 +313,11 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 				$start_x = $x + $note_col1_width;
 				
 				$isSpouseOwned = isset($rent['is_deposit_spouse']) && $rent['is_deposit_spouse'] == 1;
-				$spouseCheckBox = $isSpouseOwned ? '[ V]' : '[  ]';
+				$spouseCheckBox = $isSpouseOwned ? ' 배우자명의[ V]' : '';
 				
 				// 1 번째 컬럼: 보증금 금액
 				$pdf->SetXY($start_x, $y + $cell_height);
-				$pdf->Cell($sub_col_width * 2, $cell_height, number_format($rent['contract_deposit']).'원'.' 배우자명의'.$spouseCheckBox, 1, 0, 'R');
+				$pdf->Cell($sub_col_width * 2, $cell_height, number_format($rent['contract_deposit']).'원'.$spouseCheckBox, 1, 0, 'R');
 				
 				// 2 번째 컬럼: "월세" 라벨
 				$pdf->SetXY($start_x + $sub_col_width * 2, $y + $cell_height);
@@ -397,9 +397,12 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 				// 열 너비 계산
 				$cell_height = 72 / 9; // 9개 항목을 넣기 위해 높이 조정
 				
+				$isSpouseOwned = isset($real_estate['is_spouse']) && $real_estate['is_spouse'] == 1;
+				$spouseCheckBox = $isSpouseOwned ? ' 배우자명의[ V]' : '';
+				
 				// 소재지
 				$pdf->Cell($note_col1_width, $cell_height, '소재지', 1, 0, 'C');
-				$pdf->Cell($note_col2_width, $cell_height, $real_estate['property_location'], 1, 1, 'L');
+				$pdf->Cell($note_col2_width, $cell_height, $real_estate['property_location'].$spouseCheckBox, 1, 1, 'L');
 				
 				// 면적
 				$pdf->SetXY($x, $y + $cell_height);
@@ -426,12 +429,9 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 				$pdf->MultiCell($note_col1_width, $cell_height*2, "담보권이\n설정된 경우\n그 종류 및 담보액", 1, 'C', false, 0, '', '', true, 0, false, true, 16, 'M');
 				$securityInfo = "";
 				
-				if ($real_estate['property_security_type']) {
-					$securityInfo = $real_estate['property_security_type'] . " - " . number_format($real_estate['property_secured_debt'] ?? 0) . "원";
-				}
-				$pdf->Cell($note_col2_width * 0.2, $cell_height * 2, 'TTTTT', 1, 1, 'L');
-				$pdf->SetXY($start_x + $sub_col_width * 1.2, $y + ($cell_height * 5));
-				$pdf->Cell($note_col2_width * 0.8, $cell_height * 2, 'BBBBB', 1, 1, 'L');
+				$pdf->Cell($note_col2_width * 0.2, $cell_height * 2, $real_estate['property_security_type'], 1, 1, 'L');
+				$pdf->SetXY($start_x + $note_col2_width * 0.2, $y + ($cell_height * 5));
+				$pdf->Cell($note_col2_width * 0.8, $cell_height * 2, number_format($real_estate['property_secured_debt'] ?? 0) . "원", 1, 1, 'L');
 				
 				// 부연설명
 				$pdf->SetXY($x, $y + ($cell_height * 7));
