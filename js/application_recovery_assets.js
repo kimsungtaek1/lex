@@ -819,8 +819,27 @@ class AssetManager {
 }
 
   saveVehicleBlock(block) {
-	const caseNo = window.currentCaseNo;
-	const assetNo = block.find(".vehicle_asset_no").val();
+    const caseNo = window.currentCaseNo;
+    const assetNo = block.find(".vehicle_asset_no").val();
+    const isSpouseOwned = block.find(".vehicle_spouse_owned").is(":checked");
+    const isManualCalc = block.find(".vehicle_manual_calc").is(":checked");
+    
+    // 값 가져오기
+    const expectedValue = this.unformatMoney(block.find(".vehicle_expected_value").val());
+    const financialBalance = this.unformatMoney(block.find(".vehicle_financial_balance").val());
+    let liquidationValue = this.unformatMoney(block.find(".vehicle_liquidation_value").val());
+    
+    // 수동계산이 아니고 청산가치가 입력되지 않았거나 0인 경우 자동 계산
+    if (!isManualCalc && !liquidationValue) {
+        // 환가예상액에서 채무잔액을 뺀 값
+        liquidationValue = expectedValue - financialBalance;
+        if (liquidationValue < 0) liquidationValue = 0;
+        
+        // 배우자명의인 경우 1/2만 반영
+        if (isSpouseOwned) {
+            liquidationValue = Math.floor(liquidationValue / 2);
+        }
+    }
 	const data = {
 		asset_type: "vehicle",
 		case_no: caseNo,
@@ -830,7 +849,7 @@ class AssetManager {
 		max_bond: this.unformatMoney(block.find(".vehicle_max_bond").val()),
 		expected_value: this.unformatMoney(block.find(".vehicle_expected_value").val()),
 		financial_balance: this.unformatMoney(block.find(".vehicle_financial_balance").val()),
-		liquidation_value: this.unformatMoney(block.find(".vehicle_liquidation_value").val()),
+		liquidation_value: liquidationValue,
 		explanation: block.find(".vehicle_liquidation_explain").val().trim(),
 		is_manual_calc: block.find(".vehicle_manual_calc").is(":checked") ? "Y" : "N",
 		is_seized: block.find(`input[name="vehicle_seizure_${block.attr("id")}"]:checked`).val() || "N",
@@ -982,42 +1001,73 @@ class AssetManager {
         </div>
       </div>
     `;
-	const block = $("#" + blockId);
-	block.find(".rent_contract_deposit, .rent_monthly_rent, .rent_refund_deposit, .rent_priority_deposit, .rent_liquidation_value")
-		.on("input", (e) => {
-			const val = e.target.value.replace(/[^\d]/g, "");
-			e.target.value = this.formatMoney(val);
-		});
-	
-	// 배우자 명의 체크박스 초기 설정
-	if (data.is_deposit_spouse == 1) {
-		this.calculateRentDepositLiquidationValue(block);
-	}
-	
-	block.find(".rent_deposit_save_btn").on("click", () => this.saveRentDepositBlock(block));
-	block.find(".rent_deposit_delete_btn").on("click", () => this.deleteRentDepositBlock(block));
+  $("#rent_deposit_assets_container").append(html);
+  const block = $("#" + blockId);
+  
+  // 여기에 현재 이벤트 핸들러들이 있습니다
+  block.find(".rent_contract_deposit, .rent_monthly_rent, .rent_refund_deposit, .rent_priority_deposit, .rent_liquidation_value")
+       .on("input", (e) => {
+    const val = e.target.value.replace(/[^\d]/g, "");
+    e.target.value = this.formatMoney(val);
+  });
+  
+  // 여기에 귀하의 새 코드를 추가해야 합니다
+  block.find(".rent_deposit_spouse").on("change", () => {
+    const isSpouseOwned = block.find(".rent_deposit_spouse").is(":checked");
+    const refundDeposit = this.unformatMoney(block.find(".rent_refund_deposit").val());
+    const priorityDeposit = this.unformatMoney(block.find(".rent_priority_deposit").val());
+    const rentLocation = block.find(".rent_location").val().trim();
+    const contractDeposit = this.unformatMoney(block.find(".rent_contract_deposit").val());
+    
+    // 청산가치 다시 계산
+    const liquidationValue = this.calculateRentDepositLiquidationValue(
+      rentLocation, contractDeposit, refundDeposit, priorityDeposit, isSpouseOwned
+    );
+    
+    // 화면에 표시
+    block.find(".rent_liquidation_value").val(this.formatMoney(liquidationValue));
+  });
+  
+  // 저장 및 삭제 버튼 이벤트 핸들러
+  block.find(".rent_deposit_save_btn").on("click", () => this.saveRentDepositBlock(block));
+  block.find(".rent_deposit_delete_btn").on("click", () => this.deleteRentDepositBlock(block));
 }
 
-  saveRentDepositBlock(block) {
+saveRentDepositBlock(block) {
     const caseNo = window.currentCaseNo;
     const assetNo = block.find(".rent_deposit_asset_no").val();
-	const data = {
-		asset_type: "rent_deposit",
-		case_no: caseNo,
-		rent_location: block.find(".rent_location").val().trim(),
-		is_business_place: block.find(".rent_business_place").is(":checked") ? "Y" : "N",
-		contract_deposit: this.unformatMoney(block.find(".rent_contract_deposit").val()),
-		is_deposit_spouse: block.find(".rent_deposit_spouse").is(":checked") ? 1 : 0,
-		monthly_rent: this.unformatMoney(block.find(".rent_monthly_rent").val()),
-		refund_deposit: this.unformatMoney(block.find(".rent_refund_deposit").val()),
-		difference_reason: block.find(".rent_difference_reason").val().trim(),
-		priority_deposit: this.unformatMoney(block.find(".rent_priority_deposit").val()),
-		liquidation_value: this.unformatMoney(block.find(".rent_liquidation_value").val()),
-		explanation: block.find(".rent_liquidation_explain").val().trim(),
-		is_seized: block.find(`input[name="rent_seizure_${block.attr("id")}"]:checked`).val() || "N",
-		is_manual_calc: block.find(".rent_manual_calc").is(":checked") ? "Y" : "N", // 수동계산 체크박스 상태 추가
-		property_no: block.find(".rent_deposit_property_no").val()
-	};
+    const isSpouseOwned = block.find(".rent_deposit_spouse").is(":checked");
+    
+    // 값 가져오기
+    const rentLocation = block.find(".rent_location").val().trim();
+    const contractDeposit = this.unformatMoney(block.find(".rent_contract_deposit").val());
+    const refundDeposit = this.unformatMoney(block.find(".rent_refund_deposit").val());
+    const priorityDeposit = this.unformatMoney(block.find(".rent_priority_deposit").val());
+    let liquidationValue = this.unformatMoney(block.find(".rent_liquidation_value").val());
+    
+    // 청산가치가 입력되지 않았거나 0인 경우 자동 계산
+    if (!liquidationValue) {
+        liquidationValue = this.calculateRentDepositLiquidationValue(
+            rentLocation, contractDeposit, refundDeposit, priorityDeposit, isSpouseOwned
+        );
+    }
+    
+    const data = {
+        asset_type: "rent_deposit",
+        case_no: caseNo,
+        rent_location: rentLocation,
+        is_business_place: block.find(".rent_business_place").is(":checked") ? "Y" : "N",
+        contract_deposit: contractDeposit,
+        is_deposit_spouse: isSpouseOwned ? 1 : 0,
+        monthly_rent: this.unformatMoney(block.find(".rent_monthly_rent").val()),
+        refund_deposit: refundDeposit,
+        difference_reason: block.find(".rent_difference_reason").val().trim(),
+        priority_deposit: priorityDeposit,
+        liquidation_value: liquidationValue,
+        explanation: block.find(".rent_liquidation_explain").val().trim(),
+        is_seized: block.find(`input[name="rent_seizure_${block.attr("id")}"]:checked`).val() || "N",
+        property_no: block.find(".rent_deposit_property_no").val()
+    };
     if (assetNo) data.asset_no = assetNo;
     $.ajax({
       url: "/adm/api/application_recovery/assets/asset_api.php",
@@ -1151,7 +1201,7 @@ class AssetManager {
 			  <div class="right-section">
 				<div class="form">
 				  <div class="form-title form-notitle"><span>청산가치 판단금액</span></div>
-				  <div class="form-content form-nocontent">
+				  <div class="form-content">
 					<input type="text" class="property_liquidation_value" value="${data.property_liquidation_value ? this.formatMoney(data.property_liquidation_value) : ""}">원
 				  </div>
 				  <div class="form-content checkbox-right">
@@ -1255,8 +1305,27 @@ class AssetManager {
 	}
 
   saveRealEstateBlock(block) {
-	const caseNo = window.currentCaseNo;
-	const assetNo = block.find(".real_estate_asset_no").val();
+    const caseNo = window.currentCaseNo;
+    const assetNo = block.find(".real_estate_asset_no").val();
+    const isSpouseOwned = block.find(".property_spouse_owned").is(":checked");
+    
+    // 청산가치 계산
+    let propertyExpectedValue = this.unformatMoney(block.find(".property_expected_value").val());
+    let propertySecuredDebt = this.unformatMoney(block.find(".property_secured_debt").val());
+    let propertyDepositDebt = this.unformatMoney(block.find(".property_deposit_debt").val());
+    let propertyLiquidationValue = this.unformatMoney(block.find(".property_liquidation_value").val());
+    
+    // 청산가치가 입력되지 않았거나 0인 경우 자동 계산
+    if (!propertyLiquidationValue) {
+        // 환가예상액에서 담보채무와 보증금 채무를 뺀 값
+        propertyLiquidationValue = propertyExpectedValue - propertySecuredDebt - propertyDepositDebt;
+        if (propertyLiquidationValue < 0) propertyLiquidationValue = 0;
+        
+        // 배우자명의인 경우 1/2만 반영
+        if (isSpouseOwned) {
+            propertyLiquidationValue = Math.floor(propertyLiquidationValue / 2);
+        }
+    }
 	const data = {
 		asset_type: "real_estate",
 		case_no: caseNo,
@@ -1266,6 +1335,7 @@ class AssetManager {
 		property_location: block.find(".property_location").val().trim(),
 		is_spouse: block.find(".property_spouse_owned").is(":checked") ? 1 : 0,
 		property_expected_value: this.unformatMoney(block.find(".property_expected_value").val()),
+		property_liquidation_value: propertyLiquidationValue,
 		property_security_type: block.find(".property_security_type").val().trim(),
 		property_security_details: block.find(".property_security_details").val().trim(),
 		property_secured_debt: this.unformatMoney(block.find(".property_secured_debt").val()),
@@ -1275,7 +1345,7 @@ class AssetManager {
 		is_seized: block.find(`input[name="property_seizure_${block.attr("id")}"]:checked`).val() || "N",
 		is_manual_calc: block.find(".property_manual_calc").is(":checked") ? "Y" : "N", // 수동계산 체크박스 상태 추가
 		property_no: block.find(".real_estate_property_no").val()
-	};
+	};	
     if (assetNo) data.asset_no = assetNo;
     $.ajax({
       url: "/adm/api/application_recovery/assets/asset_api.php",
@@ -2439,36 +2509,25 @@ class AssetManager {
 	}
 	
 	// 임차보증금 청산가치 계산 함수
-	calculateRentDepositLiquidationValue(block) {
-		// 수동계산 체크되어 있으면 계산하지 않음
-		const manualCalcCheckbox = block.find(".rent_manual_calc");
-		if (manualCalcCheckbox.length > 0 && manualCalcCheckbox.is(":checked")) {
-			return;
-		}
+	calculateRentDepositLiquidationValue(rentLocation, contractDeposit, refundDeposit, priorityDeposit, isSpouseOwned) {
+		// 반환받을 보증금에서 최우선변제금을 제외한 금액을 청산가치로 산정
+		let liquidationValue = 0;
 		
-		const isSpouseOwned = block.find(".rent_deposit_spouse").is(":checked");
-		const refundDeposit = this.unformatMoney(block.find(".rent_refund_deposit").val()) || 0;
-		const priorityDeposit = this.unformatMoney(block.find(".rent_priority_deposit").val()) || 0;
-		
-		// 청산가치 계산 (반환받을 보증금 - 최우선변제 보증금)
-		let liquidationValue = refundDeposit - priorityDeposit;
-		
-		// 배우자명의인 경우 1/2 계산
-		if (isSpouseOwned && liquidationValue > 0) {
-			liquidationValue = Math.floor(liquidationValue / 2);
-			block.find(".rent_liquidation_explain").val("배우자명의 재산으로서 채무액을 공제한 환가예상액의 1/2 반영함");
-		} else {
-			// 기존 설명 유지
-			if (!block.find(".rent_liquidation_explain").val().includes("배우자명의")) {
-				block.find(".rent_liquidation_explain").val("");
+		if (refundDeposit > 0) {
+			liquidationValue = refundDeposit - priorityDeposit;
+			
+			// 음수인 경우 0으로 처리
+			if (liquidationValue < 0) {
+				liquidationValue = 0;
+			}
+			
+			// 배우자명의인 경우 1/2만 반영
+			if (isSpouseOwned) {
+				liquidationValue = Math.floor(liquidationValue / 2);
 			}
 		}
 		
-		// 결과가 음수면 0으로 설정
-		if (liquidationValue < 0) liquidationValue = 0;
-		
-		// 청산가치 설정
-		block.find(".rent_liquidation_value").val(this.formatMoney(liquidationValue));
+		return liquidationValue;
 	}
 
   /* =========================================
