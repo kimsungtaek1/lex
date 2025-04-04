@@ -1219,271 +1219,189 @@ class AssetManager {
     });
   }
 
-  // 6. 부동산 섹션
-  addRealEstateBlock(data = {}) {
-    this.assetCounters.real_estate++;
-    const blockId = "real_estate_block_" + this.assetCounters.real_estate;
-    const propertyNo = data.property_no || this.assetCounters.real_estate;
-    const html = `
-      <div class="asset-block real-estate-block" id="${blockId}">
-        <input type="hidden" class="real_estate_asset_no" value="${data.asset_no || ""}">
-        <input type="hidden" class="real_estate_property_no" value="${propertyNo}">
-        <div class="content-wrapper">
-          <div class="left-section">
-            <div class="form">
-              <div class="form-title"><span>권리 및 부동산 종류</span></div>
-              <div class="form-content">
-                <div class="form-group">
-                  <select class="property_right_type" name="propertyRightType">
-                    <option value="소유권" ${(data.property_right_type==="소유권") ? "selected" : ""}>소유권</option>
-                    <option value="지분권" ${(data.property_right_type==="지분권") ? "selected" : ""}>지분권</option>
-                  </select>
-                  <select class="property_type" name="propertyType">
-                    <option value="토지" ${(data.property_type==="토지") ? "selected" : ""}>토지</option>
-                    <option value="건물" ${(data.property_type==="건물") ? "selected" : ""}>건물</option>
-                    <option value="집합건물" ${(data.property_type==="집합건물") ? "selected" : ""}>집합건물</option>
-                    <option value="토지, 건물" ${(data.property_type==="토지, 건물") ? "selected" : ""}>토지, 건물</option>
-                  </select>
-                  <div class="form-content checkbox-right" style="border-bottom:none;">
-                    면적&nbsp;&nbsp;<input type="text" class="property_area" value="${data.property_area ? this.formatMoney(data.property_area) : ""}" class="form-control form-content-short">㎡
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="form">
-              <div class="form-title"><span>소재지</span></div>
-              <div class="form-content">
-                <input type="text" class="property_location" value="${data.property_location || ""}">
-              </div>
-              <div class="form-content checkbox-right">
-                <input type="checkbox" id="${blockId}_property_spouse_owned" class="property_spouse_owned" ${data.is_spouse==1 ? "checked" : ""}>
-                <label for="${blockId}_property_spouse_owned">배우자명의</label>
-              </div>
-            </div>
-            <div class="form">
-              <div class="form-title"><span>환가예상액</span></div>
-              <div class="form-content">
-                <input type="text" class="property_expected_value" value="${data.property_expected_value ? this.formatMoney(data.property_expected_value) : ""}">원
-              </div>
-            </div>
-            <div class="form">
-              <div class="form-title"><span>담보권 종류</span></div>
-              <div class="form-content">
-                <div class="form-group">
-                  <select class="property_security_type" name="securityRightType">
-                    <option value="근저당권" ${(data.property_security_type==="근저당권") ? "selected" : ""}>근저당권</option>
-                    <option value="전세(임차)권" ${(data.property_security_type==="전세(임차)권") ? "selected" : ""}>전세(임차)권</option>
-                    <option value="근저당권, 전세(임차)권" ${(data.property_security_type==="근저당권, 전세(임차)권") ? "selected" : ""}>근저당권, 전세(임차)권</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-            <div class="form">
-              <div class="form-title"><span>담보권 내용</span></div>
-              <div class="form-content">
-                <input type="text" class="property_security_details" value="${data.property_security_details || ""}">
-              </div>
-            </div>
-            <div class="form">
-              <div class="form-title"><span>피담보 채무액</span></div>
-              <div class="form-content">
-                <input type="text" class="property_secured_debt" value="${data.property_secured_debt ? this.formatMoney(data.property_secured_debt) : ""}">원
-              </div>
-            </div>
-            <div class="form">
-              <div class="form-title"><span>보증금 채무액</span></div>
-              <div class="form-content">
-                <input type="text" class="property_deposit_debt" value="${data.property_deposit_debt ? this.formatMoney(data.property_deposit_debt) : ""}">원
-              </div>
-            </div>
-          </div>
-          <div class="right-section">
-            <div class="form">
-              <div class="form-title form-notitle"><span>청산가치 판단금액</span></div>
-              <div class="form-content form-nocontent">
-                <input type="text" class="property_liquidation_value" value="${data.property_liquidation_value ? this.formatMoney(data.property_liquidation_value) : ""}">원
-              </div>
-            </div>
-            <div class="form">
-              <div class="form-title form-notitle"><span></span></div>
-              <div class="form-content">
-                ※ 별제권부채권의 목적물인 경우 채권자 목록을 반드시 먼저 작성해야 합니다.
-              </div>
-            </div>
-            <div class="form">
-              <div class="form-title"><span></span></div>
-              <div class="form-content">
-                부연설명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="property_liquidation_explain  form-content-justify" value="${data.property_liquidation_explain || ""}">
-              </div>
-            </div>
-            <div class="form">
-              <div class="form-title"><span>압류 유무</span></div>
-              <div class="form-content">
-                <div class="radio">
-                  <input type="radio" id="${blockId}_property_seizure_yes" name="property_seizure_${blockId}" value="Y" ${data.hasOwnProperty("is_seized") && data.is_seized==="Y" ? "checked" : ""}>
-                  <label for="${blockId}_property_seizure_yes">유</label>
-                  <input type="radio" id="${blockId}_property_seizure_no" name="property_seizure_${blockId}" value="N" ${data.hasOwnProperty("is_seized") && data.is_seized==="N" ? "checked" : ""}>
-                  <label for="${blockId}_property_seizure_no">무</label>
-                </div>
-              </div>
-            </div>
-            <div class="form">
-              <div class="form-title form-notitle"><span></span></div>
-              <div class="form-content form-nocontent"></div>
-            </div>
-            <div class="form">
-              <div class="form-title form-notitle"><span></span></div>
-              <div class="form-content form-nocontent"></div>
-            </div>
-            <div class="form">
-              <div class="form-title"></div>
-              <div class="form-content btn-right">
-                <button type="button" class="btn-delete property_delete_btn">삭제</button>
-                <button type="button" class="btn-save property_save_btn">저장</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-    $("#real_estate_assets_container").append(html);
-    const block = $("#" + blockId);
-    block.find(".property_area, .property_expected_value, .property_secured_debt, .property_deposit_debt, .property_liquidation_value")
-         .on("input", (e) => {
-      const val = e.target.value.replace(/[^\d]/g, "");
-      e.target.value = this.formatMoney(val);
-    });
-    
-    // 배우자명의 체크박스 이벤트 리스너 추가
-    block.find(".property_spouse_owned").on("change", () => {
-      const isSpouseOwned = block.find(".property_spouse_owned").is(":checked");
-      const expectedValue = this.unformatMoney(block.find(".property_expected_value").val()) || 0;
-      const securedDebt = this.unformatMoney(block.find(".property_secured_debt").val()) || 0;
-      const depositDebt = this.unformatMoney(block.find(".property_deposit_debt").val()) || 0;
-      
-      // 총 채무액
-      const totalDebt = securedDebt + depositDebt;
-      
-      if (isSpouseOwned) {
-        // (환가예상액 - 담보채무액) / 2 계산
-        const netValue = Math.max(0, expectedValue - totalDebt);
-        const liquidationValue = Math.floor(netValue / 2);
-        
-        // UI 업데이트
-        block.find(".property_liquidation_value").val(this.formatMoney(liquidationValue));
-        block.find(".property_liquidation_explain").val("배우자명의 재산으로서 채무액을 공제한 환가예상액의 1/2 반영함");
-      } else {
-        // 배우자명의가 아닌 경우 환가예상액 - 담보채무액
-        const netValue = Math.max(0, expectedValue - totalDebt);
-        block.find(".property_liquidation_value").val(this.formatMoney(netValue));
-        block.find(".property_liquidation_explain").val("");
-      }
-    });
-    
-    // 환가예상액 및 담보채무액 변경 이벤트 리스너 추가
-    block.find(".property_expected_value, .property_secured_debt, .property_deposit_debt").on("change", () => {
-      const isSpouseOwned = block.find(".property_spouse_owned").is(":checked");
-      const expectedValue = this.unformatMoney(block.find(".property_expected_value").val()) || 0;
-      const securedDebt = this.unformatMoney(block.find(".property_secured_debt").val()) || 0;
-      const depositDebt = this.unformatMoney(block.find(".property_deposit_debt").val()) || 0;
-      
-      // 총 채무액
-      const totalDebt = securedDebt + depositDebt;
-      
-      if (isSpouseOwned) {
-        // (환가예상액 - 담보채무액) / 2 계산
-        const netValue = Math.max(0, expectedValue - totalDebt);
-        const liquidationValue = Math.floor(netValue / 2);
-        
-        // UI 업데이트
-        block.find(".property_liquidation_value").val(this.formatMoney(liquidationValue));
-        block.find(".property_liquidation_explain").val("배우자명의 재산으로서 채무액을 공제한 환가예상액의 1/2 반영함");
-      } else {
-        // 배우자명의가 아닌 경우 환가예상액 - 담보채무액
-        const netValue = Math.max(0, expectedValue - totalDebt);
-        block.find(".property_liquidation_value").val(this.formatMoney(netValue));
-        block.find(".property_liquidation_explain").val("");
-      }
-    });
-    
-    block.find(".property_save_btn").on("click", () => this.saveRealEstateBlock(block));
-    block.find(".property_delete_btn").on("click", () => this.deleteRealEstateBlock(block));
-  }
-
-  saveRealEstateBlock(block) {
-    const caseNo = window.currentCaseNo;
-    const assetNo = block.find(".real_estate_asset_no").val();
-    
-    // 배우자명의 체크 여부 확인
-    const isSpouseOwned = block.find(".property_spouse_owned").is(":checked");
-    
-    // 환가예상액과 담보채무액 가져오기
-    const expectedValue = this.unformatMoney(block.find(".property_expected_value").val()) || 0;
-    const securedDebt = this.unformatMoney(block.find(".property_secured_debt").val()) || 0;
-    const depositDebt = this.unformatMoney(block.find(".property_deposit_debt").val()) || 0;
-    
-    // 총 채무액
-    const totalDebt = securedDebt + depositDebt;
-    
-    // 청산가치 계산
-    let liquidationValue = this.unformatMoney(block.find(".property_liquidation_value").val()) || 0;
-    let liquidationExplain = block.find(".property_liquidation_explain").val().trim();
-    
-    // 배우자명의인 경우
-    if (isSpouseOwned) {
-      // (환가예상액 - 담보채무액) / 2 계산
-      const netValue = Math.max(0, expectedValue - totalDebt);
-      liquidationValue = Math.floor(netValue / 2);
-      
-      // 부연설명 업데이트
-      liquidationExplain = "배우자명의 재산으로서 채무액을 공제한 환가예상액의 1/2 반영함";
-      
-      // UI 업데이트
-      block.find(".property_liquidation_value").val(this.formatMoney(liquidationValue));
-      block.find(".property_liquidation_explain").val(liquidationExplain);
-    } else {
-      // 배우자명의가 아닌 경우 환가예상액 - 담보채무액
-      liquidationValue = Math.max(0, expectedValue - totalDebt);
-    }
-    
-    const data = {
-      asset_type: "real_estate",
-      case_no: caseNo,
-      property_right_type: block.find(".property_right_type").val().trim(),
-      property_type: block.find(".property_type").val().trim(),
-      property_area: this.unformatMoney(block.find(".property_area").val()),
-      property_location: block.find(".property_location").val().trim(),
-      is_spouse: isSpouseOwned ? 1 : 0,
-      property_expected_value: expectedValue,
-      property_security_type: block.find(".property_security_type").val().trim(),
-      property_security_details: block.find(".property_security_details").val().trim(),
-      property_secured_debt: securedDebt,
-      property_deposit_debt: depositDebt,
-      property_liquidation_value: liquidationValue,
-      property_liquidation_explain: liquidationExplain,
-      is_seized: block.find(`input[name="property_seizure_${block.attr("id")}"]:checked`).val() || "N",
-      property_no: block.find(".real_estate_property_no").val()
-    };
-    if (assetNo) data.asset_no = assetNo;
-    
-    $.ajax({
-      url: "/adm/api/application_recovery/assets/asset_api.php",
-      type: "POST",
-      data: data,
-      dataType: "json",
-      success: (response) => {
-        if (response.success) {
-          alert("부동산 자산이 저장되었습니다.");
-          block.find(".real_estate_asset_no").val(response.data.asset_no);
-        } else {
-          alert(response.message || "부동산 자산 저장 실패");
-        }
-      },
-      error: () => {
-        alert("부동산 자산 저장 중 오류가 발생했습니다.");
-      }
-    });
-  }
+	// 6. 부동산 섹션
+	addRealEstateBlock(data = {}) {
+	  this.assetCounters.real_estate++;
+	  const blockId = "real_estate_block_" + this.assetCounters.real_estate;
+	  const propertyNo = data.property_no || this.assetCounters.real_estate;
+	  const html = `
+		<div class="asset-block real-estate-block" id="${blockId}">
+		  <input type="hidden" class="real_estate_asset_no" value="${data.asset_no || ""}">
+		  <input type="hidden" class="real_estate_property_no" value="${propertyNo}">
+		  <div class="content-wrapper">
+			<div class="left-section">
+			  <div class="form">
+				<div class="form-title"><span>권리 및 부동산 종류</span></div>
+				<div class="form-content">
+				  <div class="form-group">
+					<select class="property_right_type" name="propertyRightType">
+					  <option value="소유권" ${(data.property_right_type==="소유권") ? "selected" : ""}>소유권</option>
+					  <option value="지분권" ${(data.property_right_type==="지분권") ? "selected" : ""}>지분권</option>
+					</select>
+					<select class="property_type" name="propertyType">
+					  <option value="토지" ${(data.property_type==="토지") ? "selected" : ""}>토지</option>
+					  <option value="건물" ${(data.property_type==="건물") ? "selected" : ""}>건물</option>
+					  <option value="집합건물" ${(data.property_type==="집합건물") ? "selected" : ""}>집합건물</option>
+					  <option value="토지, 건물" ${(data.property_type==="토지, 건물") ? "selected" : ""}>토지, 건물</option>
+					</select>
+					<div class="form-content checkbox-right" style="border-bottom:none;">
+					  면적&nbsp;&nbsp;<input type="text" class="property_area" value="${data.property_area ? this.formatMoney(data.property_area) : ""}" class="form-control form-content-short">㎡
+					</div>
+				  </div>
+				</div>
+			  </div>
+			  <div class="form">
+				<div class="form-title"><span>소재지</span></div>
+				<div class="form-content">
+				  <input type="text" class="property_location" value="${data.property_location || ""}">
+				</div>
+				<div class="form-content checkbox-right">
+				  <input type="checkbox" id="${blockId}_property_spouse_owned" class="property_spouse_owned" ${data.is_spouse==1 ? "checked" : ""}>
+				  <label for="${blockId}_property_spouse_owned">배우자명의</label>
+				</div>
+			  </div>
+			  <div class="form">
+				<div class="form-title"><span>환가예상액</span></div>
+				<div class="form-content">
+				  <input type="text" class="property_expected_value" value="${data.property_expected_value ? this.formatMoney(data.property_expected_value) : ""}">원
+				</div>
+			  </div>
+			  <div class="form">
+				<div class="form-title"><span>담보권 종류</span></div>
+				<div class="form-content">
+				  <div class="form-group">
+					<select class="property_security_type" name="securityRightType">
+					  <option value="근저당권" ${(data.property_security_type==="근저당권") ? "selected" : ""}>근저당권</option>
+					  <option value="전세(임차)권" ${(data.property_security_type==="전세(임차)권") ? "selected" : ""}>전세(임차)권</option>
+					  <option value="근저당권, 전세(임차)권" ${(data.property_security_type==="근저당권, 전세(임차)권") ? "selected" : ""}>근저당권, 전세(임차)권</option>
+					</select>
+				  </div>
+				</div>
+			  </div>
+			  <div class="form">
+				<div class="form-title"><span>담보권 내용</span></div>
+				<div class="form-content">
+				  <input type="text" class="property_security_details" value="${data.property_security_details || ""}">
+				</div>
+			  </div>
+			  <div class="form">
+				<div class="form-title"><span>피담보 채무액</span></div>
+				<div class="form-content">
+				  <input type="text" class="property_secured_debt" value="${data.property_secured_debt ? this.formatMoney(data.property_secured_debt) : ""}">원
+				</div>
+			  </div>
+			  <div class="form">
+				<div class="form-title"><span>보증금 채무액</span></div>
+				<div class="form-content">
+				  <input type="text" class="property_deposit_debt" value="${data.property_deposit_debt ? this.formatMoney(data.property_deposit_debt) : ""}">원
+				</div>
+			  </div>
+			</div>
+			<div class="right-section">
+			  <div class="form">
+				<div class="form-title form-notitle"><span>청산가치 판단금액</span></div>
+				<div class="form-content form-nocontent">
+				  <input type="text" class="property_liquidation_value input86" value="${data.property_liquidation_value ? this.formatMoney(data.property_liquidation_value) : ""}">원
+				</div>
+				<div class="form-content checkbox-right">
+				  <input type="checkbox" id="${blockId}_property_manual_calc" class="property_manual_calc" ${data.is_manual_calc==="Y" ? "checked" : ""}>
+				  <label for="${blockId}_property_manual_calc">수동계산</label>
+				</div>
+			  </div>
+			  <div class="form">
+				<div class="form-title form-notitle"><span></span></div>
+				<div class="form-content">
+				  ※ 별제권부채권의 목적물인 경우 채권자 목록을 반드시 먼저 작성해야 합니다.
+				</div>
+			  </div>
+			  <div class="form">
+				<div class="form-title"><span></span></div>
+				<div class="form-content">
+				  부연설명&nbsp;&nbsp;|&nbsp;&nbsp;<input type="text" class="property_liquidation_explain" value="${data.property_liquidation_explain || ""}">
+				</div>
+			  </div>
+			  <div class="form">
+				<div class="form-title"><span>압류 유무</span></div>
+				<div class="form-content">
+				  <div class="radio">
+					<input type="radio" id="${blockId}_property_seizure_yes" name="property_seizure_${blockId}" value="Y" ${data.hasOwnProperty("is_seized") && data.is_seized==="Y" ? "checked" : ""}>
+					<label for="${blockId}_property_seizure_yes">유</label>
+					<input type="radio" id="${blockId}_property_seizure_no" name="property_seizure_${blockId}" value="N" ${data.hasOwnProperty("is_seized") && data.is_seized==="N" ? "checked" : ""}>
+					<label for="${blockId}_property_seizure_no">무</label>
+				  </div>
+				</div>
+			  </div>
+			  <div class="form">
+				<div class="form-title form-notitle"><span></span></div>
+				<div class="form-content form-nocontent"></div>
+			  </div>
+			  <div class="form">
+				<div class="form-title form-notitle"><span></span></div>
+				<div class="form-content form-nocontent"></div>
+			  </div>
+			  <div class="form">
+				<div class="form-title"></div>
+				<div class="form-content btn-right">
+				  <button type="button" class="btn-delete property_delete_btn">삭제</button>
+				  <button type="button" class="btn-save property_save_btn">저장</button>
+				</div>
+			  </div>
+			</div>
+		  </div>
+		</div>
+	  `;
+	  $("#real_estate_assets_container").append(html);
+	  const block = $("#" + blockId);
+	  block.find(".property_area, .property_expected_value, .property_secured_debt, .property_deposit_debt, .property_liquidation_value")
+		   .on("input", (e) => {
+		const val = e.target.value.replace(/[^\d]/g, "");
+		e.target.value = this.formatMoney(val);
+	  });
+	  block.find(".property_save_btn").on("click", () => this.saveRealEstateBlock(block));
+	  block.find(".property_delete_btn").on("click", () => this.deleteRealEstateBlock(block));
+	}
+	
+	saveRealEstateBlock(block) {
+	  const caseNo = window.currentCaseNo;
+	  const assetNo = block.find(".real_estate_asset_no").val();
+	  const data = {
+		asset_type: "real_estate",
+		case_no: caseNo,
+		property_right_type: block.find(".property_right_type").val().trim(),
+		property_type: block.find(".property_type").val().trim(),
+		property_area: this.unformatMoney(block.find(".property_area").val()),
+		property_location: block.find(".property_location").val().trim(),
+		is_spouse: block.find(".property_spouse_owned").is(":checked") ? 1 : 0,
+		property_expected_value: this.unformatMoney(block.find(".property_expected_value").val()),
+		property_security_type: block.find(".property_security_type").val().trim(),
+		property_security_details: block.find(".property_security_details").val().trim(),
+		property_secured_debt: this.unformatMoney(block.find(".property_secured_debt").val()),
+		property_deposit_debt: this.unformatMoney(block.find(".property_deposit_debt").val()),
+		property_liquidation_value: this.unformatMoney(block.find(".property_liquidation_value").val()),
+		property_liquidation_explain: block.find(".property_liquidation_explain").val().trim(),
+		is_manual_calc: block.find(".property_manual_calc").is(":checked") ? "Y" : "N",
+		is_seized: block.find(`input[name="property_seizure_${block.attr("id")}"]:checked`).val() || "N",
+		property_no: block.find(".real_estate_property_no").val()
+	  };
+	  if (assetNo) data.asset_no = assetNo;
+	  $.ajax({
+		url: "/adm/api/application_recovery/assets/asset_api.php",
+		type: "POST",
+		data: data,
+		dataType: "json",
+		success: (response) => {
+		  if (response.success) {
+			alert("부동산 자산이 저장되었습니다.");
+			block.find(".real_estate_asset_no").val(response.data.asset_no);
+		  } else {
+			alert(response.message || "부동산 자산 저장 실패");
+		  }
+		},
+		error: () => {
+		  alert("부동산 자산 저장 중 오류가 발생했습니다.");
+		}
+	  });
+	}
 
   deleteRealEstateBlock(block) {
     // 저장되지 않은 블록인 경우 바로 삭제 후 빈 블록 추가
