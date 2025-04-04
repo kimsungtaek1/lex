@@ -67,8 +67,9 @@ function registerEventListeners() {
 		// 출처 확인 (선택 사항이지만 보안상 권장)
 		// if (event.origin !== 'expected_origin') return;
 
-		if (event.data && event.data.type === 'propertySelected') { // Corrected message type
-			fillSelectedAppendixData(event.data.propertyData); // Use propertyData as sent from property_select.php
+		// property_select.php에서 보내는 메시지 구조에 맞게 수정 (event.data.data 사용)
+		if (event.data && event.data.type === 'propertySelected') {
+			fillSelectedAppendixData(event.data.data); // event.data.data 사용
 			isSamePropertySelected = true; // 동일 목적물 선택 플래그 설정
 			// console.log("isSamePropertySelected set to true"); // 디버깅용 로그
 		}

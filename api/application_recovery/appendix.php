@@ -28,7 +28,7 @@ if ($case_no === 0) {
     <?php
     // creditor_count가 null이 아닐 경우 해당 값으로 필터링, null일 경우 모든 creditor_count 조회
     $query = "SELECT * FROM application_recovery_creditor_appendix 
-              WHERE case_no = ?";
+              WHERE case_no = ? ORDER BY updated_at ASC";
     $params = [$case_no];
 
     $stmt = $pdo->prepare($query);

@@ -20,6 +20,7 @@ try {
 }
 
 function writeLog($message) {
+    /*
     $logFile = __DIR__ . '/logs/' . date('Y-m-d') . '.log';
     $logDir = dirname($logFile);
 
@@ -34,6 +35,7 @@ function writeLog($message) {
     
     // 파일에 로그 작성
     file_put_contents($logFile, $formattedMessage, FILE_APPEND);
+    */
 }
 
 //문자

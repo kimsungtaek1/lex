@@ -404,7 +404,7 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		$mortgage_rank = 1;
 
 		if (!empty($appendix_details)) {
-			// 새 페이지 추가 또는 공간 확인
+			$pdf->AddPage(); // 새 페이지에서 시작
 			if ($pdf->GetY() + 50 > $pdf->getPageHeight() - 20) { // 표 높이 예상치
 				$pdf->AddPage();
 			} else {
@@ -597,6 +597,470 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		$pdf->MultiCell(0, 10, "별제권부 채권 내역 생성 중 오류 발생: " . $e->getMessage(), 0, 'C');
 	}
 	// --- 별제권부채권 표 추가 끝 ---
+
+	// --- 부속서류 2. 다툼이 있거나 예상되는 채권의 내역 표 추가 ---
+	try {
+		// 다툼이 있는 채권 데이터 조회
+		$stmt_disputed = $pdo->prepare("
+			SELECT 
+				oc.creditor_count,
+				c.financial_institution,
+				c.principal AS list_principal,
+				c.interest AS list_interest,
+				oc.creditor_principal, 
+				oc.creditor_interest,
+				oc.undisputed_principal,
+				oc.undisputed_interest,
+				oc.difference_principal,
+				oc.difference_interest,
+				oc.dispute_reason,
+				oc.litigation_status
+			FROM application_recovery_creditor_other_claims oc
+			JOIN application_recovery_creditor c 
+				ON oc.case_no = c.case_no AND oc.creditor_count = c.creditor_count
+			WHERE oc.case_no = ?
+			ORDER BY oc.creditor_count ASC
+		");
+		$stmt_disputed->execute([$case_no]);
+		$disputed_claims = $stmt_disputed->fetchAll(PDO::FETCH_ASSOC);
+
+		if (!empty($disputed_claims)) {
+			$pdf->AddPage(); // 새 페이지에서 시작
+			$pdf->SetFont('cid0kr', 'B', 10);
+			$pdf->Cell(0, 10, '부속서류 2. 다툼이 있거나 예상되는 채권의 내역', 0, 1, 'L');
+			$pdf->SetFont('cid0kr', '', 8);
+			$pdf->Cell(0, 5, '(단위 : 원)', 0, 1, 'R');
+			$pdf->Ln(1);
+
+			// 테이블 너비 설정
+			$colWidth1 = 10; // 채권번호
+			$colWidth2 = 25; // 채권자
+			$colWidth3a = 10; // 원금/이자
+			$colWidth3b = 31; // 금액(목록상)
+			$colWidth3 = 15; // 사이값
+			$colWidth4 = 26; // 채권자주장채권현재액
+			$colWidth5 = 26; // 다툼이 없는 부분
+			$colWidth6 = 26; // 차이나는 부분
+			$colWidth7 = 26; // 다툼의 원인
+
+			// 테이블 헤더 - 첫 번째 행
+			$pdf->SetFont('cid0kr', 'B', 8);
+			
+			// 채권번호와 채권자는 2행 병합
+			$rowHeight1 = 10; // 첫 번째 행 높이
+			$rowHeight2 = 8;  // 두 번째 행 높이
+			
+			$pdf->MultiCell($colWidth1, $rowHeight1 + $rowHeight2, "채권\n번호", 1, 'C', false, 0);
+			$pdf->MultiCell($colWidth2, $rowHeight1 + $rowHeight2, "채권자", 1, 'C', false, 0);
+			
+			// ①~⑤ 항목들
+			$currentX = $pdf->GetX();
+			$currentY = $pdf->GetY();
+			
+			$pdf->MultiCell($colWidth3a + $colWidth3b, $rowHeight1, "①채권자목록상\n채권현재액", 1, 'C', false, 0);
+			$pdf->MultiCell($colWidth4, $rowHeight1, "②채권자 주장 채권현재액", 1, 'C', false, 0);
+			$pdf->MultiCell($colWidth5, $rowHeight1, "③다툼이 없는\n부분", 1, 'C', false, 0);
+			$pdf->MultiCell($colWidth6, $rowHeight1, "④차이나는 부분\n(② - ①)", 1, 'C', false, 0);
+			$pdf->MultiCell($colWidth7, $rowHeight1, "⑤다툼의 원인", 1, 'C', false, 1);
+			
+			// 두 번째 행 - 소송제기여부 항목
+			$pdf->SetXY($currentX, $currentY + $rowHeight1);
+			$pdf->MultiCell($colWidth3a + $colWidth3b + $colWidth4 + $colWidth5 + $colWidth6 + $colWidth7, $rowHeight2, "⑥소송제기여부 및 진행경과", 1, 'C', false, 1);
+			
+			// 각 채권자별 데이터 출력
+			$pdf->SetFont('cid0kr', '', 8);
+
+			foreach ($disputed_claims as $claim) {
+				$rowHeight3 = 10; // 데이터 행 높이
+				
+				// 기본 정보 (채권번호, 채권자) - 3행 병합으로 변경
+				$startY = $pdf->GetY();
+				$pdf->MultiCell($colWidth1, $rowHeight3 * 3, $claim['creditor_count'], 1, 'C', false, 0);
+				$pdf->MultiCell($colWidth2, $rowHeight3 * 3, $claim['financial_institution'], 1, 'C', false, 0);
+				
+				// 원금 행과 이자 행을 위치시킬 x 좌표 저장
+				$startX = $pdf->GetX();
+				
+				// 원금 행
+				$pdf->MultiCell($colWidth3a, $rowHeight3, "원금", 1, 'C', false, 0);
+				$pdf->MultiCell($colWidth3b, $rowHeight3, number_format($claim['list_principal'])."원", 1, 'R', false, 0);
+				$pdf->MultiCell($colWidth4, $rowHeight3, number_format($claim['creditor_principal'])."원", 1, 'R', false, 0);
+				$pdf->MultiCell($colWidth5, $rowHeight3, number_format($claim['undisputed_principal'])."원", 1, 'R', false, 0); // 다툼 없는 부분
+				$pdf->MultiCell($colWidth6, $rowHeight3, number_format($claim['difference_principal'])."원", 1, 'R', false, 0); // 차이나는 부분
+				
+				// 다툼의 원인 위치 저장
+				$disputeX = $pdf->GetX();
+				$disputeY = $pdf->GetY();
+				
+				// 원금 행 종료 - 줄바꿈 없이
+				$pdf->MultiCell($colWidth7, $rowHeight3 * 2, $claim['dispute_reason'], 1, 'L', false, 0);
+				
+				// 이자 행 시작 위치로 이동 (원금 행 바로 아래)
+				$pdf->SetXY($colWidth1 + $colWidth2 + $colWidth3, $disputeY + $rowHeight3);
+				
+				// 이자 행
+				$pdf->MultiCell($colWidth3a, $rowHeight3, "이자", 1, 'C', false, 0);
+				$pdf->MultiCell($colWidth3b, $rowHeight3, number_format($claim['list_interest'])."원", 1, 'R', false, 0);
+				$pdf->MultiCell($colWidth4, $rowHeight3, number_format($claim['creditor_interest'])."원", 1, 'R', false, 0);
+				$pdf->MultiCell($colWidth5, $rowHeight3, number_format($claim['undisputed_interest'])."원", 1, 'R', false, 0);
+				$pdf->MultiCell($colWidth6, $rowHeight3, number_format($claim['difference_interest'])."원", 1, 'R', false, 0);
+				
+				// 이자 행 종료 후 소송제기여부 행 시작 위치로 이동
+				$pdf->SetXY($colWidth1 + $colWidth2 + $colWidth3, $disputeY + $rowHeight3 * 2);
+				
+				// 소송제기여부 행
+				$pdf->MultiCell($colWidth3a + $colWidth3b + $colWidth4 + $colWidth5 + $colWidth6 + $colWidth7, $rowHeight3, $claim['litigation_status'], 1, 'L', false, 1);
+			}
+		}
+	} catch (Exception $e) {
+		$pdf->SetFont('cid0kr', '', 8);
+		$pdf->MultiCell(0, 10, "다툼이 있는 채권 내역 생성 중 오류 발생: " . $e->getMessage(), 0, 'C');
+	}
+	// --- 부속서류 2 표 추가 끝 ---
+
+	// --- 부속서류 3. 전부명령의 내역 표 추가 ---
+	try {
+		// 전부명령된 채권 조회
+		$stmt_assigned = $pdo->prepare("
+			SELECT 
+				ac.claim_no,
+				ac.creditor_count,
+				c.financial_institution,
+				c.principal,
+				c.interest,
+				c.claim_content,
+				ac.court_case_number,
+				ac.debtor_name,
+				ac.service_date,
+				ac.confirmation_date,
+				ac.claim_range
+			FROM application_recovery_creditor_assigned_claims ac
+			JOIN application_recovery_creditor c 
+				ON ac.case_no = c.case_no AND ac.creditor_count = c.creditor_count
+			WHERE ac.case_no = ?
+			ORDER BY ac.creditor_count ASC
+		");
+		$stmt_assigned->execute([$case_no]);
+		$assigned_claims = $stmt_assigned->fetchAll(PDO::FETCH_ASSOC);
+
+		if (!empty($assigned_claims)) {
+			$pdf->AddPage(); // 새 페이지에서 시작
+			$pdf->SetFont('cid0kr', 'B', 10);
+			$pdf->Cell(0, 10, '부속서류 3. 전부명령의 내역', 0, 1, 'L');
+			$pdf->SetFont('cid0kr', '', 8);
+			$pdf->Cell(0, 5, '(단위 : 원)', 0, 1, 'R');
+			$pdf->Ln(1);
+
+			// 테이블 너비 설정
+			$colWidth1 = 10; // 채권번호
+			$colWidth2 = 25; // 채권자
+			$colWidth3 = 40; // 채권의 내용
+			$colWidth4 = 100; // 전부명령의 내역
+			
+			// 테이블 헤더
+			$pdf->SetFont('cid0kr', 'B', 8);
+			$pdf->Cell($colWidth1, 8, '채권번호', 1, 0, 'C');
+			$pdf->Cell($colWidth2, 8, '채권자', 1, 0, 'C');
+			$pdf->Cell($colWidth3, 8, '채권의 내용', 1, 0, 'C');
+			$pdf->Cell($colWidth4, 8, '전부명령의 내역', 1, 1, 'C');
+			
+			// 데이터 행
+			$pdf->SetFont('cid0kr', '', 8);
+			
+			foreach ($assigned_claims as $claim) {
+				// 전부명령 내용 작성
+				$assigned_content = "1. 사건번호 : " . $claim['court_case_number'] . "\n";
+				$assigned_content .= "2. 제3채무자명 : " . $claim['debtor_name'] . "\n";
+				$assigned_content .= "3. 송달일자 : " . ($claim['service_date'] ? date('Y-m-d', strtotime($claim['service_date'])) : '') . "\n";
+				$assigned_content .= "4. 확정일자 : " . ($claim['confirmation_date'] ? date('Y-m-d', strtotime($claim['confirmation_date'])) : '') . "\n";
+				$assigned_content .= "5. 전부명령의 내용 : " . $claim['claim_range'];
+				
+				// 채권 내용
+				$claim_content = "";
+				if ($claim['principal'] > 0) {
+					$claim_content .= "원금 " . number_format($claim['principal']) . "원";
+					if ($claim['interest'] > 0) {
+						$claim_content .= " 및 그 중 원금 " . number_format($claim['principal']) . "원에 대한";
+					}
+				}
+				if ($claim['interest'] > 0) {
+					if (empty($claim_content)) {
+						$claim_content = "원금에 대한";
+					}
+					// 채권 내용에서 날짜와 이율 정보 추출 시도
+					$date_pattern = '/(\d{4}-\d{2}-\d{2})/';
+					$rate_pattern = '/연\s*(\d+(?:\.\d+)?)%/';
+					$date_match = [];
+					$rate_match = [];
+					
+					if (preg_match($date_pattern, $claim['claim_content'], $date_match) && 
+						preg_match($rate_pattern, $claim['claim_content'], $rate_match)) {
+						$claim_content .= " " . $date_match[1] . "부터 완제일까지 연 " . $rate_match[1] . "%의 비율에 의한 금원.";
+					} else {
+						$claim_content .= " 지연이자.";
+					}
+				}
+				
+				// 내용이 비어있으면 원본 내용 사용
+				if (empty($claim_content)) {
+					$claim_content = $claim['claim_content'];
+				}
+				
+				// 내용을 기준으로 행 높이 계산
+				$assigned_lines = count(explode("\n", $assigned_content));
+				$claim_lines = 1;  // 최소 1줄은 필요
+				
+				// 채권 내용의 줄 수 계산 (대략 문자 길이 / 컬럼 너비 * 1.5)
+				$claim_string_width = $pdf->GetStringWidth($claim_content);
+				$claim_lines = ceil($claim_string_width / ($colWidth3 - 2) * 1.5);
+				
+				// 두 내용 중 더 많은 줄 수로 높이 결정
+				$lines = max($assigned_lines, $claim_lines);
+				$cell_height = max(8, $lines * 5);  // 최소 8포인트, 줄당 5포인트
+				
+				// 채권번호와 채권자는 일반 Cell로 출력
+				$pdf->Cell($colWidth1, $cell_height, $claim['creditor_count'], 1, 0, 'C');
+				$pdf->Cell($colWidth2, $cell_height, $claim['financial_institution'], 1, 0, 'C');
+				
+				// 현재 위치 저장
+				$x = $pdf->GetX();
+				$y = $pdf->GetY();
+				
+				// 채권 내용 MultiCell (높이를 전체 셀 높이로 지정)
+				$pdf->MultiCell($colWidth3, $cell_height, $claim_content, 1, 'L', false, 0);
+				
+				// 전부명령 내역 MultiCell (높이를 전체 셀 높이로 지정)
+				$pdf->MultiCell($colWidth4, $cell_height, $assigned_content, 1, 'L', false, 1);
+			}
+		}
+	} catch (Exception $e) {
+		$pdf->SetFont('cid0kr', '', 8);
+		$pdf->MultiCell(0, 10, "전부명령 채권 내역 생성 중 오류 발생: " . $e->getMessage(), 0, 'C');
+	}
+	// --- 부속서류 3 표 추가 끝 ---
+
+	// --- 부속서류 4. 기타(보증선 채무등) 표 추가 ---
+	try {
+		// 기타 채무 데이터 조회
+		$stmt_other_debts = $pdo->prepare("
+			SELECT 
+				od.creditor_count,
+				c.financial_institution,
+				od.debt_description,
+				od.has_mortgage
+			FROM application_recovery_creditor_other_debts od
+			JOIN application_recovery_creditor c 
+				ON od.case_no = c.case_no AND od.creditor_count = c.creditor_count
+			WHERE od.case_no = ?
+			ORDER BY od.creditor_count ASC
+		");
+		$stmt_other_debts->execute([$case_no]);
+		$other_debts = $stmt_other_debts->fetchAll(PDO::FETCH_ASSOC);
+
+		if (!empty($other_debts)) {
+			$pdf->AddPage(); // 새 페이지에서 시작
+			$pdf->SetFont('cid0kr', 'B', 10);
+			$pdf->Cell(0, 10, '부속서류 4. 기타(보증선 채무등)', 0, 1, 'L');
+			$pdf->SetFont('cid0kr', '', 8);
+			$pdf->Ln(5);
+
+			// 테이블 헤더 및 컬럼 너비 설정
+			$colWidth1 = 15; // 채권번호
+			$colWidth2 = 30; // 채권자
+			$colWidth3 = 100; // 기타 내역
+			$colWidth4 = 30; // 근저당권 설정 여부
+
+			// 테이블 헤더
+			$pdf->SetFont('cid0kr', 'B', 8);
+			$pdf->Cell($colWidth1, 10, '채권번호', 1, 0, 'C');
+			$pdf->Cell($colWidth2, 10, '채권자', 1, 0, 'C');
+			$pdf->Cell($colWidth3, 10, '기타내역', 1, 0, 'C');
+			$pdf->Cell($colWidth4, 10, '근저당권 설정 여부', 1, 1, 'C');
+
+			// 테이블 데이터
+			$pdf->SetFont('cid0kr', '', 8);
+			
+			foreach ($other_debts as $debt) {
+				// 각 행의 높이를 텍스트 길이에 따라 조정
+				$description = $debt['debt_description'];
+				// 내용에 따라 줄 높이 계산 (대략적인 계산)
+				$lineHeight = max(8, ceil(strlen($description) / 80) * 8);
+				
+				$pdf->Cell($colWidth1, $lineHeight, $debt['creditor_count'], 1, 0, 'C');
+				$pdf->Cell($colWidth2, $lineHeight, $debt['financial_institution'], 1, 0, 'C');
+				
+				// MultiCell을 사용하여 긴 텍스트 처리
+				$xPos = $pdf->GetX();
+				$yPos = $pdf->GetY();
+				$pdf->MultiCell($colWidth3, $lineHeight, $description, 1, 'L');
+				
+				// 다음 셀 위치 조정
+				$pdf->SetXY($xPos + $colWidth3, $yPos);
+				
+				// 근저당권 설정 여부
+				$hasMortgage = $debt['has_mortgage'] ? 'O' : 'X';
+				$pdf->Cell($colWidth4, $lineHeight, $hasMortgage, 1, 1, 'C');
+			}
+		}
+	} catch (Exception $e) {
+		$pdf->SetFont('cid0kr', '', 8);
+		$pdf->MultiCell(0, 10, "기타(보증선 채무등) 내역 생성 중 오류 발생: " . $e->getMessage(), 0, 'C');
+	}
+	// --- 부속서류 4 표 추가 끝 ---
+	
+	// --- 주택담보대출채권 채무재조정 프로그램 신청서 추가 ---
+	try {
+		// 주택담보대출 신청서 관련 데이터 조회
+		$stmt_mortgage = $pdo->prepare("
+			SELECT 
+				c.creditor_count,
+				c.financial_institution,
+				c.address,
+				c.phone,
+				c.principal,
+				c.default_rate,
+				c.mortgage_restructuring,
+				r.name,
+				r.now_address,
+				cm.case_number,
+				a.max_claim
+			FROM
+				application_recovery_creditor c
+			JOIN
+				application_recovery r ON c.case_no = r.case_no
+			JOIN
+				case_management cm ON r.case_no = cm.case_no
+			JOIN
+				application_recovery_creditor_appendix a ON r.case_no = cm.case_no
+			WHERE 
+				c.case_no = ? AND c.mortgage_restructuring = 1
+			ORDER BY 
+				c.creditor_count ASC
+		");
+		$stmt_mortgage->execute([$case_no]);
+		$mortgage_creditors = $stmt_mortgage->fetchAll(PDO::FETCH_ASSOC);
+
+		if (!empty($mortgage_creditors)) {
+			foreach ($mortgage_creditors as $creditor) {
+				// 부동산 정보 조회 (첫번째 부동산 정보 사용)
+				$stmt_property = $pdo->prepare("
+					SELECT 
+						property_location
+					FROM 
+						application_recovery_asset_real_estate
+					WHERE 
+						case_no = ?
+					LIMIT 1
+				");
+				$stmt_property->execute([$case_no]);
+				$property = $stmt_property->fetch(PDO::FETCH_ASSOC);
+				
+				$pdf->AddPage();
+				
+				// 제목
+				$pdf->SetFont('cid0kr', 'B', 14);
+				$pdf->Cell(0, 10, '주택담보대출채권 채무재조정 프로그램 신청서', 0, 1, 'C');
+				$pdf->Ln(3);
+				
+				// 사건 정보
+				$pdf->SetFont('cid0kr', 'B', 10);
+				$pdf->Cell(25, 10, '사 건', 1, 0, 'C');
+				$pdf->SetFont('cid0kr', '', 10);
+				$pdf->Cell(155, 10, $creditor['case_number'].'    개인회생', 1, 1, 'L');
+				
+				// 신청인(채무자) 정보
+				$pdf->SetFont('cid0kr', 'B', 10);
+				$pdf->MultiCell(25, 30, "신청인\n(채무자)", 1, 'C', false, 0); // 여러 줄로 표시되도록 수정
+				$pdf->SetFont('cid0kr', '', 10);
+				
+				if($creditor['phone']==''){
+					$phone = '                                  ';
+				}else{
+					$phone = $creditor['phone'];
+				}
+				
+				$email = '                                  ';
+				
+				// 주소 줄바꿈 처리
+				$address_parts = explode(',', $creditor['now_address']);
+				$address1 = isset($address_parts[0]) ? trim($address_parts[0]) : '';
+				$address2 = isset($address_parts[1]) ? trim($address_parts[1]) : '';
+
+				// 신청인 정보 출력
+				$pdf->MultiCell(155, 30, 
+					"성명 : " . $creditor['name'] . "\n" .
+					"주소 : " . $address1 . "\n" . $address2 . "\n" .
+					"전화 : " . $phone . " (이메일 : ".$email.")", 
+					1, 'L', false, 1);
+
+				// 상대방(금융기관) 정보
+				$pdf->SetFont('cid0kr', 'B', 10);
+				$pdf->MultiCell(25, 30, "상대방\n(금융기관)", 1, 'C', false, 0); // 여러 줄로 표시되도록 수정
+				$pdf->SetFont('cid0kr', '', 10);
+
+				// 금융기관 주소 줄바꿈 처리
+				$creditor_address_parts = explode(',', $creditor['address']);
+				$creditor_address1 = isset($creditor_address_parts[0]) ? trim($creditor_address_parts[0]) : '';
+				$creditor_address2 = isset($creditor_address_parts[1]) ? trim($creditor_address_parts[1]) : '';
+				$creditor_address3 = isset($creditor_address_parts[2]) ? trim($creditor_address_parts[2]) : '';
+
+				$creditor_address = $creditor_address1;
+				if (!empty($creditor_address2)) {
+					$creditor_address .= "\n      " . $creditor_address2;
+				}
+				if (!empty($creditor_address3)) {
+					$creditor_address .= "\n      " . $creditor_address3;
+				}
+
+				// 상대방 정보 출력
+				$pdf->MultiCell(155, 30, 
+					"성명 : " . $creditor['financial_institution'] . "\n" .
+					"주소 : " . $creditor_address . "\n" .
+					"전화 : " . $phone . " (이메일 : ".$email.")", 
+					1, 'L', false, 1);
+
+				// 조정대상 주택담보대출의 내역
+				$pdf->SetFont('cid0kr', 'B', 10);
+				$pdf->MultiCell(25, 50, "조정대상\n주택담보대출의\n내역", 1, 'C', false, 0); // 여러 줄로 표시되도록 수정
+				$pdf->SetFont('cid0kr', '', 10);
+
+				// 현재 날짜 포맷
+				$now = date('Y.m.d');
+
+				// 부동산 위치
+				$property_location = isset($property['property_location']) ? $property['property_location'] : 'xxx';
+
+				// 원금 포맷팅
+				$principal = number_format($creditor['principal']) . '원';
+				$max_claim = number_format($creditor['max_claim']) . '원';
+
+				// 대출 정보 출력
+				$pdf->MultiCell(155, 50, 
+					"1. 대상 주택의 표시 :\n" .
+					$property_location . "\n\n" .
+					"2. 대상 주택담보대출채권액, 이율 및 채권최고액 :\n" .
+					"채권액(피담보채무금액) : " . $principal . " (" . $now . " 기준)\n" .
+					"이율 : ". $creditor['default_rate'] ."%\n" .
+					"채권최고액 : ". $max_claim, 
+					1, 'L', false, 1);
+				
+				// 신청 문구
+				$pdf->Ln(5);
+				$pdf->MultiCell(0, 10, "위와 같이 주택담보대출채권 채무재조정 프로그램을 신청합니다.", 0, 'L');
+				
+				// 서명란
+				$pdf->Ln(10);
+				$pdf->SetFont('cid0kr', '', 10);
+				$pdf->Cell(0, 10, '20   .    .    .', 0, 1, 'C');
+				$pdf->Cell(0, 10, '신청인 ' . $creditor['name'] . '   (인)', 0, 1, 'R');
+			}
+		}
+	} catch (Exception $e) {
+		$pdf->SetFont('cid0kr', '', 10);
+		$pdf->AddPage();
+		$pdf->MultiCell(0, 10, "주택담보대출채권 채무재조정 프로그램 신청서 생성 중 오류 발생: " . $e->getMessage(), 0, 'C');
+	}
+	// --- 주택담보대출채권 채무재조정 프로그램 신청서 추가 끝 ---
 }
 
 /**

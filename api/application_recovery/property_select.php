@@ -58,15 +58,18 @@ if (!$caseNo) {
         // 선택 버튼 클릭 이벤트
         $(document).on('click', '.select-btn', function() {
             const appendix_no = $(this).data('id');
+            // propertiesData 배열에서 appendix_no와 일치하는 전체 데이터 찾기
+            const selectedProperty = propertiesData.find(p => p.appendix_no == appendix_no); // Use == for potential type coercion
 
-            if (appendix_no) {
+            if (selectedProperty) {
                 window.opener.postMessage({
                     type: 'propertySelected',
-                    data: appendix_no // 선택된 데이터 전달
+                    data: selectedProperty // 선택된 전체 데이터 객체 전달
                 }, '*');
                 window.close();
             } else {
-                alert('오류: 선택된 목적물 정보를 가져올 수 없습니다.');
+                alert('오류: 선택된 목적물 정보를 찾을 수 없습니다.');
+                console.error('Could not find property with appendix_no:', appendix_no, 'in', propertiesData);
             }
         });
     });
