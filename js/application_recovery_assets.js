@@ -1300,7 +1300,7 @@ class AssetManager {
 			<div class="right-section">
 			  <div class="form">
 				<div class="form-title form-notitle"><span>청산가치 판단금액</span></div>
-				<div class="form-content form-nocontent">
+				<div class="form-content">
 				  <input type="text" class="property_liquidation_value input86" value="${data.property_liquidation_value ? this.formatMoney(data.property_liquidation_value) : ""}">원
 				</div>
 				<div class="form-content checkbox-right">
