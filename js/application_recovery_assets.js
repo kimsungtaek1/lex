@@ -828,8 +828,6 @@ addVehicleBlock(data = {}) {
 	  // 배우자명의 체크박스가 해제되면 부연설명 내용 삭제
 	  if (!$(this).is(":checked")) {
 		block.find(".vehicle_liquidation_explain").val("");
-	  }else{
-		  block.find(".vehicle_liquidation_explain").val("배우자명의 재산으로서 채무액을 공제한 환가예상액의 1/2 반영함");
 	  }
 	  
 	  // 청산가치 자동 계산 (수동계산이 아닐 경우)
@@ -1352,9 +1350,7 @@ addRealEstateBlock(data = {}) {
 	  // 배우자명의 체크박스가 해제되면 부연설명 내용 삭제
 	  if (!$(this).is(":checked")) {
 		block.find(".property_liquidation_explain").val("");
-	} else {
-		block.find(".property_liquidation_explain").val("배우자명의 재산으로서 채무액을 공제한 환가예상액의 1/2 반영함");
-	}
+		}
 	  
 	  // 청산가치 자동 계산 (수동계산이 아닐 경우)
 	  if (!block.find(".property_manual_calc").is(":checked")) {
