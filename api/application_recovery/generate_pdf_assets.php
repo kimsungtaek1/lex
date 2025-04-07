@@ -839,7 +839,7 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 			WHERE case_no = ?
 		");
 		$stmt->execute([$case_no]);
-		$exemption1 = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		$exemption1 = $stmt->fetch(PDO::FETCH_ASSOC);
 		
 		$exemption1_total = $exemption1['exemption_amount'] ?? 0;
 		
@@ -850,10 +850,10 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 			WHERE case_no = ?
 		");
 		$stmt->execute([$case_no]);
-		$exemption2 = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		$exemption2 = $stmt->fetch(PDO::FETCH_ASSOC);
 		
 		$exemption2_total = $exemption2['exemption_amount'] ?? 0;
-		$exemption2_contents = $exemption2['special_property_content'] ?? ''
+		$exemption2_contents = $exemption2['special_property_content'] ?? '';
 		
 		// 면제재산 - 임차보증금반환청구권 출력 (2줄로 수정)
 		if ($exemption1_total > 0) {
@@ -990,18 +990,21 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 	
 	// 소명자료 체크박스
 	$contract_check = ($exemption1['lease_contract'] ?? 'N') == 'Y' ? '[ V]' : '[   ]';
+	$contract_check_num = ($exemption1['lease_contract'] ?? 'N') == 'Y' ? '1' : '0';
 	$resident_check = ($exemption1['resident_registration'] ?? 'N') == 'Y' ? '[ V]' : '[   ]';
+	$resident_check_num = ($exemption1['resident_registration'] ?? 'N') == 'Y' ? '1' : '0';
 	$other_check = ($exemption1['other_evidence'] ?? 'N') == 'Y' ? '[ V]' : '[   ]';
+	$other_check_num = ($exemption1['other_evidence'] ?? 'N') == 'Y' ? $exemption1['other_evidence_detail'] : '';
 	
 	$pdf->Cell(7, 8, $contract_check, 0, 0, 'L');
-	$pdf->Cell(20, 8, '임대차계약서           '.$exemption2['evidence1'].'부', 0, 1, 'L');
+	$pdf->Cell(20, 8, '임대차계약서           '.$contract_check_num.'부', 0, 1, 'L');
 	$pdf->Cell(45, 8, '', 0, 0, 'L');
 	$pdf->Cell(7, 8, $resident_check, 0, 0, 'L');
-	$pdf->Cell(10, 8, '주민등록등본           '.$exemption2['evidence2'].'통', 0, 1, 'L');
+	$pdf->Cell(10, 8, '주민등록등본           '.$resident_check_num.'통', 0, 1, 'L');
 	$pdf->Cell(45, 8, '', 0, 0, 'L');
 	$pdf->Cell(7, 8, $other_check, 0, 0, 'L');
 	$pdf->Cell(20, 8, '기타 [', 0, 0, 'L');
-	$pdf->Cell(10, 8, $exemption2['evidence3'], 0, 0, 'L');
+	$pdf->Cell(2, 8, $other_check_num, 0, 0, 'L');
 	$pdf->Cell(5, 8, '] 통', 0, 1, 'L');
 	
 	$pdf->Ln(5);
@@ -1114,20 +1117,15 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 			$pdf->SetFont('cid0kr', '', 8);
 			
 			// 특정재산 테이블 헤더
-			$pdf->Cell(10, 8, '순번', 1, 0, 'C', true);
 			$pdf->Cell(40, 8, '특정재산의내용', 1, 0, 'C', true);
 			$pdf->Cell(60, 8, '소재지', 1, 0, 'C', true);
 			$pdf->Cell(30, 8, '추정시가', 1, 0, 'C', true);
 			$pdf->Cell(40, 8, '면제재산결정의 사유', 1, 1, 'C', true);
 			
-			// 특정재산 데이터
-			foreach ($exemption2 as $index => $exempt) {
-				$pdf->Cell(10, 8, ($index + 1), 1, 0, 'C');
-				$pdf->Cell(40, 8, $exempt['special_property_content'] ?? '', 1, 0, 'L');
-				$pdf->Cell(60, 8, '', 1, 0, 'C');
-				$pdf->Cell(30, 8, number_format($exempt['exemption_amount'] ?? 0) . '원', 1, 0, 'R');
-				$pdf->Cell(40, 8, '', 1, 1, 'C');
-			}
+			$pdf->Cell(40, 8, $exemption2['special_property_content'] ?? '', 1, 0, 'L');
+			$pdf->Cell(60, 8, '', 1, 0, 'C');
+			$pdf->Cell(30, 8, number_format($exemption2['exemption_amount'] ?? 0) . '원', 1, 0, 'R');
+			$pdf->Cell(40, 8, '', 1, 1, 'C');
 			
 			$pdf->Ln(5);
 			
