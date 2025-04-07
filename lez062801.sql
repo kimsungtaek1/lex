@@ -1,3 +1,9 @@
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
 
 
 CREATE TABLE application_bankruptcy (
@@ -597,30 +603,19 @@ CREATE TABLE application_recovery (
   income_source varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE application_recovery_asset_attached_deposits (
-  asset_no int(11) NOT NULL,
-  property_no int(11) NOT NULL,
-  case_no int(11) NOT NULL,
-  seizure_content text DEFAULT NULL COMMENT '압류내용',
-  custodian varchar(100) DEFAULT NULL COMMENT '보관자',
-  liquidation_value int(11) DEFAULT 0,
-  exclude_liquidation enum('Y','N') DEFAULT 'N' COMMENT '청산가치제외여부',
-  repayment_input enum('Y','N') DEFAULT 'N' COMMENT '변제투입여부',
-  created_at datetime DEFAULT current_timestamp(),
-  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 CREATE TABLE application_recovery_asset_business (
   asset_no int(11) NOT NULL,
-  property_no int(11) NOT NULL,
   case_no int(11) NOT NULL,
+  property_no int(11) NOT NULL COMMENT '품목번호',
   item_name varchar(255) NOT NULL COMMENT '품목',
   purchase_date varchar(7) NOT NULL COMMENT '구입시기',
   quantity int(11) NOT NULL COMMENT '수량',
   used_price int(11) NOT NULL COMMENT '중고시세',
   total int(11) NOT NULL COMMENT '합계',
   created_at datetime DEFAULT current_timestamp(),
-  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  liquidation_value int(11) DEFAULT 0 COMMENT '청산가치판단금액',
+  is_seized enum('Y','N') DEFAULT 'N' COMMENT '압류여부'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE application_recovery_asset_cash (
@@ -630,19 +625,6 @@ CREATE TABLE application_recovery_asset_cash (
   property_detail text DEFAULT NULL COMMENT '재산 세부 상황',
   liquidation_value int(11) DEFAULT 0,
   is_seized enum('Y','N') NOT NULL DEFAULT 'N' COMMENT '압류여부',
-  created_at datetime DEFAULT current_timestamp(),
-  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-CREATE TABLE application_recovery_asset_court_deposits (
-  asset_no int(11) NOT NULL,
-  property_no int(11) NOT NULL,
-  case_no int(11) NOT NULL,
-  seizure_content text DEFAULT NULL COMMENT '압류내용',
-  court_name varchar(100) DEFAULT NULL COMMENT '법원명',
-  liquidation_value int(11) DEFAULT 0,
-  exclude_liquidation enum('Y','N') DEFAULT 'N' COMMENT '청산가치제외여부',
-  repayment_input enum('Y','N') DEFAULT 'N' COMMENT '변제투입여부',
   created_at datetime DEFAULT current_timestamp(),
   updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -843,6 +825,32 @@ CREATE TABLE application_recovery_asset_sales_receivables (
   created_at datetime DEFAULT current_timestamp(),
   updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE application_recovery_asset_seizure_deposit (
+  asset_no int(11) NOT NULL,
+  property_no int(11) NOT NULL,
+  case_no int(11) NOT NULL,
+  seizure_content text DEFAULT NULL COMMENT '공탁내용',
+  keeper varchar(100) DEFAULT NULL COMMENT '공탁기관',
+  liquidation_value int(11) DEFAULT 0,
+  exclude_liquidation enum('Y','N') DEFAULT 'N' COMMENT '청산가치제외여부',
+  repayment_input enum('Y','N') DEFAULT 'N' COMMENT '변제투입여부',
+  created_at datetime DEFAULT current_timestamp(),
+  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='회생 공탁금';
+
+CREATE TABLE application_recovery_asset_seizure_reserve (
+  asset_no int(11) NOT NULL,
+  property_no int(11) NOT NULL,
+  case_no int(11) NOT NULL,
+  seizure_reserve_content text DEFAULT NULL COMMENT '공탁내용',
+  keeper varchar(100) DEFAULT NULL COMMENT '공탁기관',
+  liquidation_value int(11) DEFAULT 0,
+  reserve_exclude_liquidation enum('Y','N') DEFAULT 'N' COMMENT '청산가치제외여부',
+  repayment_input enum('Y','N') DEFAULT 'N' COMMENT '변제투입여부',
+  created_at datetime DEFAULT current_timestamp(),
+  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='회생 공탁금';
 
 CREATE TABLE application_recovery_asset_severance (
   asset_no int(11) NOT NULL,
@@ -1650,18 +1658,10 @@ ALTER TABLE application_recovery
   ADD KEY case_no (case_no),
   ADD KEY assigned_employee (assigned_employee);
 
-ALTER TABLE application_recovery_asset_attached_deposits
-  ADD PRIMARY KEY (asset_no),
-  ADD KEY case_no (case_no);
-
 ALTER TABLE application_recovery_asset_business
   ADD PRIMARY KEY (asset_no);
 
 ALTER TABLE application_recovery_asset_cash
-  ADD PRIMARY KEY (asset_no),
-  ADD KEY case_no (case_no);
-
-ALTER TABLE application_recovery_asset_court_deposits
   ADD PRIMARY KEY (asset_no),
   ADD KEY case_no (case_no);
 
@@ -1713,6 +1713,12 @@ ALTER TABLE application_recovery_asset_rent_deposits
 ALTER TABLE application_recovery_asset_sales_receivables
   ADD PRIMARY KEY (asset_no),
   ADD KEY case_no (case_no);
+
+ALTER TABLE application_recovery_asset_seizure_deposit
+  ADD PRIMARY KEY (asset_no);
+
+ALTER TABLE application_recovery_asset_seizure_reserve
+  ADD PRIMARY KEY (asset_no);
 
 ALTER TABLE application_recovery_asset_severance
   ADD PRIMARY KEY (asset_no),
@@ -2024,16 +2030,10 @@ ALTER TABLE application_income_living_expense_standard
 ALTER TABLE application_recovery
   MODIFY recovery_no int(11) NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE application_recovery_asset_attached_deposits
-  MODIFY asset_no int(11) NOT NULL AUTO_INCREMENT;
-
 ALTER TABLE application_recovery_asset_business
   MODIFY asset_no int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE application_recovery_asset_cash
-  MODIFY asset_no int(11) NOT NULL AUTO_INCREMENT;
-
-ALTER TABLE application_recovery_asset_court_deposits
   MODIFY asset_no int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE application_recovery_asset_deposits
@@ -2073,6 +2073,12 @@ ALTER TABLE application_recovery_asset_rent_deposits
   MODIFY asset_no int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE application_recovery_asset_sales_receivables
+  MODIFY asset_no int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE application_recovery_asset_seizure_deposit
+  MODIFY asset_no int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE application_recovery_asset_seizure_reserve
   MODIFY asset_no int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE application_recovery_asset_severance
@@ -2263,14 +2269,8 @@ ALTER TABLE application_recovery
   ADD CONSTRAINT application_recovery_ibfk_1 FOREIGN KEY (case_no) REFERENCES case_management (case_no),
   ADD CONSTRAINT application_recovery_ibfk_2 FOREIGN KEY (assigned_employee) REFERENCES employee (employee_no);
 
-ALTER TABLE application_recovery_asset_attached_deposits
-  ADD CONSTRAINT fk_attached_deposits_case FOREIGN KEY (case_no) REFERENCES case_management (case_no) ON DELETE CASCADE;
-
 ALTER TABLE application_recovery_asset_cash
   ADD CONSTRAINT fk_cash_case FOREIGN KEY (case_no) REFERENCES case_management (case_no) ON DELETE CASCADE;
-
-ALTER TABLE application_recovery_asset_court_deposits
-  ADD CONSTRAINT fk_court_deposits_case FOREIGN KEY (case_no) REFERENCES case_management (case_no) ON DELETE CASCADE;
 
 ALTER TABLE application_recovery_asset_deposits
   ADD CONSTRAINT fk_deposits_case FOREIGN KEY (case_no) REFERENCES case_management (case_no) ON DELETE CASCADE;
@@ -2409,3 +2409,7 @@ ALTER TABLE inflow
 
 ALTER TABLE stay_orders
   ADD CONSTRAINT stay_orders_ibfk_1 FOREIGN KEY (case_no) REFERENCES case_management (case_no);
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
