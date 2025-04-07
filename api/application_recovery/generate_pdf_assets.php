@@ -788,36 +788,27 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		");
 		$stmt->execute([$case_no]);
 		$other_assets = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		
+
 		$other_total = 0;
-		$other_contents = [];
-		$other_seized = 'N';
-		
-		foreach ($other_assets as $other) {
-			$other_total += $other['liquidation_value'] ?? 0;
-			if ($other['asset_content']) {
-				$other_contents[] = $other['asset_content'];
-			}
-			if ($other['is_seized'] == 'Y') {
-				$other_seized = 'Y';
-			}
-		}
-		
-		// 기타 자산 출력
+
+		// 각 기타 자산 데이터별로 개별 테이블 행 생성
 		if (count($other_assets) > 0) {
-			// 새 페이지 확인
-			if ($pdf->GetY() + $row_height > $pdf->getPageHeight() - 20) {
-				$pdf->AddPage();
+			foreach ($other_assets as $index => $other) {
+				$other_total += $other['liquidation_value'] ?? 0;
+				
+				// 새 페이지 확인
+				if ($pdf->GetY() + $row_height > $pdf->getPageHeight() - 20) {
+					$pdf->AddPage();
+				}
+				
+				$pdf->Cell($col1_width, $row_height, '기타 #'.($index+1), 1, 0, 'C');
+				$pdf->Cell($col2_width, $row_height, number_format($other['liquidation_value'] ?? 0), 1, 0, 'R');
+				$pdf->Cell($col3_width, $row_height, $other['is_seized'] ?? 'N', 1, 0, 'C');
+				
+				// 비고 셀 출력
+				$pdf->Cell($note_col1_width, $row_height, '재산 내용', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $row_height, $other['asset_content'] ?? '', 1, 1, 'L');
 			}
-			
-			$pdf->Cell($col1_width, $row_height, '기타', 1, 0, 'C');
-			$pdf->Cell($col2_width, $row_height, number_format($other_total), 1, 0, 'R');
-			$pdf->Cell($col3_width, $row_height, $other_seized, 1, 0, 'C');
-			
-			// 비고 셀 출력
-			$pdf->Cell($note_col1_width, $row_height, '내용', 1, 0, 'C');
-			$pdf->Cell($note_col2_width, $row_height, implode(', ', $other_contents), 1, 1, 'L');
-			
 		} else {
 			// 기타 자산 데이터가 없는 경우
 			$pdf->Cell($col1_width, 8, '기타', 1, 0, 'C');
@@ -838,6 +829,8 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		$pdf->Cell($col3_width, $row_height, '', 1, 0, 'C');
 		$pdf->Cell($note_col1_width, $row_height, '', 1, 0, 'C');
 		$pdf->Cell($note_col2_width, $row_height, '', 1, 1, 'L');
+		
+		
 		
 		// 면제재산 - 임차보증금반환청구권
 		$stmt = $pdo->prepare("
