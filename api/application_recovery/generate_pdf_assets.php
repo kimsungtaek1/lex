@@ -994,14 +994,14 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 	$other_check = ($exemption1['other_evidence'] ?? 'N') == 'Y' ? '[ V]' : '[   ]';
 	
 	$pdf->Cell(7, 8, $contract_check, 0, 0, 'L');
-	$pdf->Cell(20, 8, '임대차계약서           '.evidence1.'부', 0, 1, 'L');
+	$pdf->Cell(20, 8, '임대차계약서           '.$exemption2['evidence1'].'부', 0, 1, 'L');
 	$pdf->Cell(45, 8, '', 0, 0, 'L');
 	$pdf->Cell(7, 8, $resident_check, 0, 0, 'L');
-	$pdf->Cell(10, 8, '주민등록등본           '.evidence2.'통', 0, 1, 'L');
+	$pdf->Cell(10, 8, '주민등록등본           '.$exemption2['evidence2'].'통', 0, 1, 'L');
 	$pdf->Cell(45, 8, '', 0, 0, 'L');
 	$pdf->Cell(7, 8, $other_check, 0, 0, 'L');
 	$pdf->Cell(20, 8, '기타 [', 0, 0, 'L');
-	$pdf->Cell(10, 8, evidence3, 0, 0, 'L');
+	$pdf->Cell(10, 8, $exemption2['evidence3'], 0, 0, 'L');
 	$pdf->Cell(5, 8, '] 통', 0, 1, 'L');
 	
 	$pdf->Ln(5);
