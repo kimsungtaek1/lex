@@ -1,0 +1,92 @@
+*{font-size:0.7vw}
+.container{margin:0 5vw}
+.tab{width:100%;overflow-x:auto;border:none;background:#6c6c6c;box-shadow:0 0.5vh 0.5vh rgba(0,0,0,0.4)}
+.tab table{width:100%;border-collapse:collapse}
+.tab th{width:15%;padding:0.7vw 0 0.7vw 3vw;text-align:left;color:#fff;font-weight:500;cursor:pointer;transition:background-color 0.3s ease}
+.tab th.active{color:#00e6c3}
+.tab th:last-child{width:40%;cursor:auto}
+.content-area{flex:1;padding:30px;background-color:#fff;margin:20px;border-radius:10px;box-shadow:0 2px 4px rgba(0,0,0,0.05)}
+.top-header{margin-bottom:30px}
+.control-box{display:flex;justify-content:flex-end;gap:10px}
+.control-box input{max-width:5vw;padding-left:10px;border:1px solid #ddd;border-radius:5px}
+.add-employee-btn,.add-dept-btn,.add-position-btn{height:1.2vw;background:#b0b0b0;min-width:3vw;color:#000;border:none;border-radius:5px;cursor:pointer}
+.data-table{width:100%;overflow-x:auto;margin-top:1vh}
+.data-table table{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0 1.5vh}
+.data-table th{padding:1vh 0.5vw;text-align:left;background:#6c6c6c;color:#fff;font-weight:500;border-bottom:1px solid #eee;cursor:pointer;transition:background-color 0.3s ease;margin-bottom:2vh}
+.data-table th:last-child{padding:1vh 2vw;}
+.data-table tr.active{background-color:#f5f5f5}
+.data-table tr.active td{background-color:#f5f5f5}
+
+/* Employee 테이블 열 너비 */
+#employeeSection .data-table th:nth-child(1){width:7%;padding-left:2vw}
+#employeeSection .data-table th:nth-child(2){width:8%}
+#employeeSection .data-table th:nth-child(3){width:8%}
+#employeeSection .data-table th:nth-child(4){width:8%}
+#employeeSection .data-table th:nth-child(5){width:14%}
+#employeeSection .data-table th:nth-child(6){width:10%}
+#employeeSection .data-table th:nth-child(7){width:10%}
+#employeeSection .data-table th:nth-child(8){width:10%}
+#employeeSection .data-table th:nth-child(9){width:6%}
+#employeeSection .data-table th:nth-child(10){width:7%;padding-right:2vw}
+
+/* Department 테이블 열 너비 */
+#departmentSection .data-table th:nth-child(1){width:20%;padding-left:2vw}
+#departmentSection .data-table th:nth-child(2){width:30%}
+#departmentSection .data-table th:nth-child(3){width:20%}
+#departmentSection .data-table th:nth-child(4){width:15%}
+#departmentSection .data-table th:nth-child(5){width:15%;padding-right:2vw}
+
+/* Position 테이블 열 너비 */
+#positionSection .data-table th:nth-child(1){width:40%;padding-left:2vw}
+#positionSection .data-table th:nth-child(2){width:20%}
+#positionSection .data-table th:nth-child(3){width:20%}
+#positionSection .data-table th:nth-child(4){width:20%;padding-right:2vw}
+
+/* 공통 테이블 스타일 */
+.data-table td{padding:1vh 0.5vw;border-top:1px solid #eee;border-bottom:1px solid #eee;color:#333}
+.data-table tr td:first-child{padding-left:2vw;border-left:1px solid #eee}
+.data-table tr td:last-child{text-align:right;padding-right:2vw;border-right:1px solid #eee}
+
+/* 버튼 스타일 통일 */
+.btn-save,.btn-delete,.btn-save-dept,.btn-delete-dept,.btn-save-pos,.btn-delete-pos{height:1.2vw;border:none;border-radius:4px;cursor:pointer;margin-bottom:5px;background:#b0b0b0;color:#000;box-shadow:2px 2px 4px rgba(0,0,0,0.2);min-width:3vw;}
+.btn-save:hover,.btn-delete:hover,.btn-save-dept:hover,.btn-delete-dept:hover,.btn-save-pos:hover,.btn-delete-pos:hover{background:#999;box-shadow:1px 1px 3px rgba(0,0,0,0.3)}
+
+/* 셀렉트 박스 스타일 통일 */
+.status-select{padding:5px 25px 5px 12px;border:1px solid #ddd;border-radius:5px;min-width:60px;color:#666;background-color:#fff;appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");background-repeat:no-repeat;background-position:right 8px center;background-size:12px}
+.control-box .status-select{border:none;background-color:#b0b0b0;color:#000;}
+.status-field,.auth-field,.dept-select,.position-select,.manager-select, .use-yn-select{padding:5px 25px 5px 12px;border:1px solid #ddd;border-radius:5px;min-width:60px;color:#666;background-color:#fff;appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");background-repeat:no-repeat;background-position:right 8px center;background-size:12px}
+.status-field:focus,.auth-field:focus,.dept-select:focus,.position-select:focus,.manager-select:focus,.use-yn-select:focus{outline:none;border-color:#00e6c3}
+.status-field option,.auth-field option,.dept-select option,.position-select option,.manager-select option,.use-yn-select option{padding:5px}
+
+
+/* 검색 박스 */
+.search-box{display:flex;justify-content:flex-end;margin-top:1vh;margin-right:2vw}
+.search-box input{max-width:4vw;padding-left:10px;border:1px solid #ddd;border-right:none;border-radius:5px 0 0 5px}
+.search-btn{height:1.2vw;background:#fff;border:1px solid #ddd;border-left:none;cursor:pointer;border-radius:0 5px 5px 0}
+
+/* 페이지네이션 */
+.pagination{display:flex;align-items:center;justify-content:center;gap:5px;margin:2vh 0 4vh}
+.page-numbers{display:flex;gap:5px}
+.page-btn{width:30px;height:30px;border:1px solid #ddd;background:#fff;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#666;transition:all 0.3s ease}
+.page-btn:hover:not(:disabled){background:#f8f9fa;color:#00e6c3;border-color:#00e6c3}
+.page-btn:disabled{cursor:not-allowed;opacity:0.5}
+.page-btn.active{background:#00e6c3;color:#fff;border-color:#00e6c3}
+
+/* 정렬 표시자 */
+.sort-indicator{display:inline-block;margin-left:5px}
+
+/* 섹션 표시 */
+.section-content{display:none}
+#employeeSection{display:block}
+
+/* Editable 셀 스타일 */
+.editable{cursor:pointer}
+.editable input{width:90%;padding:5px;border:1px solid #00e6c3;border-radius:3px}
+
+/* 모바일 반응형 */
+@media screen and (max-width:768px){
+    *{font-size:12px}
+    .data-table select{min-width:60px}
+    .btn-save,.btn-delete,.btn-save-dept,.btn-delete-dept,.btn-save-pos,.btn-delete-pos{padding:3px 8px}
+    .search-box input{max-width:80px}
+}

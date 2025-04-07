@@ -1,0 +1,1 @@
+AddPage, SetFont, Cell, MultiCell, Write, Output, SetMargins, Image, SetTitle, SetAuthor, Header, Footer, Ln, SetFillColor, SetTextColor, SetDrawColor
