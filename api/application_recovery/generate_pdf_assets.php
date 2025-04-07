@@ -706,7 +706,7 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 			
 			// 모든 정보를 순차적으로 추가
 			if (!empty($seizure_deposit['keeper'])) {
-			  $additionalInfo .= " (보관자: " . $seizure_deposit['keeper'] . ")";
+			  $additionalInfo .= " [보관자: " . $seizure_deposit['keeper'] . "]";
 			}
 			
 			// 체크박스 정보 추가
@@ -757,7 +757,7 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 			
 			// 모든 정보를 순차적으로 추가
 			if (!empty($seizure_reserve['keeper'])) {
-			  $additionalInfo .= " (공탁된 법원: " . $seizure_reserve['keeper'] . ")";
+			  $additionalInfo .= " [공탁된 법원: " . $seizure_reserve['keeper'] . "]";
 			}
 			
 			// 체크박스 정보 추가
