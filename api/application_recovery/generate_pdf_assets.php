@@ -1063,7 +1063,7 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 			// 테이블 헤더 - 면제재산 금액
 			$pdf->SetFont('cid0kr', 'B', 10);
 			$pdf->Cell(40, 10, '면제재산 금액', 1, 0, 'C');
-			$pdf->Cell(150, 10, '금 ' . number_format($exemption1_total) . ' 원', 1, 1, 'L');
+			$pdf->Cell(130, 10, '금 ' . number_format($exemption1_total) . ' 원', 1, 1, 'L');
 			
 			// 주택임대차계약의 내용 타이틀
 			$pdf->Cell(40, 80, '주택임대차계약의 내용', 1, 0, 'C');
@@ -1099,7 +1099,7 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 			$contract_info .= "⑧확정일자\t\t( " . ($exemption1_item['fixed_date'] ?? '') . " 확정일자받음 )";
 			
 			// MultiCell로 계약 정보 출력
-			$pdf->MultiCell(150, 80, $contract_info, 1, 'L');
+			$pdf->MultiCell(130, 80, $contract_info, 1, 'L');
 			
 			// 소명자료 체크박스
 			$contract_check = ($exemption1_item['lease_contract'] ?? 'N') == 'Y' ? '[ V]' : '[  ]';
@@ -1114,7 +1114,7 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 			$evidence_info .= $resident_check . " 주민등록등본 1통 / ";
 			$evidence_info .= $other_check . " 기타 [" . ($exemption1_item['other_evidence_detail'] ?? '') . "] 통";
 			
-			$pdf->MultiCell(150, 10, $evidence_info, 1, 'L');
+			$pdf->MultiCell(130, 10, $evidence_info, 1, 'L');
 			
 			$pdf->Ln(5);
 		}
