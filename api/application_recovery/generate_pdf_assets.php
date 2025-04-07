@@ -1148,14 +1148,12 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 			$evidence2_check = !empty($exemption2['evidence2'] ?? '') ? '[ V]' : '[   ]';
 			$evidence3_check = !empty($exemption2['evidence3'] ?? '') ? '[ V]' : '[   ]';
 			
-			$pdf->Cell(10, 8, $evidence1_check, 0, 0, 'C');
-			$pdf->Cell(20, 8, '( ' . ($exemption2['evidence1'] ?? '') . ' )보증서 1통', 0, 0, 'L');
-			$pdf->Cell(5, 8, '/', 0, 0, 'C');
-			$pdf->Cell(10, 8, $evidence2_check, 0, 0, 'C');
-			$pdf->Cell(20, 8, '사진 1장', 0, 0, 'L');
-			$pdf->Cell(5, 8, '/', 0, 0, 'C');
-			$pdf->Cell(10, 8, $evidence3_check, 0, 0, 'C');
-			$pdf->Cell(20, 8, '기타 [' . ($exemption2['evidence3'] ?? '') . '] 통', 0, 1, 'L');
+			$pdf->Cell(10, 8, $evidence1_check, 0, 0, 'L');
+			$pdf->Cell(30, 8, '( ' . ($exemption2['evidence1'] ?? '') . ' )보증서 1통', 0, 0, 'L');
+			$pdf->Cell(10, 8, $evidence2_check, 0, 0, 'L');
+			$pdf->Cell(30, 8, '사진 1장', 0, 0, 'L');
+			$pdf->Cell(10, 8, $evidence3_check, 0, 0, 'L');
+			$pdf->Cell(30, 8, '기타 [' . ($exemption2['evidence3'] ?? '') . '] 통', 0, 1, 'L');
 		}
 	}
 }
