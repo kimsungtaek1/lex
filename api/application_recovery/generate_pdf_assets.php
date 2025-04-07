@@ -899,23 +899,25 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 			$pdf->MultiCell($note_col2_width, $row_height*2, '2. 6개월간 생계비에 사용할 특정재산', 1, 'L', false, 1, '', '', true, 0, false, true, $row_height*2, 'M');
 		}
 		
+		
+		// 청산가치 출력 (3줄 멀티셀로 수정)
 		// 청산가치 계산
 		$total_exemption = $exemption1_total + $exemption2_total;
 		$liquidation_value = $total_assets - $total_exemption;
-		
-		// 청산가치 출력
-		$pdf->Cell($col1_width, $row_height, '청산가치', 1, 0, 'C');
-		$pdf->Cell($col2_width, $row_height, number_format($liquidation_value), 1, 0, 'R');
-		$pdf->Cell($col3_width, $row_height, '', 1, 0, 'C');
-		
+
+		// 청산가치 출력 - 3줄짜리 멀티셀로 수정
+		$pdf->MultiCell($col1_width, $row_height*3, "청산가치\n\n(총 재산에서\n면제재산 제외)", 1, 'C', false, 0, '', '', true, 0, false, true, $row_height*3, 'M');
+		$pdf->MultiCell($col2_width, $row_height*3, number_format($liquidation_value), 1, 'R', false, 0, '', '', true, 0, false, true, $row_height*3, 'M');
+		$pdf->MultiCell($col3_width, $row_height*3, '', 1, 'C', false, 0, '', '', true, 0, false, true, $row_height*3, 'M');
+
 		// 비고 셀 - 예금과 보험 청산가치 계산 내역
-		$pdf->Cell($note_col1_width, $row_height, '청산가치 계산', 1, 0, 'C');
-		
+		$pdf->MultiCell($note_col1_width, $row_height*3, "청산가치\n계산\n내역", 1, 'C', false, 0, '', '', true, 0, false, true, $row_height*3, 'M');
+
 		// 예금 청산가치 계산
 		$deposit_exemption = 1850000; // 압류금지 예금 (185만원)
 		$deposit_liquidation = $deposit_total - $deposit_exemption;
 		if ($deposit_liquidation < 0) $deposit_liquidation = 0;
-		
+
 		// 보험 청산가치 계산
 		$insurance_coverage_total = 0;
 		foreach ($insurances as $insurance) {
@@ -927,13 +929,14 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		$insurance_liquidation = $insurance_coverage_total - $insurance_exemption;
 		if ($insurance_liquidation < 0) $insurance_liquidation = 0;
 		$insurance_liquidation += ($insurance_total - $insurance_coverage_total);
-		
+
 		$calculation_note = "*예금(청산가치) : " . number_format($deposit_liquidation) . "원\n";
 		$calculation_note .= "=[예치금액 합계: " . number_format($deposit_total) . " - 공제금액: " . number_format($deposit_exemption) . "]\n";
 		$calculation_note .= "*보험(청산가치): " . number_format($insurance_liquidation) . "원\n";
 		$calculation_note .= "=[{보장성: " . number_format($insurance_coverage_total) . " - 공제금액: " . number_format($insurance_exemption) . "} + " . number_format($insurance_total - $insurance_coverage_total) . "]";
+
+		$pdf->MultiCell($note_col2_width, $row_height*3, $calculation_note, 1, 'L', false, 1, '', '', true, 0, false, true, $row_height*3, 'T');
 		
-		$pdf->MultiCell($note_col2_width, $row_height, $calculation_note, 1, 'L', false, 1, '', '', true, 0, false, true, $row_height * 4, 'T');
 		
 	} catch (Exception $e) {
 		$pdf->MultiCell(0, $row_height, 
