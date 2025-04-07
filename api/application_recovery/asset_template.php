@@ -160,133 +160,27 @@
       <div class="checkbox-group">
         <span>(가)압류 적립금</span>
       </div>
-    </div>
-  </div>
-  <div id="seizure_deposit_assets_container">
-    <div class="content-wrapper">
-      <div class="left-section">
-        <div class="form">
-          <div class="form-title">
-            <span>(가)압류 내용</span>
-          </div>
-          <div class="form-content">
-            <input type="text" name="seizure_content" id="seizure_content_desc" class="form-control form-content-long">
-          </div>
-        </div>
-        <div class="form">
-          <div class="form-title">
-            <span>보관자(회사 등)</span>
-          </div>
-          <div class="form-content">
-            <input type="text" name="custodian" id="seizure_custodian" class="form-control">
-          </div>
-        </div>
-        <div class="form">
-          <div class="form-title">
-            <span>청산가치 판단금액</span>
-          </div>
-          <div class="form-content">
-            <input type="text" name="liquidation_value" id="seizure_liquidation_value" class="form-control form-content-justify">원
-          </div>
-          <div class="form-content checkbox-right">
-            <input type="checkbox" id="seizure_exclude_liquidation" name="seizure_exclude_liquidation">
-            <label for="seizure_exclude_liquidation">청산가치에서 제외</label>
-          </div>
-        </div>
-      </div>
-      <div class="right-section">
-        <div class="form">
-          <div class="form-title">
-            <span>변제투입 유무</span>
-          </div>
-          <div class="form-content">
-            <input type="checkbox" id="seizure_repayment_input" name="seizure_repayment_input">
-            <label for="seizure_repayment_input">가용소득 1회 투입</label>
-          </div>
-        </div>
-        <div class="form">
-          <div class="form-title form-notitle">
-            <span></span>
-          </div>
-          <div class="form-content form-nocontent"></div>
-        </div>
-        <div class="form">
-          <div class="form-title"></div>
-          <div class="form-content btn-right">
-            <button type="button" class="btn-save" id="seizure_btn_save">저장</button>
-          </div>
-        </div>
+      <div class="button-group">
+        <button type="button" class="btn btn-add2" id="add_seizure_deposit_asset">추가</button>
       </div>
     </div>
   </div>
+  <div id="seizure_deposit_assets_container"></div>
 </div>
 
 <!-- 공탁금 섹션 -->
-<div class="asset-box" data-type="deposit_money">
+<div class="asset-box" data-type="seizure_reserve">
   <div class="section-header">
     <div class="creditor-title">
       <div class="checkbox-group">
         <span>공탁금</span>
       </div>
-    </div>
-  </div>
-  <div id="deposit_money_assets_container">
-    <div class="content-wrapper">
-      <div class="left-section">
-        <div class="form">
-          <div class="form-title">
-            <span>(가)압류 내용</span>
-          </div>
-          <div class="form-content">
-            <input type="text" name="seizure_content" id="deposit_money_seizure_content" class="form-control">
-          </div>
-        </div>
-        <div class="form">
-          <div class="form-title">
-            <span>보관자(공탁된 법원)</span>
-          </div>
-          <div class="form-content">
-            <input type="text" name="court_name" id="deposit_money_court_name" class="form-control">
-          </div>
-        </div>
-        <div class="form">
-          <div class="form-title">
-            <span>청산가치 판단금액</span>
-          </div>
-          <div class="form-content">
-            <input type="text" name="deposit_liquidation_value" id="deposit_money_liquidation_value" class="form-control form-content-justify">원
-          </div>
-          <div class="form-content checkbox-right">
-            <input type="checkbox" id="deposit_money_exclude" name="deposit_money_exclude">
-            <label for="deposit_money_exclude">청산가치에서 제외</label>
-          </div>
-        </div>
-      </div>
-      <div class="right-section">
-        <div class="form">
-          <div class="form-title">
-            <span>변제투입 유무</span>
-          </div>
-          <div class="form-content">
-            <input type="checkbox" id="deposit_money_repayment" name="deposit_money_repayment">
-            <label for="deposit_money_repayment">가용소득 1회 투입</label>
-          </div>
-        </div>
-        <div class="form">
-          <div class="form-title form-notitle">
-            <span></span>
-          </div>
-          <div class="form-content form-nocontent"></div>
-        </div>
-        <div class="form">
-          <div class="form-title"></div>
-          <div class="form-content btn-right">
-            <button type="button" class="btn-save" id="deposit_money_btn_save">저장</button>
-          </div>
-        </div>
+      <div class="button-group">
+        <button type="button" class="btn btn-add2" id="add_seizure_reserve_asset">추가</button>
       </div>
     </div>
   </div>
+  <div id="seizure_reserve_assets_container"></div>
 </div>
 
 <!-- 기타 섹션 -->
