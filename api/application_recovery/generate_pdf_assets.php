@@ -826,17 +826,7 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		// 합계 계산
 		$total_assets = $cash_total + $deposit_total + $insurance_total + $vehicle_total + 
 						$rent_total + $real_estate_total + $business_total + 
-						$loan_total + $sales_total + $severance_total;
-		
-		if ($attached_deposit) {
-			$total_assets += $attached_deposit['liquidation_value'] ?? 0;
-		}
-		
-		if ($court_deposit) {
-			$total_assets += $court_deposit['liquidation_value'] ?? 0;
-		}
-		
-		$total_assets += $other_total;
+						$loan_total + $sales_total + $severance_total + $other_total;
 		
 		// 합계 출력
 		$pdf->Cell($col1_width, $row_height, '합계', 1, 0, 'C');
