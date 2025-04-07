@@ -66,8 +66,8 @@ class AssetManager {
     $("#add_other_asset").on("click", () => this.addOtherAssetBlock());
     $("#add_exempt_property_asset").on("click", () => this.addExemptPropertyBlock());
     $("#add_exempt_property_special_asset").on("click", () => this.addExemptPropertySpecialBlock());
-    $("#add_seizure_deposit_asset").on("click", () => this.addSeizureDepositBlock()); // (가)압류 적립금 추가 버튼 이벤트 핸들러 연결
-    $("#add_seizure_reserve_asset").on("click", () => this.addSeizureReserveBlock()); // 공탁금 추가 버튼 이벤트 핸들러 연결
+    $("#add_seizure_deposit_asset").on("click", () => this.addSeizureDepositBlock());
+    $("#add_seizure_reserve_asset").on("click", () => this.addSeizureReserveBlock());
 	
     // 소액임차인 최우선 변제금 기준 팝업 이벤트 추가
     $('#exempt_rent_criteria').on('click', function() {

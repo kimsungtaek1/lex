@@ -959,9 +959,10 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 	
 	// 사건 정보 조회
 	$stmt = $pdo->prepare("
-		SELECT r.case_no, r.court_name, r.name, c.case_number, ex2.*
+		SELECT r.case_no, r.court_name, r.name, c.case_number, ex1.*, ex2.*
 		FROM application_recovery r
 		JOIN case_management c ON r.case_no = c.case_no
+		JOIN application_recovery_asset_exemption1 ex1 ON r.case_no = ex1.case_no
 		JOIN application_recovery_asset_exemption2 ex2 ON r.case_no = ex2.case_no
 		WHERE r.case_no = ?
 	");
