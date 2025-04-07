@@ -965,11 +965,8 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 	
 	$pdf->Ln(5);
 	
-	$pdf->MultiCell(0, 8, 
-		"신청인은 채무자 회생 및 파산에 관한 법률 제580조 제3항,제1항 제1호,제383조 제2항에 따라\n".
-		"채무자 소유의 별지 목록 기재 재산을 면제재산으로 정한다는 결정을 구합니다.\n".
-		"(※아래 해당되는 부분에 ∨ 표를 하고, 면제재산결정 신청을 하는 재산목록 및 소명자료를\n".
-		"첨부하시기 바랍니다.)", 
+	$pdf->MultiCell(150, 8, 
+		"    신청인은 채무자 회생 및 파산에 관한 법률 제580조 제3항,제1항 제1호,제383조 제2항에 따라 채무자 소유의 별지 목록 기재  재산을 면제재산으로 정한다는 결정을 구합니다. \n(※아래 해당되는 부분에 ∨ 표를 하고, 면제재산결정 신청을 하는 재산목록 및 소명자료를 첨부하시기 바랍니다.)", 
 		0, 'L'
 	);
 	
@@ -977,9 +974,9 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 	
 	// 임차보증금 면제재산 표시
 	$checkbox1 = ($exemption1_total > 0) ? "[ V]" : "[   ]";
-	$pdf->Cell(10, 8, $checkbox1, 0, 0, 'C');
-	$pdf->Cell(170, 8, '1. 주거용건물 임차보증금반환청구권에 대한 면제재산결정 신청', 0, 1, 'L');
-	$pdf->Cell(190, 8, '(법 제580조 제3항, 제1항 제1호, 제383조 제2항 제1호)', 0, 1, 'L');
+	$pdf->Cell(20, 8, $checkbox1, 0, 0, 'C');
+	$pdf->Cell(20, 8, '1. 주거용건물 임차보증금반환청구권에 대한 면제재산결정 신청', 0, 1, 'L');
+	$pdf->Cell(20, 8, '(법 제580조 제3항, 제1항 제1호, 제383조 제2항 제1호)', 0, 1, 'L');
 	
 	$pdf->Cell(20, 8, '', 0, 0, 'L');
 	$pdf->Cell(170, 8, '※ 첨부서류', 0, 1, 'L');
@@ -997,14 +994,14 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 	$other_check_num = ($exemption1['other_evidence'] ?? 'N') == 'Y' ? $exemption1['other_evidence_detail'] : '';
 	
 	$pdf->Cell(7, 8, $contract_check, 0, 0, 'L');
-	$pdf->Cell(20, 8, '임대차계약서           '.$contract_check_num.'부', 0, 1, 'L');
+	$pdf->Cell(55, 8, '임대차계약서                  '.$contract_check_num.'부', 0, 1, 'L');
 	$pdf->Cell(45, 8, '', 0, 0, 'L');
 	$pdf->Cell(7, 8, $resident_check, 0, 0, 'L');
-	$pdf->Cell(10, 8, '주민등록등본           '.$resident_check_num.'통', 0, 1, 'L');
+	$pdf->Cell(55, 8, '주민등록등본                  '.$resident_check_num.'통', 0, 1, 'L');
 	$pdf->Cell(45, 8, '', 0, 0, 'L');
 	$pdf->Cell(7, 8, $other_check, 0, 0, 'L');
-	$pdf->Cell(20, 8, '기타 [', 0, 0, 'L');
-	$pdf->Cell(2, 8, $other_check_num, 0, 0, 'L');
+	$pdf->Cell(10, 8, '기타 [', 0, 0, 'L');
+	$pdf->Cell(30, 8, $other_check_num, 0, 0, 'L');
 	$pdf->Cell(5, 8, '] 통', 0, 1, 'L');
 	
 	$pdf->Ln(5);
