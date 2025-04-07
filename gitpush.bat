@@ -2,7 +2,10 @@
 chcp 65001 >nul
 cd /d "C:\Users\khs\Desktop\lex"
 
-:: Changed files만 돌면서
+:: 원격 저장소 정보만 갱신 (pull 아님)
+git fetch origin
+
+:: 내 변경된 파일들만 add
 for /f "delims=" %%F in ('git status --porcelain') do (
     set "line=%%F"
     call :processLine
@@ -11,7 +14,9 @@ for /f "delims=" %%F in ('git status --porcelain') do (
 :: 커밋 메시지 입력받기
 set /p msg=Commit message: 
 git commit -m "%msg%"
-git push origin main
+
+:: 변경 내용만 푸시 (충돌 없다면 성공)
+git push origin HEAD:main
 goto :eof
 
 :processLine
@@ -23,8 +28,7 @@ set "filepath=!line:~3!"
 echo !filepath! | findstr /i "\.tmp \.log \.bak \.swp \.swo \.DS_Store \.vscode" >nul
 if errorlevel 1 (
     if "!status!"==" D" (
-        :: 삭제된 파일은 건드리지 않음
-        rem skip deleted file
+        rem 삭제된 파일은 무시
     ) else (
         git add "!filepath!" >nul 2>&1
     )
