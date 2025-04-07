@@ -2046,265 +2046,268 @@ saveRealEstateBlock(block) {
   }
 
   // 10. (가)압류 적립금 섹션
-  addSeizureDepositBlock(data = {}) {
-    this.assetCounters.seizure_deposit++;
-    const blockId = "seizure_deposit_block_" + this.assetCounters.seizure_deposit;
-    const propertyNo = data.property_no || this.assetCounters.seizure_deposit;
-    const html = `
-      <div class="asset-block seizure-deposit-block" id="${blockId}">
-        <input type="hidden" class="seizure_deposit_asset_no" value="${data.asset_no || ""}">
-        <input type="hidden" class="seizure_deposit_property_no" value="${propertyNo}">
-        <div class="content-wrapper">
-          <div class="left-section">
-            <div class="form">
-              <div class="form-title"><span>(가)압류 내용</span></div>
-              <div class="form-content">
-                <input type="text" class="seizure_content" value="${data.seizure_content || data.seizure_content || ""}">
-              </div>
-            </div>
-            <div class="form">
-              <div class="form-title"><span>보관자(회사 등)</span></div>
-              <div class="form-content">
-                <input type="text" class="keeper" value="${data.custodian || data.keeper || ""}">
-              </div>
-            </div>
-            <div class="form">
-              <div class="form-title"><span>청산가치 판단금액</span></div>
-              <div class="form-content">
-                <input type="text" class="seizure_deposit_liquidation_value" value="${data.liquidation_value ? this.formatMoney(data.liquidation_value) : ""}">원
-                <div class="form-content checkbox-right" style="margin-left: 10px;height: 95%;border: none;">
-                  <input type="checkbox" id="seizure_exclude_liquidation" name="seizure_exclude_liquidation">
-                  <label for="seizure_exclude_liquidation">청산가치에서 제외</label>
-                </div>
-              </div>
+addSeizureDepositBlock(data = {}) {
+  this.assetCounters.seizure_deposit++;
+  const blockId = "seizure_deposit_block_" + this.assetCounters.seizure_deposit;
+  const propertyNo = data.property_no || this.assetCounters.seizure_deposit;
+  const html = `
+    <div class="asset-block seizure-deposit-block" id="${blockId}">
+      <input type="hidden" class="seizure_deposit_asset_no" value="${data.asset_no || ""}">
+      <input type="hidden" class="seizure_deposit_property_no" value="${propertyNo}">
+      <div class="content-wrapper">
+        <div class="left-section">
+          <div class="form">
+            <div class="form-title"><span>(가)압류 내용</span></div>
+            <div class="form-content">
+              <input type="text" class="seizure_content" value="${data.seizure_content || data.seizure_content || ""}">
             </div>
           </div>
-          <div class="right-section">
-            <div class="form">
-              <div class="form-title"><span>변제투입 유무</span></div>
-              <div class="form-content">
-                <input type="checkbox" id="${blockId}_repayment_input" class="seizure_repayment_input" ${data.repayment_input === 1 || data.repayment_input === 'Y' ? "checked" : ""}>
-                <label for="${blockId}_repayment_input">가용소득 1회 투입</label>
-              </div>
+          <div class="form">
+            <div class="form-title"><span>보관자(회사 등)</span></div>
+            <div class="form-content">
+              <input type="text" class="keeper" value="${data.custodian || data.keeper || ""}">
             </div>
-            <div class="form">
-              <div class="form-title form-notitle"><span></span></div>
-              <div class="form-content form-nocontent">
-              </div>
-            </div>
-            <div class="form">
-              <div class="form-title"></div>
-              <div class="form-content btn-right">
-                <button type="button" class="btn-delete seizure_deposit_delete_btn">삭제</button>
-                <button type="button" class="btn-save seizure_deposit_save_btn">저장</button>
+          </div>
+          <div class="form">
+            <div class="form-title"><span>청산가치 판단금액</span></div>
+            <div class="form-content">
+              <input type="text" class="seizure_deposit_liquidation_value" value="${data.liquidation_value ? this.formatMoney(data.liquidation_value) : ""}">원
+              <div class="form-content checkbox-right" style="margin-left: 10px;height: 95%;border: none;">
+                <input type="checkbox" id="${blockId}_exclude_liquidation" name="seizure_exclude_liquidation" class="seizure_exclude_liquidation" ${data.exclude_liquidation === 'Y' ? "checked" : ""}>
+                <label for="${blockId}_exclude_liquidation">청산가치에서 제외</label>
               </div>
             </div>
           </div>
         </div>
+        <div class="right-section">
+          <div class="form">
+            <div class="form-title"><span>변제투입 유무</span></div>
+            <div class="form-content">
+              <input type="checkbox" id="${blockId}_repayment_input" class="seizure_repayment_input" ${data.repayment_input === 1 || data.repayment_input === 'Y' ? "checked" : ""}>
+              <label for="${blockId}_repayment_input">가용소득 1회 투입</label>
+            </div>
+          </div>
+          <div class="form">
+            <div class="form-title form-notitle"><span></span></div>
+            <div class="form-content form-nocontent">
+            </div>
+          </div>
+          <div class="form">
+            <div class="form-title"></div>
+            <div class="form-content btn-right">
+              <button type="button" class="btn-delete seizure_deposit_delete_btn">삭제</button>
+              <button type="button" class="btn-save seizure_deposit_save_btn">저장</button>
+            </div>
+          </div>
+        </div>
       </div>
-    `;
-    $("#seizure_deposit_assets_container").append(html);
-    const block = $("#" + blockId);
-    block.find(".seizure_deposit_liquidation_value").on("input", (e) => {
-      const val = e.target.value.replace(/[^\d]/g, "");
-      e.target.value = this.formatMoney(val);
-    });
-    block.find(".seizure_deposit_save_btn").on("click", () => this.saveSeizureDepositBlock(block));
-    block.find(".seizure_deposit_delete_btn").on("click", () => this.deleteSeizureDepositBlock(block));
-  }
+    </div>
+  `;
+  $("#seizure_deposit_assets_container").append(html);
+  const block = $("#" + blockId);
+  block.find(".seizure_deposit_liquidation_value").on("input", (e) => {
+    const val = e.target.value.replace(/[^\d]/g, "");
+    e.target.value = this.formatMoney(val);
+  });
+  block.find(".seizure_deposit_save_btn").on("click", () => this.saveSeizureDepositBlock(block));
+  block.find(".seizure_deposit_delete_btn").on("click", () => this.deleteSeizureDepositBlock(block));
+}
 
-  saveSeizureDepositBlock(block) {
-    const caseNo = window.currentCaseNo;
-    const assetNo = block.find(".seizure_deposit_asset_no").val();
-    const data = {
-      asset_type: "seizure_deposit",
-      case_no: caseNo,
-      seizure_content: block.find(".seizure_content").val().trim(),
-      liquidation_value: this.unformatMoney(block.find(".seizure_deposit_liquidation_value").val()),
-      repayment_input: block.find(".seizure_repayment_input").is(":checked") ? 1 : 0,
-      property_no: block.find(".seizure_deposit_property_no").val()
-    };
-    if (assetNo) data.asset_no = assetNo;
-    $.ajax({
-      url: "api/application_recovery/assets/asset_api.php",
-      type: "POST",
-      data: data,
-      dataType: "json",
-      success: (response) => {
-        if (response.success) {
-          alert("(가)압류 적립금이 저장되었습니다.");
-          block.find(".seizure_deposit_asset_no").val(response.data.asset_no);
-        } else {
-          alert(response.message || "(가)압류 적립금 저장 실패");
-        }
-      },
-      error: () => {
-        alert("(가)압류 적립금 저장 중 오류가 발생했습니다.");
+saveSeizureDepositBlock(block) {
+  const caseNo = window.currentCaseNo;
+  const assetNo = block.find(".seizure_deposit_asset_no").val();
+  const data = {
+    asset_type: "seizure_deposit",
+    case_no: caseNo,
+    seizure_content: block.find(".seizure_content").val().trim(),
+    keeper: block.find(".keeper").val().trim(),
+    liquidation_value: this.unformatMoney(block.find(".seizure_deposit_liquidation_value").val()),
+    exclude_liquidation: block.find("#seizure_exclude_liquidation").is(":checked") ? "Y" : "N",
+    repayment_input: block.find(".seizure_repayment_input").is(":checked") ? 1 : 0,
+    property_no: block.find(".seizure_deposit_property_no").val()
+  };
+  if (assetNo) data.asset_no = assetNo;
+  $.ajax({
+    url: "api/application_recovery/assets/asset_api.php",
+    type: "POST",
+    data: data,
+    dataType: "json",
+    success: (response) => {
+      if (response.success) {
+        alert("(가)압류 적립금이 저장되었습니다.");
+        block.find(".seizure_deposit_asset_no").val(response.data.asset_no);
+      } else {
+        alert(response.message || "(가)압류 적립금 저장 실패");
       }
-    });
-  }
-
-  deleteSeizureDepositBlock(block) {
-    if (!block.find(".seizure_deposit_asset_no").val()) {
-      block.remove();
-      this.checkEmptyBlock("seizure_deposit");
-      return;
+    },
+    error: () => {
+      alert("(가)압류 적립금 저장 중 오류가 발생했습니다.");
     }
-    if (!confirm("(가)압류 적립금을 삭제하시겠습니까?")) return;
-    const caseNo = window.currentCaseNo;
-    const propertyNo = block.find(".seizure_deposit_property_no").val();
-    $.ajax({
-      url: "api/application_recovery/assets/asset_api.php",
-      type: "DELETE",
-      data: { asset_type: "seizure_deposit", case_no: caseNo, property_no: propertyNo },
-      processData: true,
-      contentType: "application/x-www-form-urlencoded; charset=UTF-8",
-      dataType: "json",
-      success: (response) => {
-        if (response.success) {
-          alert("(가)압류 적립금이 삭제되었습니다.");
-          block.remove();
-          this.checkEmptyBlock("seizure_deposit");
-        } else {
-          alert(response.message || "(가)압류 적립금 삭제 실패");
-        }
-      },
-      error: () => {
-        alert("(가)압류 적립금 삭제 중 오류가 발생했습니다.");
-      }
-    });
+  });
+}
+
+deleteSeizureDepositBlock(block) {
+  if (!block.find(".seizure_deposit_asset_no").val()) {
+    block.remove();
+    this.checkEmptyBlock("seizure_deposit");
+    return;
   }
+  if (!confirm("(가)압류 적립금을 삭제하시겠습니까?")) return;
+  const caseNo = window.currentCaseNo;
+  const propertyNo = block.find(".seizure_deposit_property_no").val();
+  $.ajax({
+    url: "api/application_recovery/assets/asset_api.php",
+    type: "DELETE",
+    data: { asset_type: "seizure_deposit", case_no: caseNo, property_no: propertyNo },
+    processData: true,
+    contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+    dataType: "json",
+    success: (response) => {
+      if (response.success) {
+        alert("(가)압류 적립금이 삭제되었습니다.");
+        block.remove();
+        this.checkEmptyBlock("seizure_deposit");
+      } else {
+        alert(response.message || "(가)압류 적립금 삭제 실패");
+      }
+    },
+    error: () => {
+      alert("(가)압류 적립금 삭제 중 오류가 발생했습니다.");
+    }
+  });
+}
 
   // 11. 공탁금 섹션
-  addSeizureReserveBlock(data = {}) {
-    this.assetCounters.seizure_reserve++;
-    const blockId = "seizure_reserve_block_" + this.assetCounters.seizure_reserve;
-    const propertyNo = data.property_no || this.assetCounters.seizure_reserve;
-    const html = `
-      <div class="asset-block seizure-reserve-block" id="${blockId}">
-        <input type="hidden" class="seizure_reserve_asset_no" value="${data.asset_no || ""}">
-        <input type="hidden" class="seizure_reserve_property_no" value="${propertyNo}">
-        <div class="content-wrapper">
-          <div class="left-section">
-            <div class="form">
-              <div class="form-title"><span>(가)압류 내용</span></div>
-              <div class="form-content">
-                <input type="text" class="seizure_reserve_content" value="${data.seizure_reserve_content || ""}">
-              </div>
-            </div>
-            <div class="form">
-              <div class="form-title"><span>보관자(공탁된 법원)</span></div>
-              <div class="form-content">
-                <input type="text" class="seizure_reserve_keeper" value="${data.keeper || ""}">
-              </div>
-            </div>
-            <div class="form">
-              <div class="form-title"><span>청산가치 판단금액</span></div>
-              <div class="form-content">
-                <input type="text" class="seizure_reserve_liquidation_value" value="${data.liquidation_value ? this.formatMoney(data.liquidation_value) : ""}">원
-                <div class="form-content checkbox-right" style="margin-left: 10px;height: 95%;border: none;">
-                  <input type="checkbox" id="reserve_exclude_liquidation" name="reserve_exclude_liquidation">
-                  <label for="reserve_exclude_liquidation">청산가치에서 제외</label>
-                </div>
-              </div>
+addSeizureReserveBlock(data = {}) {
+  this.assetCounters.seizure_reserve++;
+  const blockId = "seizure_reserve_block_" + this.assetCounters.seizure_reserve;
+  const propertyNo = data.property_no || this.assetCounters.seizure_reserve;
+  const html = `
+    <div class="asset-block seizure-reserve-block" id="${blockId}">
+      <input type="hidden" class="seizure_reserve_asset_no" value="${data.asset_no || ""}">
+      <input type="hidden" class="seizure_reserve_property_no" value="${propertyNo}">
+      <div class="content-wrapper">
+        <div class="left-section">
+          <div class="form">
+            <div class="form-title"><span>(가)압류 내용</span></div>
+            <div class="form-content">
+              <input type="text" class="seizure_reserve_content" value="${data.seizure_reserve_content || ""}">
             </div>
           </div>
-          <div class="right-section">
-            <div class="form">
-              <div class="form-title"><span>변제투입 유무</span></div>
-              <div class="form-content">
-                <input type="checkbox" id="${blockId}_repayment_input" class="seizure_reserve_repayment_input" ${data.repayment_input === 1 || data.repayment_input === 'Y' ? "checked" : ""}>
-                <label for="${blockId}_repayment_input">가용소득 1회 투입</label>
-              </div>
+          <div class="form">
+            <div class="form-title"><span>보관자(공탁된 법원)</span></div>
+            <div class="form-content">
+              <input type="text" class="seizure_reserve_keeper" value="${data.keeper || ""}">
             </div>
-            <div class="form">
-              <div class="form-title form-notitle"><span></span></div>
-              <div class="form-content form-nocontent">
-              </div>
-            </div>
-            <div class="form">
-              <div class="form-title"></div>
-              <div class="form-content btn-right">
-                <button type="button" class="btn-delete seizure_reserve_delete_btn">삭제</button>
-                <button type="button" class="btn-save seizure_reserve_save_btn">저장</button>
+          </div>
+          <div class="form">
+            <div class="form-title"><span>청산가치 판단금액</span></div>
+            <div class="form-content">
+              <input type="text" class="seizure_reserve_liquidation_value" value="${data.liquidation_value ? this.formatMoney(data.liquidation_value) : ""}">원
+              <div class="form-content checkbox-right" style="margin-left: 10px;height: 95%;border: none;">
+                <input type="checkbox" id="${blockId}_reserve_exclude_liquidation" name="reserve_exclude_liquidation" class="reserve_exclude_liquidation" ${data.reserve_exclude_liquidation === 'Y' ? "checked" : ""}>
+                <label for="${blockId}_reserve_exclude_liquidation">청산가치에서 제외</label>
               </div>
             </div>
           </div>
         </div>
+        <div class="right-section">
+          <div class="form">
+            <div class="form-title"><span>변제투입 유무</span></div>
+            <div class="form-content">
+              <input type="checkbox" id="${blockId}_repayment_input" class="seizure_reserve_repayment_input" ${data.repayment_input === 1 || data.repayment_input === 'Y' ? "checked" : ""}>
+              <label for="${blockId}_repayment_input">가용소득 1회 투입</label>
+            </div>
+          </div>
+          <div class="form">
+            <div class="form-title form-notitle"><span></span></div>
+            <div class="form-content form-nocontent">
+            </div>
+          </div>
+          <div class="form">
+            <div class="form-title"></div>
+            <div class="form-content btn-right">
+              <button type="button" class="btn-delete seizure_reserve_delete_btn">삭제</button>
+              <button type="button" class="btn-save seizure_reserve_save_btn">저장</button>
+            </div>
+          </div>
+        </div>
       </div>
-    `;
-    $("#seizure_reserve_assets_container").append(html);
-    const block = $("#" + blockId);
-    block.find(".seizure_reserve_liquidation_value").on("input", (e) => {
-      const val = e.target.value.replace(/[^\d]/g, "");
-      e.target.value = this.formatMoney(val);
-    });
-    block.find(".seizure_reserve_save_btn").on("click", () => this.saveSeizureReserveBlock(block));
-    block.find(".seizure_reserve_delete_btn").on("click", () => this.deleteSeizureReserveBlock(block));
-  }
+    </div>
+  `;
+  $("#seizure_reserve_assets_container").append(html);
+  const block = $("#" + blockId);
+  block.find(".seizure_reserve_liquidation_value").on("input", (e) => {
+    const val = e.target.value.replace(/[^\d]/g, "");
+    e.target.value = this.formatMoney(val);
+  });
+  block.find(".seizure_reserve_save_btn").on("click", () => this.saveSeizureReserveBlock(block));
+  block.find(".seizure_reserve_delete_btn").on("click", () => this.deleteSeizureReserveBlock(block));
+}
 
-  saveSeizureReserveBlock(block) {
-    const caseNo = window.currentCaseNo;
-    const assetNo = block.find(".seizure_reserve_asset_no").val();
-    const data = {
-      asset_type: "seizure_reserve", // API asset_type
-      case_no: caseNo,
-      seizure_reserve_content: block.find(".seizure_reserve_content").val().trim(),
-      keeper: block.find(".seizure_reserve_keeper").val().trim(),
-      liquidation_value: this.unformatMoney(block.find(".seizure_reserve_liquidation_value").val()),
-      repayment_input: block.find(".seizure_reserve_repayment_input").is(":checked") ? 1 : 0,
-      property_no: block.find(".seizure_reserve_property_no").val()
-    };
-    if (assetNo) data.asset_no = assetNo;
-    $.ajax({
-      url: "api/application_recovery/assets/asset_api.php",
-      type: "POST",
-      data: data,
-      dataType: "json",
-      success: (response) => {
-        if (response.success) {
-          alert("공탁금이 저장되었습니다.");
-          block.find(".seizure_reserve_asset_no").val(response.data.asset_no);
-        } else {
-          alert(response.message || "공탁금 저장 실패");
-        }
-      },
-      error: () => {
-        alert("공탁금 저장 중 오류가 발생했습니다.");
+saveSeizureReserveBlock(block) {
+  const caseNo = window.currentCaseNo;
+  const assetNo = block.find(".seizure_reserve_asset_no").val();
+  const data = {
+    asset_type: "seizure_reserve", // API asset_type
+    case_no: caseNo,
+    seizure_reserve_content: block.find(".seizure_reserve_content").val().trim(),
+    keeper: block.find(".seizure_reserve_keeper").val().trim(),
+    liquidation_value: this.unformatMoney(block.find(".seizure_reserve_liquidation_value").val()),
+    reserve_exclude_liquidation: block.find("#reserve_exclude_liquidation").is(":checked") ? "Y" : "N",
+    repayment_input: block.find(".seizure_reserve_repayment_input").is(":checked") ? 1 : 0,
+    property_no: block.find(".seizure_reserve_property_no").val()
+  };
+  if (assetNo) data.asset_no = assetNo;
+  $.ajax({
+    url: "api/application_recovery/assets/asset_api.php",
+    type: "POST",
+    data: data,
+    dataType: "json",
+    success: (response) => {
+      if (response.success) {
+        alert("공탁금이 저장되었습니다.");
+        block.find(".seizure_reserve_asset_no").val(response.data.asset_no);
+      } else {
+        alert(response.message || "공탁금 저장 실패");
       }
-    });
-  }
-
-  deleteSeizureReserveBlock(block) {
-    if (!block.find(".seizure_reserve_asset_no").val()) {
-      block.remove();
-      this.checkEmptyBlock("seizure_reserve");
-      return;
+    },
+    error: () => {
+      alert("공탁금 저장 중 오류가 발생했습니다.");
     }
-    if (!confirm("공탁금을 삭제하시겠습니까?")) return;
-    const caseNo = window.currentCaseNo;
-    const propertyNo = block.find(".seizure_reserve_property_no").val();
-    $.ajax({
-      url: "api/application_recovery/assets/asset_api.php",
-      type: "DELETE",
-      data: { asset_type: "seizure_reserve", case_no: caseNo, property_no: propertyNo },
-      processData: true,
-      contentType: "application/x-www-form-urlencoded; charset=UTF-8",
-      dataType: "json",
-      success: (response) => {
-        if (response.success) {
-          alert("공탁금이 삭제되었습니다.");
-          block.remove();
-          this.checkEmptyBlock("seizure_reserve");
-        } else {
-          alert(response.message || "공탁금 삭제 실패");
-        }
-      },
-      error: () => {
-        alert("공탁금 삭제 중 오류가 발생했습니다.");
-      }
-    });
+  });
+}
+
+deleteSeizureReserveBlock(block) {
+  if (!block.find(".seizure_reserve_asset_no").val()) {
+    block.remove();
+    this.checkEmptyBlock("seizure_reserve");
+    return;
   }
+  if (!confirm("공탁금을 삭제하시겠습니까?")) return;
+  const caseNo = window.currentCaseNo;
+  const propertyNo = block.find(".seizure_reserve_property_no").val();
+  $.ajax({
+    url: "api/application_recovery/assets/asset_api.php",
+    type: "DELETE",
+    data: { asset_type: "seizure_reserve", case_no: caseNo, property_no: propertyNo },
+    processData: true,
+    contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+    dataType: "json",
+    success: (response) => {
+      if (response.success) {
+        alert("공탁금이 삭제되었습니다.");
+        block.remove();
+        this.checkEmptyBlock("seizure_reserve");
+      } else {
+        alert(response.message || "공탁금 삭제 실패");
+      }
+    },
+    error: () => {
+      alert("공탁금 삭제 중 오류가 발생했습니다.");
+    }
+  });
+}
   
   // 12. 기타 섹션
   addOtherAssetBlock(data = {}) {

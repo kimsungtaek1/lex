@@ -680,20 +680,21 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		
 		// (가)압류 적립금
 		$stmt = $pdo->prepare("
-			SELECT *
-			FROM application_recovery_asset_seizure_deposit 
-			WHERE case_no = ?
+		  SELECT *
+		  FROM application_recovery_asset_seizure_deposit 
+		  WHERE case_no = ?
 		");
 		$stmt->execute([$case_no]);
-		$seizure_deposit = $stmt->fetch(PDO::FETCH_ASSOC);
+		$seizure_deposits = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-		if ($seizure_deposit) {
+		if (count($seizure_deposits) > 0) {
+		  foreach ($seizure_deposits as $index => $seizure_deposit) {
 			// 새 페이지 확인
 			if ($pdf->GetY() + $row_height > $pdf->getPageHeight() - 20) {
-				$pdf->AddPage();
+			  $pdf->AddPage();
 			}
 			
-			$pdf->Cell($col1_width, $row_height, '(가)압류 적립금', 1, 0, 'C');
+			$pdf->Cell($col1_width, $row_height, '(가)압류 적립금 #'.($index+1), 1, 0, 'C');
 			$pdf->Cell($col2_width, $row_height, number_format($seizure_deposit['liquidation_value'] ?? 0), 1, 0, 'R');
 			$pdf->Cell($col3_width, $row_height, '', 1, 0, 'C');
 			
@@ -705,44 +706,46 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 			
 			// 모든 정보를 순차적으로 추가
 			if (!empty($seizure_deposit['keeper'])) {
-				$additionalInfo .= " (보관자: " . $seizure_deposit['keeper'] . ")";
+			  $additionalInfo .= " (보관자: " . $seizure_deposit['keeper'] . ")";
 			}
 			
 			// 체크박스 정보 추가
 			if (isset($seizure_deposit['exclude_liquidation']) && $seizure_deposit['exclude_liquidation'] == 'Y') {
-				$additionalInfo .= " [청산가치 제외]";
+			  $additionalInfo .= " [청산가치 제외]";
 			}
 			
 			if (isset($seizure_deposit['repayment_input']) && $seizure_deposit['repayment_input'] == 'Y') {
-				$additionalInfo .= " [가용소득 1회 투입]";
+			  $additionalInfo .= " [가용소득 1회 투입]";
 			}
 			
 			$pdf->Cell($note_col2_width, $row_height, $additionalInfo, 1, 1, 'L');
+		  }
 		} else {
-			// (가)압류 적립금 데이터가 없는 경우
-			$pdf->Cell($col1_width, 8, '(가)압류 적립금', 1, 0, 'C');
-			$pdf->Cell($col2_width, 8, '0', 1, 0, 'R');
-			$pdf->Cell($col3_width, 8, '', 1, 0, 'C');
-			$pdf->Cell($note_col1_width, 8, '해당 여부', 1, 0, 'C');
-			$pdf->Cell($note_col2_width, 8, '해당 없음', 1, 1, 'L');
+		  // (가)압류 적립금 데이터가 없는 경우
+		  $pdf->Cell($col1_width, 8, '(가)압류 적립금', 1, 0, 'C');
+		  $pdf->Cell($col2_width, 8, '0', 1, 0, 'R');
+		  $pdf->Cell($col3_width, 8, '', 1, 0, 'C');
+		  $pdf->Cell($note_col1_width, 8, '해당 여부', 1, 0, 'C');
+		  $pdf->Cell($note_col2_width, 8, '해당 없음', 1, 1, 'L');
 		}
 
 		// 공탁금
 		$stmt = $pdo->prepare("
-			SELECT *
-			FROM application_recovery_asset_seizure_reserve 
-			WHERE case_no = ?
+		  SELECT *
+		  FROM application_recovery_asset_seizure_reserve 
+		  WHERE case_no = ?
 		");
 		$stmt->execute([$case_no]);
-		$seizure_reserve = $stmt->fetch(PDO::FETCH_ASSOC);
+		$seizure_reserves = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-		if ($seizure_reserve) {
+		if (count($seizure_reserves) > 0) {
+		  foreach ($seizure_reserves as $index => $seizure_reserve) {
 			// 새 페이지 확인
 			if ($pdf->GetY() + $row_height > $pdf->getPageHeight() - 20) {
-				$pdf->AddPage();
+			  $pdf->AddPage();
 			}
 			
-			$pdf->Cell($col1_width, $row_height, '공탁금', 1, 0, 'C');
+			$pdf->Cell($col1_width, $row_height, '공탁금 #'.($index+1), 1, 0, 'C');
 			$pdf->Cell($col2_width, $row_height, number_format($seizure_reserve['liquidation_value'] ?? 0), 1, 0, 'R');
 			$pdf->Cell($col3_width, $row_height, '', 1, 0, 'C');
 			
@@ -754,49 +757,27 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 			
 			// 모든 정보를 순차적으로 추가
 			if (!empty($seizure_reserve['keeper'])) {
-				$additionalInfo .= " (공탁된 법원: " . $seizure_reserve['keeper'] . ")";
+			  $additionalInfo .= " (공탁된 법원: " . $seizure_reserve['keeper'] . ")";
 			}
 			
 			// 체크박스 정보 추가
 			if (isset($seizure_reserve['reserve_exclude_liquidation']) && $seizure_reserve['reserve_exclude_liquidation'] == 'Y') {
-				$additionalInfo .= " [청산가치 제외]";
+			  $additionalInfo .= " [청산가치 제외]";
 			}
 			
 			if (isset($seizure_reserve['repayment_input']) && $seizure_reserve['repayment_input'] == 'Y') {
-				$additionalInfo .= " [가용소득 1회 투입]";
+			  $additionalInfo .= " [가용소득 1회 투입]";
 			}
 			
 			$pdf->Cell($note_col2_width, $row_height, $additionalInfo, 1, 1, 'L');
+		  }
 		} else {
-			// 공탁금 데이터가 없는 경우
-			$pdf->Cell($col1_width, 8, '공탁금', 1, 0, 'C');
-			$pdf->Cell($col2_width, 8, '0', 1, 0, 'R');
-			$pdf->Cell($col3_width, 8, '', 1, 0, 'C');
-			$pdf->Cell($note_col1_width, 8, '해당 여부', 1, 0, 'C');
-			$pdf->Cell($note_col2_width, 8, '해당 없음', 1, 1, 'L');
-		}
-		
-		// 기타 자산
-		$stmt = $pdo->prepare("
-			SELECT *
-			FROM application_recovery_asset_other
-			WHERE case_no = ?
-		");
-		$stmt->execute([$case_no]);
-		$other_assets = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		
-		$other_total = 0;
-		$other_contents = [];
-		$other_seized = 'N';
-		
-		foreach ($other_assets as $other) {
-			$other_total += $other['liquidation_value'] ?? 0;
-			if ($other['asset_content']) {
-				$other_contents[] = $other['asset_content'];
-			}
-			if ($other['is_seized'] == 'Y') {
-				$other_seized = 'Y';
-			}
+		  // 공탁금 데이터가 없는 경우
+		  $pdf->Cell($col1_width, 8, '공탁금', 1, 0, 'C');
+		  $pdf->Cell($col2_width, 8, '0', 1, 0, 'R');
+		  $pdf->Cell($col3_width, 8, '', 1, 0, 'C');
+		  $pdf->Cell($note_col1_width, 8, '해당 여부', 1, 0, 'C');
+		  $pdf->Cell($note_col2_width, 8, '해당 없음', 1, 1, 'L');
 		}
 		
 		// 기타 자산 출력
