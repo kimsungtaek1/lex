@@ -205,9 +205,6 @@
       <div class="checkbox-group">
         <span>면제재산 결정신청 | 주거용 임차보증금반환청구권</span>
       </div>
-      <div class="button-group">
-        <button type="button" class="btn btn-add2" id="add_exempt_property_asset">추가</button>
-      </div>
     </div>
   </div>
   <div id="exempt_property_assets_container"></div>
@@ -219,9 +216,6 @@
     <div class="creditor-title">
       <div class="checkbox-group">
         <span>면제재산 결정신청 | 6개월간 생계비에 사용할 특정재산</span>
-      </div>
-      <div class="button-group">
-        <button type="button" class="btn btn-add2" id="add_exempt_property_special_asset">추가</button>
       </div>
     </div>
   </div>
