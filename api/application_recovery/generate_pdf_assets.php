@@ -841,10 +841,7 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		$stmt->execute([$case_no]);
 		$exemption1 = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
-		$exemption1_total = 0;
-		foreach ($exemption1 as $exempt) {
-			$exemption1_total += $exempt['exemption_amount'] ?? 0;
-		}
+		$exemption1_total = $exemption1['exemption_amount'] ?? 0;
 		
 		// 면제재산 - 6개월간 생계비
 		$stmt = $pdo->prepare("
@@ -855,15 +852,8 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		$stmt->execute([$case_no]);
 		$exemption2 = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
-		$exemption2_total = 0;
-		$exemption2_contents = [];
-		
-		foreach ($exemption2 as $exempt) {
-			$exemption2_total += $exempt['exemption_amount'] ?? 0;
-			if ($exempt['special_property_content']) {
-				$exemption2_contents[] = $exempt['special_property_content'];
-			}
-		}
+		$exemption2_total = $exemption2['exemption_amount'] ?? 0;
+		$exemption2_contents = $exemption2['special_property_content'] ?? '';
 		
 		// 면제재산 - 임차보증금반환청구권 출력 (2줄로 수정)
 		if ($exemption1_total > 0) {
@@ -959,11 +949,9 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 	
 	// 사건 정보 조회
 	$stmt = $pdo->prepare("
-		SELECT r.case_no, r.court_name, r.name, c.case_number, ex1.*, ex2.*
+		SELECT r.case_no, r.court_name, r.name, c.case_number
 		FROM application_recovery r
 		JOIN case_management c ON r.case_no = c.case_no
-		JOIN application_recovery_asset_exemption1 ex1 ON r.case_no = ex1.case_no
-		JOIN application_recovery_asset_exemption2 ex2 ON r.case_no = ex2.case_no
 		WHERE r.case_no = ?
 	");
 	$stmt->execute([$case_no]);
@@ -1001,19 +989,19 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 	$pdf->Cell(25, 8, '나. 소명자료 : ', 0, 0, 'L');
 	
 	// 소명자료 체크박스
-	$contract_check = ($exemption1[0]['lease_contract'] ?? 'N') == 'Y' ? '[ V]' : '[   ]';
-	$resident_check = ($exemption1[0]['resident_registration'] ?? 'N') == 'Y' ? '[ V]' : '[   ]';
-	$other_check = ($exemption1[0]['other_evidence'] ?? 'N') == 'Y' ? '[ V]' : '[   ]';
+	$contract_check = ($exemption1['lease_contract'] ?? 'N') == 'Y' ? '[ V]' : '[   ]';
+	$resident_check = ($exemption1['resident_registration'] ?? 'N') == 'Y' ? '[ V]' : '[   ]';
+	$other_check = ($exemption1['other_evidence'] ?? 'N') == 'Y' ? '[ V]' : '[   ]';
 	
 	$pdf->Cell(7, 8, $contract_check, 0, 0, 'L');
-	$pdf->Cell(20, 8, '임대차계약서           '..'부', 0, 1, 'L');
+	$pdf->Cell(20, 8, '임대차계약서           '.evidence1.'부', 0, 1, 'L');
 	$pdf->Cell(45, 8, '', 0, 0, 'L');
 	$pdf->Cell(7, 8, $resident_check, 0, 0, 'L');
-	$pdf->Cell(10, 8, '주민등록등본           '..'통', 0, 1, 'L');
+	$pdf->Cell(10, 8, '주민등록등본           '.evidence2.'통', 0, 1, 'L');
 	$pdf->Cell(45, 8, '', 0, 0, 'L');
 	$pdf->Cell(7, 8, $other_check, 0, 0, 'L');
 	$pdf->Cell(20, 8, '기타 [', 0, 0, 'L');
-	$pdf->Cell(10, 8, '', 0, 0, 'L');
+	$pdf->Cell(10, 8, evidence3, 0, 0, 'L');
 	$pdf->Cell(5, 8, '] 통', 0, 1, 'L');
 	
 	$pdf->Ln(5);
@@ -1032,10 +1020,10 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 	$pdf->Cell(10, 8, '나. 소명자료 : ', 0, 0, 'L');
 	
 	// 소명자료 체크박스
-	$evidence1_check = !empty($exemption2[0]['evidence1'] ?? '') ? '[ V]' : '[   ]';
+	$evidence1_check = !empty($exemption2['evidence1'] ?? '') ? '[ V]' : '[   ]';
 	$pdf->Cell(30, 8, $evidence1_check, 0, 0, 'C');
 	$pdf->Cell(10, 8, '[', 0, 0, 'L');
-	$pdf->Cell(40, 8, $exemption2[0]['evidence1'] ?? '', 0, 0, 'C');
+	$pdf->Cell(40, 8, $exemption2['evidence1'] ?? '', 0, 0, 'C');
 	$pdf->Cell(10, 8, '] 1통', 0, 1, 'L');
 	$pdf->Cell(40, 8, '', 0, 0, 'L');
 	$pdf->Cell(10, 8, '[   ]', 0, 0, 'C');
@@ -1079,33 +1067,33 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 			$pdf->Cell(0, 8, '주택임대차계약의 내용', 0, 1, 'L');
 			
 			$pdf->Cell(40, 8, '①임대차계약일자', 0, 0, 'L');
-			$pdf->Cell(160, 8, '( ' . ($exemption1[0]['contract_date'] ?? '') . ' )', 0, 1, 'L');
+			$pdf->Cell(160, 8, '( ' . ($exemption1['contract_date'] ?? '') . ' )', 0, 1, 'L');
 			
 			$pdf->Cell(40, 8, '②임대차기간', 0, 0, 'L');
-			$pdf->Cell(160, 8, '( ' . ($exemption1[0]['lease_start_date'] ?? '') . ' 부터 ' . ($exemption1[0]['lease_end_date'] ?? '') . ' 까지 )', 0, 1, 'L');
+			$pdf->Cell(160, 8, '( ' . ($exemption1['lease_start_date'] ?? '') . ' 부터 ' . ($exemption1['lease_end_date'] ?? '') . ' 까지 )', 0, 1, 'L');
 			
 			$pdf->Cell(40, 8, '③임차목적물의 소재지', 0, 0, 'L');
-			$pdf->Cell(160, 8, '( ' . ($exemption1[0]['lease_location'] ?? '') . ' )', 0, 1, 'L');
+			$pdf->Cell(160, 8, '( ' . ($exemption1['lease_location'] ?? '') . ' )', 0, 1, 'L');
 			
 			$pdf->Cell(40, 8, '④임차보증금', 0, 0, 'L');
-			$pdf->Cell(160, 8, '( ' . number_format($exemption1[0]['lease_deposit'] ?? 0) . ' 원 )', 0, 1, 'L');
+			$pdf->Cell(160, 8, '( ' . number_format($exemption1['lease_deposit'] ?? 0) . ' 원 )', 0, 1, 'L');
 			
 			$pdf->Cell(40, 8, '⑤임료의 액수 및 연체기간', 0, 0, 'L');
-			$pdf->Cell(160, 8, '(월 ' . number_format($exemption1[0]['rent_fee'] ?? 0) . ' 원,' . ($exemption1[0]['overdue_months'] ?? '0') . ' 개월간 연체 )', 0, 1, 'L');
+			$pdf->Cell(160, 8, '(월 ' . number_format($exemption1['rent_fee'] ?? 0) . ' 원,' . ($exemption1['overdue_months'] ?? '0') . ' 개월간 연체 )', 0, 1, 'L');
 			
 			$pdf->Cell(40, 8, '⑥임대인의 성명', 0, 0, 'L');
-			$pdf->Cell(160, 8, '( ' . ($exemption1[0]['lessor_name'] ?? '') . ' )', 0, 1, 'L');
+			$pdf->Cell(160, 8, '( ' . ($exemption1['lessor_name'] ?? '') . ' )', 0, 1, 'L');
 			
 			$pdf->Cell(40, 8, '⑦주민등록일자', 0, 0, 'L');
-			$pdf->Cell(160, 8, '( ' . ($exemption1[0]['registration_date'] ?? '') . ' )', 0, 1, 'L');
+			$pdf->Cell(160, 8, '( ' . ($exemption1['registration_date'] ?? '') . ' )', 0, 1, 'L');
 			
 			$pdf->Cell(40, 8, '⑧확정일자', 0, 0, 'L');
-			$pdf->Cell(160, 8, '( ' . ($exemption1[0]['fixed_date'] ?? '') . ' 확정일자받음 )', 0, 1, 'L');
+			$pdf->Cell(160, 8, '( ' . ($exemption1['fixed_date'] ?? '') . ' 확정일자받음 )', 0, 1, 'L');
 			
 			// 소명자료 체크박스
-			$contract_check = ($exemption1[0]['lease_contract'] ?? 'N') == 'Y' ? '[ V]' : '[   ]';
-			$resident_check = ($exemption1[0]['resident_registration'] ?? 'N') == 'Y' ? '[ V]' : '[   ]';
-			$other_check = ($exemption1[0]['other_evidence'] ?? 'N') == 'Y' ? '[ V]' : '[   ]';
+			$contract_check = ($exemption1['lease_contract'] ?? 'N') == 'Y' ? '[ V]' : '[   ]';
+			$resident_check = ($exemption1['resident_registration'] ?? 'N') == 'Y' ? '[ V]' : '[   ]';
+			$other_check = ($exemption1['other_evidence'] ?? 'N') == 'Y' ? '[ V]' : '[   ]';
 			
 			$pdf->Cell(10, 8, $contract_check, 0, 0, 'C');
 			$pdf->Cell(50, 8, '임대차계약서 1부', 0, 0, 'L');
@@ -1114,7 +1102,7 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 			$pdf->Cell(50, 8, '주민등록등본 1통', 0, 0, 'L');
 			$pdf->Cell(5, 8, '/', 0, 0, 'C');
 			$pdf->Cell(10, 8, $other_check, 0, 0, 'C');
-			$pdf->Cell(50, 8, '기타 [' . ($exemption1[0]['other_evidence_detail'] ?? '') . '] 통', 0, 1, 'L');
+			$pdf->Cell(50, 8, '기타 [' . ($exemption1['other_evidence_detail'] ?? '') . '] 통', 0, 1, 'L');
 			
 			$pdf->Ln(5);
 		}
@@ -1147,18 +1135,18 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 			$pdf->SetFont('cid0kr', '', 10);
 			$pdf->Cell(20, 8, '※ 소명자료:', 0, 0, 'L');
 			
-			$evidence1_check = !empty($exemption2[0]['evidence1'] ?? '') ? '[ V]' : '[   ]';
-			$evidence2_check = !empty($exemption2[0]['evidence2'] ?? '') ? '[ V]' : '[   ]';
-			$evidence3_check = !empty($exemption2[0]['evidence3'] ?? '') ? '[ V]' : '[   ]';
+			$evidence1_check = !empty($exemption2['evidence1'] ?? '') ? '[ V]' : '[   ]';
+			$evidence2_check = !empty($exemption2['evidence2'] ?? '') ? '[ V]' : '[   ]';
+			$evidence3_check = !empty($exemption2['evidence3'] ?? '') ? '[ V]' : '[   ]';
 			
 			$pdf->Cell(10, 8, $evidence1_check, 0, 0, 'C');
-			$pdf->Cell(50, 8, '( ' . ($exemption2[0]['evidence1'] ?? '') . ' )보증서 1통', 0, 0, 'L');
+			$pdf->Cell(50, 8, '( ' . ($exemption2['evidence1'] ?? '') . ' )보증서 1통', 0, 0, 'L');
 			$pdf->Cell(5, 8, '/', 0, 0, 'C');
 			$pdf->Cell(10, 8, $evidence2_check, 0, 0, 'C');
 			$pdf->Cell(50, 8, '사진 1장', 0, 0, 'L');
 			$pdf->Cell(5, 8, '/', 0, 0, 'C');
 			$pdf->Cell(10, 8, $evidence3_check, 0, 0, 'C');
-			$pdf->Cell(30, 8, '기타 [' . ($exemption2[0]['evidence3'] ?? '') . '] 통', 0, 1, 'L');
+			$pdf->Cell(30, 8, '기타 [' . ($exemption2['evidence3'] ?? '') . '] 통', 0, 1, 'L');
 		}
 	}
 }
