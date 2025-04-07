@@ -10,6 +10,8 @@
             <div class="col">| 구입시기</div>
             <div class="col">| 수량</div>
             <div class="col">| 중고시세</div>
+			<div class="col">| 청산가치판단금액</div>
+			<div class="col">| 압류유무</div>
             <div class="col">| 합계</div>
         </div>
         
@@ -26,8 +28,6 @@
 		<button type="button" id="saveButton">저장</button>
 		<button type="button" id="addButton">추가</button>
 	</div>
-
-
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -39,11 +39,18 @@ $(document).ready(function() {
 		return `
 			<div class="form" data-asset-id="${index}">
 				<div class="form-content">
-					<div class="col">${index}</div>
+					<div class="col"><input type="number" class="item-no" value="${index}"></div>
 					<div class="col"><input type="text" class="item-name"></div>
 					<div class="col"><input type="month" class="purchase-date"></div>
 					<div class="col"><input type="number" class="quantity" min="0"></div>
 					<div class="col"><input type="text" class="item-price" data-type="money"></div>
+					<div class="col"><input type="text" class="liquidation-value" data-type="money"></div>
+					<div class="col">
+						<select class="is-seized">
+							<option value="N" selected>무</option>
+							<option value="Y">유</option>
+						</select>
+					</div>
 					<div class="col">
 						<input type="text" class="item-total" readonly>
 						<button type="button" class="delete-row">삭제️</button>
@@ -99,14 +106,17 @@ $(document).ready(function() {
 					response.data.sort((a, b) => a.property_no - b.property_no);
 
 					response.data.forEach((item, index) => {
-						const newPropertyNo = index + 1; // 🔹 불러올 때도 1부터 다시 정렬
-						container.append(createRow(newPropertyNo));
+						container.append(createRow(index + 1));
 						const row = container.children().last();
-						row.attr('data-asset-id', newPropertyNo);
+						
+						row.attr('data-asset-id', item.property_no);
+						row.find('.item-no').val(index + 1);
 						row.find('.item-name').val(item.item_name);
 						row.find('.purchase-date').val(item.purchase_date);
 						row.find('.quantity').val(item.quantity);
 						row.find('.item-price').val(formatMoney(item.used_price));
+						row.find('.liquidation-value').val(formatMoney(item.liquidation_value || 0));
+						row.find('.is-seized').val(item.is_seized || 'N');
 						calculateRowTotal(row);
 					});
 				}
@@ -135,6 +145,8 @@ $(document).ready(function() {
 					purchase_date: $(this).find('.purchase-date').val(),
 					quantity: $(this).find('.quantity').val(),
 					used_price: unformatMoney($(this).find('.item-price').val()),
+					liquidation_value: unformatMoney($(this).find('.liquidation-value').val()),
+					is_seized: $(this).find('.is-seized').val(),
 					total: unformatMoney($(this).find('.item-total').val())
 				});
 
@@ -252,6 +264,8 @@ $(document).ready(function() {
 					purchase_date: $(this).find('.purchase-date').val(),
 					quantity: $(this).find('.quantity').val(),
 					used_price: unformatMoney($(this).find('.item-price').val()),
+					liquidation_value: unformatMoney($(this).find('.liquidation-value').val()),
+					is_seized: $(this).find('.is-seized').val(),
 					total: unformatMoney($(this).find('.item-total').val())
 				});
 			}
@@ -275,10 +289,12 @@ $(document).ready(function() {
 	}
 
     // 이벤트 핸들러 등록
-    $(document).on('input', '.item-price', function() {
+    $(document).on('input', '[data-type="money"]', function() {
         let val = $(this).val().replace(/[^\d]/g, '');
         $(this).val(formatMoney(val));
-        calculateRowTotal($(this).closest('.form'));
+        if ($(this).hasClass('item-price') || $(this).hasClass('quantity')) {
+            calculateRowTotal($(this).closest('.form'));
+        }
     });
 
     $(document).on('input', '.quantity', function() {
@@ -294,5 +310,4 @@ $(document).ready(function() {
     // 초기 데이터 로드
     loadEquipmentData();
 });
-
 </script>

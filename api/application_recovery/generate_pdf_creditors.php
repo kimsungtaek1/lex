@@ -368,6 +368,7 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 	}
 
 	// --- 별제권부채권 및 이에 준하는 채권의 내역 표 추가 ---
+
 	try {
 		// 별제권 관련 데이터 조회 (appendix 테이블 활용)
 		$stmt_appendix_details = $pdo->prepare("
@@ -1053,6 +1054,8 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 				$pdf->SetFont('cid0kr', '', 10);
 				$pdf->Cell(0, 10, '20   .    .    .', 0, 1, 'C');
 				$pdf->Cell(0, 10, '신청인 ' . $creditor['name'] . '   (인)', 0, 1, 'R');
+				
+				break;
 			}
 		}
 	} catch (Exception $e) {
