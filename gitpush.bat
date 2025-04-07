@@ -2,6 +2,9 @@
 chcp 65001 >nul
 cd /d "C:\Users\khs\Desktop\lex"
 
+:: 현재 날짜와 시간으로 커밋 메시지 자동 생성
+for /f %%a in ('powershell -command "Get-Date -Format \"yyyy-MM-dd HH:mm\" "') do set "msg=%%a"
+
 :: 원격 저장소 정보만 갱신 (pull 아님)
 git fetch origin
 
@@ -11,8 +14,7 @@ for /f "delims=" %%F in ('git status --porcelain') do (
     call :processLine
 )
 
-:: 커밋 메시지 입력받기
-set /p msg=Commit message: 
+:: 자동 커밋
 git commit -m "%msg%"
 
 :: 변경 내용만 푸시 (충돌 없다면 성공)
