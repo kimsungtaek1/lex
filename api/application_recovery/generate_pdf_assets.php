@@ -685,35 +685,35 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 			WHERE case_no = ?
 		");
 		$stmt->execute([$case_no]);
-		$attached_deposit = $stmt->fetch(PDO::FETCH_ASSOC);
+		$seizure_deposit = $stmt->fetch(PDO::FETCH_ASSOC);
 
-		if ($attached_deposit) {
+		if ($seizure_deposit) {
 			// 새 페이지 확인
 			if ($pdf->GetY() + $row_height > $pdf->getPageHeight() - 20) {
 				$pdf->AddPage();
 			}
 			
 			$pdf->Cell($col1_width, $row_height, '(가)압류 적립금', 1, 0, 'C');
-			$pdf->Cell($col2_width, $row_height, number_format($attached_deposit['seizure_liquidation_value'] ?? 0), 1, 0, 'R');
+			$pdf->Cell($col2_width, $row_height, number_format($seizure_deposit['liquidation_value'] ?? 0), 1, 0, 'R');
 			$pdf->Cell($col3_width, $row_height, '', 1, 0, 'C');
 			
 			// 비고 셀 출력
 			$pdf->Cell($note_col1_width, $row_height, '내용', 1, 0, 'C');
 			
 			// 추가 정보 문자열 구성
-			$additionalInfo = $attached_deposit['seizure_content_desc'] ?? '';
+			$additionalInfo = $seizure_deposit['seizure_content'] ?? '';
 			
 			// 모든 정보를 순차적으로 추가
-			if (!empty($attached_deposit['seizure_custodian'])) {
-				$additionalInfo .= " (보관자: " . $attached_deposit['seizure_custodian'] . ")";
+			if (!empty($seizure_deposit['keeper'])) {
+				$additionalInfo .= " (보관자: " . $seizure_deposit['keeper'] . ")";
 			}
 			
 			// 체크박스 정보 추가
-			if (isset($attached_deposit['seizure_exclude_liquidation']) && $attached_deposit['seizure_exclude_liquidation'] == 1) {
+			if (isset($seizure_deposit['exclude_liquidation']) && $seizure_deposit['exclude_liquidation'] == 'Y') {
 				$additionalInfo .= " [청산가치 제외]";
 			}
 			
-			if (isset($attached_deposit['seizure_repayment_input']) && $attached_deposit['seizure_repayment_input'] == 1) {
+			if (isset($seizure_deposit['repayment_input']) && $seizure_deposit['repayment_input'] == 'Y') {
 				$additionalInfo .= " [가용소득 1회 투입]";
 			}
 			
@@ -734,35 +734,35 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 			WHERE case_no = ?
 		");
 		$stmt->execute([$case_no]);
-		$court_deposit = $stmt->fetch(PDO::FETCH_ASSOC);
+		$seizure_reserve = $stmt->fetch(PDO::FETCH_ASSOC);
 
-		if ($court_deposit) {
+		if ($seizure_reserve) {
 			// 새 페이지 확인
 			if ($pdf->GetY() + $row_height > $pdf->getPageHeight() - 20) {
 				$pdf->AddPage();
 			}
 			
 			$pdf->Cell($col1_width, $row_height, '공탁금', 1, 0, 'C');
-			$pdf->Cell($col2_width, $row_height, number_format($court_deposit['deposit_money_liquidation_value'] ?? 0), 1, 0, 'R');
+			$pdf->Cell($col2_width, $row_height, number_format($seizure_reserve['liquidation_value'] ?? 0), 1, 0, 'R');
 			$pdf->Cell($col3_width, $row_height, '', 1, 0, 'C');
 			
 			// 비고 셀 출력
 			$pdf->Cell($note_col1_width, $row_height, '내용', 1, 0, 'C');
 			
 			// 추가 정보 문자열 구성
-			$additionalInfo = $court_deposit['deposit_money_seizure_content'] ?? '';
+			$additionalInfo = $seizure_reserve['seizure_reserve_content'] ?? '';
 			
 			// 모든 정보를 순차적으로 추가
-			if (!empty($court_deposit['deposit_money_court_name'])) {
-				$additionalInfo .= " (공탁된 법원: " . $court_deposit['deposit_money_court_name'] . ")";
+			if (!empty($seizure_reserve['keeper'])) {
+				$additionalInfo .= " (공탁된 법원: " . $seizure_reserve['keeper'] . ")";
 			}
 			
 			// 체크박스 정보 추가
-			if (isset($court_deposit['deposit_money_exclude']) && $court_deposit['deposit_money_exclude'] == 1) {
+			if (isset($seizure_reserve['reserve_exclude_liquidation']) && $seizure_reserve['reserve_exclude_liquidation'] == 'Y') {
 				$additionalInfo .= " [청산가치 제외]";
 			}
 			
-			if (isset($court_deposit['deposit_money_repayment']) && $court_deposit['deposit_money_repayment'] == 1) {
+			if (isset($seizure_reserve['repayment_input']) && $seizure_reserve['repayment_input'] == 'Y') {
 				$additionalInfo .= " [가용소득 1회 투입]";
 			}
 			
