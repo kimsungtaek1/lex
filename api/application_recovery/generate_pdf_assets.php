@@ -780,6 +780,29 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		  $pdf->Cell($note_col2_width, 8, '해당 없음', 1, 1, 'L');
 		}
 		
+		// 기타 자산
+		$stmt = $pdo->prepare("
+			SELECT *
+			FROM application_recovery_asset_other
+			WHERE case_no = ?
+		");
+		$stmt->execute([$case_no]);
+		$other_assets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		
+		$other_total = 0;
+		$other_contents = [];
+		$other_seized = 'N';
+		
+		foreach ($other_assets as $other) {
+			$other_total += $other['liquidation_value'] ?? 0;
+			if ($other['asset_content']) {
+				$other_contents[] = $other['asset_content'];
+			}
+			if ($other['is_seized'] == 'Y') {
+				$other_seized = 'Y';
+			}
+		}
+		
 		// 기타 자산 출력
 		if (count($other_assets) > 0) {
 			// 새 페이지 확인
