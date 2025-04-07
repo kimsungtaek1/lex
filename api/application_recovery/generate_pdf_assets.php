@@ -853,7 +853,7 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		$exemption2 = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
 		$exemption2_total = $exemption2['exemption_amount'] ?? 0;
-		$exemption2_contents = $exemption2['special_property_content'] ?? '';
+		$exemption2_contents = $exemption2['special_property_content'] ?? ''
 		
 		// 면제재산 - 임차보증금반환청구권 출력 (2줄로 수정)
 		if ($exemption1_total > 0) {
