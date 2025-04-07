@@ -865,36 +865,38 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 			}
 		}
 		
-		// 면제재산 - 임차보증금반환청구권 출력
+		// 면제재산 - 임차보증금반환청구권 출력 (2줄로 수정)
 		if ($exemption1_total > 0) {
 			// 새 페이지 확인
-			if ($pdf->GetY() + $row_height > $pdf->getPageHeight() - 20) {
+			if ($pdf->GetY() + $row_height*2 > $pdf->getPageHeight() - 20) {
 				$pdf->AddPage();
 			}
 			
-			$pdf->Cell($col1_width, $row_height, '면제재산 결정신청 금액', 1, 0, 'C');
-			$pdf->Cell($col2_width, $row_height, number_format($exemption1_total), 1, 0, 'R');
-			$pdf->Cell($col3_width, $row_height, '', 1, 0, 'C');
+			// 면제재산 결정신청 금액을 2줄로 표시
+			$pdf->MultiCell($col1_width, $row_height*2, "면제재산\n결정신청 금액", 1, 'C', false, 0, '', '', true, 0, false, true, $row_height*2, 'M');
+			$pdf->MultiCell($col2_width, $row_height*2, number_format($exemption1_total), 1, 'R', false, 0, '', '', true, 0, false, true, $row_height*2, 'M');
+			$pdf->MultiCell($col3_width, $row_height*2, '', 1, 'C', false, 0, '', '', true, 0, false, true, $row_height*2, 'M');
 			
 			// 비고 셀 출력
-			$pdf->Cell($note_col1_width, $row_height, '면제재산 종류', 1, 0, 'C');
-			$pdf->Cell($note_col2_width, $row_height, '1. 주거용 임차보증금 반환청구권', 1, 1, 'L');
+			$pdf->MultiCell($note_col1_width, $row_height*2, "면제재산\n종류", 1, 'C', false, 0, '', '', true, 0, false, true, $row_height*2, 'M');
+			$pdf->MultiCell($note_col2_width, $row_height*2, '1. 주거용 임차보증금 반환청구권', 1, 'L', false, 1, '', '', true, 0, false, true, $row_height*2, 'M');
 		}
-		
-		// 면제재산 - 6개월간 생계비 출력
+
+		// 면제재산 - 6개월간 생계비 출력 (2줄로 수정)
 		if ($exemption2_total > 0) {
 			// 새 페이지 확인
-			if ($pdf->GetY() + $row_height > $pdf->getPageHeight() - 20) {
+			if ($pdf->GetY() + $row_height*2 > $pdf->getPageHeight() - 20) {
 				$pdf->AddPage();
 			}
 			
-			$pdf->Cell($col1_width, $row_height, '면제재산 결정신청 금액', 1, 0, 'C');
-			$pdf->Cell($col2_width, $row_height, number_format($exemption2_total), 1, 0, 'R');
-			$pdf->Cell($col3_width, $row_height, '', 1, 0, 'C');
+			// 면제재산 결정신청 금액을 2줄로 표시
+			$pdf->MultiCell($col1_width, $row_height*2, "면제재산\n결정신청 금액", 1, 'C', false, 0, '', '', true, 0, false, true, $row_height*2, 'M');
+			$pdf->MultiCell($col2_width, $row_height*2, number_format($exemption2_total), 1, 'R', false, 0, '', '', true, 0, false, true, $row_height*2, 'M');
+			$pdf->MultiCell($col3_width, $row_height*2, '', 1, 'C', false, 0, '', '', true, 0, false, true, $row_height*2, 'M');
 			
 			// 비고 셀 출력
-			$pdf->Cell($note_col1_width, $row_height, '면제재산 종류', 1, 0, 'C');
-			$pdf->Cell($note_col2_width, $row_height, '2. 6개월간 생계비에 사용할 특정재산', 1, 1, 'L');
+			$pdf->MultiCell($note_col1_width, $row_height*2, "면제재산\n종류", 1, 'C', false, 0, '', '', true, 0, false, true, $row_height*2, 'M');
+			$pdf->MultiCell($note_col2_width, $row_height*2, '2. 6개월간 생계비에 사용할 특정재산', 1, 'L', false, 1, '', '', true, 0, false, true, $row_height*2, 'M');
 		}
 		
 		// 청산가치 계산
