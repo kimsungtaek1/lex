@@ -967,7 +967,7 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 	$case_info = $stmt->fetch(PDO::FETCH_ASSOC);
 	
 	$pdf->Cell(20, 8, '사 건', 0, 0, 'L');
-	$pdf->Cell(160, 8, $case_info['name']?? ''.' 개인회생', 0, 1, 'L');
+	$pdf->Cell(160, 8, $case_info['']?? ''.' 개인회생', 0, 1, 'L');
 	
 	$pdf->Cell(20, 8, '신 청 인(채 무 자)', 0, 0, 'L');
 	$pdf->Cell(140, 8, $case_info['name'] ?? '', 0, 1, 'L');
