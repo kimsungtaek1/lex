@@ -1050,55 +1050,75 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		
 		// 임차보증금 면제재산
 		if ($exemption1_total > 0) {
-			$pdf->Cell(40, 8, '면제재산 금액', 0, 0, 'L');
-			$pdf->Cell(160, 8, '금 ' . number_format($exemption1_total) . ' 원', 0, 1, 'L');
+			// 쿼리 수정: 하나의 레코드만 가져오기
+			$stmt = $pdo->prepare("
+				SELECT *
+				FROM application_recovery_asset_exemption1
+				WHERE case_no = ?
+				LIMIT 1
+			");
+			$stmt->execute([$case_no]);
+			$exemption1_item = $stmt->fetch(PDO::FETCH_ASSOC);
 			
-			$pdf->Ln(5);
+			// 테이블 헤더 - 면제재산 금액
+			$pdf->SetFont('cid0kr', 'B', 10);
+			$pdf->Cell(40, 10, '면제재산 금액', 1, 0, 'C');
+			$pdf->Cell(150, 10, '금 ' . number_format($exemption1_total) . ' 원', 1, 1, 'L');
 			
-			// 주택임대차계약의 내용
-			$pdf->Cell(0, 8, '주택임대차계약의 내용', 0, 1, 'L');
+			// 주택임대차계약의 내용 타이틀
+			$pdf->Cell(40, 80, '주택임대차계약의 내용', 1, 0, 'C');
 			
-			$pdf->Cell(40, 8, '①임대차계약일자', 0, 0, 'L');
-			$pdf->Cell(160, 8, '( ' . ($exemption1['contract_date'] ?? '') . ' )', 0, 1, 'L');
+			// 8개 항목 정보를 담을 셀 생성
+			$pdf->SetFont('cid0kr', '', 10);
 			
-			$pdf->Cell(40, 8, '②임대차기간', 0, 0, 'L');
-			$pdf->Cell(160, 8, '( ' . ($exemption1['lease_start_date'] ?? '') . ' 부터 ' . ($exemption1['lease_end_date'] ?? '') . ' 까지 )', 0, 1, 'L');
+			// 계약 정보를 담을 변수
+			$contract_info = '';
 			
-			$pdf->Cell(40, 8, '③임차목적물의 소재지', 0, 0, 'L');
-			$pdf->Cell(160, 8, '( ' . ($exemption1['lease_location'] ?? '') . ' )', 0, 1, 'L');
+			// ① 임대차계약일자
+			$contract_info .= "①임대차계약일자\t\t( " . ($exemption1_item['contract_date'] ?? '') . " )\n\n";
 			
-			$pdf->Cell(40, 8, '④임차보증금', 0, 0, 'L');
-			$pdf->Cell(160, 8, '( ' . number_format($exemption1['lease_deposit'] ?? 0) . ' 원 )', 0, 1, 'L');
+			// ② 임대차기간
+			$contract_info .= "②임대차기간\t\t( " . ($exemption1_item['lease_start_date'] ?? '') . " 부터 " . ($exemption1_item['lease_end_date'] ?? '') . " 까지 )\n\n";
 			
-			$pdf->Cell(40, 8, '⑤임료의 액수 및 연체기간', 0, 0, 'L');
-			$pdf->Cell(160, 8, '(월 ' . number_format($exemption1['rent_fee'] ?? 0) . ' 원,' . ($exemption1['overdue_months'] ?? '0') . ' 개월간 연체 )', 0, 1, 'L');
+			// ③ 임차목적물의 소재지
+			$contract_info .= "③임차목적물의 소재지\t( " . ($exemption1_item['lease_location'] ?? '') . " )\n\n";
 			
-			$pdf->Cell(40, 8, '⑥임대인의 성명', 0, 0, 'L');
-			$pdf->Cell(160, 8, '( ' . ($exemption1['lessor_name'] ?? '') . ' )', 0, 1, 'L');
+			// ④ 임차보증금
+			$contract_info .= "④임차보증금\t\t( " . number_format($exemption1_item['lease_deposit'] ?? 0) . " 원 )\n\n";
 			
-			$pdf->Cell(40, 8, '⑦주민등록일자', 0, 0, 'L');
-			$pdf->Cell(160, 8, '( ' . ($exemption1['registration_date'] ?? '') . ' )', 0, 1, 'L');
+			// ⑤ 임료의 액수 및 연체기간
+			$contract_info .= "⑤임료의 액수 및 연체기간\t(월 " . number_format($exemption1_item['rent_fee'] ?? 0) . " 원," . ($exemption1_item['overdue_months'] ?? '0') . " 개월간 연체 )\n\n";
 			
-			$pdf->Cell(40, 8, '⑧확정일자', 0, 0, 'L');
-			$pdf->Cell(160, 8, '( ' . ($exemption1['fixed_date'] ?? '') . ' 확정일자받음 )', 0, 1, 'L');
+			// ⑥ 임대인의 성명
+			$contract_info .= "⑥임대인의 성명\t\t( " . ($exemption1_item['lessor_name'] ?? '') . " )\n\n";
+			
+			// ⑦ 주민등록일자
+			$contract_info .= "⑦주민등록일자\t\t( " . ($exemption1_item['registration_date'] ?? '') . " )\n\n";
+			
+			// ⑧ 확정일자
+			$contract_info .= "⑧확정일자\t\t( " . ($exemption1_item['fixed_date'] ?? '') . " 확정일자받음 )";
+			
+			// MultiCell로 계약 정보 출력
+			$pdf->MultiCell(150, 80, $contract_info, 1, 'L');
 			
 			// 소명자료 체크박스
-			$contract_check = ($exemption1['lease_contract'] ?? 'N') == 'Y' ? '[ V]' : '[   ]';
-			$resident_check = ($exemption1['resident_registration'] ?? 'N') == 'Y' ? '[ V]' : '[   ]';
-			$other_check = ($exemption1['other_evidence'] ?? 'N') == 'Y' ? '[ V]' : '[   ]';
+			$contract_check = ($exemption1_item['lease_contract'] ?? 'N') == 'Y' ? '[ V]' : '[  ]';
+			$resident_check = ($exemption1_item['resident_registration'] ?? 'N') == 'Y' ? '[ V]' : '[  ]';
+			$other_check = ($exemption1_item['other_evidence'] ?? 'N') == 'Y' ? '[ V]' : '[  ]';
 			
-			$pdf->Cell(10, 8, $contract_check, 0, 0, 'C');
-			$pdf->Cell(50, 8, '임대차계약서 1부', 0, 0, 'L');
-			$pdf->Cell(5, 8, '/', 0, 0, 'C');
-			$pdf->Cell(10, 8, $resident_check, 0, 0, 'C');
-			$pdf->Cell(50, 8, '주민등록등본 1통', 0, 0, 'L');
-			$pdf->Cell(5, 8, '/', 0, 0, 'C');
-			$pdf->Cell(10, 8, $other_check, 0, 0, 'C');
-			$pdf->Cell(50, 8, '기타 [' . ($exemption1['other_evidence_detail'] ?? '') . '] 통', 0, 1, 'L');
+			// 소명자료 테이블 생성
+			$pdf->Cell(40, 10, '소명자료', 1, 0, 'C');
+			
+			// 소명자료 정보
+			$evidence_info = $contract_check . " 임대차계약서 1부 / ";
+			$evidence_info .= $resident_check . " 주민등록등본 1통 / ";
+			$evidence_info .= $other_check . " 기타 [" . ($exemption1_item['other_evidence_detail'] ?? '') . "] 통";
+			
+			$pdf->MultiCell(150, 10, $evidence_info, 1, 'L');
 			
 			$pdf->Ln(5);
 		}
-		
+
 		// 6개월간 생계비 면제재산
 		if ($exemption2_total > 0) {
 			$pdf->Cell(40, 8, '[   ]6개월간의 생계비에 사용할 특정재산에 대한 면제재산결정 신청(법 제383조제2항 제2호)', 0, 1, 'L');
