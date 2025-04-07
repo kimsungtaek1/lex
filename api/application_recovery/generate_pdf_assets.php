@@ -450,7 +450,7 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 			$pdf->Cell($note_col2_width, 8, '해당 없음', 1, 1, 'L');
 		}
 		
-		// 사업용 설비
+		// 사업용 설비 - 수정된 코드
 		$stmt = $pdo->prepare("
 			SELECT *
 			FROM application_recovery_asset_business
@@ -458,57 +458,46 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		");
 		$stmt->execute([$case_no]);
 		$business_equipments = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		
 		$business_total = 0;
-		$business_items = [];
-		$business_dates = [];
-		$business_quantities = [];
-		$business_prices = [];
-		
-		foreach ($business_equipments as $equipment) {
-			$business_total += $equipment['total'] ?? 0;
-			$business_items[] = $equipment['item_name'] ?? '';
-			$business_dates[] = $equipment['purchase_date'] ?? '';
-			$business_quantities[] = $equipment['quantity'] ?? 0;
-			$business_prices[] = $equipment['used_price'] ?? 0;
-		}
-		
-		// 사업용 설비 출력
+
+		// 각 사업용 설비 데이터별로 개별 테이블 행 생성
 		if (count($business_equipments) > 0) {
-			// 새 페이지 확인
-			if ($pdf->GetY() + 25 > $pdf->getPageHeight() - 20) {
-				$pdf->AddPage();
+			foreach ($business_equipments as $index => $equipment) {
+				$business_total += $equipment['total'];
+				
+				// 새 페이지 확인 - 현재 페이지에 충분한 공간이 없으면 새 페이지 추가
+				if ($pdf->GetY() + 25 > $pdf->getPageHeight() - 20) {
+					$pdf->AddPage();
+				}
+				
+				$pdf->MultiCell($col1_width, 25, "사업용 설비,\n재고품, 비품 등 #".($index+1), 1, 'C', false, 0, '', '', true, 0, false, true, 25, 'M');
+				$pdf->MultiCell($col2_width, 25, number_format($equipment['used_price'] * $equipment['quantity']), 1, 'R', false, 0, '', '', true, 0, false, true, 25, 'M');
+				$pdf->MultiCell($col3_width, 25, '', 1, 'C', false, 0, '', '', true, 0, false, true, 25, 'M');
+				
+				// 비고 셀 시작 위치 저장
+				$x = $pdf->GetX();
+				$y = $pdf->GetY();
+				
+				// 열 너비 계산
+				$cell_height = 25 / 3; // 3개 항목을 넣기 위해 높이 조정
+				
+				// 품목, 개수
+				$pdf->Cell($note_col1_width, $cell_height, '품목, 개수', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, $equipment['item_name'] . " (" . $equipment['quantity'] . "개)", 1, 1, 'L');
+				
+				// 구입 시기
+				$pdf->SetXY($x, $y + $cell_height);
+				$pdf->Cell($note_col1_width, $cell_height, '구입 시기', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, $equipment['purchase_date'], 1, 1, 'L');
+				
+				// 평가액
+				$pdf->SetXY($x, $y + ($cell_height * 2));
+				$pdf->Cell($note_col1_width, $cell_height, '평가액', 1, 0, 'C');
+				$pdf->Cell($note_col2_width, $cell_height, number_format($equipment['used_price'] * $equipment['quantity']) . "원", 1, 1, 'L');
+				
+				// Y 위치 조정하여 다음 항목 출력 준비
+				$pdf->SetY($y + 25);
 			}
-			
-			$pdf->MultiCell($col1_width, 25, "사업용 설비,\n재고품, 비품 등", 1, 'C', false, 0, '', '', true, 0, false, true, 25, 'M');
-			$pdf->MultiCell($col2_width, 25, number_format($business_total), 1, 'R', false, 0, '', '', true, 0, false, true, 25, 'M');
-			$pdf->MultiCell($col3_width, 25, '', 1, 'C', false, 0, '', '', true, 0, false, true, 25, 'M');
-			
-			// 비고 셀 시작 위치 저장
-			$x = $pdf->GetX();
-			$y = $pdf->GetY();
-			
-			// 열 너비 계산
-			$cell_height = 25 / 3; // 3개 항목을 넣기 위해 높이 조정
-			
-			// 품목, 개수
-			$pdf->Cell($note_col1_width, $cell_height, '품목, 개수', 1, 0, 'C');
-			$items_text = implode(', ', $business_items);
-			$quantities_text = implode(', ', $business_quantities);
-			$pdf->Cell($note_col2_width, $cell_height, $items_text . " (" . $quantities_text . "개)", 1, 1, 'L');
-			
-			// 구입 시기
-			$pdf->SetXY($x, $y + $cell_height);
-			$pdf->Cell($note_col1_width, $cell_height, '구입 시기', 1, 0, 'C');
-			$pdf->Cell($note_col2_width, $cell_height, implode(', ', $business_dates), 1, 1, 'L');
-			
-			// 평가액
-			$pdf->SetXY($x, $y + ($cell_height * 2));
-			$pdf->Cell($note_col1_width, $cell_height, '평가액', 1, 0, 'C');
-			$pdf->Cell($note_col2_width, $cell_height, number_format($business_total) . "원", 1, 1, 'L');
-			
-			// Y 위치 조정하여 다음 항목 출력 준비
-			$pdf->SetY($y + 25);
 		} else {
 			// 사업용 설비 데이터가 없는 경우
 			$pdf->Cell($col1_width, 8, '사업용 설비', 1, 0, 'C');
@@ -626,11 +615,11 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		");
 		$stmt->execute([$case_no]);
 		$severance_pays = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		
+
 		$severance_total = 0;
 		$workplaces = [];
 		$severance_seized = 'N';
-		
+
 		foreach ($severance_pays as $severance) {
 			$severance_total += $severance['liquidation_value'] ?? 0;
 			if ($severance['workplace']) {
@@ -640,25 +629,45 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 				$severance_seized = 'Y';
 			}
 		}
-		
+
 		// 예상 퇴직금 출력
 		if (count($severance_pays) > 0) {
 			// 새 페이지 확인
-			if ($pdf->GetY() + $row_height > $pdf->getPageHeight() - 20) {
+			if ($pdf->GetY() + $row_height * 2 > $pdf->getPageHeight() - 20) {
 				$pdf->AddPage();
 			}
 			
-			$pdf->Cell($col1_width, $row_height, '예상 퇴직금', 1, 0, 'C');
-			$pdf->Cell($col2_width, $row_height, number_format($severance_total), 1, 0, 'R');
-			$pdf->Cell($col3_width, $row_height, $severance_seized, 1, 0, 'C');
+			$pdf->Cell($col1_width, $row_height * 2, '예상 퇴직금', 1, 0, 'C');
+			$pdf->Cell($col2_width, $row_height * 2, number_format($severance_total), 1, 0, 'R');
+			$pdf->Cell($col3_width, $row_height * 2, $severance_seized, 1, 0, 'C');
 			
 			// 비고 셀 시작 위치 저장
 			$x = $pdf->GetX();
 			$y = $pdf->GetY();
 			
-			// 근무처 정보
+			// 근무처 정보 - 첫 번째 줄
 			$pdf->Cell($note_col1_width, $row_height, '근무처', 1, 0, 'C');
-			$pdf->Cell($note_col2_width, $row_height, implode(', ', $workplaces) . " (압류할 수 없는 퇴직금 " . number_format($severance_pays[0]['deduction_amount'] ?? 0) . "원 제외)", 1, 1, 'L');
+			$pdf->Cell($note_col2_width, $row_height, implode(', ', $workplaces), 1, 1, 'L');
+			
+			// 퇴직금 정보 - 두 번째 줄
+			$pdf->SetXY($x, $y + $row_height);
+			$pdf->Cell($note_col1_width, $row_height, '퇴직금', 1, 0, 'C');
+			
+			$severance_info = '';
+			if (!empty($severance_pays[0])) {
+				$expectedAmount = $severance_pays[0]['expected_severance'] ?? 0;
+				$deductionAmount = $severance_pays[0]['deduction_amount'] ?? 0;
+				$severance_info = number_format($expectedAmount) . '원';
+				
+				if ($deductionAmount > 0) {
+					$severance_info .= ' (압류할 수 없는 퇴직금 ' . number_format($deductionAmount) . '원 제외)';
+				}
+			}
+			
+			$pdf->Cell($note_col2_width, $row_height, $severance_info, 1, 1, 'L');
+			
+			// Y 위치 조정
+			$pdf->SetY($y + $row_height * 2);
 			
 		} else {
 			// 예상 퇴직금 데이터가 없는 경우
@@ -672,12 +681,12 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		// (가)압류 적립금
 		$stmt = $pdo->prepare("
 			SELECT *
-			FROM application_recovery_asset_attached_deposits
+			FROM application_recovery_asset_seizure_deposit 
 			WHERE case_no = ?
 		");
 		$stmt->execute([$case_no]);
 		$attached_deposit = $stmt->fetch(PDO::FETCH_ASSOC);
-		
+
 		if ($attached_deposit) {
 			// 새 페이지 확인
 			if ($pdf->GetY() + $row_height > $pdf->getPageHeight() - 20) {
@@ -685,13 +694,30 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 			}
 			
 			$pdf->Cell($col1_width, $row_height, '(가)압류 적립금', 1, 0, 'C');
-			$pdf->Cell($col2_width, $row_height, number_format($attached_deposit['liquidation_value'] ?? 0), 1, 0, 'R');
+			$pdf->Cell($col2_width, $row_height, number_format($attached_deposit['seizure_liquidation_value'] ?? 0), 1, 0, 'R');
 			$pdf->Cell($col3_width, $row_height, '', 1, 0, 'C');
 			
 			// 비고 셀 출력
 			$pdf->Cell($note_col1_width, $row_height, '내용', 1, 0, 'C');
-			$pdf->Cell($note_col2_width, $row_height, $attached_deposit['seizure_content'] ?? '', 1, 1, 'L');
 			
+			// 추가 정보 문자열 구성
+			$additionalInfo = $attached_deposit['seizure_content_desc'] ?? '';
+			
+			// 모든 정보를 순차적으로 추가
+			if (!empty($attached_deposit['seizure_custodian'])) {
+				$additionalInfo .= " (보관자: " . $attached_deposit['seizure_custodian'] . ")";
+			}
+			
+			// 체크박스 정보 추가
+			if (isset($attached_deposit['seizure_exclude_liquidation']) && $attached_deposit['seizure_exclude_liquidation'] == 1) {
+				$additionalInfo .= " [청산가치 제외]";
+			}
+			
+			if (isset($attached_deposit['seizure_repayment_input']) && $attached_deposit['seizure_repayment_input'] == 1) {
+				$additionalInfo .= " [가용소득 1회 투입]";
+			}
+			
+			$pdf->Cell($note_col2_width, $row_height, $additionalInfo, 1, 1, 'L');
 		} else {
 			// (가)압류 적립금 데이터가 없는 경우
 			$pdf->Cell($col1_width, 8, '(가)압류 적립금', 1, 0, 'C');
@@ -700,16 +726,16 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 			$pdf->Cell($note_col1_width, 8, '해당 여부', 1, 0, 'C');
 			$pdf->Cell($note_col2_width, 8, '해당 없음', 1, 1, 'L');
 		}
-		
+
 		// 공탁금
 		$stmt = $pdo->prepare("
 			SELECT *
-			FROM application_recovery_asset_court_deposits
+			FROM application_recovery_asset_seizure_reserve 
 			WHERE case_no = ?
 		");
 		$stmt->execute([$case_no]);
 		$court_deposit = $stmt->fetch(PDO::FETCH_ASSOC);
-		
+
 		if ($court_deposit) {
 			// 새 페이지 확인
 			if ($pdf->GetY() + $row_height > $pdf->getPageHeight() - 20) {
@@ -717,13 +743,30 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 			}
 			
 			$pdf->Cell($col1_width, $row_height, '공탁금', 1, 0, 'C');
-			$pdf->Cell($col2_width, $row_height, number_format($court_deposit['liquidation_value'] ?? 0), 1, 0, 'R');
+			$pdf->Cell($col2_width, $row_height, number_format($court_deposit['deposit_money_liquidation_value'] ?? 0), 1, 0, 'R');
 			$pdf->Cell($col3_width, $row_height, '', 1, 0, 'C');
 			
 			// 비고 셀 출력
 			$pdf->Cell($note_col1_width, $row_height, '내용', 1, 0, 'C');
-			$pdf->Cell($note_col2_width, $row_height, $court_deposit['seizure_content'] ?? '', 1, 1, 'L');
 			
+			// 추가 정보 문자열 구성
+			$additionalInfo = $court_deposit['deposit_money_seizure_content'] ?? '';
+			
+			// 모든 정보를 순차적으로 추가
+			if (!empty($court_deposit['deposit_money_court_name'])) {
+				$additionalInfo .= " (공탁된 법원: " . $court_deposit['deposit_money_court_name'] . ")";
+			}
+			
+			// 체크박스 정보 추가
+			if (isset($court_deposit['deposit_money_exclude']) && $court_deposit['deposit_money_exclude'] == 1) {
+				$additionalInfo .= " [청산가치 제외]";
+			}
+			
+			if (isset($court_deposit['deposit_money_repayment']) && $court_deposit['deposit_money_repayment'] == 1) {
+				$additionalInfo .= " [가용소득 1회 투입]";
+			}
+			
+			$pdf->Cell($note_col2_width, $row_height, $additionalInfo, 1, 1, 'L');
 		} else {
 			// 공탁금 데이터가 없는 경우
 			$pdf->Cell($col1_width, 8, '공탁금', 1, 0, 'C');

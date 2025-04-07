@@ -27,6 +27,8 @@ $assetMapping = [
     'sales_receivables'       => 'application_recovery_asset_sales_receivables',
     'severance_pay'           => 'application_recovery_asset_severance',
     'other_assets'            => 'application_recovery_asset_other',
+	'seizure_deposit'         => 'application_recovery_asset_seizure_deposit',
+	'seizure_reserve'         => 'application_recovery_asset_seizure_reserve',
     'exempt_property'         => 'application_recovery_asset_exemption1',
     'exempt_property_special' => 'application_recovery_asset_exemption2'
 ];
