@@ -712,7 +712,7 @@ class ApplicationRecoveryIncomeExpenditure {
 		const left = (window.screen.width - popupWidth) / 2;
 		const top = (window.screen.height - popupHeight) / 2;
 		
-		window.open('../api/application_recovery/income/living_expense_standard_table.php', 
+		window.open('../adm/api/application_recovery/income/living_expense_standard_table.php', 
 			'년도별 기준중위소득 60% 기준', 
 			`width=${popupWidth},height=${popupHeight},left=${left},top=${top},scrollbars=yes`
 		);
