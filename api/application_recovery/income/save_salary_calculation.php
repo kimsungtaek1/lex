@@ -36,23 +36,26 @@ try {
 	");
 	$stmt->execute(['case_no' => $data['case_no']]);
 	$calculations = $stmt->fetchAll(PDO::FETCH_ASSOC);
-	
-	// 관련 행 데이터 먼저 삭제
-	foreach ($calculations as $calculation) {
+
+	// 기존 데이터가 있을 경우에만 삭제 진행
+	if (!empty($calculations)) {
+		// 관련 행 데이터 먼저 삭제
+		foreach ($calculations as $calculation) {
+			$stmt = $pdo->prepare("
+				DELETE FROM application_recovery_salary_calculation_rows 
+				WHERE calculation_id = :calculation_id
+			");
+			$stmt->execute(['calculation_id' => $calculation['id']]);
+		}
+		
+		// 기본 계산 데이터 삭제
 		$stmt = $pdo->prepare("
-			DELETE FROM application_recovery_salary_calculation_rows 
-			WHERE calculation_id = :calculation_id
+			DELETE FROM application_recovery_salary_calculation 
+			WHERE case_no = :case_no
 		");
-		$stmt->execute(['calculation_id' => $calculation['id']]);
+		$stmt->execute(['case_no' => $data['case_no']]);
 	}
-	
-	// 기본 계산 데이터 삭제
-	$stmt = $pdo->prepare("
-		DELETE FROM application_recovery_salary_calculation 
-		WHERE case_no = :case_no
-	");
-	$stmt->execute(['case_no' => $data['case_no']]);
-	
+
 	// 기본 정보 저장
 	$stmt = $pdo->prepare("
 		INSERT INTO application_recovery_salary_calculation 
@@ -60,7 +63,7 @@ try {
 		VALUES 
 		(:case_no, :year, :calculation_type, :monthly_average, :yearly_amount)
 	");
-	
+
 	$stmt->execute([
 		'case_no' => $data['case_no'],
 		'year' => $data['year'] ?? date('Y'),
@@ -68,8 +71,10 @@ try {
 		'monthly_average' => $data['monthly_average'] ?? 0,
 		'yearly_amount' => $data['yearly_amount'] ?? 0
 	]);
-	
+
 	$calculationId = $pdo->lastInsertId();
+	
+	
 	
 	// 소득 행 저장
 	if (isset($data['income_rows']) && is_array($data['income_rows'])) {
@@ -141,9 +146,10 @@ try {
 		}
 	}
 	
+	
 	// 급여 수입 업데이트 (월 소득과 연간 소득)
 	$stmt = $pdo->prepare("
-		SELECT id FROM application_recovery_income_salary WHERE case_no = :case_no
+		SELECT salary_no FROM application_recovery_income_salary WHERE case_no = :case_no
 	");
 	$stmt->execute(['case_no' => $data['case_no']]);
 	$salary_exists = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -166,6 +172,7 @@ try {
 			(:case_no, :monthly_income, :yearly_income, NOW(), NOW())
 		");
 	}
+	
 	
 	$stmt->execute([
 		'case_no' => $data['case_no'],
