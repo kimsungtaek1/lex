@@ -8,7 +8,7 @@ body{margin:0;padding:0}
 .form{display:flex}
 .form-title{width:8vw;color:#f3f3f3;background:#a7a7a7;border-bottom:1px solid #f3f3f3;display:flex;justify-content:center;align-items:center;position:relative;border-top-left-radius:0.3vw;border-bottom-left-radius:0.3vw}
 .form-title span{padding-left:10%;width:90%}
-.form-content{flex:1;display:flex;flex-direction:row;align-items:center;padding:0 2%;position:relative;background:#f7f7f7;border-bottom:1px solid #d4d4d4;height:2vw;border-top-right-radius:0.3vw;border-bottom-right-radius:0.3vw}
+.form-content{flex:1;display:flex;flex-direction:row;align-items:center;position:relative;background:#f7f7f7;border-bottom:1px solid #d4d4d4;height:2vw;border-top-right-radius:0.3vw;border-bottom-right-radius:0.3vw}
 .form-content select{width:6vw;padding:0;border:none;border-radius:3px;background:transparent;outline:none}
 .form-content .separator{margin:0 1vw;color:#666}
 .form-content .radio-group{display:flex;align-items:center}
