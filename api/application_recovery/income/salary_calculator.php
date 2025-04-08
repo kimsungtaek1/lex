@@ -50,7 +50,14 @@ if (empty($case_no)) {
 		
 		<!-- 소득내역 섹션 -->
 		<div class="section-header">
-			<span>소득내역</span>
+			<div class="creditor-title">
+				<div class="checkbox-group">
+					<span>소득내역</span>
+				</div>
+				<div class="button-group">
+					<button type="button" class="btn btn-add2" id="add_income_row">추가</button>
+				</div>
+			</div>
 		</div>
 		<div class="salary-table">
 			<div class="table-header">
@@ -105,13 +112,20 @@ if (empty($case_no)) {
 				<div class="col"><span class="month-total" data-month="11">0</span></div>
 				<div class="col"><span class="month-total" data-month="12">0</span></div>
 				<div class="col"><span id="income_grand_total">0</span></div>
-				<div class="col"><button class="btn-add-row" id="add_income_row" type="button">추가</button></div>
+				<div class="col"></div>
 			</div>
 		</div>
 		
 		<!-- 공제내역 섹션 -->
 		<div class="section-header">
-			<span>공제내역</span>
+			<div class="creditor-title">
+				<div class="checkbox-group">
+					<span>공제내역</span>
+				</div>
+				<div class="button-group">
+					<button type="button" class="btn btn-add2" id="add_deduction_row">추가</button>
+				</div>
+			</div>
 		</div>
 		<div class="deduction-table">
 			<div class="table-header">
@@ -166,13 +180,17 @@ if (empty($case_no)) {
 				<div class="col"><span class="month-total" data-month="11">0</span></div>
 				<div class="col"><span class="month-total" data-month="12">0</span></div>
 				<div class="col"><span id="deduction_grand_total">0</span></div>
-				<div class="col"><button class="btn-add-row" id="add_deduction_row" type="button">추가</button></div>
+				<div class="col"></div>
 			</div>
 		</div>
 		
 		<!-- 실수령액 섹션 -->
 		<div class="section-header">
-			<span>실수령액</span>
+			<div class="creditor-title">
+				<div class="checkbox-group">
+					<span>실수령액</span>
+				</div>
+			</div>
 		</div>
 		<div class="net-amount-table">
 			<div class="table-header">
