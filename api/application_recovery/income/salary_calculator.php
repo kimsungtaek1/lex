@@ -1,10 +1,4 @@
 <?php
-// 직접 실행 방지
-if (!defined('INCLUDED_FROM_MAIN') && basename($_SERVER['PHP_SELF']) == basename(__FILE__)) {
-	header('HTTP/1.0 403 Forbidden');
-	exit;
-}
-
 // 필수 파라미터 확인
 $case_no = isset($_GET['case_no']) ? $_GET['case_no'] : '';
 if (empty($case_no)) {
@@ -18,7 +12,7 @@ if (empty($case_no)) {
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>월평균소득계산기</title>
-	<link rel="stylesheet" href="./css/salary_calculator.css">
+	<link rel="stylesheet" href="../css/salary_calculator.css">
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
