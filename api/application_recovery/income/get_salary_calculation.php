@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 // 접근 권한 확인
 session_start();
 if (!isset($_SESSION['employee_no'])) {
@@ -8,7 +11,7 @@ if (!isset($_SESSION['employee_no'])) {
 }
 
 // 데이터베이스 연결 설정
-require_once($_SERVER['DOCUMENT_ROOT'].'/adm/db/db_connect.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/adm/config.php');
 
 // 파라미터 확인
 $case_no = isset($_GET['case_no']) ? $_GET['case_no'] : '';
@@ -95,9 +98,10 @@ try {
 	echo json_encode(['success' => true, 'data' => $response_data]);
 	
 } catch (PDOException $e) {
+	// 에러 로그 기록
 	error_log('월평균소득계산기 데이터 조회 오류: ' . $e->getMessage());
 	
 	header('Content-Type: application/json');
-	echo json_encode(['success' => false, 'message' => '데이터베이스 오류가 발생했습니다.']);
+	echo json_encode(['success' => false, 'message' => '데이터베이스 오류가 발생했습니다.', 'error' => $e->getMessage()]);
 }
 ?>

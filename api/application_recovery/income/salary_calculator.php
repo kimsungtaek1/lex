@@ -497,10 +497,39 @@ if (empty($case_no)) {
 		
 		// 소득산정개월수에 따른 입력 제한
 		function applyPeriodLimitation() {
-			const periodMonths = 12; // 고정값으로 12개월 사용
+			const periodMonths = parseInt($('#salary_period2').val()) || 12;
 			
 			// 모든 입력 필드 초기화 (활성화)
 			$('.income-amount, .deduction-amount').prop('disabled', false).css('background-color', '');
+			
+			// 소득산정개월수에 따라 입력 필드 제한
+			if (periodMonths < 12) {
+				// 소득 테이블 처리
+				$('#income_container .form-content').each(function() {
+					for (let month = 1; month <= 12; month++) {
+						if (month > periodMonths) {
+							$(this).find(`input[data-month="${month}"]`)
+								.prop('disabled', true)
+								.css('background-color', '#f0f0f0')
+								.data('include-disabled', false)
+								.val(''); // 값도 비움
+						}
+					}
+				});
+				
+				// 공제 테이블 처리
+				$('#deduction_container .form-content').each(function() {
+					for (let month = 1; month <= 12; month++) {
+						if (month > periodMonths) {
+							$(this).find(`input[data-month="${month}"]`)
+								.prop('disabled', true)
+								.css('background-color', '#f0f0f0')
+								.data('include-disabled', false)
+								.val(''); // 값도 비움
+						}
+					}
+				});
+			}
 			
 			// 다시 계산 실행
 			recalculateAll();
@@ -598,11 +627,30 @@ if (empty($case_no)) {
 							window.opener.updateSalaryData(data.monthly_average, data.yearly_amount);
 						}
 					} else {
-						alert(response.message || '저장 중 오류가 발생했습니다.');
+						alert(response.message+response.error || '저장 중 오류가 발생했습니다.');
 					}
 				},
-				error: function() {
-					alert('서버 통신 중 오류가 발생했습니다.');
+				error: function(xhr, status, error) {
+					// 더 자세한 오류 정보 출력
+					console.error('데이터 삭제 중 오류가 발생했습니다.');
+					console.error('상태 코드:', xhr.status);
+					console.error('오류 유형:', status);
+					console.error('오류 메시지:', error);
+					
+					// 응답 내용 확인
+					try {
+						const responseJson = JSON.parse(xhr.responseText);
+						console.error('서버 응답:', responseJson);
+						if (responseJson.error) {
+							console.error('서버 오류 상세:', responseJson.error);
+							alert('삭제 오류: ' + responseJson.error);
+						} else {
+							alert('서버 통신 중 오류가 발생했습니다.');
+						}
+					} catch (e) {
+						console.error('응답 내용:', xhr.responseText);
+						alert('서버 통신 중 오류가 발생했습니다.');
+					}
 				}
 			});
 		}
@@ -688,8 +736,29 @@ if (empty($case_no)) {
 						recalculateAll();
 					}
 				},
-				error: function() {
+				error: function(xhr, status, error) {
+					// 더 자세한 오류 정보 출력
 					console.error('데이터 로드 중 오류가 발생했습니다.');
+					console.error('상태 코드:', xhr.status);
+					console.error('오류 메시지:', error);
+					
+					// 응답 내용 확인
+					try {
+						const responseJson = JSON.parse(xhr.responseText);
+						console.error('서버 응답:', responseJson);
+						if (responseJson.error) {
+							console.error('서버 오류 상세:', responseJson.error);
+						}
+					} catch (e) {
+						console.error('응답 내용:', xhr.responseText);
+					}
+					
+					// 기본 행 추가
+					$('#income_container, #deduction_container').empty();
+					addIncomeRow();
+					addDeductionRow();
+					bindEvents();
+					recalculateAll();
 				}
 			});
 		}
@@ -723,8 +792,27 @@ if (empty($case_no)) {
 						alert(response.message || '삭제 중 오류가 발생했습니다.');
 					}
 				},
-				error: function() {
-					alert('서버 통신 중 오류가 발생했습니다.');
+				error: function(xhr, status, error) {
+					// 더 자세한 오류 정보 출력
+					console.error('데이터 삭제 중 오류가 발생했습니다.');
+					console.error('상태 코드:', xhr.status);
+					console.error('오류 유형:', status);
+					console.error('오류 메시지:', error);
+					
+					// 응답 내용 확인
+					try {
+						const responseJson = JSON.parse(xhr.responseText);
+						console.error('서버 응답:', responseJson);
+						if (responseJson.error) {
+							console.error('서버 오류 상세:', responseJson.error);
+							alert('삭제 오류: ' + responseJson.error);
+						} else {
+							alert('서버 통신 중 오류가 발생했습니다.');
+						}
+					} catch (e) {
+						console.error('응답 내용:', xhr.responseText);
+						alert('서버 통신 중 오류가 발생했습니다.');
+					}
 				}
 			});
 		}
@@ -744,15 +832,17 @@ if (empty($case_no)) {
 				addDeductionRow();
 			});
 			
-			// 계산 방식 변경 이벤트 제거
-			
 			// 기준 월 변경 이벤트
 			$('#salary_month').change(function() {
 				applyMonthDisplay();
 				recalculateAll();
 			});
 			
-			// 소득산정개월수 변경 이벤트 제거
+			// 소득산정개월수 변경 이벤트 추가
+			$('#salary_period2').change(function() {
+				applyPeriodLimitation();
+				recalculateAll();
+			});
 			
 			// 저장 버튼
 			$('#btn_save').click(function() {
