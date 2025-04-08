@@ -295,7 +295,7 @@
             <div class="form">
                 <div class="form-title form-notitle"></div>
                 <div class="form-content form-nocontent">
-                    (기준 중위소득의 &nbsp;&nbsp;<input type="text" class="form-control form-content-short5" id="iex_income_ratio" value="" readonly>%)에 해당
+                    (기준 중위소득의 &nbsp;&nbsp;<input type="text" class="form-control form-content-short7" id="iex_income_ratio" value="" readonly>%)에 해당
                 </div>
             </div>
             <div class="form">
