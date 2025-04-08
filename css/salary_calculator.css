@@ -29,11 +29,11 @@ body{margin:0;padding:0}
 .form-content .col{flex:1;padding:0.5vh 0.5vw;text-align:center;display:flex;align-items:center;justify-content:center}
 .form-content .col:first-child{flex:2;justify-content:flex-start}
 .form-content .col:last-child{flex:0.5}
-.form-content .col input{width:90%;padding:0.3vh 0.2vw;border:none;background:transparent;text-align:right;outline:none}
+.form-content .col input{width:90%;padding:0.3vh 0.2vw;border:none;background:transparent;text-align:center;outline:none}
 .form-content .col .row-total{font-weight:500;color:#333}
 
 .total-row{background:#f0f0f0;font-weight:500}
-.total-row .col span{width:90%;text-align:right}
+.total-row .col span{width:100%;text-align:center}
 .total-row .month-total,.total-row .net-amount,.total-row #income_grand_total,
 .total-row #deduction_grand_total,.total-row #net_amount_grand_total{font-weight:bold;color:#333}
 
