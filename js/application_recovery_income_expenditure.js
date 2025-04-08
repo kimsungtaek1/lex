@@ -667,178 +667,184 @@ class ApplicationRecoveryIncomeExpenditure {
 		});
 	}
 
-	updateLivingExpenseStandards(year) {
-		// 데이터베이스에서 가족 수를 가져옴
-		this.getFamilyCountFromDB((familyCount) => {
-			// 받아온 가족 수로 생계비 기준 업데이트
-			$.ajax({
-				url: '/adm/api/application_recovery/income/living_expense_standard_api.php',
-				type: 'GET',
-				data: { year: year },
-				dataType: 'json',
-				success: (response) => {
-					if (response.success && response.data) {
-						// 가족 수를 화면에 표시
-						$('#iex_family_count').val(familyCount);
+updateLivingExpenseStandards(year) {
+	// 데이터베이스에서 가족 수를 가져옴
+	this.getFamilyCountFromDB((familyCount) => {
+		// 받아온 가족 수로 생계비 기준 업데이트
+		$.ajax({
+			url: '/adm/api/application_recovery/income/living_expense_standard_api.php',
+			type: 'GET',
+			data: { year: year },
+			dataType: 'json',
+			success: (response) => {
+				if (response.success && response.data) {
+					// 가족 수를 화면에 표시
+					$('#iex_family_count').val(familyCount);
 
-						$('#standard_amount_container input').each((index, element) => {
-							const members = $(element).data('family-members');
-							const amount = response.data[members] || 0;
+					$('#standard_amount_container input').each((index, element) => {
+						const members = $(element).data('family-members');
+						const amount = response.data[members] || 0;
+						
+						// 해당 가족 구성원 수의 금액
+						$(element).val(this.formatNumber(amount));
+						
+						// 총 가족 구성원 수와 일치하는 경우
+						if (parseInt(members) === familyCount) {
+							// 수정: 최소값은 기준중위소득 60%의 2/3, 최대값은 기준중위소득 60% 그대로
+							const minValue = Math.round(amount * 2 / 3);
+							const maxValue = amount;
 							
-							// 해당 가족 구성원 수의 금액
-							$(element).val(this.formatNumber(amount));
+							$('#iex_range_min').val(this.formatNumber(minValue));
+							$('#iex_range_max').val(this.formatNumber(maxValue));
 							
-							// 총 가족 구성원 수와 일치하는 경우
-							if (parseInt(members) === familyCount) {
-								// 최소값: 기준 금액의 2/3 
-								const minValue = Math.round(amount * 2 / 3);
+							// 생계비 범위 체크에 따라 생계비 금액 설정
+							const isStandard = $('input[name="iex_expense_range"]:checked').val() === 'Y';
+							if (isStandard) {
+								$('#iex_living_expense').val(this.formatMoney(amount));
+								// 중위소득 비율 설정 (60%)
+								$('#iex_income_ratio').val('60.00');
+								this.calculateTotalExpense();
+							} else {
+								// 기준 범위 초과 시 중위소득 비율 재계산
+								const currentExpense = this.unformatMoney($('#iex_living_expense').val());
+								const midIncome = amount * (100/60);
+								const percentageOfMidIncome = midIncome > 0 ? (currentExpense / midIncome * 100).toFixed(2) : 0;
 								
-								// 최대값: 기준 금액
-								const maxValue = amount;
-								
-								$('#iex_range_min').val(this.formatNumber(minValue));
-								$('#iex_range_max').val(this.formatNumber(maxValue));
-								
-								// 생계비 범위 체크에 따라 생계비 금액 설정
-								const isStandard = $('input[name="iex_expense_range"]:checked').val() === 'Y';
-								if (isStandard) {
-									$('#iex_living_expense').val(this.formatMoney(amount));
-									this.calculateTotalExpense();
-								} else {
-									// 기준 범위 초과 시 중위소득 비율 재계산
-									const currentExpense = this.unformatMoney($('#iex_living_expense').val());
-									const midIncome = amount * (100/60);
-									const percentageOfMidIncome = midIncome > 0 ? (currentExpense / midIncome * 100).toFixed(2) : 0;
-									
-									$('#iex_income_ratio').val(percentageOfMidIncome);
-								}
+								$('#iex_income_ratio').val(percentageOfMidIncome);
 							}
-						});
-					} else {
-						alert('해당 연도의 생계비 기준 데이터를 찾을 수 없습니다.');
-						$('#standard_amount_container input, #iex_range_min, #iex_range_max').val(0);
-					}
-				},
-				error: () => {
-					alert('생계비 기준 데이터를 불러오는 데 실패했습니다.');
+						}
+					});
+				} else {
+					alert('해당 연도의 생계비 기준 데이터를 찾을 수 없습니다.');
 					$('#standard_amount_container input, #iex_range_min, #iex_range_max').val(0);
+					$('#iex_income_ratio').val('0.00');
 				}
-			});
+			},
+			error: () => {
+				alert('생계비 기준 데이터를 불러오는 데 실패했습니다.');
+				$('#standard_amount_container input, #iex_range_min, #iex_range_max').val(0);
+				$('#iex_income_ratio').val('0.00');
+			}
 		});
-	}
+	});
+}
 
 	formatNumber(number) {
 		return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 	}
 
-	initializeLivingExpenseSection() {
-		// 기본적으로 기준 범위 내 생계비 선택
-		$('input[name="iex_expense_range"][value="Y"]').prop('checked', true);
+initializeLivingExpenseSection() {
+	// 기본적으로 기준 범위 내 생계비 선택
+	$('input[name="iex_expense_range"][value="Y"]').prop('checked', true);
 
-		// 초기 로드 시 생계비 자동 설정
-		const calculateInitialStandardExpense = () => {
-			// DB에서 가족 수 가져오기
+	// 초기 로드 시 생계비 자동 설정
+	const calculateInitialStandardExpense = () => {
+		// DB에서 가족 수 가져오기
+		this.getFamilyCountFromDB((familyCount) => {
+			$('#iex_family_count').val(familyCount);
+			
+			const standardAmount = this.getStandardLivingExpense(familyCount);
+			$('#iex_living_expense').val(this.formatMoney(standardAmount));
+			
+			// 기준 중위소득 60%의 값이 최대값, 그 2/3가 최소값
+			$('#iex_range_min').val(this.formatMoney(Math.round(standardAmount * 2/3)));
+			$('#iex_range_max').val(this.formatMoney(standardAmount));
+			
+			// 기준 범위 내 생계비일 경우 60% 설정
+			$('#iex_income_ratio').val('60.00');
+			
+			this.calculateTotalExpense();
+		});
+	};
+
+	// 페이지 로드 직후와 가족 구성원 정보 로드 후 호출
+	const deferredInitialCalculation = () => {
+		// 약간의 지연을 두어 DOM 렌더링 후 계산
+		setTimeout(calculateInitialStandardExpense, 300);
+	};
+
+	// 초기 로드 시 호출
+	deferredInitialCalculation();
+
+	// 생계비 범위 변경 이벤트 핸들러 개선
+	$('input[name="iex_expense_range"]').on('change', (e) => {
+		const isStandard = e.target.value === 'Y';
+		const livingExpenseInput = $('#iex_living_expense');
+		const directInputCheckbox = $('#iex_direct_input');
+		
+		livingExpenseInput.prop('readonly', isStandard);
+		
+		if (isStandard) {
+			// DB에서 가족 수 조회
 			this.getFamilyCountFromDB((familyCount) => {
 				$('#iex_family_count').val(familyCount);
-				
 				const standardAmount = this.getStandardLivingExpense(familyCount);
-				$('#iex_living_expense').val(this.formatMoney(standardAmount));
-				
-				// 기준 중위소득 범위 계산
-				const midIncome = standardAmount * (100/60);
-				$('#iex_range_min').val(this.formatMoney(Math.round(midIncome * 2/3)));
-				$('#iex_range_max').val(this.formatMoney(Math.round(midIncome)));
-				
+				livingExpenseInput.val(this.formatMoney(standardAmount));
+				directInputCheckbox.prop('checked', false);
+				// 기준 범위 내인 경우 60% 설정
+				$('#iex_income_ratio').val('60.00');
 				this.calculateTotalExpense();
 			});
-		};
-
-		// 페이지 로드 직후와 가족 구성원 정보 로드 후 호출
-		const deferredInitialCalculation = () => {
-			// 약간의 지연을 두어 DOM 렌더링 후 계산
-			setTimeout(calculateInitialStandardExpense, 300);
-		};
-
-		// 초기 로드 시 호출
-		deferredInitialCalculation();
-
-		// 생계비 범위 변경 이벤트 핸들러 개선
-		$('input[name="iex_expense_range"]').on('change', (e) => {
-			const isStandard = e.target.value === 'Y';
-			const livingExpenseInput = $('#iex_living_expense');
-			const directInputCheckbox = $('#iex_direct_input');
+		} else {
+			// 기준 범위 초과 선택 시 직접입력 체크박스 자동 체크
+			directInputCheckbox.prop('checked', true);
+			livingExpenseInput.prop('readonly', false);
 			
-			livingExpenseInput.prop('readonly', isStandard);
-			
-			if (isStandard) {
-				// DB에서 가족 수 조회
-				this.getFamilyCountFromDB((familyCount) => {
-					$('#iex_family_count').val(familyCount);
-					const standardAmount = this.getStandardLivingExpense(familyCount);
-					livingExpenseInput.val(this.formatMoney(standardAmount));
-					directInputCheckbox.prop('checked', false);
-					this.calculateTotalExpense();
-				});
-			} else {
-				// 기준 범위 초과 선택 시 직접입력 체크박스 자동 체크
-				directInputCheckbox.prop('checked', true);
-				livingExpenseInput.prop('readonly', false);
+			// DB에서 가족 수 조회하여 중위소득 비율 계산
+			this.getFamilyCountFromDB((familyCount) => {
+				$('#iex_family_count').val(familyCount);
+				const standardAmount = this.getStandardLivingExpense(familyCount);
+				const midIncome = standardAmount * (100/60);
 				
-				// DB에서 가족 수 조회하여 중위소득 비율 계산
-				this.getFamilyCountFromDB((familyCount) => {
-					$('#iex_family_count').val(familyCount);
-					const standardAmount = this.getStandardLivingExpense(familyCount);
-					const midIncome = standardAmount * (100/60);
-					
-					// 현재 생계비 금액 계산
-					const currentExpense = this.unformatMoney(livingExpenseInput.val());
-					const percentageOfMidIncome = midIncome > 0 ? (currentExpense / midIncome * 100).toFixed(2) : 0;
-					
-					$('#iex_income_ratio').val(percentageOfMidIncome);
-					this.calculateTotalExpense();
-				});
-			}
-		});
+				// 현재 생계비 금액 계산
+				const currentExpense = this.unformatMoney(livingExpenseInput.val());
+				const percentageOfMidIncome = midIncome > 0 ? (currentExpense / midIncome * 100).toFixed(2) : 0;
+				
+				$('#iex_income_ratio').val(percentageOfMidIncome);
+				this.calculateTotalExpense();
+			});
+		}
+	});
+	
+	// 직접 입력 체크박스 이벤트
+	$('#iex_direct_input').on('change', (e) => {
+		$('#iex_living_expense').prop('readonly', !e.target.checked);
 		
-		// 직접 입력 체크박스 이벤트
-		$('#iex_direct_input').on('change', (e) => {
-			$('#iex_living_expense').prop('readonly', !e.target.checked);
-			
-			if (e.target.checked) {
-				// 기준 범위 초과 선택
-				$('input[name="iex_expense_range"][value="N"]').prop('checked', true);
-			}
-		});
+		if (e.target.checked) {
+			// 기준 범위 초과 선택
+			$('input[name="iex_expense_range"][value="N"]').prop('checked', true);
+		}
+	});
+	
+	// 생계비 금액 변경 시 중위소득 비율 계산
+	$('#iex_living_expense').on('input', (e) => {
+		// 금액 포맷팅
+		const val = e.target.value.replace(/[^\d]/g, '');
+		e.target.value = this.formatMoney(val);
 		
-		// 생계비 금액 변경 시 중위소득 비율 계산
-		$('#iex_living_expense').on('input', (e) => {
-			// 금액 포맷팅
-			const val = e.target.value.replace(/[^\d]/g, '');
-			e.target.value = this.formatMoney(val);
-			
-			// 중위소득 비율 계산 (기준 범위 초과 선택 시에만)
-			const isExceedRange = $('input[name="iex_expense_range"]:checked').val() === 'N';
-			if (isExceedRange) {
-				this.getFamilyCountFromDB((familyCount) => {
-					const standardAmount = this.getStandardLivingExpense(familyCount);
-					const midIncome = standardAmount * (100/60);
-					const currentExpense = this.unformatMoney(e.target.value);
-					const percentageOfMidIncome = midIncome > 0 ? (currentExpense / midIncome * 100).toFixed(2) : 0;
-					
-					$('#iex_income_ratio').val(percentageOfMidIncome);
-				});
-			}
-			
-			this.calculateTotalExpense();
-		});
-		
-		// 추가 생계비 변경 시 총액 계산
-		$('#iex_additional_expense').on('input', () => {
-			this.calculateTotalExpense();
-		});
+		// 중위소득 비율 계산 (기준 범위 초과 선택 시에만)
+		const isExceedRange = $('input[name="iex_expense_range"]:checked').val() === 'N';
+		if (isExceedRange) {
+			this.getFamilyCountFromDB((familyCount) => {
+				const standardAmount = this.getStandardLivingExpense(familyCount);
+				const midIncome = standardAmount * (100/60);
+				const currentExpense = this.unformatMoney(e.target.value);
+				const percentageOfMidIncome = midIncome > 0 ? (currentExpense / midIncome * 100).toFixed(2) : 0;
+				
+				$('#iex_income_ratio').val(percentageOfMidIncome);
+			});
+		}
 		
 		this.calculateTotalExpense();
-	}
+	});
+	
+	// 추가 생계비 변경 시 총액 계산
+	$('#iex_additional_expense').on('input', () => {
+		this.calculateTotalExpense();
+	});
+	
+	this.calculateTotalExpense();
+}
 
   initializePlan10Section() {
     // 변제계획안 10항 초기화 로직
