@@ -40,16 +40,9 @@ if (empty($case_no)) {
 						}
 						?>
 					</select>
-					<span class="separator">월</span>
-					<select id="salary_period1">
-						<?php
-						for ($i = 1; $i <= 12; $i++) {
-							echo "<option value=\"{$i}\">{$i}</option>";
-						}
-						?>
-					</select>
-					<span class="separator">개월(간)</span>
-					<select id="salary_period2">
+					<span class="separator">월 부터 12개월(간)</span>
+					<span class="separator">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;소득산정개월수&nbsp;|</span>
+					<select id="salary_period">
 						<?php
 						for ($i = 1; $i <= 12; $i++) {
 							echo "<option value=\"{$i}\">{$i}</option>";
