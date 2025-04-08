@@ -25,7 +25,7 @@
 .btn{background:#d9d9d9;cursor:pointer;border-radius:3px;box-shadow:1px 1px 3px rgba(0,0,0,0.3);border:none;}
 .btn-add2{min-width:2.5vw;height:1vw;background:#d9d9d9;padding:0 0.5vw;margin-left:1vw;color:#000;border:none;border-radius:5px;cursor:pointer}
 
-/* 테이블 스타일 */
+
 .table-header{display:flex;width:100%;background:#a7a7a7;color:white;border-radius:4px 4px 0 0;box-shadow:0 0.2vh 0.2vh rgba(0,0,0,0.4)}
 .table-header .col{flex:1;padding:1vh 0.5vw;text-align:center}
 .table-header .col:first-child{flex:1.5}
@@ -41,7 +41,7 @@
 .form-content .col .net-amount{text-align:right;width:90%}
 
 .total-row{background:#f0f0f0;font-weight:bold}
-.total-row .col span{text-align:right;width:90%}
+.total-row .col span{text-align:right;width:100%}
 .total-row .col:first-child span{text-align:center}
 
 .btn-delete-row{border:none;background:#d9d9d9;padding:0.2vh 0.4vw;border-radius:3px;cursor:pointer;box-shadow:1px 1px 2px rgba(0,0,0,0.2)}

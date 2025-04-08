@@ -245,24 +245,50 @@ if (empty($case_no)) {
 					<div class="value"><span id="yearly_net_amount">0</span>원</div>
 				</div>
 			</div>
-			
-			<div class="result-section">
-				<div class="result-item">
-					<div class="label">월평균 소득금액</div>
-					<div class="value"><span id="monthly_average_income">0</span>원</div>
+			<div class="content-wrapper">
+			  <div class="left-section">
+				<div class="form">
+				  <div class="form-title"><span>연 소득 총액</span></div>
+				  <div class="form-content">
+					<span id="yearly_income">0</span>원
+				  </div>
 				</div>
-				<div class="result-item">
-					<div class="label">연간환산금액</div>
-					<div class="value"><span id="annualized_income">0</span>원</div>
+				<div class="form">
+				  <div class="form-title"><span>연 공제 총액</span></div>
+				  <div class="form-content">
+					<span id="yearly_deduction">0</span>원
+				  </div>
 				</div>
+				<div class="form">
+				  <div class="form-title"><span>연 실수령액</span></div>
+				  <div class="form-content">
+					<span id="yearly_net_amount">0</span>원
+				  </div>
+				</div>
+			  </div>
+			  <div class="right-section">
+				<div class="form">
+				  <div class="form-title"><span>월평균 소득금액</span></div>
+				  <div class="form-content">
+					<span id="monthly_average_income">0</span>원
+				  </div>
+				</div>
+				<div class="form">
+				  <div class="form-title"><span>연간환산금액</span></div>
+				  <div class="form-content">
+					<span id="annualized_income">0</span>원
+				  </div>
+				</div>
+				<div class="form">
+				  <div class="form-title"></div>
+				  <div class="form-content btn-right">
+					<button type="button" id="btn_save">저장</button>
+					<button type="button" id="btn_delete">삭제</button>
+					<button type="button" id="btn_close">닫기</button>
+				  </div>
+				</div>
+			  </div>
 			</div>
-		</div>
-		
-		<!-- 버튼 섹션 -->
-		<div class="button-section">
-			<button type="button" id="btn_save">저장</button>
-			<button type="button" id="btn_delete">삭제</button>
-			<button type="button" id="btn_close">닫기</button>
 		</div>
 	</div>
 	
