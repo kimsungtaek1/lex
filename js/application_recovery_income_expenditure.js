@@ -707,6 +707,7 @@ initializeLivingExpenseSection() {
 				supportMemberCount++;
 			}
 		});
+		alert(supportMemberCount + 1);
 		return supportMemberCount + 1; // 본인 포함
 	};
 
