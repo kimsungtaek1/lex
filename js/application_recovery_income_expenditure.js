@@ -396,53 +396,55 @@ class ApplicationRecoveryIncomeExpenditure {
 
 
 
-  saveFamilyMember(e) {
-    if (this.isSaving) return;
-    this.isSaving = true;
+	saveFamilyMember(e) {
+		if (this.isSaving) return;
+		this.isSaving = true;
 
-    const row = $(e.target).closest('tr');
-    const data = {
-      case_no: window.currentCaseNo,
-      relation: row.find('.iex_family_relation').val()?.trim() || '',
-      name: row.find('.iex_family_name').val()?.trim() || '',
-      age: row.find('.iex_family_age').val() || 0,
-      live_together: row.find('input[name^="iex_family_live_together"]:checked').val() || 'N',
-      live_period: row.find('.iex_family_live_period').val()?.trim() || '',
-      job: row.find('.iex_family_job').val()?.trim() || '',
-      income: this.unformatMoney(row.find('.iex_family_income').val()),
-      assets: this.unformatMoney(row.find('.iex_family_assets').val()),
-      support: row.find('input[name^="iex_family_support"]:checked').val() || 'N'
-    };
+		const row = $(e.target).closest('tr');
+		const memberNo = row.attr('data-member-no');
+		const data = {
+			case_no: window.currentCaseNo,
+			member_no: memberNo || '', // 기존에 저장된 member_no 포함
+			relation: row.find('.iex_family_relation').val()?.trim() || '',
+			name: row.find('.iex_family_name').val()?.trim() || '',
+			age: row.find('.iex_family_age').val() || 0,
+			live_together: row.find('input[name^="iex_family_live_together"]:checked').val() || 'N',
+			live_period: row.find('.iex_family_live_period').val()?.trim() || '',
+			job: row.find('.iex_family_job').val()?.trim() || '',
+			income: this.unformatMoney(row.find('.iex_family_income').val()),
+			assets: this.unformatMoney(row.find('.iex_family_assets').val()),
+			support: row.find('input[name^="iex_family_support"]:checked').val() || 'N'
+		};
 
-    if (!data.relation || !data.name) {
-      alert('관계와 성명은 필수입력 항목입니다.');
-      this.isSaving = false;
-      return;
-    }
+		if (!data.relation || !data.name) {
+			alert('관계와 성명은 필수입력 항목입니다.');
+			this.isSaving = false;
+			return;
+		}
 
-    $.ajax({
-      url: '/adm/api/application_recovery/income/family_member_api.php',
-      type: 'POST',
-      data: data,
-      dataType: 'json',
-      success: (response) => {
-        if (response.success) {
-          alert('가족관계 정보가 저장되었습니다.');
-          if (response.data?.member_no) {
-            row.attr('data-member-no', response.data.member_no);
-          }
-        } else {
-          alert(response.message || '가족관계 정보 저장 실패');
-        }
-      },
-      error: () => {
-        alert('가족관계 정보 저장 중 오류가 발생했습니다.');
-      },
-      complete: () => {
-        this.isSaving = false;
-      }
-    });
-  }
+		$.ajax({
+			url: '/adm/api/application_recovery/income/family_member_api.php',
+			type: 'POST',
+			data: data,
+			dataType: 'json',
+			success: (response) => {
+				if (response.success) {
+					alert(memberNo ? '가족관계 정보가 수정되었습니다.' : '가족관계 정보가 저장되었습니다.');
+					if (response.data?.member_no) {
+						row.attr('data-member-no', response.data.member_no);
+					}
+				} else {
+					alert(response.message || '가족관계 정보 저장 실패');
+				}
+			},
+			error: () => {
+				alert('가족관계 정보 저장 중 오류가 발생했습니다.');
+			},
+			complete: () => {
+				this.isSaving = false;
+			}
+		});
+	}
 
   deleteFamilyMember(e) {
     const row = $(e.target).closest('tr');
