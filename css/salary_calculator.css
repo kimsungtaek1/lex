@@ -56,8 +56,6 @@
 .result-item .value{text-align:right}
 
 /* 버튼 섹션 */
-.button-section{margin-top:2vh;display:flex;justify-content:center;gap:1vw}
+.button-section{margin-top:2vh;display:flex;justify-content:right;gap:1vw}
 .button-section button{background:#a7a7a7;color:#000;border:none;padding:0.7vh 1.5vw;border-radius:3px;cursor:pointer;box-shadow:0 0.2vh 0.4vh rgba(0,0,0,0.2);min-width:4vw}
 .button-section button:hover{background:#999}
-#btn_save{background:#1DFDBE;color:#000}
-#btn_save:hover{background:#19e3a9}

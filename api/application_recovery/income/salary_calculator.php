@@ -361,7 +361,7 @@ if (empty($case_no)) {
 			incomeRowCount++;
 			const newRow = `
 				<div class="form-content" data-row-id="income_${incomeRowCount}">
-					<div class="col"><input type="text" class="income-name" value="소득 항목 ${incomeRowCount}"></div>
+					<div class="col"><input type="text" class="income-name" value=""></div>
 					<div class="col"><input type="text" class="income-amount" data-month="1"></div>
 					<div class="col"><input type="text" class="income-amount" data-month="2"></div>
 					<div class="col"><input type="text" class="income-amount" data-month="3"></div>
@@ -387,7 +387,7 @@ if (empty($case_no)) {
 			deductionRowCount++;
 			const newRow = `
 				<div class="form-content" data-row-id="deduction_${deductionRowCount}">
-					<div class="col"><input type="text" class="deduction-name" value="공제 항목 ${deductionRowCount}"></div>
+					<div class="col"><input type="text" class="deduction-name" value=""></div>
 					<div class="col"><input type="text" class="deduction-amount" data-month="1"></div>
 					<div class="col"><input type="text" class="deduction-amount" data-month="2"></div>
 					<div class="col"><input type="text" class="deduction-amount" data-month="3"></div>
