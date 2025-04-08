@@ -698,18 +698,20 @@ initializeLivingExpenseSection() {
 	// 기본적으로 기준 범위 내 생계비 선택
 	$('input[name="iex_expense_range"][value="Y"]').prop('checked', true);
 
-	// 부양가족 수 계산 함수 (부양 여부를 정확히 반영)
+	// 부양가족 수 계산 함수 (정확한 부양 여부 반영)
 	const calculateSupportMemberCount = () => {
-		const totalSupportMemberCount = 0;
-		// 가족관계에서 부양 가족 수 계산
+		let totalSupportMemberCount = 0;
+		
+		// 가족관계에서 부양 가족 수 계산 (오직 부양유무 라디오 버튼만)
 		$('#familyRelationshipSection .long-table tbody tr').each(function() {
 			const isSupportChecked = $(this).find('input[name^="iex_family_support"]:checked').val() === 'Y';
-			console.log(isSupportChecked);
+			
+			// 오직 부양유무 라디오 버튼이 'Y'인 경우만 계산
 			if (isSupportChecked) {
 				totalSupportMemberCount++;
 			}
 		});
-		alert(totalSupportMemberCount + 1);
+		
 		return totalSupportMemberCount + 1; // 본인 포함
 	};
 
@@ -729,8 +731,8 @@ initializeLivingExpenseSection() {
 
 	// 페이지 로드 직후와 가족 구성원 정보 로드 후 호출
 	const deferredInitialCalculation = () => {
-		// setTimeout을 사용해 DOM 렌더링 후 계산
-		setTimeout(calculateInitialStandardExpense, 100);
+		// 약간의 지연을 두어 DOM 렌더링 후 계산
+		setTimeout(calculateInitialStandardExpense, 300);
 	};
 
 	// 초기 로드 시 호출
@@ -772,7 +774,7 @@ initializeLivingExpenseSection() {
 	});
 	
 	// 가족 구성원의 부양유무 변경 시 생계비 재계산
-	$('#familyRelationshipSection').on('change', 'input[name^="iex_family_support"]', () => {
+	$('#familyRelationshipSection').on('change', 'input[name^="iex_family_support"], .iex_family_live_period', () => {
 		const familyCount = calculateSupportMemberCount();
 		$('#iex_family_count').val(familyCount);
 		
