@@ -1165,6 +1165,40 @@ CREATE TABLE application_recovery_prohibition_orders (
   updated_at datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+CREATE TABLE application_recovery_salary_calculation (
+  id int(11) NOT NULL,
+  case_no int(11) NOT NULL,
+  year int(4) NOT NULL,
+  calculation_type varchar(20) DEFAULT 'month',
+  monthly_average int(11) DEFAULT 0,
+  yearly_amount int(11) DEFAULT 0,
+  created_at datetime DEFAULT current_timestamp(),
+  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE application_recovery_salary_calculation_rows (
+  id int(11) NOT NULL,
+  calculation_id int(11) NOT NULL,
+  row_type enum('income','deduction') NOT NULL,
+  row_order int(11) NOT NULL,
+  row_name varchar(100) DEFAULT NULL,
+  month1 int(11) DEFAULT 0,
+  month2 int(11) DEFAULT 0,
+  month3 int(11) DEFAULT 0,
+  month4 int(11) DEFAULT 0,
+  month5 int(11) DEFAULT 0,
+  month6 int(11) DEFAULT 0,
+  month7 int(11) DEFAULT 0,
+  month8 int(11) DEFAULT 0,
+  month9 int(11) DEFAULT 0,
+  month10 int(11) DEFAULT 0,
+  month11 int(11) DEFAULT 0,
+  month12 int(11) DEFAULT 0,
+  row_total int(11) DEFAULT 0,
+  created_at datetime DEFAULT current_timestamp(),
+  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 CREATE TABLE application_recovery_statement_bankruptcy_reason (
   bankruptcy_reason_id int(11) NOT NULL,
   case_no int(11) NOT NULL,
@@ -1800,6 +1834,14 @@ ALTER TABLE application_recovery_prohibition_orders
   ADD PRIMARY KEY (order_no),
   ADD KEY case_no (case_no);
 
+ALTER TABLE application_recovery_salary_calculation
+  ADD PRIMARY KEY (id),
+  ADD KEY idx_case_no (case_no);
+
+ALTER TABLE application_recovery_salary_calculation_rows
+  ADD PRIMARY KEY (id),
+  ADD KEY idx_calculation_id (calculation_id);
+
 ALTER TABLE application_recovery_statement_bankruptcy_reason
   ADD PRIMARY KEY (bankruptcy_reason_id),
   ADD UNIQUE KEY case_no (case_no),
@@ -2141,6 +2183,12 @@ ALTER TABLE application_recovery_plan10
 ALTER TABLE application_recovery_prohibition_orders
   MODIFY order_no int(11) NOT NULL AUTO_INCREMENT;
 
+ALTER TABLE application_recovery_salary_calculation
+  MODIFY id int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE application_recovery_salary_calculation_rows
+  MODIFY id int(11) NOT NULL AUTO_INCREMENT;
+
 ALTER TABLE application_recovery_statement_bankruptcy_reason
   MODIFY bankruptcy_reason_id int(11) NOT NULL AUTO_INCREMENT;
 
@@ -2346,6 +2394,9 @@ ALTER TABLE application_recovery_plan10
 
 ALTER TABLE application_recovery_prohibition_orders
   ADD CONSTRAINT application_recovery_prohibition_orders_ibfk_1 FOREIGN KEY (case_no) REFERENCES case_management (case_no) ON DELETE CASCADE;
+
+ALTER TABLE application_recovery_salary_calculation_rows
+  ADD CONSTRAINT fk_calculation_rows FOREIGN KEY (calculation_id) REFERENCES application_recovery_salary_calculation (id) ON DELETE CASCADE;
 
 ALTER TABLE application_recovery_statement_bankruptcy_reason
   ADD CONSTRAINT application_recovery_statement_bankruptcy_reason_ibfk_1 FOREIGN KEY (case_no) REFERENCES case_management (case_no) ON DELETE CASCADE;
