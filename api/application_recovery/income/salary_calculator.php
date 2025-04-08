@@ -19,31 +19,44 @@ if (empty($case_no)) {
 	<div class="content-wrapper">
 		<div class="appendix-title">월평균소득계산기</div>
 		
-		<div class="calculator-header">
-			<div class="form">
-				<div class="form-title">
+		<div class="section-header">
+			<div class="creditor-title">
+				<div class="checkbox-group">
 					<span>기준 기간</span>
-				</div>
-				<div class="form-content">
+					<span class="separator">|</span>
 					<select id="salary_year">
 						<?php
 						$current_year = date('Y');
-						for ($i = $current_year; $i >= $current_year - 5; $i--) {
+						for ($i = $current_year; $i >= $current_year - 10; $i--) {
 							echo "<option value=\"{$i}\">{$i}년</option>";
 						}
 						?>
 					</select>
-					<span class="separator">|</span>
-					<div class="radio-group">
-						<input type="radio" id="option_year" name="calculation_type" value="year">
-						<label for="option_year">년</label>
-						<input type="radio" id="option_month" name="calculation_type" value="month" checked>
-						<label for="option_month">월</label>
-						<input type="radio" id="option_period1" name="calculation_type" value="period1">
-						<label for="option_period1">개월(간)</label>
-						<input type="radio" id="option_period2" name="calculation_type" value="period2">
-						<label for="option_period2">개월(간)으로 월평균 소득금액 및 연간환산금액 계산</label>
-					</div>
+					<span class="separator">년</span>
+					<select id="salary_month">
+						<?php
+						for ($i = 1; $i <= 12; $i++) {
+							echo "<option value=\"{$i}\">{$i}</option>";
+						}
+						?>
+					</select>
+					<span class="separator">월</span>
+					<select id="salary_period1">
+						<?php
+						for ($i = 1; $i <= 12; $i++) {
+							echo "<option value=\"{$i}\">{$i}</option>";
+						}
+						?>
+					</select>
+					<span class="separator">개월(간)</span>
+					<select id="salary_period2">
+						<?php
+						for ($i = 1; $i <= 12; $i++) {
+							echo "<option value=\"{$i}\">{$i}</option>";
+						}
+						?>
+					</select>
+					<span class="separator">개월(간)으로 월평균 소득금액 및 연간환산금액 계산</span>
 				</div>
 			</div>
 		</div>
@@ -233,19 +246,19 @@ if (empty($case_no)) {
 		<div class="calculation-result">
 		  <div class="left-section">
 			<div class="form">
-			  <div class="form-title"><span>연 소득 총액</span></div>
+			  <div class="form-title"><span>연 소득 총액 ①</span></div>
 			  <div class="form-content">
 				<span id="yearly_income">0</span>원
 			  </div>
 			</div>
 			<div class="form">
-			  <div class="form-title"><span>연 공제 총액</span></div>
+			  <div class="form-title"><span>연 공제 총액 ②</span></div>
 			  <div class="form-content">
 				<span id="yearly_deduction">0</span>원
 			  </div>
 			</div>
 			<div class="form">
-			  <div class="form-title"><span>연 실수령액</span></div>
+			  <div class="form-title"><span>연 실수령액 (①-②)</span></div>
 			  <div class="form-content">
 				<span id="yearly_net_amount">0</span>원
 			  </div>
@@ -267,9 +280,9 @@ if (empty($case_no)) {
 			<div class="form">
 			  <div class="form-title"></div>
 			  <div class="form-content btn-right">
+			    <button type="button" id="btn_close">닫기</button>
 			    <button type="button" id="btn_delete">삭제</button>
 			    <button type="button" id="btn_save">저장</button>
-			    <button type="button" id="btn_close">닫기</button>
 			  </div>
 			</div>
 		  </div>
