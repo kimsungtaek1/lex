@@ -7,7 +7,7 @@
 .form{display:flex}
 .form-title{width:10vw;color:#f3f3f3;background:#a7a7a7;border-bottom:1px solid #f3f3f3;display:flex;justify-content:center;align-items:center;position:relative}
 .form-title span{padding-left:10%;width:90%}
-.form-content{flex:1;display:flex;flex-direction:row;align-items:center;padding:0 2.5%;position:relative;background:#f7f7f7;border-bottom:1px solid #d4d4d4;min-height:2vw}
+.form-content{flex:1;display:flex;flex-direction:row;align-items:center;position:relative;background:#f7f7f7;border-bottom:1px solid #d4d4d4;min-height:2vw}
 .form:nth-child(1) .form-title{border-top-left-radius:0.3vw}
 .form:nth-child(1) .form-content{border-top-right-radius:0.3vw}
 .form:nth-last-child(1) .form-title{border-bottom-left-radius:0.3vw}
@@ -42,7 +42,7 @@
 
 .total-row{background:#f0f0f0;font-weight:bold}
 .total-row .col span{text-align:right;width:90%}
-.total-row .col:first-child span{text-align:left}
+.total-row .col:first-child span{text-align:center}
 
 .btn-delete-row{border:none;background:#d9d9d9;padding:0.2vh 0.4vw;border-radius:3px;cursor:pointer;box-shadow:1px 1px 2px rgba(0,0,0,0.2)}
 .btn-delete-row:hover{background:#bbb}
