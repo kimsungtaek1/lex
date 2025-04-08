@@ -18,7 +18,7 @@
 .radio-group{display:flex;gap:1vw}
 .radio-group input[type="radio"]{margin-right:0.3vw}
 
-.section-header{width:100%;padding:1vh 1vw;border:none;background:#6c6c6c;color:#fff;margin:15px 0;box-shadow:0 0.5vh 0.5vh rgba(0,0,0,0.4);display:flex}
+.section-header{padding:1vh 1vw;border:none;background:#6c6c6c;color:#fff;margin:15px 0;box-shadow:0 0.5vh 0.5vh rgba(0,0,0,0.4);display:flex}
 .creditor-title{width:100%;display:flex;justify-content:space-between}
 .checkbox-group{display:flex;align-items:center;width:70%}
 .button-group{display:flex;justify-content:flex-end}
