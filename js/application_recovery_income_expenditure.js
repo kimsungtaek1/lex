@@ -233,7 +233,7 @@ class ApplicationRecoveryIncomeExpenditure {
     if (!caseNo) return;
     window.open('/adm/api/application_recovery/income/salary_calculator.php?case_no=' + caseNo,
       '월평균소득계산기',
-      'width=1600,height=600,scrollbars=yes');
+      'width=1600,height=800,scrollbars=yes');
   }
 
   formatMoney(amount) {
