@@ -55,3 +55,45 @@
 .btn-right{flex-direction:row-reverse;}
 .btn-right button{background:#a7a7a7;color:#000;border:none;margin-left:0.5vw;padding:0.7vh 1.5vw;border-radius:3px;cursor:pointer;box-shadow:0 0.2vh 0.4vh rgba(0,0,0,0.2);min-width:4vw}
 .btn-right button:hover{background:#999}
+
+/* 비활성화된 입력 필드 스타일 */
+input:disabled {
+	background-color: #f0f0f0;
+	color: #999;
+	cursor: not-allowed;
+}
+
+/* 테이블 헤더 레이아웃 수정 */
+.table-header .col {
+	flex: 1;
+	padding: 1vh 0.5vw;
+	text-align: center;
+	min-width: 50px; /* 최소 너비 추가 */
+}
+
+/* 모바일에서 더 나은 반응형 지원 */
+@media screen and (max-width: 768px) {
+	.form-content .col input,
+	.form-content .col .row-total,
+	.form-content .col .month-total,
+	.form-content .col .net-amount {
+		width: 100%;
+		padding: 0.2vh 0;
+		font-size: 0.6vw;
+	}
+	
+	.btn-delete-row {
+		padding: 0.1vh 0.2vw;
+		font-size: 0.6vw;
+	}
+}
+
+/* 통계 표시 개선 */
+#monthly_average_income,
+#annualized_income,
+#yearly_income,
+#yearly_deduction,
+#yearly_net_amount {
+	font-weight: bold;
+	color: #333;
+}

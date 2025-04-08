@@ -41,8 +41,9 @@ if (empty($case_no)) {
 						?>
 					</select>
 					<span class="separator">월 부터 12개월(간)</span>
-					<span class="separator">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;소득산정개월수&nbsp;|</span>
-					<select id="salary_period">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<span class="separator">소득산정개월수</span>
+					<select id="salary_period2">
 						<?php
 						for ($i = 1; $i <= 12; $i++) {
 							echo "<option value=\"{$i}\">{$i}</option>";
@@ -66,20 +67,20 @@ if (empty($case_no)) {
 			</div>
 		</div>
 		<div class="salary-table">
-			<div class="table-header">
+			<div class="table-header" id="income_header">
 				<div class="col">소득내역</div>
-				<div class="col">1월</div>
-				<div class="col">2월</div>
-				<div class="col">3월</div>
-				<div class="col">4월</div>
-				<div class="col">5월</div>
-				<div class="col">6월</div>
-				<div class="col">7월</div>
-				<div class="col">8월</div>
-				<div class="col">9월</div>
-				<div class="col">10월</div>
-				<div class="col">11월</div>
-				<div class="col">12월</div>
+				<div class="col month-header" data-month="1">1월</div>
+				<div class="col month-header" data-month="2">2월</div>
+				<div class="col month-header" data-month="3">3월</div>
+				<div class="col month-header" data-month="4">4월</div>
+				<div class="col month-header" data-month="5">5월</div>
+				<div class="col month-header" data-month="6">6월</div>
+				<div class="col month-header" data-month="7">7월</div>
+				<div class="col month-header" data-month="8">8월</div>
+				<div class="col month-header" data-month="9">9월</div>
+				<div class="col month-header" data-month="10">10월</div>
+				<div class="col month-header" data-month="11">11월</div>
+				<div class="col month-header" data-month="12">12월</div>
 				<div class="col">합계</div>
 				<div class="col">삭제</div>
 			</div>
@@ -134,20 +135,20 @@ if (empty($case_no)) {
 			</div>
 		</div>
 		<div class="deduction-table">
-			<div class="table-header">
+			<div class="table-header" id="deduction_header">
 				<div class="col">공제내역</div>
-				<div class="col">1월</div>
-				<div class="col">2월</div>
-				<div class="col">3월</div>
-				<div class="col">4월</div>
-				<div class="col">5월</div>
-				<div class="col">6월</div>
-				<div class="col">7월</div>
-				<div class="col">8월</div>
-				<div class="col">9월</div>
-				<div class="col">10월</div>
-				<div class="col">11월</div>
-				<div class="col">12월</div>
+				<div class="col month-header" data-month="1">1월</div>
+				<div class="col month-header" data-month="2">2월</div>
+				<div class="col month-header" data-month="3">3월</div>
+				<div class="col month-header" data-month="4">4월</div>
+				<div class="col month-header" data-month="5">5월</div>
+				<div class="col month-header" data-month="6">6월</div>
+				<div class="col month-header" data-month="7">7월</div>
+				<div class="col month-header" data-month="8">8월</div>
+				<div class="col month-header" data-month="9">9월</div>
+				<div class="col month-header" data-month="10">10월</div>
+				<div class="col month-header" data-month="11">11월</div>
+				<div class="col month-header" data-month="12">12월</div>
 				<div class="col">합계</div>
 				<div class="col">삭제</div>
 			</div>
@@ -199,20 +200,20 @@ if (empty($case_no)) {
 			</div>
 		</div>
 		<div class="net-amount-table">
-			<div class="table-header">
+			<div class="table-header" id="net_amount_header">
 				<div class="col">실수령액</div>
-				<div class="col">1월</div>
-				<div class="col">2월</div>
-				<div class="col">3월</div>
-				<div class="col">4월</div>
-				<div class="col">5월</div>
-				<div class="col">6월</div>
-				<div class="col">7월</div>
-				<div class="col">8월</div>
-				<div class="col">9월</div>
-				<div class="col">10월</div>
-				<div class="col">11월</div>
-				<div class="col">12월</div>
+				<div class="col month-header" data-month="1">1월</div>
+				<div class="col month-header" data-month="2">2월</div>
+				<div class="col month-header" data-month="3">3월</div>
+				<div class="col month-header" data-month="4">4월</div>
+				<div class="col month-header" data-month="5">5월</div>
+				<div class="col month-header" data-month="6">6월</div>
+				<div class="col month-header" data-month="7">7월</div>
+				<div class="col month-header" data-month="8">8월</div>
+				<div class="col month-header" data-month="9">9월</div>
+				<div class="col month-header" data-month="10">10월</div>
+				<div class="col month-header" data-month="11">11월</div>
+				<div class="col month-header" data-month="12">12월</div>
 				<div class="col">합계</div>
 				<div class="col"></div>
 			</div>
@@ -234,6 +235,8 @@ if (empty($case_no)) {
 				<div class="col"></div>
 			</div>
 		</div>
+		
+		<!-- 계산 옵션 섹션 삭제 -->
 		
 		<!-- 계산 결과 섹션 -->
 		<div class="calculation-result">
@@ -273,9 +276,9 @@ if (empty($case_no)) {
 			<div class="form">
 			  <div class="form-title"></div>
 			  <div class="form-content btn-right">
-			    <button type="button" id="btn_close">닫기</button>
-			    <button type="button" id="btn_delete">삭제</button>
-			    <button type="button" id="btn_save">저장</button>
+				<button type="button" id="btn_close">닫기</button>
+				<button type="button" id="btn_delete">삭제</button>
+				<button type="button" id="btn_save">저장</button>
 			  </div>
 			</div>
 		  </div>
@@ -303,20 +306,43 @@ if (empty($case_no)) {
 		function calculateRowTotal(row) {
 			let total = 0;
 			$(row).find('input[data-month]').each(function() {
-				total += extractNumber($(this).val());
+				// 비활성화된 필드도 포함하여 계산
+				if (!$(this).prop('disabled') || $(this).data('include-disabled')) {
+					total += extractNumber($(this).val());
+				}
 			});
 			$(row).find('.row-total').text(formatNumber(total));
 			return total;
 		}
 		
-		// 월별 합계 계산
-		function calculateMonthlyTotals(container, totalClass) {
+		// 월별 합계 계산 - 수정됨
+		function calculateMonthlyTotals() {
+			// 소득 합계 계산
 			for (let month = 1; month <= 12; month++) {
-				let monthTotal = 0;
-				$(`${container} input[data-month="${month}"]`).each(function() {
-					monthTotal += extractNumber($(this).val());
+				let incomeTotal = 0;
+				$('#income_container input[data-month="' + month + '"]').each(function() {
+					// 비활성화된 필드도 포함하여 계산
+					if (!$(this).prop('disabled') || $(this).data('include-disabled')) {
+						incomeTotal += extractNumber($(this).val());
+					}
 				});
-				$(`${totalClass}[data-month="${month}"]`).text(formatNumber(monthTotal));
+				// 소득합계 업데이트 - 수정된 부분
+				$('.month-total[data-month="' + month + '"]').first().text(formatNumber(incomeTotal));
+				
+				// 공제 합계 계산
+				let deductionTotal = 0;
+				$('#deduction_container input[data-month="' + month + '"]').each(function() {
+					// 비활성화된 필드도 포함하여 계산
+					if (!$(this).prop('disabled') || $(this).data('include-disabled')) {
+						deductionTotal += extractNumber($(this).val());
+					}
+				});
+				// 공제합계 업데이트 - 수정된 부분
+				$('.deduction-table .month-total[data-month="' + month + '"]').text(formatNumber(deductionTotal));
+				
+				// 실수령액 계산
+				const netAmount = incomeTotal - deductionTotal;
+				$(`.net-amount[data-month="${month}"]`).text(formatNumber(netAmount));
 			}
 		}
 		
@@ -332,18 +358,24 @@ if (empty($case_no)) {
 		
 		// 실수령액 계산
 		function calculateNetAmount() {
+			let netAmountGrandTotal = 0;
+			
 			for (let month = 1; month <= 12; month++) {
-				const incomeTotal = extractNumber($(`.income-table .month-total[data-month="${month}"]`).text());
-				const deductionTotal = extractNumber($(`.deduction-table .month-total[data-month="${month}"]`).text());
+				// 수정된 부분 - 올바른 선택자 사용
+				const incomeTotal = extractNumber($('.month-total[data-month="' + month + '"]').first().text());
+				const deductionTotal = extractNumber($('.deduction-table .month-total[data-month="' + month + '"]').text());
 				const netAmount = incomeTotal - deductionTotal;
 				$(`.net-amount[data-month="${month}"]`).text(formatNumber(netAmount));
+				
+				// 총 실수령액에 더함
+				netAmountGrandTotal += netAmount;
 			}
 			
-			// 총 실수령액
+			$('#net_amount_grand_total').text(formatNumber(netAmountGrandTotal));
+			
+			// 소득 및 공제 총액
 			const incomeGrandTotal = extractNumber($('#income_grand_total').text());
 			const deductionGrandTotal = extractNumber($('#deduction_grand_total').text());
-			const netAmountGrandTotal = incomeGrandTotal - deductionGrandTotal;
-			$('#net_amount_grand_total').text(formatNumber(netAmountGrandTotal));
 			
 			// 연간 및 월평균 금액 업데이트
 			$('#yearly_income').text(formatNumber(incomeGrandTotal));
@@ -351,19 +383,8 @@ if (empty($case_no)) {
 			$('#yearly_net_amount').text(formatNumber(netAmountGrandTotal));
 			
 			// 월평균 소득금액 및 연간환산금액 계산
-			const calculationType = $('input[name="calculation_type"]:checked').val();
-			let monthCount = 12; // 기본값
-			
-			if (calculationType === 'period1' || calculationType === 'period2') {
-				// 입력된 데이터가 있는 월의 개수 계산
-				let nonZeroMonths = 0;
-				for (let month = 1; month <= 12; month++) {
-					if (extractNumber($(`.net-amount[data-month="${month}"]`).text()) > 0) {
-						nonZeroMonths++;
-					}
-				}
-				monthCount = nonZeroMonths > 0 ? nonZeroMonths : 12;
-			}
+			// salary_period2 값 사용 (사용자가 지정한 개월수)
+			const monthCount = parseInt($('#salary_period2').val()) || 12;
 			
 			const monthlyAverage = Math.round(netAmountGrandTotal / monthCount);
 			const annualizedAmount = monthlyAverage * 12;
@@ -395,6 +416,12 @@ if (empty($case_no)) {
 				</div>
 			`;
 			$('#income_container').append(newRow);
+			
+			// 기준월 및 소득산정개월수 설정 적용
+			applyMonthDisplay();
+			applyPeriodLimitation();
+			
+			// 이벤트 바인딩
 			bindEvents();
 		}
 		
@@ -421,6 +448,12 @@ if (empty($case_no)) {
 				</div>
 			`;
 			$('#deduction_container').append(newRow);
+			
+			// 기준월 및 소득산정개월수 설정 적용
+			applyMonthDisplay();
+			applyPeriodLimitation();
+			
+			// 이벤트 바인딩
 			bindEvents();
 		}
 		
@@ -441,8 +474,7 @@ if (empty($case_no)) {
 			});
 			
 			// 월별 합계 계산
-			calculateMonthlyTotals('#income_container', '.income-table .month-total');
-			calculateMonthlyTotals('#deduction_container', '.deduction-table .month-total');
+			calculateMonthlyTotals();
 			
 			// 총액 계산
 			calculateGrandTotal('#income_container', 'income_grand_total');
@@ -450,6 +482,28 @@ if (empty($case_no)) {
 			
 			// 실수령액 계산
 			calculateNetAmount();
+		}
+		
+		// 기준월에 따른 월 표시 조정 (1월 -> n월 등)
+		function applyMonthDisplay() {
+			const startMonth = parseInt($('#salary_month').val()) || 1;
+			
+			// 각 월 헤더 업데이트
+			for (let i = 1; i <= 12; i++) {
+				const displayMonth = ((startMonth - 1 + i - 1) % 12) + 1;
+				$(`.month-header[data-month="${i}"]`).text(displayMonth + '월');
+			}
+		}
+		
+		// 소득산정개월수에 따른 입력 제한
+		function applyPeriodLimitation() {
+			const periodMonths = 12; // 고정값으로 12개월 사용
+			
+			// 모든 입력 필드 초기화 (활성화)
+			$('.income-amount, .deduction-amount').prop('disabled', false).css('background-color', '');
+			
+			// 다시 계산 실행
+			recalculateAll();
 		}
 		
 		// 금액 입력 이벤트 처리
@@ -495,7 +549,9 @@ if (empty($case_no)) {
 				const monthlyData = {};
 				
 				for (let month = 1; month <= 12; month++) {
-					monthlyData[`month${month}`] = extractNumber($(this).find(`input[data-month="${month}"]`).val());
+					const inputField = $(this).find(`input[data-month="${month}"]`);
+					// disabled된 필드도 포함하여 저장
+					monthlyData[`month${month}`] = extractNumber(inputField.val());
 				}
 				
 				data.income_rows.push({
@@ -513,7 +569,9 @@ if (empty($case_no)) {
 				const monthlyData = {};
 				
 				for (let month = 1; month <= 12; month++) {
-					monthlyData[`month${month}`] = extractNumber($(this).find(`input[data-month="${month}"]`).val());
+					const inputField = $(this).find(`input[data-month="${month}"]`);
+					// disabled된 필드도 포함하여 저장
+					monthlyData[`month${month}`] = extractNumber(inputField.val());
 				}
 				
 				data.deduction_rows.push({
@@ -562,7 +620,6 @@ if (empty($case_no)) {
 						
 						// 기본 설정 로드
 						$('#salary_year').val(data.year);
-						$(`input[name="calculation_type"][value="${data.calculation_type}"]`).prop('checked', true);
 						
 						// 기존 행 제거
 						$('#income_container, #deduction_container').empty();
@@ -622,6 +679,10 @@ if (empty($case_no)) {
 							// 기본 행 추가
 							addDeductionRow();
 						}
+						
+						// 기준월 및 소득산정개월수 설정 적용
+						applyMonthDisplay();
+						applyPeriodLimitation();
 						
 						bindEvents();
 						recalculateAll();
@@ -683,10 +744,15 @@ if (empty($case_no)) {
 				addDeductionRow();
 			});
 			
-			// 계산 방식 변경 이벤트
-			$('input[name="calculation_type"]').change(function() {
+			// 계산 방식 변경 이벤트 제거
+			
+			// 기준 월 변경 이벤트
+			$('#salary_month').change(function() {
+				applyMonthDisplay();
 				recalculateAll();
 			});
+			
+			// 소득산정개월수 변경 이벤트 제거
 			
 			// 저장 버튼
 			$('#btn_save').click(function() {
@@ -705,6 +771,10 @@ if (empty($case_no)) {
 			
 			// 초기 이벤트 바인딩
 			bindEvents();
+			
+			// 기준월 및 소득산정개월수 설정 적용
+			applyMonthDisplay();
+			applyPeriodLimitation();
 		});
 	</script>
 </body>
