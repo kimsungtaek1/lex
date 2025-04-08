@@ -240,7 +240,7 @@
                     <span>가족생계비범위</span>
                 </div>
                 <div class="form-content">
-                    <input type="text" class="form-control form-content-short" id="iex_family_count" value="">인
+                    <input type="text" class="form-control form-content-short" id="iex_family_count" value="" readonly>인
                 </div>
             </div>
             <div class="form">
@@ -248,8 +248,8 @@
                     <span></span>
                 </div>
                 <div class="form-content">
-                    <input type="text" class="form-control form-content-short" id="iex_range_min" value="">원 부터&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <input type="text" class="form-control form-content-short" id="iex_range_max" value="">원
+                    <input type="text" class="form-control form-content-short" id="iex_range_min" value="" readonly>원 부터&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <input type="text" class="form-control form-content-short" id="iex_range_max" value="" readonly>원
                 </div>
             </div>
         </div>

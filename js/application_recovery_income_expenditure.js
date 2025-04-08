@@ -656,19 +656,47 @@ class ApplicationRecoveryIncomeExpenditure {
 			dataType: 'json',
 			success: (response) => {
 				if (response.success && response.data) {
+					let totalSupportMemberCount = 0;
+					
+					// 가족관계에서 부양 가족 수 계산
+					$('#familyRelationshipSection .long-table tbody tr').each(function() {
+						const isSupportChecked = $(this).find('input[name^="iex_family_support"]:checked').val() === 'Y';
+						if (isSupportChecked) {
+							totalSupportMemberCount++;
+						}
+					});
+					
+					// 본인 포함 총 가족 구성원 수 (본인 1 + 부양 가족)
+					const totalFamilyCount = totalSupportMemberCount + 1;
+					$('#iex_family_count').val(totalFamilyCount);
+
 					$('#standard_amount_container input').each((index, element) => {
 						const familyMembers = $(element).data('family-members');
 						const amount = response.data[familyMembers] || 0;
+						
+						// 해당 가족 구성원 수의 금액
 						$(element).val(this.formatNumber(amount));
+						
+						// 총 가족 구성원 수와 일치하는 경우
+						if (parseInt(familyMembers) === totalFamilyCount) {
+							// 최소값: 기준 금액의 2/3 
+							const minValue = Math.round(amount * 2 / 3);
+							
+							// 최대값: 기준 금액
+							const maxValue = amount;
+							
+							$('#iex_range_min').val(this.formatNumber(minValue));
+							$('#iex_range_max').val(this.formatNumber(maxValue));
+						}
 					});
 				} else {
 					alert('해당 연도의 생계비 기준 데이터를 찾을 수 없습니다.');
-					$('#standard_amount_container input').val(0);
+					$('#standard_amount_container input, #iex_range_min, #iex_range_max').val(0);
 				}
 			},
 			error: () => {
 				alert('생계비 기준 데이터를 불러오는 데 실패했습니다.');
-				$('#standard_amount_container input').val(0);
+				$('#standard_amount_container input, #iex_range_min, #iex_range_max').val(0);
 			}
 		});
 	}
