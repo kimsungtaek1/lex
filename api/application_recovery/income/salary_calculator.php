@@ -73,7 +73,7 @@ if (empty($case_no)) {
 			<div id="income_container">
 				<!-- 기본 소득 행 -->
 				<div class="form-content" data-row-id="income_1">
-					<div class="col"><input type="text" class="income-name" value="소득금액"></div>
+					<div class="col"><span>소득금액</span></div>
 					<div class="col"><input type="text" class="income-amount" data-month="1"></div>
 					<div class="col"><input type="text" class="income-amount" data-month="2"></div>
 					<div class="col"><input type="text" class="income-amount" data-month="3"></div>
@@ -134,7 +134,7 @@ if (empty($case_no)) {
 			<div id="deduction_container">
 				<!-- 기본 공제 행 -->
 				<div class="form-content" data-row-id="deduction_1">
-					<div class="col"><input type="text" class="deduction-name" value="공제금액"></div>
+					<div class="col"><span>공제금액</span></div>
 					<div class="col"><input type="text" class="deduction-amount" data-month="1"></div>
 					<div class="col"><input type="text" class="deduction-amount" data-month="2"></div>
 					<div class="col"><input type="text" class="deduction-amount" data-month="3"></div>
