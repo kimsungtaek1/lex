@@ -433,6 +433,9 @@ class ApplicationRecoveryIncomeExpenditure {
 					if (response.data?.member_no) {
 						row.attr('data-member-no', response.data.member_no);
 					}
+					// 생계비 기준 업데이트
+					const selectedYear = $('#iex_year').val();
+					this.updateLivingExpenseStandards(selectedYear);
 				} else {
 					alert(response.message || '가족관계 정보 저장 실패');
 				}

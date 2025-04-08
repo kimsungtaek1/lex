@@ -200,6 +200,7 @@
         <div class="creditor-title">
             <div class="checkbox-group">
                 <span>생계비산정</span>
+				<button type="button" class="btn btn-add2" id="living_expense_table">년도별 기준중위소득 60% 기준보기</button>
             </div>
         </div>
     </div>
