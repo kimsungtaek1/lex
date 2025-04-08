@@ -700,15 +700,19 @@ initializeLivingExpenseSection() {
 
 	// 부양가족 수 계산 함수 (부양 여부를 정확히 반영)
 	const calculateSupportMemberCount = () => {
-		let supportMemberCount = 0;
+		let totalSupportMemberCount = 0;
+		// 가족관계에서 부양 가족 수 계산
 		$('#familyRelationshipSection .long-table tbody tr').each(function() {
 			const isSupportChecked = $(this).find('input[name^="iex_family_support"]:checked').val() === 'Y';
 			if (isSupportChecked) {
-				supportMemberCount++;
+				totalSupportMemberCount++;
 			}
 		});
-		alert(supportMemberCount + 1);
-		return supportMemberCount + 1; // 본인 포함
+		
+		// 본인 포함 총 가족 구성원 수 (본인 1 + 부양 가족)
+		const totalFamilyCount = totalSupportMemberCount + 1;
+		alert(totalSupportMemberCount + 1);
+		return totalSupportMemberCount + 1; // 본인 포함
 	};
 
 	// 초기 로드 시 생계비 자동 설정
