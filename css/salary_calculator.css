@@ -1,0 +1,64 @@
+*{font-size:0.8vw;font-family:'Pretendard'}
+body{margin:0;padding:0}
+.content-wrapper{display:flex;flex-direction:column;padding:1vw}
+.appendix-title{background:#666;color:#1DFDBE;padding:1.5vh 2vw;font-size:1.0vw;font-weight:500;box-shadow:0 0.7vh 0.7vh rgba(0,0,0,0.4);border-radius:5px}
+
+/* 기준 기간 폼 */
+.calculator-header{margin-top:2vh}
+.form{display:flex}
+.form-title{width:8vw;color:#f3f3f3;background:#a7a7a7;border-bottom:1px solid #f3f3f3;display:flex;justify-content:center;align-items:center;position:relative;border-top-left-radius:0.3vw;border-bottom-left-radius:0.3vw}
+.form-title span{padding-left:10%;width:90%}
+.form-content{flex:1;display:flex;flex-direction:row;align-items:center;padding:0 2%;position:relative;background:#f7f7f7;border-bottom:1px solid #d4d4d4;height:2vw;border-top-right-radius:0.3vw;border-bottom-right-radius:0.3vw}
+.form-content select{width:6vw;padding:0;border:none;border-radius:3px;background:transparent;outline:none}
+.form-content .separator{margin:0 1vw;color:#666}
+.form-content .radio-group{display:flex;align-items:center}
+.form-content .radio-group input[type="radio"]{margin-right:0.2vw;margin-left:1vw}
+.form-content .radio-group label{margin-right:0.5vw}
+
+/* 섹션 헤더 */
+.section-header{width:100%;padding:1vh 1vw;border:none;background:#6c6c6c;color:#fff;margin:1.5vh 0 0 0;box-shadow:0 0.5vh 0.5vh rgba(0,0,0,0.4);display:flex}
+
+/* 테이블 스타일 */
+.salary-table,.deduction-table,.net-amount-table{width:100%;margin-top:0.5vh}
+.table-header{display:flex;width:100%;background:#a7a7a7;color:white;border-radius:3px 3px 0 0}
+.table-header .col{flex:1;padding:0.5vh 0.5vw;text-align:center;font-weight:500}
+.table-header .col:first-child{flex:2}
+.table-header .col:last-child{flex:0.5}
+
+.form-content{display:flex;width:100%;border:none;border-bottom:1px solid #ddd;height:auto;border-radius:0}
+.form-content .col{flex:1;padding:0.5vh 0.5vw;text-align:center;display:flex;align-items:center;justify-content:center}
+.form-content .col:first-child{flex:2;justify-content:flex-start}
+.form-content .col:last-child{flex:0.5}
+.form-content .col input{width:90%;padding:0.3vh 0.2vw;border:none;background:transparent;text-align:right;outline:none}
+.form-content .col .row-total{font-weight:500;color:#333}
+
+.total-row{background:#f0f0f0;font-weight:500}
+.total-row .col span{width:90%;text-align:right}
+.total-row .month-total,.total-row .net-amount,.total-row #income_grand_total,
+.total-row #deduction_grand_total,.total-row #net_amount_grand_total{font-weight:bold;color:#333}
+
+/* 계산 결과 섹션 */
+.calculation-result{display:flex;flex-direction:column;margin-top:2vh;gap:1vh}
+.result-section{display:flex;flex-direction:row;gap:1vw}
+.result-item{display:flex;flex:1;background:#f0f0f0;border-radius:5px;box-shadow:0 0.2vh 0.2vh rgba(0,0,0,0.2);padding:1vh 1vw}
+.result-item .label{color:#333;font-weight:500}
+.result-item .value{margin-left:auto;font-weight:bold;color:#333}
+
+/* 버튼 섹션 */
+.button-section{display:flex;justify-content:flex-end;gap:1vw;margin-top:2vh}
+.button-section button{padding:0.5vh 1vw;min-width:5vw;background:#a7a7a7;color:#000;border:none;border-radius:5px;cursor:pointer;box-shadow:0 0.2vh 0.2vh rgba(0,0,0,0.2)}
+.button-section button:hover{background:#999}
+
+/* 행 추가/삭제 버튼 */
+.btn-add-row,.btn-delete-row{padding:0.2vh 0.5vw;min-width:3vw;background:#a7a7a7;color:#000;border:none;border-radius:3px;cursor:pointer;font-size:0.7vw}
+.btn-delete-row:hover,.btn-add-row:hover{background:#999}
+
+/* 반응형 스타일 */
+@media screen and (max-width:768px) {
+.content-wrapper{padding:10px}
+.form-title{width:30%}
+.form-content{padding:0 5%}
+.form-content .radio-group{flex-wrap:wrap}
+.result-section{flex-direction:column}
+.button-section{justify-content:center}
+}
