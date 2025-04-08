@@ -695,11 +695,21 @@ class ApplicationRecoveryIncomeExpenditure {
 	}
 
 	initializeLivingExpenseSection() {
-		// 기본적으로 기준 범위 내 생계비 선택
-		$('input[name="iex_expense_range"][value="Y"]').prop('checked', true);
-		
+		// 부양가족 수 계산 함수
+		const calculateSupportMemberCount = () => {
+			let supportMemberCount = 0;
+			$('#familyRelationshipSection .long-table tbody tr').each(function() {
+				const isSupportChecked = $(this).find('input[name^="iex_family_support"]:checked').val() === 'Y';
+				if (isSupportChecked) {
+					supportMemberCount++;
+				}
+			});
+			return supportMemberCount + 1; // 본인 포함
+		};
+
 		// 초기 로드 시 생계비 자동 설정
-		const initialFamilyCount = parseInt($('#iex_family_count').val()) || 1;
+		const initialFamilyCount = calculateSupportMemberCount();
+		$('#iex_family_count').val(initialFamilyCount);
 		const initialStandardAmount = this.getStandardLivingExpense(initialFamilyCount);
 		$('#iex_living_expense').val(this.formatMoney(initialStandardAmount));
 		
@@ -712,7 +722,8 @@ class ApplicationRecoveryIncomeExpenditure {
 			livingExpenseInput.prop('readonly', isStandard);
 			
 			if (isStandard) {
-				const familyCount = parseInt($('#iex_family_count').val()) || 1;
+				const familyCount = calculateSupportMemberCount();
+				$('#iex_family_count').val(familyCount);
 				const standardAmount = this.getStandardLivingExpense(familyCount);
 				livingExpenseInput.val(this.formatMoney(standardAmount));
 				directInputCheckbox.prop('checked', false);
@@ -722,7 +733,8 @@ class ApplicationRecoveryIncomeExpenditure {
 				livingExpenseInput.prop('readonly', false);
 				
 				// 직접입력 시 가이드라인 계산
-				const familyCount = parseInt($('#iex_family_count').val()) || 1;
+				const familyCount = calculateSupportMemberCount();
+				$('#iex_family_count').val(familyCount);
 				const standardAmount = this.getStandardLivingExpense(familyCount);
 				const midIncome = standardAmount * (100/60);
 				
@@ -742,7 +754,8 @@ class ApplicationRecoveryIncomeExpenditure {
 			livingExpenseInput.prop('readonly', !e.target.checked);
 			
 			if (e.target.checked && $('input[name="iex_expense_range"]:checked').val() === 'N') {
-				const familyCount = parseInt($('#iex_family_count').val()) || 1;
+				const familyCount = calculateSupportMemberCount();
+				$('#iex_family_count').val(familyCount);
 				const standardAmount = this.getStandardLivingExpense(familyCount);
 				const midIncome = standardAmount * (100/60);
 				
@@ -752,6 +765,21 @@ class ApplicationRecoveryIncomeExpenditure {
 				
 				$('#iex_income_ratio').val(percentageOfMidIncome);
 			}
+		});
+		
+		// 가족 구성원의 부양유무 변경 시 생계비 재계산
+		$('#familyRelationshipSection').on('change', 'input[name^="iex_family_support"]', () => {
+			const familyCount = calculateSupportMemberCount();
+			$('#iex_family_count').val(familyCount);
+			
+			// 현재 선택된 범위에 따라 생계비 재설정
+			const isStandard = $('input[name="iex_expense_range"]:checked').val() === 'Y';
+			if (isStandard) {
+				const standardAmount = this.getStandardLivingExpense(familyCount);
+				$('#iex_living_expense').val(this.formatMoney(standardAmount));
+			}
+			
+			this.calculateTotalExpense();
 		});
 		
 		this.calculateTotalExpense();
