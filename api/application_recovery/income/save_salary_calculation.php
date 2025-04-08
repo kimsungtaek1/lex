@@ -59,15 +59,16 @@ try {
 	// 기본 정보 저장
 	$stmt = $pdo->prepare("
 		INSERT INTO application_recovery_salary_calculation 
-		(case_no, year, calculation_type, monthly_average, yearly_amount) 
+		(case_no, year, month, period, monthly_average, yearly_amount) 
 		VALUES 
-		(:case_no, :year, :calculation_type, :monthly_average, :yearly_amount)
+		(:case_no, :year, :month, :period, :monthly_average, :yearly_amount)
 	");
 
 	$stmt->execute([
 		'case_no' => $data['case_no'],
 		'year' => $data['year'] ?? date('Y'),
-		'calculation_type' => $data['calculation_type'] ?? 'month',
+		'month' => $data['month'] ?? 12,
+		'period' => $data['period'] ?? 12,
 		'monthly_average' => $data['monthly_average'] ?? 0,
 		'yearly_amount' => $data['yearly_amount'] ?? 0
 	]);

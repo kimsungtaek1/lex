@@ -40,7 +40,6 @@ try {
 			'success' => true,
 			'data' => [
 				'year' => date('Y'),
-				'calculation_type' => 'month',
 				'monthly_average' => 0,
 				'yearly_amount' => 0,
 				'income_rows' => [],
@@ -87,7 +86,8 @@ try {
 	// 응답 데이터
 	$response_data = [
 		'year' => $calculation['year'],
-		'calculation_type' => $calculation['calculation_type'],
+		'month' => $calculation['month'],
+		'period' => $calculation['period'],
 		'monthly_average' => (int)$calculation['monthly_average'],
 		'yearly_amount' => (int)$calculation['yearly_amount'],
 		'income_rows' => $income_rows,

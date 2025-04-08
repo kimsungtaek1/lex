@@ -35,9 +35,10 @@ if (empty($case_no)) {
 					<span class="separator">년</span>
 					<select id="salary_month">
 						<?php
-						for ($i = 1; $i <= 12; $i++) {
+						for ($i = 1; $i <= 11; $i++) {
 							echo "<option value=\"{$i}\">{$i}</option>";
 						}
+						echo "<option value=\"12\" selected>12</option>";
 						?>
 					</select>
 					<span class="separator">월 부터 12개월(간)</span>
@@ -45,9 +46,10 @@ if (empty($case_no)) {
 					<span class="separator">소득산정개월수</span>
 					<select id="salary_period">
 						<?php
-						for ($i = 1; $i <= 12; $i++) {
+						for ($i = 1; $i <= 11; $i++) {
 							echo "<option value=\"{$i}\">{$i}</option>";
 						}
+						echo "<option value=\"12\" selected>12</option>";
 						?>
 					</select>
 					<span class="separator">개월(간)으로 월평균 소득금액 및 연간환산금액 계산</span>
@@ -564,7 +566,8 @@ if (empty($case_no)) {
 			const data = {
 				case_no: caseNo,
 				year: $('#salary_year').val(),
-				calculation_type: $('input[name="calculation_type"]:checked').val(),
+				month: $('#salary_month').val(),
+				period: $('#salary_period').val(),
 				monthly_average: extractNumber($('#monthly_average_income').text()),
 				yearly_amount: extractNumber($('#annualized_income').text()),
 				income_rows: [],
@@ -668,6 +671,8 @@ if (empty($case_no)) {
 						
 						// 기본 설정 로드
 						$('#salary_year').val(data.year);
+						$('#salary_month').val(data.month);
+						$('#salary_period').val(data.period);
 						
 						// 기존 행 제거
 						$('#income_container, #deduction_container').empty();
