@@ -16,7 +16,7 @@ body{margin:0;padding:0}
 .form-content .radio-group label{margin-right:0.5vw}
 
 /* 섹션 헤더 */
-.section-header{width:100%;padding:1vh 1vw;border:none;background:#6c6c6c;color:#fff;margin:1.5vh 0 0 0;box-shadow:0 0.5vh 0.5vh rgba(0,0,0,0.4);display:flex}
+.section-header{padding:1vh 1vw;border:none;background:#6c6c6c;color:#fff;margin:1.5vh 0 0 0;box-shadow:0 0.5vh 0.5vh rgba(0,0,0,0.4);display:flex}
 
 /* 테이블 스타일 */
 .salary-table,.deduction-table,.net-amount-table{width:100%;margin-top:0.5vh}
