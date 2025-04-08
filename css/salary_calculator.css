@@ -48,14 +48,11 @@
 .btn-delete-row:hover{background:#bbb}
 
 /* 계산 결과 섹션 */
-.calculation-result{margin-top:2vh;display:flex;justify-content:space-between;gap:2vw}
-.result-section{flex:1;background:#f7f7f7;padding:1.5vh 2vw;border-radius:5px;box-shadow:0 0.2vh 0.4vh rgba(0,0,0,0.1)}
-.result-item{display:flex;justify-content:space-between;padding:0.5vh 0;border-bottom:1px solid #eee}
-.result-item:last-child{border-bottom:none}
-.result-item .label{font-weight:bold}
-.result-item .value{text-align:right}
+.calculation-result{margin-top:2vh;display:flex;gap:2vw}
+.left-section,.right-section{flex:1;border-radius:5px;box-shadow:0 0.2vh 0.4vh rgba(0,0,0,0.1)}
+
 
 /* 버튼 섹션 */
-.button-section{margin-top:2vh;display:flex;justify-content:right;gap:1vw}
-.button-section button{background:#a7a7a7;color:#000;border:none;padding:0.7vh 1.5vw;border-radius:3px;cursor:pointer;box-shadow:0 0.2vh 0.4vh rgba(0,0,0,0.2);min-width:4vw}
-.button-section button:hover{background:#999}
+.btn-right{flex-direction:row-reverse;}
+.form-content button{background:#a7a7a7;color:#000;border:none;padding:0.7vh 1.5vw;border-radius:3px;cursor:pointer;box-shadow:0 0.2vh 0.4vh rgba(0,0,0,0.2);min-width:4vw}
+.form-content button:hover{background:#999}
