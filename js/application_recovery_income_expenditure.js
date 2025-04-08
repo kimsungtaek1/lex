@@ -695,6 +695,9 @@ class ApplicationRecoveryIncomeExpenditure {
 	}
 
 	initializeLivingExpenseSection() {
+		// 기본적으로 기준 범위 내 생계비 선택
+		$('input[name="iex_expense_range"][value="Y"]').prop('checked', true);
+
 		// 부양가족 수 계산 함수
 		const calculateSupportMemberCount = () => {
 			let supportMemberCount = 0;
