@@ -43,7 +43,7 @@ if (empty($case_no)) {
 					<span class="separator">월 부터 12개월(간)</span>
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 					<span class="separator">소득산정개월수</span>
-					<select id="salary_period2">
+					<select id="salary_period">
 						<?php
 						for ($i = 1; $i <= 12; $i++) {
 							echo "<option value=\"{$i}\">{$i}</option>";
@@ -383,8 +383,8 @@ if (empty($case_no)) {
 			$('#yearly_net_amount').text(formatNumber(netAmountGrandTotal));
 			
 			// 월평균 소득금액 및 연간환산금액 계산
-			// salary_period2 값 사용 (사용자가 지정한 개월수)
-			const monthCount = parseInt($('#salary_period2').val()) || 12;
+			// salary_period 값 사용 (사용자가 지정한 개월수)
+			const monthCount = parseInt($('#salary_period').val()) || 12;
 			
 			const monthlyAverage = Math.round(netAmountGrandTotal / monthCount);
 			const annualizedAmount = monthlyAverage * 12;
@@ -497,7 +497,7 @@ if (empty($case_no)) {
 		
 		// 소득산정개월수에 따른 입력 제한
 		function applyPeriodLimitation() {
-			const periodMonths = parseInt($('#salary_period2').val()) || 12;
+			const periodMonths = parseInt($('#salary_period').val()) || 12;
 			
 			// 모든 입력 필드 초기화 (활성화)
 			$('.income-amount, .deduction-amount').prop('disabled', false).css('background-color', '');
@@ -839,7 +839,7 @@ if (empty($case_no)) {
 			});
 			
 			// 소득산정개월수 변경 이벤트 추가
-			$('#salary_period2').change(function() {
+			$('#salary_period').change(function() {
 				applyPeriodLimitation();
 				recalculateAll();
 			});
