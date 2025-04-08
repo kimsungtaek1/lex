@@ -21,6 +21,7 @@ class ApplicationRecoveryIncomeExpenditure {
 			const selectedYear = $('#iex_year').val();
 			this.updateLivingExpenseStandards(selectedYear);
 		});
+		$('#living_expense_table').on('click', () => this.openLivingExpenseTable());
     } catch (error) {
       console.error("초기화 실패:", error);
       alert("초기화 중 오류가 발생했습니다.");
@@ -619,36 +620,21 @@ class ApplicationRecoveryIncomeExpenditure {
 	}
 	
 	loadYearOptions() {
-		$.ajax({
-			url: '/adm/api/application_recovery/income/living_expense_standard_api.php',
-			type: 'GET',
-			data: { action: 'get_years' },
-			dataType: 'json',
-			success: (response) => {
-				if (response.success && response.years) {
-					const $yearSelect = $('#iex_year');
-					$yearSelect.empty(); // 기존 옵션 제거
+		const currentYear = new Date().getFullYear();
+		
+		const $yearSelect = $('#iex_year');
+		$yearSelect.empty(); // 기존 옵션 제거
 
-					// 연도 옵션 동적 생성
-					response.years.forEach((year, index) => {
-						const $option = $('<option>', {
-							value: year,
-							text: year + '년',
-							selected: index === 0 // 첫 번째 연도를 기본 선택
-						});
-						$yearSelect.append($option);
-					});
-
-					// 첫 번째 연도로 생계비 기준 업데이트
-					this.updateLivingExpenseStandards($yearSelect.val());
-				} else {
-					alert('연도 목록을 불러오는 데 실패했습니다.');
-				}
-			},
-			error: () => {
-				alert('연도 목록을 불러오는 중 오류가 발생했습니다.');
-			}
+		// 현재 연도만 옵션으로 추가
+		const $option = $('<option>', {
+			value: currentYear,
+			text: currentYear + '년',
+			selected: true
 		});
+		$yearSelect.append($option);
+
+		// 현재 연도로 생계비 기준 업데이트
+		this.updateLivingExpenseStandards(currentYear);
 	}
 
 	updateLivingExpenseStandards(year) {
@@ -716,6 +702,21 @@ class ApplicationRecoveryIncomeExpenditure {
   initializePlan10Section() {
     // 변제계획안 10항 초기화 로직
   }
+  
+  openLivingExpenseTable() {
+		const caseNo = window.currentCaseNo;
+		if (!caseNo) return;
+		
+		const popupWidth = 1200;
+		const popupHeight = 800;
+		const left = (window.screen.width - popupWidth) / 2;
+		const top = (window.screen.height - popupHeight) / 2;
+		
+		window.open('../api/application_recovery/income/living_expense_standard_table.php', 
+			'년도별 기준중위소득 60% 기준', 
+			`width=${popupWidth},height=${popupHeight},left=${left},top=${top},scrollbars=yes`
+		);
+	}
 }
 
 // 페이지 로드 시 인스턴스 생성
