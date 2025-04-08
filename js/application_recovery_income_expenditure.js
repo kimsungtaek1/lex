@@ -695,9 +695,62 @@ class ApplicationRecoveryIncomeExpenditure {
 	}
 
   initializeLivingExpenseSection() {
-    $('input[name="iex_expense_range"]:checked').trigger('change');
-    this.calculateTotalExpense();
-  }
+	// 기본적으로 기준 범위 내 생계비 선택
+	$('input[name="iex_expense_range"][value="Y"]').prop('checked', true);
+	
+	// 생계비 범위 변경 이벤트 핸들러 개선
+	$('input[name="iex_expense_range"]').on('change', (e) => {
+		const isStandard = e.target.value === 'Y';
+		const livingExpenseInput = $('#iex_living_expense');
+		const directInputCheckbox = $('#iex_direct_input');
+		
+		livingExpenseInput.prop('readonly', isStandard);
+		
+		if (isStandard) {
+			const familyCount = parseInt($('#iex_family_count').val()) || 1;
+			const standardAmount = this.getStandardLivingExpense(familyCount);
+			livingExpenseInput.val(this.formatMoney(standardAmount));
+			directInputCheckbox.prop('checked', false);
+		} else {
+			// 기준 범위 초과 선택 시 직접입력 체크박스 자동 체크
+			directInputCheckbox.prop('checked', true);
+			livingExpenseInput.prop('readonly', false);
+			
+			// 직접입력 시 가이드라인 계산
+			const familyCount = parseInt($('#iex_family_count').val()) || 1;
+			const standardAmount = this.getStandardLivingExpense(familyCount);
+			const midIncome = standardAmount * (100/60);
+			
+			// 현재 생계비 금액 계산
+			const currentExpense = this.unformatMoney(livingExpenseInput.val());
+			const percentageOfMidIncome = midIncome > 0 ? (currentExpense / midIncome * 100).toFixed(2) : 0;
+			
+			$('#iex_income_ratio').val(percentageOfMidIncome);
+		}
+		
+		this.calculateTotalExpense();
+	});
+	
+	// 직접입력 체크박스 이벤트 핸들러
+	$('#iex_direct_input').on('change', (e) => {
+			const livingExpenseInput = $('#iex_living_expense');
+			livingExpenseInput.prop('readonly', !e.target.checked);
+			
+			if (e.target.checked && $('input[name="iex_expense_range"]:checked').val() === 'N') {
+				const familyCount = parseInt($('#iex_family_count').val()) || 1;
+				const standardAmount = this.getStandardLivingExpense(familyCount);
+				const midIncome = standardAmount * (100/60);
+				
+				// 현재 생계비 금액 계산
+				const currentExpense = this.unformatMoney(livingExpenseInput.val());
+				const percentageOfMidIncome = midIncome > 0 ? (currentExpense / midIncome * 100).toFixed(2) : 0;
+				
+				$('#iex_income_ratio').val(percentageOfMidIncome);
+			}
+		});
+		
+		this.calculateTotalExpense();
+	}
 
   initializePlan10Section() {
     // 변제계획안 10항 초기화 로직
