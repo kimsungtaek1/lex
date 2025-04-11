@@ -264,7 +264,7 @@ function generatePdfIncome($pdf, $pdo, $case_no) {
 
 		foreach ($family_members as $member) {
 			$live_together = $member['live_together'] == 'Y' ? '동거' : '별거';
-			$live_period = $member['live_period'] ? $live_period : '';
+			$live_period = $member['live_period'] ? $member['live_period'] : '';
 			$live_info = $live_together . ($live_period ? ' ' . $live_period : '');
 			
 			$pdf->Cell(15, 10, $member['relation'] ?? '', 1, 0, 'C');
