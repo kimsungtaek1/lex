@@ -21,13 +21,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' || isset($_GET['action'])) {
                     $pdo->beginTransaction();
                     
                     // 저장 로직 구현
+                    $case_no = $_POST['case_no'];
+                    $trustee = $_POST['trustee'] ?? null; // 'yes' or 'no'
+                    $fee_rate = $_POST['fee'] ?? 0; // 기본값 0
+                    $additional_fee = $_POST['additional_fee'] ?? 'N'; // 'Y' or 'N'
+                    $is_external = ($trustee === 'yes') ? 'Y' : 'N';
+
+                    // 기존 데이터 확인
+                    $checkStmt = $pdo->prepare("SELECT COUNT(*) FROM application_recovery_income_trustee_fee WHERE case_no = :case_no");
+                    $checkStmt->execute([':case_no' => $case_no]);
+                    $exists = $checkStmt->fetchColumn() > 0;
+
+                    if ($exists) {
+                        // UPDATE
+                        $stmt = $pdo->prepare("
+                            UPDATE application_recovery_income_trustee_fee
+                            SET
+                                is_external_trustee = :is_external_trustee,
+                                trustee_fee_rate = :trustee_fee_rate,
+                                calculate_trustee_fee_after_disposal = :calculate_trustee_fee_after_disposal
+                            WHERE case_no = :case_no
+                        ");
+                    } else {
+                        // INSERT
+                        $stmt = $pdo->prepare("
+                            INSERT INTO application_recovery_income_trustee_fee
+                            (case_no, is_external_trustee, trustee_fee_rate, calculate_trustee_fee_after_disposal)
+                            VALUES (:case_no, :is_external_trustee, :trustee_fee_rate, :calculate_trustee_fee_after_disposal)
+                        ");
+                    }
+                    
+                    $stmt->bindParam(':is_external_trustee', $is_external, PDO::PARAM_STR);
+                    $stmt->bindParam(':trustee_fee_rate', $fee_rate, PDO::PARAM_INT);
+                    $stmt->bindParam(':calculate_trustee_fee_after_disposal', $additional_fee, PDO::PARAM_STR);
+                    $stmt->bindParam(':case_no', $case_no, PDO::PARAM_INT);
+                    
+                    $stmt->execute();
                     
                     $pdo->commit();
                     echo json_encode(['success' => true]);
                 } catch (Exception $e) {
                     $pdo->rollBack();
                     echo json_encode([
-                        'success' => false, 
+                        'success' => false,
                         'message' => $e->getMessage(),
                         'post_data' => $_POST
                     ]);
@@ -36,10 +72,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' || isset($_GET['action'])) {
 
             case 'get':
                 // 데이터 조회 로직 구현
+                $stmt = $pdo->prepare("SELECT is_external_trustee, trustee_fee_rate, calculate_trustee_fee_after_disposal FROM application_recovery_income_trustee_fee WHERE case_no = :case_no");
+                $stmt->execute([':case_no' => $case_no]);
+                $data = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                // is_external_trustee 값을 'yes'/'no'로 변환 (JavaScript 호환성)
+                if ($data) {
+                    $data['trustee'] = ($data['is_external_trustee'] === 'Y') ? 'yes' : 'no';
+                    $data['fee'] = $data['trustee_fee_rate']; // JavaScript에서 fee 이름 사용
+                    // calculate_trustee_fee_after_disposal은 'Y'/'N' 그대로 사용
+                } else {
+                    // 데이터가 없을 경우 기본값 설정 (선택사항)
+                    $data = [
+                        'trustee' => 'no',
+                        'fee' => 0,
+                        'calculate_trustee_fee_after_disposal' => 'N'
+                    ];
+                }
+
+                echo json_encode(['success' => true, 'data' => $data]);
                 break;
 
             case 'delete':
-                // 삭제 로직 구현
+                // 삭제 로직 구현 (필요 시)
+                // $stmt = $pdo->prepare("DELETE FROM application_recovery_income_trustee_fee WHERE case_no = :case_no");
+                // $stmt->execute([':case_no' => $case_no]);
+                // echo json_encode(['success' => true]);
+                echo json_encode(['success' => false, 'message' => '삭제 기능은 지원되지 않습니다.']);
                 break;
 
             default:
@@ -207,7 +266,22 @@ function saveTrusteeFee() {
         success: function(response) {
             if(response.success) {
                 alert('저장되었습니다.');
+                // 부모 창으로 값 전달 (조건부)
+                if (window.opener && !window.opener.closed && window.opener.$) {
+                    const isExternalTrustee = $('input[name="trustee"]:checked').val();
+                    // 'yes'일 경우 선택된 비율, 'no'일 경우 0
+                    const feeRateToPass = (isExternalTrustee === 'yes') ? ($('input[name="fee"]:checked').val() || 0) : 0;
+                    
+                    // 부모 창의 #iex_trustee_fee_rate 요소에 값 설정
+                    window.opener.$('#iex_trustee_fee_rate').val(feeRateToPass);
+                    
+                    // 필요하다면 부모 창의 다른 함수도 호출 (예: 합계 재계산 등)
+                    // if (typeof window.opener.recalculateTotals === 'function') {
+                    //     window.opener.recalculateTotals();
+                    // }
+                }
                 loadTrusteeFee();
+                // window.close(); // 필요하다면 창 닫기
             } else {
                 alert(response.message || '저장에 실패했습니다.');
             }

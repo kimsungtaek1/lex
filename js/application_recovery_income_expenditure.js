@@ -8,20 +8,30 @@ class ApplicationRecoveryIncomeExpenditure {
 
   initialize() {
     try {
-		this.loadIncomeType();
-		this.loadBusinessIncome();
-		this.initializeEventHandlers();
-		this.initializeSalarySection();
-		this.initializeBusinessSection();
-		this.initializeFamilySection();
-		this.loadYearOptions();
-		this.initializeLivingExpenseSection();
-		this.initializePlan10Section();
-		$('#iex_year').on('change', () => {
-			const selectedYear = $('#iex_year').val();
-			this.updateLivingExpenseStandards(selectedYear);
-		});
-		$('#living_expense_table').on('click', () => this.openLivingExpenseTable());
+      this.loadIncomeType();
+      this.loadBusinessIncome();
+      this.initializeEventHandlers();
+      this.initializeSalarySection();
+      this.initializeBusinessSection();
+      this.initializeFamilySection();
+      this.loadYearOptions();
+      this.initializeLivingExpenseSection();
+      // 데이터 직접 로드 함수 호출 추가
+      this.loadOtherFeeData();
+      this.loadTrusteeFeeData();
+      this.loadAdditionalExpenseData();
+      this.initializePlan10Section();
+      $('#iex_year').on('change', () => {
+        const selectedYear = $('#iex_year').val();
+        this.updateLivingExpenseStandards(selectedYear);
+      });
+      $('#living_expense_table').on('click', () => this.openLivingExpenseTable());
+
+      $('#iex_plan10_save_btn').off('click').on('click', () => {
+          console.log('iex_plan10_save_btn clicked (direct)');
+        this.savePlan10Data();
+      });
+
     } catch (error) {
       console.error("초기화 실패:", error);
       alert("초기화 중 오류가 발생했습니다.");
@@ -46,6 +56,7 @@ class ApplicationRecoveryIncomeExpenditure {
     // 생계비 섹션 이벤트
     $('input[name="iex_expense_range"]').off('change').on('change', (e) => this.handleExpenseRangeChange(e));
     $('#iex_direct_input').off('change').on('change', (e) => this.handleDirectInputChange(e));
+    // 팝업 버튼 이벤트 핸들러 복원
     $('#iex_expense_calc_btn').off('click').on('click', () => this.openAdditionalExpenseCalculator());
     $('#iex_trustee_fee_btn').off('click').on('click', () => this.openTrusteeFeeCalculator());
     $('#iex_other_fee_btn').off('click').on('click', () => this.openOtherFeeCalculator());
@@ -53,9 +64,15 @@ class ApplicationRecoveryIncomeExpenditure {
     // 변제계획 이벤트
     $('#iex-monthCountValue').off('input').on('input', () => this.calculateMonthlyPayment());
     $('#iex-calcPlanBtn').off('click').on('click', () => this.calculateRepaymentPlan());
+    
+    $('#iex_plan10_save_btn').off('click').on('click', () => {
+      console.log('iex_plan10_save_btn clicked (in event handlers)');
+      this.savePlan10Data();
+    });
 
     // 공통 이벤트
     this.initializeMoneyInputs();
+
   }
 
   loadIncomeType() {
@@ -162,7 +179,8 @@ class ApplicationRecoveryIncomeExpenditure {
       '#iex_family_assets',
       '#iex_living_expense',
       '#iex_additional_expense',
-      '#iex_other_fee'
+      '#iex_other_fee',
+      '#iex_trustee_fee_rate' // 외부회생위원 보수율 필드 추가
     ];
 
     moneyInputs.forEach(selector => {
@@ -491,9 +509,20 @@ class ApplicationRecoveryIncomeExpenditure {
     livingExpenseInput.prop('readonly', isStandard);
 
     if (isStandard) {
+      // 기준 범위 내 선택 시: 표준 금액 설정 및 추가 생계비 데이터 삭제
       const familyCount = parseInt($('#iex_family_count').val()) || 1;
       const standardAmount = this.getStandardLivingExpense(familyCount);
       livingExpenseInput.val(this.formatMoney(standardAmount));
+      this.deleteAdditionalExpenseData(); // 추가 생계비 데이터 삭제 함수 호출
+    } else {
+      // 기준 범위 초과 선택 시: 중위소득 비율 재계산 (기존 로직 유지)
+      this.getFamilyCountFromDB((familyCount) => {
+        const standardAmount = this.getStandardLivingExpense(familyCount);
+        const midIncome = standardAmount * (100/60);
+        const currentExpense = this.unformatMoney(livingExpenseInput.val());
+        const percentageOfMidIncome = midIncome > 0 ? (currentExpense / midIncome * 100).toFixed(2) : 0;
+        $('#iex_income_ratio').val(percentageOfMidIncome);
+      });
     }
 
     this.calculateTotalExpense();
@@ -512,6 +541,7 @@ class ApplicationRecoveryIncomeExpenditure {
   calculateTotalExpense() {
     const livingExpense = this.unformatMoney($('#iex_living_expense').val());
     const additionalExpense = this.unformatMoney($('#iex_additional_expense').val());
+    // 참고: 외부회생위원 보수와 기타 개인회생재단 채권은 현재 총 지출 계산에 포함되지 않음. 필요시 로직 수정.
     const totalExpense = livingExpense + additionalExpense;
 
     $('#iex-livingExpenseValue').val(this.formatMoney(totalExpense));
@@ -539,26 +569,177 @@ class ApplicationRecoveryIncomeExpenditure {
     }
   }
 
+  // --- 팝업 창 여는 함수들 (닫힐 때 데이터 리로드 추가) ---
+
   openAdditionalExpenseCalculator() {
-	const caseNo = window.currentCaseNo;
+    // 기준 범위 내 생계비 선택 시 추가 생계비 입력 불가
+    const isStandard = $('input[name="iex_expense_range"]:checked').val() === 'Y';
+    if (isStandard) {
+      alert('추가 생계비는 기준 범위 초과 생계비를 선택한 경우에만 입력 가능합니다.');
+      return;
+    }
+
+    const caseNo = window.currentCaseNo;
     if (!caseNo) return;
-    window.open('/adm/api/application_recovery/income/additional_expense_calculator.php?case_no=' + caseNo, '추가생계비계산기', 'width=1000,height=600,scrollbars=yes');
+    const popup = window.open('/adm/api/application_recovery/income/additional_expense_calculator.php?case_no=' + caseNo, '추가생계비계산기', 'width=1000,height=600,scrollbars=yes');
+    this.monitorPopupClose(popup, () => this.loadAdditionalExpenseData());
   }
 
   openTrusteeFeeCalculator() {
-	const caseNo = window.currentCaseNo;
+    const caseNo = window.currentCaseNo;
     if (!caseNo) return;
-    window.open('/adm/api/application_recovery/income/trustee_fee_calculator.php?case_no=' + caseNo,
-      '외부회생위원보수계산기',
-      'width=1000,height=1200,scrollbars=yes');
+    const popup = window.open('/adm/api/application_recovery/income/trustee_fee_calculator.php?case_no=' + caseNo, '외부회생위원보수계산기', 'width=1000,height=1200,scrollbars=yes');
+    this.monitorPopupClose(popup, () => this.loadTrusteeFeeData());
   }
 
   openOtherFeeCalculator() {
-	const caseNo = window.currentCaseNo;
+    const caseNo = window.currentCaseNo;
     if (!caseNo) return;
-    window.open('/adm/api/application_recovery/income/other_fee_calculator.php?case_no=' + caseNo,
-      '기타재단채권계산기',
-      'width=1000,height=1200,scrollbars=yes');
+    const popup = window.open('/adm/api/application_recovery/income/other_fee_calculator.php?case_no=' + caseNo, '기타재단채권계산기', 'width=1000,height=1200,scrollbars=yes');
+    this.monitorPopupClose(popup, () => this.loadOtherFeeData());
+  }
+
+  // 팝업 창 닫힘 감지 및 콜백 실행 함수
+  monitorPopupClose(popup, callback) {
+    if (!popup) return;
+    const timer = setInterval(() => {
+      if (popup.closed) {
+        clearInterval(timer);
+        if (typeof callback === 'function') {
+          callback();
+        }
+      }
+    }, 500); // 0.5초마다 확인
+  }
+
+
+  // --- 데이터 직접 로딩 함수들 ---
+
+  loadOtherFeeData() {
+    const caseNo = window.currentCaseNo;
+    if (!caseNo) return;
+
+    $.ajax({
+      url: '/adm/api/application_recovery/income/other_fee_calculator.php',
+      type: 'GET',
+      data: { action: 'get', case_no: caseNo },
+      dataType: 'json',
+      success: (response) => {
+        if (response.success && response.data) {
+          let totalOtherFee = 0;
+          response.data.forEach(item => {
+            totalOtherFee += parseInt(item.amount) || 0;
+          });
+          $('#iex_other_fee').val(this.formatMoney(totalOtherFee));
+          // 필요시 총 지출 계산 업데이트
+          // this.calculateTotalExpense();
+        } else {
+           $('#iex_other_fee').val(this.formatMoney(0)); // 데이터 없으면 0으로 초기화
+        }
+      },
+      error: (xhr, status, error) => {
+        console.error('기타 개인회생재단 채권 데이터 로드 중 오류 발생:', error);
+         $('#iex_other_fee').val(this.formatMoney(0)); // 오류 시 0으로 초기화
+      }
+    });
+  }
+
+  loadTrusteeFeeData() {
+    const caseNo = window.currentCaseNo;
+    if (!caseNo) return;
+
+    $.ajax({
+      url: '/adm/api/application_recovery/income/trustee_fee_calculator.php',
+      type: 'GET',
+      data: { action: 'get', case_no: caseNo },
+      dataType: 'json',
+      success: (response) => {
+        if (response.success && response.data) {
+          // 외부회생위원 선임 여부에 따라 보수율 설정
+          const isExternalTrustee = response.data.trustee === 'yes';
+          const feeRate = isExternalTrustee ? (response.data.fee || 0) : 0;
+          $('#iex_trustee_fee_rate').val(feeRate);
+          // 필요시 총 지출 계산 업데이트
+          // this.calculateTotalExpense();
+        } else {
+           $('#iex_trustee_fee_rate').val(0); // 데이터 없으면 0으로 초기화
+        }
+      },
+      error: (xhr, status, error) => {
+        console.error('외부회생위원 보수 데이터 로드 중 오류 발생:', error);
+         $('#iex_trustee_fee_rate').val(0); // 오류 시 0으로 초기화
+      }
+    });
+  }
+
+  loadAdditionalExpenseData() {
+    const caseNo = window.currentCaseNo;
+    if (!caseNo) return;
+
+    $.ajax({
+      url: '/adm/api/application_recovery/income/additional_expense_calculator.php',
+      type: 'GET',
+      data: { action: 'get', case_no: caseNo },
+      dataType: 'json',
+      success: (response) => {
+        if (response.success && response.data) {
+          let totalAdditionalExpense = 0;
+          response.data.forEach(item => {
+            totalAdditionalExpense += parseInt(item.amount) || 0;
+          });
+          $('#iex_additional_expense').val(this.formatMoney(totalAdditionalExpense));
+          // 추가 생계비 로드 후 총 지출 계산 업데이트
+          this.calculateTotalExpense();
+        } else {
+           $('#iex_additional_expense').val(this.formatMoney(0)); // 데이터 없으면 0으로 초기화
+           this.calculateTotalExpense(); // 총 지출 업데이트
+        }
+      },
+      error: (xhr, status, error) => {
+        console.error('추가 생계비 데이터 로드 중 오류 발생:', error);
+         $('#iex_additional_expense').val(this.formatMoney(0)); // 오류 시 0으로 초기화
+         this.calculateTotalExpense(); // 총 지출 업데이트
+      }
+    });
+  }
+
+  // 추가 생계비 데이터 삭제 함수
+  deleteAdditionalExpenseData() {
+    const caseNo = window.currentCaseNo;
+    if (!caseNo) return;
+
+    // 사용자에게 삭제 여부 확인 (선택 사항)
+    // if (!confirm('기준 범위 내 생계비를 선택하면 입력된 추가 생계비 정보가 삭제됩니다. 계속하시겠습니까?')) {
+    //   // 이전 선택 상태로 되돌리기 (필요 시 구현)
+    //   $('input[name="iex_expense_range"][value="N"]').prop('checked', true);
+    //   return;
+    // }
+
+    $.ajax({
+      url: '/adm/api/application_recovery/income/additional_expense_calculator.php',
+      type: 'POST', // DELETE 메서드 대신 POST 사용 (서버 API가 POST로 delete 액션을 처리)
+      data: {
+        action: 'delete',
+        case_no: caseNo
+      },
+      dataType: 'json',
+      success: (response) => {
+        if (response.success) {
+          console.log('추가 생계비 데이터가 삭제되었습니다.');
+          // 화면 업데이트: 추가 생계비 0으로 설정 및 총 지출 재계산
+          $('#iex_additional_expense').val(this.formatMoney(0));
+          this.calculateTotalExpense();
+        } else {
+          alert(response.message || '추가 생계비 데이터 삭제 실패');
+          // 실패 시 이전 선택 상태로 되돌릴 수 있음 (필요 시 구현)
+        }
+      },
+      error: (xhr, status, error) => {
+        console.error('추가 생계비 삭제 중 오류 발생:', error);
+        alert('추가 생계비 삭제 중 오류가 발생했습니다.');
+        // 오류 시 이전 선택 상태로 되돌릴 수 있음 (필요 시 구현)
+      }
+    });
   }
 
   initializeBusinessSection() {
@@ -772,23 +953,24 @@ initializeLivingExpenseSection() {
 		const livingExpenseInput = $('#iex_living_expense');
 		const directInputCheckbox = $('#iex_direct_input');
 		
-		livingExpenseInput.prop('readonly', isStandard);
-		
+		// 표준 범위일 경우 직접 입력 불가능 처리
 		if (isStandard) {
+			livingExpenseInput.prop('readonly', true);
+			directInputCheckbox.prop('checked', false);
+			
 			// DB에서 가족 수 조회
 			this.getFamilyCountFromDB((familyCount) => {
 				$('#iex_family_count').val(familyCount);
 				const standardAmount = this.getStandardLivingExpense(familyCount);
 				livingExpenseInput.val(this.formatMoney(standardAmount));
-				directInputCheckbox.prop('checked', false);
 				// 기준 범위 내인 경우 60% 설정
 				$('#iex_income_ratio').val('60.00');
 				this.calculateTotalExpense();
 			});
 		} else {
-			// 기준 범위 초과 선택 시 직접입력 체크박스 자동 체크
-			directInputCheckbox.prop('checked', true);
-			livingExpenseInput.prop('readonly', false);
+			// 기준 범위 초과 선택 시에도 직접 입력 체크박스 상태는 변경하지 않음
+			// 다만 읽기 전용 상태는 직접 입력 체크박스 상태에 따름
+			livingExpenseInput.prop('readonly', !directInputCheckbox.prop('checked'));
 			
 			// DB에서 가족 수 조회하여 중위소득 비율 계산
 			this.getFamilyCountFromDB((familyCount) => {
@@ -806,14 +988,26 @@ initializeLivingExpenseSection() {
 		}
 	});
 	
-	// 직접 입력 체크박스 이벤트
+	// 직접 입력 체크박스 이벤트 수정
 	$('#iex_direct_input').on('change', (e) => {
+		// 읽기 전용 속성만 변경하고, 라디오 버튼 상태는 변경하지 않음
 		$('#iex_living_expense').prop('readonly', !e.target.checked);
 		
-		if (e.target.checked) {
-			// 기준 범위 초과 선택
-			$('input[name="iex_expense_range"][value="N"]').prop('checked', true);
+		// 중위소득 비율 계산은 현재 선택된 라디오 버튼에 따라 결정
+		const isExceedRange = $('input[name="iex_expense_range"]:checked').val() === 'N';
+		if (isExceedRange) {
+			this.getFamilyCountFromDB((familyCount) => {
+				const standardAmount = this.getStandardLivingExpense(familyCount);
+				const midIncome = standardAmount * (100/60);
+				const currentExpense = this.unformatMoney($('#iex_living_expense').val());
+				const percentageOfMidIncome = midIncome > 0 ? (currentExpense / midIncome * 100).toFixed(2) : 0;
+				
+				$('#iex_income_ratio').val(percentageOfMidIncome);
+			});
 		}
+		
+		// 총액 계산 업데이트
+		this.calculateTotalExpense();
 	});
 	
 	// 생계비 금액 변경 시 중위소득 비율 계산
@@ -847,7 +1041,102 @@ initializeLivingExpenseSection() {
 }
 
   initializePlan10Section() {
-    // 변제계획안 10항 초기화 로직
+    this.loadPlan10Data(); // 데이터 로딩 함수 호출
+    // 기존 변제계획안 10항 초기화 로직 (있다면 유지)
+  }
+
+  loadPlan10Data() {
+    const caseNo = window.currentCaseNo;
+    if (!caseNo) return;
+
+    $.ajax({
+      url: '/adm/api/application_recovery/income/plan10_api.php', // API 경로 확인 필요
+      type: 'GET',
+      data: { case_no: caseNo },
+      dataType: 'json',
+      success: (response) => {
+        if (response.success && response.data) {
+          $('#iex_plan10_title').val(response.data.title || '');
+          $('#iex_plan10_content').val(response.data.content || '');
+        } else {
+        }
+      },
+      error: (xhr, status, error) => {
+        console.error('변제계획안 10항 데이터 로드 중 오류:', error);
+      }
+    });
+  }
+
+  savePlan10Data() {
+    console.log('savePlan10Data function called'); // 함수 호출 확인 로그
+    if (this.isSaving) {
+       console.log('Saving already in progress, returning.'); // 저장 중복 방지 확인 로그
+       return;
+    }
+    this.isSaving = true;
+
+    const caseNo = window.currentCaseNo;
+    if (!caseNo) {
+      alert('사건 번호가 필요합니다.');
+      this.isSaving = false;
+      return;
+    }
+
+    const title = $('#iex_plan10_title').val()?.trim() || '';
+    const content = $('#iex_plan10_content').val()?.trim() || '';
+
+    if (!title || !content) {
+		alert('제목과 내용을 모두 입력해주세요.');
+		his.isSaving = false;
+		return;
+    }
+
+    const data = {
+      case_no: caseNo,
+      title: title,
+      content: content
+    };
+
+    $.ajax({
+      url: '/adm/api/application_recovery/income/plan10_api.php', // API 경로 확인 필요
+      type: 'POST',
+      data: data,
+      dataType: 'json',
+      success: (response) => {
+        if (response.success) {
+          alert('변제계획안 10항 정보가 저장되었습니다.');
+        } else {
+          alert(response.message || '변제계획안 10항 정보 저장 실패');
+        }
+      },
+      error: (xhr, status, error) => {
+        console.error('변제계획안 10항 저장 중 오류:', status, error);
+        // 서버 응답 내용 확인 (JSON 형태일 수 있음)
+        let errorMessage = '변제계획안 10항 저장 중 오류가 발생했습니다.';
+        if (xhr.responseText) {
+          try {
+            const response = JSON.parse(xhr.responseText);
+            // PHP에서 반환하는 상세 오류 메시지 사용
+            if (response && response.message) {
+              errorMessage += `\n서버 메시지: ${response.message}`;
+              if (response.error_message) { // PHP에서 추가한 상세 오류
+                 console.error('서버 오류 상세:', response.error_message);
+                 console.error('서버 오류 추적:', response.error_trace);
+              }
+            } else {
+               console.error('서버 응답:', xhr.responseText); // JSON 파싱 실패 시 원본 응답 출력
+            }
+          } catch (e) {
+            console.error('서버 응답 파싱 오류:', e);
+            console.error('원본 서버 응답:', xhr.responseText);
+          }
+        }
+        alert(errorMessage);
+      },
+      complete: () => {
+        this.isSaving = false;
+      }
+    });
   }
   
   openLivingExpenseTable() {

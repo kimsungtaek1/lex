@@ -351,7 +351,7 @@
                 <div id="iex-monthCountBox">
                     <div class="iex-title">개월수</div>
                     <div class="iex-box">
-                        <input type="text" class="form-control" id="iex-monthCountValue" placeholder="0">
+                        <input type="text" class="form-control" id="iex-monthCountValue" placeholder="36" value="36">
                         <div class="iex-value">&nbsp;개월</div>
                     </div>
                 </div>
@@ -385,7 +385,7 @@
                     <span>제목</span>
                 </div>
                 <div class="form-content">
-                    <input type="text" class="form-control" id="iex_plan_title" value="">
+                    <input type="text" class="form-control" id="iex_plan10_title" value="">
                 </div>
             </div>
             <div class="form">
@@ -393,7 +393,7 @@
                     <span>내용</span>
                 </div>
                 <div class="form-content form-content-3 textarea">
-                    <textarea id="iex_plan_content" name="iex_plan_content" class="form-control" placeholder="" rows="6"></textarea>
+                    <textarea id="iex_plan10_content" name="iex_plan10_content" class="form-control" placeholder="" rows="6"></textarea>
                 </div>
             </div>
         </div>
@@ -415,8 +415,8 @@
             <div class="form">
                 <div class="form-title"></div>
                 <div class="form-content btn-right">
-                    <button class="btn-delete" id="iex_plan_delete_btn">삭제</button>
-                    <button class="btn-save" id="iex_plan_save_btn">저장</button>
+                    <button class="btn-delete" id="iex_plan10_delete_btn">삭제</button>
+                    <button class="btn-save" id="iex_plan10_save_btn">저장</button>
                 </div>
             </div>
         </div>
