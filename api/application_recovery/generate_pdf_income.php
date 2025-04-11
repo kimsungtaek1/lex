@@ -153,7 +153,6 @@ function generatePdfIncome($pdf, $pdo, $case_no) {
 			$pdf->Cell($col_width3, 10, '', 1, 0, 'C');
 			$pdf->Cell($col_width4, 10, '', 1, 1, 'C');
 		}
-
 		// 연 수입, 월 평균 소득 요약
 		$total_yearly = ($salary_info['yearly_income'] ?? 0) + ($business_info['yearly_income'] ?? 0);
 		$total_monthly = ($salary_info['monthly_income'] ?? 0) + ($business_info['monthly_income'] ?? 0);
@@ -277,6 +276,87 @@ function generatePdfIncome($pdf, $pdo, $case_no) {
 			$pdf->Cell(20, 10, $member['support'] == 'Y' ? '유' : '무', 1, 1, 'C');
 		}
 		
+		// 생계비 초과 지출 내역 - 새 페이지에 표시 (가족관계 다음 페이지)
+		if ($living_expense_type == 'N' && !empty($living_expenses)) {
+			$pdf->AddPage();
+			$pdf->SetFont('cid0kr', 'B', 14);
+			$pdf->Cell(0, 10, '채무자가 예상하는 생계비 지출 내역', 0, 1, 'C');
+			$pdf->Ln(5);
+			
+			// 기준 중위소득 계산 정보 표시
+			$pdf->SetFont('cid0kr', 'B', 12);
+			$pdf->Cell(0, 10, '1. 기준 중위소득 정보', 0, 1, 'L');
+			$pdf->SetFont('cid0kr', '', 10);
+			
+			$pdf->Cell(100, 10, '가구원 수: '.$household_size.'명', 0, 0, 'L');
+			$pdf->Cell(0, 10, '기준 중위소득: '.number_format($median_income_amount).'원', 0, 1, 'L');
+			$pdf->Cell(100, 10, '생계비 비율: '.$income_percentage.'%', 0, 0, 'L');
+			$pdf->Cell(0, 10, '생계비 금액: '.number_format($living_expense_amount).'원', 0, 1, 'L');
+			$pdf->Ln(5);
+			
+			// 생계비 항목별 내역 테이블
+			$pdf->SetFont('cid0kr', 'B', 12);
+			$pdf->Cell(0, 10, '2. 생계비 항목별 내역', 0, 1, 'L');
+			$pdf->SetFont('cid0kr', '', 10);
+			
+			// 테이블 헤더
+			$pdf->SetFillColor(240, 240, 240);
+			$pdf->Cell(50, 10, '비 목', 1, 0, 'C', true);
+			$pdf->Cell(40, 10, '지출 예상 금액', 1, 0, 'C', true);
+			$pdf->Cell(100, 10, '추가 지출 사유', 1, 1, 'C', true);
+			// 생계비 내역 데이터
+			$total_expense = 0;
+			foreach ($living_expenses as $expense) {
+				$amount = $expense['amount'] ?? 0;
+				$total_expense += $amount;
+				
+				$pdf->Cell(50, 10, $expense['type'] ?? '', 1, 0, 'L');
+				$pdf->Cell(40, 10, number_format($amount).'원', 1, 0, 'R');
+				
+				// 추가 지출 사유 (내용이 길 경우 여러 줄로 표시)
+				$reason = $expense['reason'] ?? '';
+				if (mb_strlen($reason, 'UTF-8') > 60) {
+					$pdf->MultiCell(100, 10, $reason, 1, 'L');
+				} else {
+					$pdf->Cell(100, 10, $reason, 1, 1, 'L');
+				}
+			}
+			
+			// 합계 행
+			$pdf->SetFont('cid0kr', 'B', 10);
+			$pdf->Cell(50, 10, '합계', 1, 0, 'C');
+			$pdf->Cell(40, 10, number_format($total_expense).'원', 1, 0, 'R');
+			$pdf->Cell(100, 10, '', 1, 1, 'C');
+			
+			$pdf->Ln(5);
+			
+			// 생계비 초과 지출 사유 섹션
+			$pdf->SetFont('cid0kr', 'B', 12);
+			$pdf->Cell(0, 10, '3. 생계비 초과 지출 종합 사유', 0, 1, 'L');
+			$pdf->SetFont('cid0kr', '', 10);
+			
+			// 종합 사유 조회
+			$expense_reason_stmt = $pdo->prepare("
+				SELECT overall_reason FROM application_recovery_income_expenditure 
+				WHERE case_no = ?
+			");
+			$expense_reason_stmt->execute([$case_no]);
+			$expense_reason_info = $expense_reason_stmt->fetch(PDO::FETCH_ASSOC);
+			
+			$overall_reason = $expense_reason_info['overall_reason'] ?? '';
+			
+			// 종합 사유 표시
+			$pdf->MultiCell(0, 10, $overall_reason, 1, 'L');
+			
+			$pdf->Ln(5);
+			
+			// 관련 법규 및 안내 사항
+			$pdf->SetFont('cid0kr', '', 8);
+			$pdf->Cell(0, 6, '■ 관련 법규: 개인회생규칙 제74조(변제계획의 내용) 제3항', 0, 1, 'L');
+			$pdf->MultiCell(0, 6, '※ 채무자가 제출한 예상 생계비가 보건복지부 공표 기준 중위소득의 100분의 60을 초과하는 경우에는 초과 사유와 내역을 객관적 자료로 증명하여야 합니다.', 0, 'L');
+			$pdf->MultiCell(0, 6, '※ 초과 생계비에 대한 증빙자료를 첨부하여 주시기 바랍니다.', 0, 'L');
+		}
+		
 		// 월 평균 소득 계산 내역
 		if (!empty($income_rows) || !empty($deduction_rows)) {
 			$pdf->AddPage();
@@ -343,7 +423,6 @@ function generatePdfIncome($pdf, $pdo, $case_no) {
 			$total_income = 0;
 			foreach ($income_rows as $row) {
 				$pdf->Cell(20, 10, $row['row_name'], 1, 0, 'L');
-				
 				$row_total = 0;
 				for ($i=1; $i<=12; $i++) {
 					$month_key = 'month'.$i;
@@ -469,7 +548,6 @@ function generatePdfIncome($pdf, $pdo, $case_no) {
 			
 			// 연간 환산 금액
 			$annual_amount = $monthly_average * 12;
-			
 			// 요약 행
 			$pdf->Cell(45, 10, '연 소득총액(A)', 1, 0, 'L');
 			$pdf->Cell(30, 10, number_format($yearly_income), 1, 0, 'R');
@@ -481,34 +559,6 @@ function generatePdfIncome($pdf, $pdo, $case_no) {
 			$pdf->Cell(30, 10, number_format($monthly_average), 1, 1, 'R');
 			
 			$pdf->Cell(0, 10, '연간환산금액     '.number_format($annual_amount), 1, 1, 'R');
-		}
-		
-		// 생계비 추가 지출 정보 표시
-		if (!empty($living_expenses) && count($living_expenses) > 0 && $living_expense_type == 'N') {
-			$pdf->AddPage();
-			$pdf->SetFont('cid0kr', 'B', 12);
-			$pdf->Cell(0, 10, '생계비 지출 내역', 0, 1, 'C');
-			$pdf->SetFont('cid0kr', '', 8);
-			
-			// 테이블 헤더
-			$pdf->SetFillColor(240, 240, 240);
-			$pdf->Cell(40, 10, '비 목', 1, 0, 'C', true);
-			$pdf->Cell(40, 10, '지출 예상 생계비', 1, 0, 'C', true);
-			$pdf->Cell(100, 10, '추가 지출 사유', 1, 1, 'C', true);
-			
-			// 생계비 내역
-			foreach ($living_expenses as $expense) {
-				$pdf->Cell(40, 10, $expense['type'], 1, 0, 'C');
-				$pdf->Cell(40, 10, number_format($expense['amount']).'원', 1, 0, 'R');
-				
-				// 추가 지출 사유 내용이 긴 경우 처리
-				$reason_text = $expense['reason'] ?? '';
-				if (mb_strlen($reason_text) > 60) {
-					$pdf->MultiCell(100, 10, $reason_text, 1, 'L');
-				} else {
-					$pdf->Cell(100, 10, $reason_text, 1, 1, 'L');
-				}
-			}
 		}
 
 	} catch (Exception $e) {
