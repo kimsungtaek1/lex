@@ -1,66 +1,68 @@
+// 모두 선택 체크박스와 개별 체크박스 간의 상호작용 관리
 $(document).ready(function() {
-	// 열람/인쇄 버튼 클릭 이벤트 처리
-	$('#view_print_btn').on('click', function() {
-		// 체크된 항목들 수집
-		const checkedItems = [];
+	// 모두 선택 체크박스 이벤트
+	$('#select_all_items').change(function() {
+		// 모두 선택 체크박스 상태에 따라 모든 개별 체크박스 상태 변경
+		$('input[name="view_print[]"]').prop('checked', $(this).prop('checked'));
+	});
+
+	// 개별 체크박스 이벤트
+	$('input[name="view_print[]"]').change(function() {
+		// 모든 개별 체크박스가 선택되었는지 확인
+		const allChecked = $('input[name="view_print[]"]').length === $('input[name="view_print[]"]:checked').length;
+		// 모두 선택 체크박스 상태 업데이트
+		$('#select_all_items').prop('checked', allChecked);
+	});
+
+	// 열람/인쇄 버튼 클릭 이벤트
+	$('#view_print_btn').click(function() {
+		// 선택된 항목 확인
+		const selectedItems = [];
 		$('input[name="view_print[]"]:checked').each(function() {
-			checkedItems.push($(this).val());
+			selectedItems.push($(this).val());
 		});
-		
-		// 선택된 항목이 없을 경우 경고 메시지 표시
-		if (checkedItems.length === 0) {
-			alert('출력할 항목을 하나 이상 선택해주세요.');
+
+		// 선택된 항목이 없으면 알림 표시
+		if (selectedItems.length === 0) {
+			alert('출력할 항목을 선택해주세요.');
 			return;
 		}
-		
-		// 현재 URL에서 case_no 파라미터 추출
-		const caseNo = window.currentCaseNo;
+
+		// 현재 사건 번호 가져오기
+		const caseNo = $('#case_no').val() || currentCaseNo;
 		
 		if (!caseNo) {
-			alert('사건 번호가 없습니다. 다시 시도해주세요.');
+			alert('사건 정보를 찾을 수 없습니다.');
 			return;
 		}
-		
-		// PDF 생성 요청 URL 구성
-		let isRecovery = location.pathname.indexOf('application_recovery') > -1;
-		let isBankruptcy = location.pathname.indexOf('application_bankruptcy') > -1;
-		let apiPath = '';
-		
-		if (isRecovery) {
-			apiPath = '/adm/api/application_recovery/generate_pdf.php';
-		} else if (isBankruptcy) {
-			apiPath = '/adm/api/application_bankruptcy/generate_pdf.php';
-		} else {
-			alert('지원되지 않는 경로입니다.');
-			return;
-		}
-		
-		// 새 창으로 PDF 요청 전송
-		const form = $('<form target="_blank" method="post" action="' + apiPath + '"></form>');
-		form.append('<input type="hidden" name="case_no" value="' + caseNo + '">');
-		
-		// 체크된 항목들을 폼에 추가
-		checkedItems.forEach(function(item) {
-			form.append('<input type="hidden" name="print_items[]" value="' + item + '">');
+
+		// AJAX 대신 폼 제출 방식 사용
+		const form = $('<form></form>').attr({
+			method: 'post',
+			action: '/adm/api/application_recovery/generate_pdf.php',
+			target: '_blank'
+		}).appendTo('body');
+
+		// 사건 번호 필드 추가
+		$('<input>').attr({
+			type: 'hidden',
+			name: 'case_no',
+			value: caseNo
+		}).appendTo(form);
+
+		// 선택된 항목들 필드 추가
+		selectedItems.forEach(function(item) {
+			$('<input>').attr({
+				type: 'hidden',
+				name: 'print_items[]',
+				value: item
+			}).appendTo(form);
 		});
-		
-		// 폼을 body에 추가하고 자동 제출
-		$('body').append(form);
+
+		// 폼 제출
 		form.submit();
-		form.remove();
-	});
-	
-	// 모두 선택/해제 기능 구현
-	$('#select_all_items').on('change', function() {
-		const isChecked = $(this).prop('checked');
-		$('input[name="view_print[]"]').prop('checked', isChecked);
-	});
-	
-	// 개별 항목 체크박스 변경 시 '모두 선택' 체크박스 상태 업데이트
-	$('input[name="view_print[]"]').on('change', function() {
-		const totalItems = $('input[name="view_print[]"]').length;
-		const checkedItems = $('input[name="view_print[]"]:checked').length;
 		
-		$('#select_all_items').prop('checked', totalItems === checkedItems);
+		// 사용 후 폼 제거
+		form.remove();
 	});
 });
