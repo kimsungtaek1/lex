@@ -18,7 +18,7 @@ for /f "delims=" %%F in ('git status --porcelain') do (
 git commit -m "%msg%"
 
 :: 변경 내용만 푸시 (충돌 없다면 성공)
-git push origin HEAD:main
+git push origin HEAD:main --force-with-lease
 goto :eof
 
 :processLine

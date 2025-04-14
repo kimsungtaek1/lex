@@ -1,0 +1,99 @@
+*{font-size:0.7vw;font-family:'Pretendard'}
+
+.content-wrapper{display:flex;flex-direction:column;padding:0.5vw}
+.appendix-title{background:#666;color:#1DFDBE;padding:1.5vh 1vw;font-size:0.9vw;font-weight:500;box-shadow:0 0.7vh 0.7vh rgba(0,0,0,0.4);border-radius:5px}
+.calculator-header{width:100%;margin:1.5vh 0}
+
+.form{display:flex}
+.form-title{width:10vw;color:#f3f3f3;background:#a7a7a7;border-bottom:1px solid #f3f3f3;display:flex;justify-content:center;align-items:center;position:relative}
+.form-title span{padding-left:10%;width:90%}
+.form-content{flex:1;display:flex;flex-direction:row;align-items:center;position:relative;background:#f7f7f7;border-bottom:1px solid #d4d4d4;min-height:2vw}
+.form:nth-child(1) .form-title{border-top-left-radius:0.3vw}
+.form:nth-child(1) .form-content{border-top-right-radius:0.3vw}
+.form:nth-last-child(1) .form-title{border-bottom-left-radius:0.3vw}
+.form:nth-last-child(1) .form-content{border-bottom-right-radius:0.3vw}
+
+.form-content select{width:6vw;padding:6px 0;border:none;border-radius:3px;box-sizing:border-box;background:transparent;outline:none}
+.separator{margin: 0 1vw 0 0.3vw;color:white;}
+.radio-group{display:flex;gap:1vw}
+.radio-group input[type="radio"]{margin-right:0.3vw}
+
+.section-header{padding:1vh 1vw;border:none;background:#6c6c6c;color:#fff;margin:1.5vh 0 1vh 0;box-shadow:0 0.5vh 0.5vh rgba(0,0,0,0.4);display:flex}
+.creditor-title{width:100%;display:flex;justify-content:space-between}
+.checkbox-group{display:flex;align-items:center;width:70%}
+.button-group{display:flex;justify-content:flex-end}
+.btn{background:#d9d9d9;cursor:pointer;border-radius:3px;box-shadow:1px 1px 3px rgba(0,0,0,0.3);border:none;}
+.btn-add2{min-width:2.5vw;height:1vw;background:#d9d9d9;padding:0 0.5vw;margin-left:1vw;color:#000;border:none;border-radius:5px;cursor:pointer}
+
+
+.table-header{display:flex;width:100%;background:#a7a7a7;color:white;border-radius:4px 4px 0 0;box-shadow:0 0.2vh 0.2vh rgba(0,0,0,0.4)}
+.table-header .col{flex:1;padding:1vh 0.5vw;text-align:center}
+.table-header .col:first-child{flex:1.5}
+.table-header .col:last-child{flex:0.5}
+
+.form-content .col{flex:1;padding:0.5vh 0.5vw;display:flex;align-items:center;justify-content:center}
+.form-content .col:first-child{flex:1.5;justify-content:flex-start}
+.form-content .col:last-child{flex:0.5}
+.form-content .col input{width:90%;border:none;background:transparent;text-align:right;outline:none;padding:0.3vh 0}
+.form-content .col:first-child input{text-align:left}
+.form-content .col .row-total,
+.form-content .col .month-total,
+.form-content .col .net-amount{text-align:right;width:90%}
+
+.total-row{background:#f0f0f0;font-weight:bold}
+.total-row .col span{text-align:right;width:100%}
+.total-row .col:first-child span{text-align:center}
+
+.btn-delete-row{border:none;background:#d9d9d9;padding:0.2vh 0.4vw;border-radius:3px;cursor:pointer;box-shadow:1px 1px 2px rgba(0,0,0,0.2)}
+.btn-delete-row:hover{background:#bbb}
+
+/* 계산 결과 섹션 */
+.calculation-result{margin-top:2vh;display:flex;gap:2vw}
+.calculation-result .form-content{padding:0 2.5%;}
+.left-section,.right-section{flex:1;border-radius:5px;box-shadow:0 0.2vh 0.4vh rgba(0,0,0,0.1)}
+
+.btn-right{flex-direction:row-reverse;}
+.btn-right button{background:#a7a7a7;color:#000;border:none;margin-left:0.5vw;padding:0.7vh 1.5vw;border-radius:3px;cursor:pointer;box-shadow:0 0.2vh 0.4vh rgba(0,0,0,0.2);min-width:4vw}
+.btn-right button:hover{background:#999}
+
+/* 비활성화된 입력 필드 스타일 */
+input:disabled {
+	background-color: #f0f0f0;
+	color: #999;
+	cursor: not-allowed;
+}
+
+/* 테이블 헤더 레이아웃 수정 */
+.table-header .col {
+	flex: 1;
+	padding: 1vh 0.5vw;
+	text-align: center;
+	min-width: 50px; /* 최소 너비 추가 */
+}
+
+/* 모바일에서 더 나은 반응형 지원 */
+@media screen and (max-width: 768px) {
+	.form-content .col input,
+	.form-content .col .row-total,
+	.form-content .col .month-total,
+	.form-content .col .net-amount {
+		width: 100%;
+		padding: 0.2vh 0;
+		font-size: 0.6vw;
+	}
+	
+	.btn-delete-row {
+		padding: 0.1vh 0.2vw;
+		font-size: 0.6vw;
+	}
+}
+
+/* 통계 표시 개선 */
+#monthly_average_income,
+#annualized_income,
+#yearly_income,
+#yearly_deduction,
+#yearly_net_amount {
+	font-weight: bold;
+	color: #333;
+}

@@ -200,6 +200,7 @@
         <div class="creditor-title">
             <div class="checkbox-group">
                 <span>생계비산정</span>
+				<button type="button" class="btn btn-add2" id="living_expense_table">년도별 기준중위소득 60% 기준보기</button>
             </div>
         </div>
     </div>
@@ -240,7 +241,7 @@
                     <span>가족생계비범위</span>
                 </div>
                 <div class="form-content">
-                    <input type="text" class="form-control form-content-short" id="iex_family_count" value="">인
+                    <input type="text" class="form-control form-content-short" id="iex_family_count" value="" readonly>인
                 </div>
             </div>
             <div class="form">
@@ -248,8 +249,8 @@
                     <span></span>
                 </div>
                 <div class="form-content">
-                    <input type="text" class="form-control form-content-short" id="iex_range_min" value="">원 부터&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <input type="text" class="form-control form-content-short" id="iex_range_max" value="">원
+                    <input type="text" class="form-control form-content-short" id="iex_range_min" value="" readonly>원 부터&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <input type="text" class="form-control form-content-short" id="iex_range_max" value="" readonly>원
                 </div>
             </div>
         </div>
@@ -294,7 +295,7 @@
             <div class="form">
                 <div class="form-title form-notitle"></div>
                 <div class="form-content form-nocontent">
-                    (기준 중위소득의 &nbsp;&nbsp;<input type="text" class="form-control form-content-short5" id="iex_income_ratio" value="">%)에 해당
+                    (기준 중위소득의 &nbsp;&nbsp;<input type="text" class="form-control form-content-short7" id="iex_income_ratio" value="" readonly>%)에 해당
                 </div>
             </div>
             <div class="form">
@@ -350,7 +351,7 @@
                 <div id="iex-monthCountBox">
                     <div class="iex-title">개월수</div>
                     <div class="iex-box">
-                        <input type="text" class="form-control" id="iex-monthCountValue" placeholder="0">
+                        <input type="text" class="form-control" id="iex-monthCountValue" placeholder="36" value="36">
                         <div class="iex-value">&nbsp;개월</div>
                     </div>
                 </div>
@@ -384,7 +385,7 @@
                     <span>제목</span>
                 </div>
                 <div class="form-content">
-                    <input type="text" class="form-control" id="iex_plan_title" value="">
+                    <input type="text" class="form-control" id="iex_plan10_title" value="">
                 </div>
             </div>
             <div class="form">
@@ -392,7 +393,7 @@
                     <span>내용</span>
                 </div>
                 <div class="form-content form-content-3 textarea">
-                    <textarea id="iex_plan_content" name="iex_plan_content" class="form-control" placeholder="" rows="6"></textarea>
+                    <textarea id="iex_plan10_content" name="iex_plan10_content" class="form-control" placeholder="" rows="6"></textarea>
                 </div>
             </div>
         </div>
@@ -414,8 +415,8 @@
             <div class="form">
                 <div class="form-title"></div>
                 <div class="form-content btn-right">
-                    <button class="btn-delete" id="iex_plan_delete_btn">삭제</button>
-                    <button class="btn-save" id="iex_plan_save_btn">저장</button>
+                    <button class="btn-delete" id="iex_plan10_delete_btn">삭제</button>
+                    <button class="btn-save" id="iex_plan10_save_btn">저장</button>
                 </div>
             </div>
         </div>
