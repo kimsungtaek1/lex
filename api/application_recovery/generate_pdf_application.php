@@ -79,35 +79,57 @@ function generateCoverPage($pdf, $basic_info) {
 	$pdf->Cell(60, 10, '           원', 0, 1, 'L');
 	
 	// 사건 정보 표
-	$pdf->Ln(30);
+	$pdf->Ln(20);
 	$pdf->SetFont('cid0kr', '', 10);
 	
-	// 표 제작
-	$pdf->Cell(40, 10, '사 건 번 호', 1, 0, 'C');
-	$pdf->Cell(60, 10, '', 1, 1, 'C');
-	
-	$pdf->Cell(40, 10, '해당순위번호', 1, 0, 'C');
-	$pdf->Cell(60, 10, '', 1, 1, 'C');
-	
-	$pdf->Cell(40, 10, '재 판 부', 1, 0, 'C');
-	$pdf->Cell(60, 10, '', 1, 1, 'C');
-	
-	$pdf->Cell(40, 10, '주 심', 1, 0, 'C');
-	$pdf->Cell(60, 10, '', 1, 1, 'C');
-	
-	// 최초면담기일통지
+	// 표 제작 - 우측 정렬 및 동일한 너비로 조정
+	$tableWidth = 100; // 전체 표 너비 설정
+	$leftColumnWidth = 30; // 좌측 컬럼 너비
+	$rightColumnWidth = $tableWidth - $leftColumnWidth; // 우측 컬럼 너비
+
+	// 오른쪽 정렬을 위한 여백 계산 (A4 페이지 너비는 210mm, 여백을 뺀 값)
+	$pageWidth = 180;
+	$marginLeft = ($pageWidth - $tableWidth) / 2 + 50; // 기본 15mm 여백 + 추가 정렬 여백
+	$pdf->SetLeftMargin($marginLeft);
+
+	$pdf->Cell($leftColumnWidth, 10, '사 건 번 호', 1, 0, 'C');
+	$pdf->Cell($rightColumnWidth, 10, '', 1, 1, 'C');
+
+	$pdf->Cell($leftColumnWidth, 10, '해당순위번호', 1, 0, 'C');
+	$pdf->Cell($rightColumnWidth, 10, '', 1, 1, 'C');
+
+	$pdf->Cell($leftColumnWidth, 10, '재 판 부', 1, 0, 'C');
+	$pdf->Cell($rightColumnWidth, 10, '', 1, 1, 'C');
+
+	$pdf->Cell($leftColumnWidth, 10, '주 심', 1, 0, 'C');
+	$pdf->Cell($rightColumnWidth, 10, '', 1, 1, 'C');
+
+	// 최초면담기일통지 (동일한 너비로 조정)
 	$pdf->Ln(5);
-	$pdf->Cell(80, 10, '최초면담기일통지', 1, 0, 'C');
-	$pdf->Cell(60, 10, '영 수 인', 1, 1, 'C');
-	
-	$pdf->Cell(80, 10, '20   .   .   .  :', 1, 0, 'C');
-	$pdf->Cell(60, 10, '', 1, 1, 'C');
-	
-	// 당일면담희망여부
+	$pdf->Cell(50, 10, '최초면담기일통지', 1, 0, 'C');
+	$pdf->Cell(50, 10, '영 수 인', 1, 1, 'C');
+
+	$pdf->Cell(50, 20, '20   .   .   .  :', 1, 0, 'C');
+	$pdf->Cell(50, 20, '', 1, 1, 'C');
+
+	// 당일면담희망여부 표 - 상단 셀과 하단 셀로 구성
 	$pdf->Ln(5);
-	$pdf->Cell(50, 20, '당일면담', 1, 0, 'C');
-	$pdf->Cell(50, 20, '희망여부', 1, 0, 'C');
-	$pdf->Cell(60, 20, '', 1, 1, 'C');
+
+	// 너비와 위치 설정
+	$tableWidth = 30; // 표 너비
+	$marginLeft = ($pageWidth - $tableWidth) / 2 + 15;
+	$pdf->SetLeftMargin($marginLeft);
+
+	// 상단 셀 (당일면담\n희망여부)
+	$pdf->SetX($marginLeft);
+	$pdf->MultiCell($tableWidth, 10, "당일면담\n희망여부", 1, 'C');
+
+	// 하단 셀 (빈 셀)
+	$pdf->SetX($marginLeft);
+	$pdf->Cell($tableWidth, 20, '', 1, 1, 'C');
+
+	// 오리지널 마진으로 복원
+	$pdf->SetLeftMargin(15);
 	
 	// 하단 법원 정보
 	$pdf->Ln(30);
