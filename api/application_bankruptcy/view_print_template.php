@@ -16,8 +16,8 @@
 					<label for="select_all_items">모두 선택</label>
 				</div>
 				<div class="view-print-item">
-					<input type="checkbox" id="view_print_item_0" name="view_print[]" value="진술서 열람">
-					<label for="view_print_item_0">진술서 열람</label>
+					<input type="checkbox" id="view_print_item_0" name="view_print[]" value="파산 및 면책신청서">
+					<label for="view_print_item_0">파산 및 면책신청서</label>
 				</div>
 				<div class="view-print-item">
 					<input type="checkbox" id="view_print_item_1" name="view_print[]" value="채권자목록 열람">
@@ -28,19 +28,19 @@
 					<label for="view_print_item_2">재산목록 열람</label>
 				</div>
 				<div class="view-print-item">
-					<input type="checkbox" id="view_print_item_3" name="view_print[]" value="생활상황목록 열람">
-					<label for="view_print_item_3">생활상황목록 열람</label>
+					<input type="checkbox" id="view_print_item_3" name="view_print[]" value="수입지출목록 열람">
+					<label for="view_print_item_3">수입지출목록 열람</label>
 				</div>
 				<div class="view-print-item">
-					<input type="checkbox" id="view_print_item_4" name="view_print[]" value="수입지출목록 열람">
-					<label for="view_print_item_4">수입지출목록 열람</label>
+					<input type="checkbox" id="view_print_item_4" name="view_print[]" value="진술서 열람">
+					<label for="view_print_item_4">진술서 열람</label>
 				</div>
+				<input type="hidden" id="case_no" value="<?php echo isset($_GET['case_no']) ? htmlspecialchars($_GET['case_no']) : ''; ?>">
 			</div>
 			<div class="view-print-button">
 				<button type="button" class="btn-save btn-long" id="view_print_btn">열람/인쇄</button>
 			</div>
-        </div>
-		
+        </div>	
       </div>
       <div class="right-section">
       </div>
