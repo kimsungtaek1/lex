@@ -134,7 +134,9 @@ function generateCoverPage($pdf, $basic_info) {
 	// 하단 법원 정보
 	$pdf->Ln(30);
 	$pdf->SetFont('cid0kr', 'B', 14);
-	$pdf->Cell(0, 10, '서울회생법원 귀중', 0, 1, 'C');
+	$court_name = isset($basic_info['court_name']) && !empty($basic_info['court_name']) ? 
+		$basic_info['court_name'] : '';
+	$pdf->Cell(0, 10, $court_name . ' 귀중', 0, 1, 'C');
 }
 
 function generateApplicationForm($pdf, $pdo, $case_no, $basic_info) {
@@ -156,7 +158,7 @@ function generateApplicationForm($pdf, $pdo, $case_no, $basic_info) {
 	$pdf->Cell(60, 10, $basic_info['resident_number'] ?? '', 1, 1, 'L');
 	
 	$pdf->Cell(30, 10, '주민등록상주소', 1, 0, 'C');
-	$pdf->Cell(150, 10, ($basic_info['registered_address'] ?? '') . ' (우편번호: '.$basic_info['reg_zipcode'] ?? ''.')', 1, 1, 'L');
+	$pdf->Cell(150, 10, ($basic_info['registered_address'] ?? '') . ' (우편번호: '. ($basic_info['reg_zipcode'] ?? '') .')', 1, 1, 'L');
 	
 	$pdf->Cell(30, 10, '현 주 소', 1, 0, 'C');
 	$pdf->Cell(150, 10, ($basic_info['now_address'] ?? '') . ' (우편번호: ' . ($basic_info['now_zipcode'] ?? '') . ')', 1, 1, 'L');
