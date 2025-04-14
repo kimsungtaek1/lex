@@ -128,25 +128,19 @@ function generateApplicationForm($pdf, $pdo, $case_no, $basic_info) {
 	
 	// 신청인 정보 (채무자)
 	$pdf->SetFont('cid0kr', '', 8);
-	$pdf->Cell(30, 10, '신 청 인(채 무 자)', 0, 0, 'L');
-	$pdf->Cell(5, 10, '', 0, 0);
-	$pdf->Cell(0, 10, $basic_info['name'].'                 주민등록번호: '.$basic_info['resident_number'], 0, 1, 'L');
+	$pdf->Cell(0, 10, '신 청 인(채 무 자) : '.$basic_info['name'].'                 주민등록번호: '.$basic_info['resident_number'], 0, 1, 'L');
 		
 	// 주소 정보
-	$pdf->Cell(20, 10, '주 소 :', 0, 0, 'L');
-	$pdf->Cell(0, 10, $basic_info['registered_address'] . ' (우편번호: '.($basic_info['reg_zipcode'] ?? '').')', 0, 1, 'L');
+	$pdf->Cell(0, 4, '주 소 : '.$basic_info['registered_address'] . ' (우편번호: '.($basic_info['reg_zipcode'] ?? '').')', 0, 1, 'L');
 	
-	$pdf->Cell(20, 10, '거 소 :', 0, 0, 'L');
-	$pdf->Cell(0, 10, $basic_info['now_address'] . ' (우편번호: '.($basic_info['now_zipcode'] ?? '').')', 0, 1, 'L');
+	$pdf->Cell(0, 4, '거 소 : '.$basic_info['now_address'] . ' (우편번호: '.($basic_info['now_zipcode'] ?? '').')', 0, 1, 'L');
 	
-	$pdf->Cell(20, 10, '송달장소:', 0, 0, 'L');
-	$pdf->Cell(0, 10, $basic_info['registered_address'] . ' (우편번호: '.($basic_info['reg_zipcode'] ?? '').')', 0, 1, 'L');
+	$pdf->Cell(0, 4, '송달장소 : '.$basic_info['registered_address'] . ' (우편번호: '.($basic_info['reg_zipcode'] ?? '').')', 0, 1, 'L');
 	
-	$pdf->Cell(20, 10, '송달영수인 :', 0, 0, 'L');
-	$pdf->Cell(0, 10, '', 0, 1, 'L');
+	$pdf->Cell(20, 4, '송달영수인 : ', 0, 0, 'L');
 	
 	// 연락처 정보
-	$pdf->Cell(20, 10, '연락처 :'.'  휴대전화(' . $basic_info['phone'] . ')'.'  집전화(' . ($basic_info['work_phone'] ?? '') . ')'.'  e-mail(' . ($basic_info['email'] ?? '') . ')', 0, 0, 'L');
+	$pdf->Cell(20, 4, '연락처 :'.'  휴대전화(' . $basic_info['phone'] . ')'.'  집전화(' . ($basic_info['work_phone'] ?? '') . ')'.'  e-mail(' . ($basic_info['email'] ?? '') . ')', 0, 0, 'L');
 	
 	// 신청 취지
 	$pdf->Ln(5);
@@ -175,7 +169,7 @@ function generateApplicationForm($pdf, $pdo, $case_no, $basic_info) {
 	$pdf->Cell(5, 8, '2.', 0, 0, 'L');
 	$pdf->Cell(0, 8, '주민등록초본[주소변동내역(과거 주소 전체) 및 개명, 주민등록번호 변동사항 포함] 및 주민등록본 각 1부', 0, 1, 'L');
 	$pdf->Cell(5, 8, '', 0, 0, 'L');
-	$pdf->MultiCell(0, 6, "※ 가족관계증명서, 혼인관계증명서, 주민등록등본은 신청인 외 제3자의 주민등록번호 뒷자리가 표기되지 아니한 것을 제출\n(신청인 본인의 주민등록번호는 전체 표기)", 0, 'L');
+	$pdf->MultiCell(0, 6, "※ 가족관계증명서, 혼인관계증명서, 주민등록등본은 신청인 외 제3자의 주민등록번호 뒷자리가 표기되지 아니한 것을 제출\n     (신청인 본인의 주민등록번호는 전체 표기)", 0, 'L');
 	
 	$pdf->Cell(5, 8, '3.', 0, 0, 'L');
 	$pdf->Cell(0, 8, '진술서(채권자목록, 재산목록, 현재의 생활 상황, 수입 및 지출에 관한 목록 포함) 1부', 0, 1, 'L');
@@ -230,6 +224,7 @@ function generateApplicationForm($pdf, $pdo, $case_no, $basic_info) {
 	
 	$pdf->Cell(0, 10, '신 청 인    ' . $basic_info['name'] . '    (인)', 0, 1, 'R');
 	
+	$pdf->SetFont('cid0kr', 'B', 12);
 	$pdf->Cell(0, 10, $basic_info['court_name'] . ' 귀중', 0, 1, 'C');
 }
 
