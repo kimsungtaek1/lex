@@ -19,7 +19,7 @@ if (!isset($_SESSION['auth']) || $_SESSION['auth'] < 5) {
                     <th class="stat-tab active" data-type="employee">|&nbsp;&nbsp;사원관리</th>
                     <th class="stat-tab" data-type="department">|&nbsp;&nbsp;부서관리</th>
                     <th class="stat-tab" data-type="position">|&nbsp;&nbsp;직위관리</th>
-                    <th></th>
+                    <th class="stat-tab" data-type="information">|&nbsp;&nbsp;사무실관리</th>
                     <th></th>
                 </tr>
             </thead>
@@ -109,6 +109,11 @@ if (!isset($_SESSION['auth']) || $_SESSION['auth'] < 5) {
                 <tbody id="positionList"></tbody>
             </table>
         </div>
+    </div>
+	
+	<!-- 사무실관리 섹션 -->
+    <div id="informationSection" class="section-content" style="display: none;">
+
     </div>
 </div>
 

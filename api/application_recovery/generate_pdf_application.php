@@ -7,9 +7,10 @@ function generatePdfApplication($pdf, $pdo, $case_no) {
 	// 기본 정보 조회
 	try {
 		$stmt = $pdo->prepare("
-			SELECT ar.*, cm.name, cm.case_number, cm.court_name 
+			SELECT ar.*, cm.name, cm.case_number, cm.court_name, cf.*
 			FROM application_recovery ar
 			JOIN case_management cm ON ar.case_no = cm.case_no
+			JOIN config cf
 			WHERE ar.case_no = ?
 		");
 		$stmt->execute([$case_no]);
@@ -61,11 +62,11 @@ function generateCoverPage($pdf, $basic_info) {
 	
 	$pdf->Cell(120, 10, '대리인', 0, 0, 'R');
 	$pdf->Cell(5, 10, '', 0, 0);
-	$pdf->Cell(120, 10, '법률사무소 상산', 0, 1, 'L');
+	$pdf->Cell(120, 10, $basic_info['customer_name'], 0, 1, 'L');
 	
 	$pdf->Cell(120, 10, '', 0, 0, 'R');
 	$pdf->Cell(5, 10, '', 0, 0);
-	$pdf->Cell(120, 10, '법무사 송동민, 채한규', 0, 1, 'L');
+	$pdf->Cell(120, 10, $basic_info['customer_representative'], 0, 1, 'L');
 	
 	$pdf->Ln(10);
 	
@@ -75,7 +76,7 @@ function generateCoverPage($pdf, $basic_info) {
 	$pdf->Cell(60, 10, '30,000원', 0, 1, 'L');
 	
 	$pdf->Cell(20, 10, '송달료', 0, 0, 'L');
-	$pdf->Cell(60, 10, '       원', 0, 1, 'L');
+	$pdf->Cell(60, 10, '           원', 0, 1, 'L');
 	
 	// 사건 정보 표
 	$pdf->Ln(30);

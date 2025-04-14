@@ -39,6 +39,10 @@ $(document).ready(function() {
                 $('#positionSection').show();
                 loadPositions();
                 break;
+			case 'information':
+                $('#informationSection').show();
+                loadPositions();
+                break;
         }
     });
 

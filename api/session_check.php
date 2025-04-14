@@ -12,6 +12,8 @@ function checkLogin() {
         try {
             $stmt = $GLOBALS['pdo']->prepare("UPDATE employee SET access_date = NOW() WHERE employee_no = ?");
             $stmt->execute([$_SESSION['employee_no']]);
+			$stmt = $pdo->prepare("SELECT * FROM config");
+			$stmt->execute([$case_no]);
         } catch (Exception $e) {
             error_log('Failed to update access_date: ' . $e->getMessage());
         }
