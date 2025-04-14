@@ -224,7 +224,7 @@ function generateApplicationForm($pdf, $pdo, $case_no, $basic_info) {
 	
 	$pdf->Cell(0, 10, '신 청 인    ' . $basic_info['name'] . '    (인)', 0, 1, 'R');
 	
-	$pdf->SetFont('cid0kr', 'B', 12);
+	$pdf->SetFont('cid0kr', 'B', 20);
 	$pdf->Cell(0, 10, $basic_info['court_name'] . ' 귀중', 0, 1, 'C');
 }
 
