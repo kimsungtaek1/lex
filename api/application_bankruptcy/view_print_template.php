@@ -38,7 +38,7 @@
 				<input type="hidden" id="case_no" value="<?php echo isset($_GET['case_no']) ? htmlspecialchars($_GET['case_no']) : ''; ?>">
 			</div>
 			<div class="view-print-button">
-				<button type="button" class="btn-save btn-long" id="view_print_btn">열람/인쇄</button>
+				<button type="button" class="btn-save btn-long" id="bankruptcy_view_print_btn">열람/인쇄</button>
 			</div>
         </div>	
       </div>

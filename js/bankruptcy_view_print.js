@@ -15,7 +15,7 @@ $(document).ready(function() {
 	});
 
 	// 열람/인쇄 버튼 클릭 이벤트
-	$('#view_print_btn').click(function() {
+	$('#bankruptcy_view_print_btn').click(function() {
 		// 선택된 항목 확인
 		const selectedItems = [];
 		$('input[name="view_print[]"]:checked').each(function() {

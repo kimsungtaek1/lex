@@ -105,7 +105,6 @@ class AssetManager {
 	}
 
 	getAssetTypeFromBlock(block) {
-		
 		/*
 		if (!block || !block.attr || typeof block.attr !== 'function') {
 			console.error("유효하지 않은 block 객체입니다:", block);
