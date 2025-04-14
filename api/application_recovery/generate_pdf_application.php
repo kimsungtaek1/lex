@@ -156,7 +156,7 @@ function generateApplicationForm($pdf, $pdo, $case_no, $basic_info) {
 	$pdf->Cell(60, 10, $basic_info['resident_number'] ?? '', 1, 1, 'L');
 	
 	$pdf->Cell(30, 10, '주민등록상주소', 1, 0, 'C');
-	$pdf->Cell(150, 10, ($basic_info['registered_address'] ?? '') . ' (우편번호: 31931)', 1, 1, 'L');
+	$pdf->Cell(150, 10, ($basic_info['registered_address'] ?? '') . ' (우편번호: '.$basic_info['reg_zipcode'] ?? ''.')', 1, 1, 'L');
 	
 	$pdf->Cell(30, 10, '현 주 소', 1, 0, 'C');
 	$pdf->Cell(150, 10, ($basic_info['now_address'] ?? '') . ' (우편번호: ' . ($basic_info['now_zipcode'] ?? '') . ')', 1, 1, 'L');
@@ -165,7 +165,7 @@ function generateApplicationForm($pdf, $pdo, $case_no, $basic_info) {
 	$pdf->Cell(150, 10, ($basic_info['work_address'] ?? '') . ' (우편번호: ' . ($basic_info['work_zipcode'] ?? '') . ')', 1, 1, 'L');
 
 	$pdf->Cell(30, 20, '송달 장소', 1, 0, 'C');
-	$pdf->Cell(150, 10, $basic_info['customer_phone'].' (우편번호: '.''.')', 1, 1, 'L');
+	$pdf->Cell(150, 10, ''.' (우편번호: '.''.')', 1, 1, 'L');
 	$pdf->Cell(30, 10, '', 0, 0);
 	$pdf->Cell(150, 10, '송달영수인:', 1, 1);
 	
@@ -183,7 +183,7 @@ function generateApplicationForm($pdf, $pdo, $case_no, $basic_info) {
 	$pdf->MultiCell(150, 10, $basic_info['customer_name']."\n".$basic_info['customer_representative'], 1, 'L');
 	
 	$pdf->Cell(30, 10, '사무실 주소', 1, 0, 'C');
-	$pdf->Cell(150, 10, $basic_info['customer_address'].'(우편번호: '.''.')', 1, 1, 'L');
+	$pdf->Cell(150, 10, $basic_info['customer_address'].'(우편번호: '.$basic_info['customer_zipcode'].')', 1, 1, 'L');
 	
 	$pdf->Cell(30, 10, '전화번호(사무실)', 1, 0, 'C');
 	$pdf->Cell(150, 10, $basic_info['customer_phone'], 1, 1, 'L');
