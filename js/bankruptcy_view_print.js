@@ -1,17 +1,17 @@
 // 모두 선택 체크박스와 개별 체크박스 간의 상호작용 관리
 $(document).ready(function() {
 	// 모두 선택 체크박스 이벤트
-	$('#select_all_items').change(function() {
+	$('#bankruptcy_select_all_items').change(function() {
 		// 모두 선택 체크박스 상태에 따라 모든 개별 체크박스 상태 변경
-		$('input[name="view_print[]"]').prop('checked', $(this).prop('checked'));
+		$('input[name="bankruptcy_view_print[]"]').prop('checked', $(this).prop('checked'));
 	});
 
 	// 개별 체크박스 이벤트
-	$('input[name="view_print[]"]').change(function() {
+	$('input[name="bankruptcy_view_print[]"]').change(function() {
 		// 모든 개별 체크박스가 선택되었는지 확인
-		const allChecked = $('input[name="view_print[]"]').length === $('input[name="view_print[]"]:checked').length;
+		const allChecked = $('input[name="bankruptcy_view_print[]"]').length === $('input[name="bankruptcy_view_print[]"]:checked').length;
 		// 모두 선택 체크박스 상태 업데이트
-		$('#select_all_items').prop('checked', allChecked);
+		$('#bankruptcy_select_all_items').prop('checked', allChecked);
 	});
 
 	// 열람/인쇄 버튼 클릭 이벤트
@@ -29,7 +29,7 @@ $(document).ready(function() {
 		}
 
 		// 현재 사건 번호 가져오기
-		const caseNo = $('#case_no').val() || currentCaseNo;
+		const caseNo = $('#bankruptcy_case_no').val() || currentCaseNo;
 		
 		if (!caseNo) {
 			alert('사건 정보를 찾을 수 없습니다.');
@@ -54,7 +54,7 @@ $(document).ready(function() {
 		selectedItems.forEach(function(item) {
 			$('<input>').attr({
 				type: 'hidden',
-				name: 'print_items[]',
+				name: 'bankruptcy_print_items[]',
 				value: item
 			}).appendTo(form);
 		});
