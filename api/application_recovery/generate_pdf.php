@@ -65,21 +65,6 @@ $pdf->SetAutoPageBreak(TRUE, 15);
 // 한글 지원을 위해 유니코드 폰트 사용
 $pdf->SetFont('cid0kr', '', 12); // 한글 지원 폰트
 
-/*
-// 기본 정보 페이지 추가
-$pdf->AddPage();
-$pdf->SetFont('cid0kr', 'B', 16);
-$pdf->Cell(0, 10, '개인회생 신청서 자료', 0, 1, 'C');
-
-$pdf->SetFont('cid0kr', '', 12);
-$pdf->Cell(0, 10, '신청인: ' . $basic_info['name'], 0, 1, 'C');
-$pdf->Cell(0, 10, '사건번호: ' . $basic_info['case_number'], 0, 1, 'C');
-$pdf->Cell(0, 10, '법원: ' . $basic_info['court_name'], 0, 1, 'C');
-$pdf->Cell(0, 10, '출력일자: ' . date('Y년 m월 d일'), 0, 1, 'C');
-$pdf->Ln(10);
-*/
-
-
 // 선택한 항목에 따라 데이터 추가
 foreach ($print_items as $item) {
 	switch ($item) {
