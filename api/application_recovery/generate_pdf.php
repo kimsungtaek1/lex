@@ -73,6 +73,11 @@ $pdf->SetFont('cid0kr', '', 12); // 한글 지원 폰트
 // 선택한 항목에 따라 데이터 추가
 foreach ($print_items as $item) {
 	switch ($item) {
+		case '개인회생신청서':
+			// 외부 파일 포함
+			require_once 'generate_pdf_application.php';
+			generatePdfApplication($pdf, $pdo, $case_no);
+			break;
 		case '채권자목록 열람':
 			// 외부 파일 포함
 			require_once 'generate_pdf_creditors.php';
@@ -92,11 +97,6 @@ foreach ($print_items as $item) {
 			// 외부 파일 포함
 			require_once 'generate_pdf_statements.php';
 			generatePdfStatements($pdf, $pdo, $case_no);
-			break;
-		case '개인회생신청서':
-			// 외부 파일 포함
-			require_once 'generate_pdf_application.php';
-			generatePdfApplication($pdf, $pdo, $case_no);
 			break;
 	}
 }
