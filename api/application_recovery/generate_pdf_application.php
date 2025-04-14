@@ -144,65 +144,62 @@ function generateApplicationForm($pdf, $pdo, $case_no, $basic_info) {
 	// 제목
 	$pdf->SetFont('cid0kr', 'B', 16);
 	$pdf->Cell(0, 10, '개인회생절차 개시신청서', 0, 1, 'C');
-	$pdf->Ln(5);
 	
 	// 신청인 정보
 	$pdf->SetFont('cid0kr', 'B', 12);
-	$pdf->Cell(25, 10, '신청인', 0, 1, 'L');
+	$pdf->Cell(30, 10, '신청인', 0, 1, 'L');
 	
 	$pdf->SetFont('cid0kr', '', 10);
-	$pdf->Cell(25, 10, '성 명', 1, 0, 'C');
-	$pdf->Cell(60, 10, $basic_info['name'] ?? '', 1, 0, 'L');
+	$pdf->Cell(30, 10, '성 명', 1, 0, 'C');
+	$pdf->Cell(50, 10, $basic_info['name'] ?? '', 1, 0, 'L');
 	$pdf->Cell(40, 10, '주민등록번호', 1, 0, 'C');
-	$pdf->Cell(55, 10, $basic_info['resident_number'] ?? '', 1, 1, 'L');
+	$pdf->Cell(60, 10, $basic_info['resident_number'] ?? '', 1, 1, 'L');
 	
-	$pdf->Cell(25, 10, '주민등록상주소', 1, 0, 'C');
-	$pdf->Cell(155, 10, ($basic_info['registered_address'] ?? '') . ' (우편번호: 31931)', 1, 1, 'L');
+	$pdf->Cell(30, 10, '주민등록상주소', 1, 0, 'C');
+	$pdf->Cell(150, 10, ($basic_info['registered_address'] ?? '') . ' (우편번호: 31931)', 1, 1, 'L');
 	
-	$pdf->Cell(25, 10, '현 주 소', 1, 0, 'C');
-	$pdf->Cell(155, 10, ($basic_info['now_address'] ?? '') . ' (우편번호: ' . ($basic_info['now_zipcode'] ?? '') . ')', 1, 1, 'L');
+	$pdf->Cell(30, 10, '현 주 소', 1, 0, 'C');
+	$pdf->Cell(150, 10, ($basic_info['now_address'] ?? '') . ' (우편번호: ' . ($basic_info['now_zipcode'] ?? '') . ')', 1, 1, 'L');
 	
-	$pdf->Cell(25, 10, '직장 주소', 1, 0, 'C');
-	$pdf->Cell(155, 10, ($basic_info['work_address'] ?? '') . ' (우편번호: ' . ($basic_info['work_zipcode'] ?? '') . ')', 1, 1, 'L');
+	$pdf->Cell(30, 10, '직장 주소', 1, 0, 'C');
+	$pdf->Cell(150, 10, ($basic_info['work_address'] ?? '') . ' (우편번호: ' . ($basic_info['work_zipcode'] ?? '') . ')', 1, 1, 'L');
 
-	$pdf->Cell(25, 20, '송달 장소', 1, 0, 'C');
-	$pdf->Cell(155, 10, '서울특별시 강남구 역삼로 558, 4층 (대치동) (우편번호: 06188)', 1, 1, 'L');
-	$pdf->Cell(25, 10, '', 0, 0);
-	$pdf->Cell(155, 10, '송달영수인:', 1, 1);
+	$pdf->Cell(30, 20, '송달 장소', 1, 0, 'C');
+	$pdf->Cell(150, 10, $basic_info['customer_phone'].' (우편번호: '.''.')', 1, 1, 'L');
+	$pdf->Cell(30, 10, '', 0, 0);
+	$pdf->Cell(150, 10, '송달영수인:', 1, 1);
 	
 	$pdf->Cell(40, 10, '전화번호(집ㆍ직장)', 1, 0, 'C');
 	$pdf->Cell(60, 10, '', 1, 0, 'L');
 	$pdf->Cell(40, 10, '전화번호(휴대전화)', 1, 0, 'C');
-	$pdf->Cell(40, 10, $basic_info['phone'] ?? '', 1, 1, 'L');
+	$pdf->Cell(40, 10, $basic_info['customer_phone'] ?? '', 1, 1, 'L');
 	
 	// 대리인 정보
 	$pdf->SetFont('cid0kr', 'B', 12);
-	$pdf->Cell(25, 10, '대리인', 0, 1, 'L');
+	$pdf->Cell(30, 10, '대리인', 0, 1, 'L');
 	
 	$pdf->SetFont('cid0kr', '', 10);
-	$pdf->Cell(25, 10, '성 명', 1, 0, 'C');
-	$pdf->MultiCell(155, 10, $basic_info['customer_name']."\n".$basic_info['customer_representative'], 1, 'L');
+	$pdf->Cell(30, 10, '성 명', 1, 0, 'C');
+	$pdf->MultiCell(150, 10, $basic_info['customer_name']."\n".$basic_info['customer_representative'], 1, 'L');
 	
-	$pdf->Cell(25, 10, '사무실 주소', 1, 0, 'C');
-	$pdf->Cell(155, 10, '서울특별시 강남구 역삼로 558, 4층 (대치동) (우편번호: 06188)', 1, 1, 'L');
+	$pdf->Cell(30, 10, '사무실 주소', 1, 0, 'C');
+	$pdf->Cell(150, 10, $basic_info['customer_address'].'(우편번호: '.''.')', 1, 1, 'L');
 	
-	$pdf->Cell(25, 10, '전화번호', 1, 0, 'C');
-	$pdf->Cell(155, 10, '02-553-8783', 1, 1, 'L');
-	$pdf->Cell(25, 10, '(사무실)', 1, 0, 'C');
-	$pdf->Cell(155, 10, '02-553-8783', 1, 1, 'L');
-	$pdf->Cell(25, 10, '이메일 주소', 1, 0);
-	$pdf->Cell(70, 10, '', 1, 0);
-	$pdf->Cell(25, 10, 'FAX번호', 1, 0);
-	$pdf->Cell(60, 10, '02-6008-5677', 1, 1);
+	$pdf->Cell(30, 10, '전화번호(사무실)', 1, 0, 'C');
+	$pdf->Cell(150, 10, $basic_info['customer_phone'], 1, 1, 'L');
+	$pdf->Cell(30, 10, '이메일 주소', 1, 0);
+	$pdf->Cell(60, 10, $basic_info['customer_email'], 1, 0);
+	$pdf->Cell(30, 10, 'FAX번호', 1, 0);
+	$pdf->Cell(60, 10, $basic_info['customer_fax'], 1, 1);
 	
 	// 주채무자 정보
 	$pdf->Ln(5);
 	$pdf->MultiCell(0, 10, '주채무자가(또는 보증채무자가, 연대채무자가, 배우자가) 이미 귀 법원에 파산신청 또는 개인회생절차 개시신청을 하였으므로 그 사실을 아래와 같이 기재합니다.', 1, 'L');
 	
-	$pdf->Cell(25, 10, '성 명', 1, 0, 'C');
+	$pdf->Cell(30, 10, '성 명', 1, 0, 'C');
 	$pdf->Cell(60, 10, '', 1, 0, 'L');
-	$pdf->Cell(25, 10, '사건번호', 1, 0, 'C');
-	$pdf->Cell(70, 10, '', 1, 1, 'L');
+	$pdf->Cell(30, 10, '사건번호', 1, 0, 'C');
+	$pdf->Cell(60, 10, '', 1, 1, 'L');
 	
 	// 신청 취지
 	$pdf->Ln(5);
@@ -217,7 +214,7 @@ function generateApplicationForm($pdf, $pdo, $case_no, $basic_info) {
 	$pdf->Cell(0, 10, '신 청 이 유', 0, 1, 'C');
 	
 	$pdf->SetFont('cid0kr', '', 10);
-	$pdf->MultiCell(0, 6, "1. 신청인은, 첨부한 개인회생채권자목록 기재와 같은 채무를 부담하고 있으나, 수입 및 재산이 별지 수입 및 지출에 관한 목록과 재산목록에 기재된 바와 같으므로, 파산의 원인사실이 발생 하였습니다(파산의 원인사실이 생길 염려가 있습니다).\n\n[ V] 신청인은 정기적이고 확실한 수입을 얻을 것으로 예상되고, 또한 채무자 회생 및 파산에 관한 법률 제595조에 해당하는 개시신청 기각사유는 없습니다(급여소득자).\n\n[   ] 신청인은 부동산임대소득.사업소득.농업소득.임업소득 그 밖에 이와 유사한 수입을 장래에 계속적으로 또는 반복하여 얻을 것으로 예상되고, 또한 채무자 회생 및 파산에 관한 법률 제595조에 해당하는 개시신청 기각사유는 없습니다(영업소득자).\n\n2. 신청인은, 각 회생채권자에 대한 채무 전액의 변제가 곤란하므로, 그 일부를 분할하여 지급할 계획입니다.\n즉 현시점에서 계획하고 있는 총 변제예정액은 [ 13,627,872]원 이고, 제1회부터 제36회까지 월[378,552]원으로 예정하고 있으며, 이 변제의 준비 및 절차비용지급의 준비를 위하여, 개시결정이 내려지는 경우 을 제1회로 하여, 이후 매월 일에 개시결정시 통지되는 개인회생위원의 은행계좌에 동액의 금전을 입금하겠습니다.\n\n3. 이 사건 개인회생절차에서 적립금을 반환받을 신청인의 예금계좌는 이며, 신청인의 계좌가 변경되거나 어떤 사유로든 사용할 수 없게 된 경우에는 신청인은 사건담당 회생위원에게 즉시 변경된 예금계좌를 신청인의 통장사본을 첨부하여 신고하겠습니다.\n\n4. 개인회생채권자목록 부본(개인회생채권자목록상의 채권자수 + 2통)은 개시결정 전 회생위원의 지시에 따라 지정하는 일자까지 반드시 제출하겠습니다.", 0, 'L');
+	$pdf->MultiCell(0, 6, "1. 신청인은, 첨부한 개인회생채권자목록 기재와 같은 채무를 부담하고 있으나, 수입 및 재산이 별지 수입 및 지출에 관한 목록과 재산목록에 기재된 바와 같으므로, 파산의 원인사실이 발생 하였습니다(파산의 원인사실이 생길 염려가 있습니다).\n\n[ V] 신청인은 정기적이고 확실한 수입을 얻을 것으로 예상되고, 또한 채무자 회생 및 파산에 관한 법률 제595조에 해당하는 개시신청 기각사유는 없습니다(급여소득자).\n[   ] 신청인은 부동산임대소득.사업소득.농업소득.임업소득 그 밖에 이와 유사한 수입을 장래에 계속적으로 또는 반복하여 얻을 것으로 예상되고, 또한 채무자 회생 및 파산에 관한 법률 제595조에 해당하는 개시신청 기각사유는 없습니다(영업소득자).\n\n2. 신청인은, 각 회생채권자에 대한 채무 전액의 변제가 곤란하므로, 그 일부를 분할하여 지급할 계획입니다.\n즉 현시점에서 계획하고 있는 총 변제예정액은 [ 13,627,872]원 이고, 제1회부터 제36회까지 월[378,552]원으로 예정하고 있으며, 이 변제의 준비 및 절차비용지급의 준비를 위하여, 개시결정이 내려지는 경우 을 제1회로 하여, 이후 매월 일에 개시결정시 통지되는 개인회생위원의 은행계좌에 동액의 금전을 입금하겠습니다.\n\n3. 이 사건 개인회생절차에서 적립금을 반환받을 신청인의 예금계좌는 이며, 신청인의 계좌가 변경되거나 어떤 사유로든 사용할 수 없게 된 경우에는 신청인은 사건담당 회생위원에게 즉시 변경된 예금계좌를 신청인의 통장사본을 첨부하여 신고하겠습니다.\n\n4. 개인회생채권자목록 부본(개인회생채권자목록상의 채권자수 + 2통)은 개시결정 전 회생위원의 지시에 따라 지정하는 일자까지 반드시 제출하겠습니다.", 0, 'L');
 	
 	// 첨부 서류
 	$pdf->Ln(5);
@@ -329,8 +326,8 @@ function generatePowerOfAttorney($pdf, $basic_info) {
 	$pdf->SetX($pdf->GetX() + $leftColumnWidth);
 	$pdf->Cell($rightColumnWidth, 10, $basic_info['customer_address'] ?? '', 0, 1, 'L');
 	$pdf->SetX($pdf->GetX() + $leftColumnWidth);
-	$pdf->Cell($rightColumnWidth / 2, 10, '전화 : '.$basic_info['phone'], 0, 0);
-	$pdf->Cell($rightColumnWidth / 2, 10, '팩스 : '.$basic_info['fax'], 0, 1);
+	$pdf->Cell($rightColumnWidth / 2, 10, '전화 : '.$basic_info['customer_phone'], 0, 0);
+	$pdf->Cell($rightColumnWidth / 2, 10, '팩스 : '.$basic_info['customer_fax'], 0, 1);
 	
 	// 5. 수권사항
 	$pdf->Cell($leftColumnWidth, 20, '수권사항', 1, 0, 'C');
@@ -338,7 +335,7 @@ function generatePowerOfAttorney($pdf, $basic_info) {
 	
 	// 6. 날짜
 	$pdf->Cell($leftColumnWidth, 10, '날짜', 1, 0, 'C');
-	$pdf->Cell($rightColumnWidth, 10, '20   .   .   .', 1, 1, 'C');
+	$pdf->Cell($rightColumnWidth, 10, '20   .   .   .', 1, 1, 'L');
 	
 	// 7. 위임인 정보
 	$pdf->Cell($leftColumnWidth, 10, '위임인', 1, 0, 'C');
