@@ -22,6 +22,9 @@ function generatePdfApplication($pdf, $pdo, $case_no) {
 			return;
 		}
 		
+		$court_name = isset($basic_info['court_name']) && !empty($basic_info['court_name']) ? 
+		$basic_info['court_name'] : '';
+		
 		// 표지 생성
 		generateCoverPage($pdf, $basic_info);
 		
@@ -134,8 +137,6 @@ function generateCoverPage($pdf, $basic_info) {
 	// 하단 법원 정보
 	$pdf->Ln(30);
 	$pdf->SetFont('cid0kr', 'B', 14);
-	$court_name = isset($basic_info['court_name']) && !empty($basic_info['court_name']) ? 
-		$basic_info['court_name'] : '';
 	$pdf->Cell(0, 10, $court_name . ' 귀중', 0, 1, 'C');
 }
 
@@ -291,7 +292,7 @@ function generateApplicationForm($pdf, $pdo, $case_no, $basic_info) {
 	$pdf->Cell(0, 10, '위 대리인 '.$basic_info['customer_name'] ?? '', 0, 1, 'R');
 	$pdf->Cell(0, 10, $basic_info['customer_representative'] ?? ''.' (인)', 0, 1, 'R');
 	
-	$pdf->Cell(0, 10, '서울회생법원 귀중', 0, 1, 'C');
+	$pdf->Cell(0, 10, $court_name . ' 귀중', 0, 1, 'C');
 }
 
 function generatePowerOfAttorney($pdf, $basic_info) {
@@ -357,6 +358,6 @@ function generatePowerOfAttorney($pdf, $basic_info) {
 	$pdf->Cell($rightColumnWidth, 10, $basic_info['registered_address'] ?? '', 1, 1, 'L');
 
 	$pdf->SetFont('cid0kr', 'B', 14);
-	$pdf->Cell(0, 30, '서울회생법원 귀중', 1, 1, 'C');
+	$pdf->Cell(0, 10, $court_name . ' 귀중', 0, 1, 'C');
 }
 ?>
