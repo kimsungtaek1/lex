@@ -150,7 +150,7 @@ function generateApplicationForm($pdf, $pdo, $case_no, $basic_info) {
 	
 	// 신청 취지
 	$pdf->Ln(5);
-	$pdf->SetFont('cid0kr', '', 10);
+	$pdf->SetFont('cid0kr', 'B', 10);
 	$pdf->Cell(0, 10, '신 청 취 지', 0, 1, 'C');
 	
 	$pdf->SetFont('cid0kr', '', 8);
@@ -158,16 +158,14 @@ function generateApplicationForm($pdf, $pdo, $case_no, $basic_info) {
 	$pdf->MultiCell(0, 6, '2. 채무자를 면책한다. 라는 결정을 구합니다.', 0, 'L');
 	
 	// 신청 이유
-	$pdf->Ln(5);
-	$pdf->SetFont('cid0kr', '', 10);
+	$pdf->SetFont('cid0kr', 'B', 10);
 	$pdf->Cell(0, 10, '신 청 이 유', 0, 1, 'C');
 	
 	$pdf->SetFont('cid0kr', '', 8);
 	$pdf->MultiCell(0, 6, "1. 신청인에게는 법환한 진술서 기재와 같이 지급하여야 할 채무가 존재합니다.\n2. 그런데 위 진술서 기재와 같은 신청인의 현재 자산, 수입의 상황 하에서는 채무를 지급할 수 없는 상태에 있습니다.\n3. 따라서 신청인에 대하여 파산을 선고하며, 채무자를 면책한다. 라는 결정을 구합니다.", 0, 'L');
 	
 	// 첨부 서류
-	$pdf->Ln(5);
-	$pdf->SetFont('cid0kr', '', 10);
+	$pdf->SetFont('cid0kr', 'B', 10);
 	$pdf->Cell(0, 10, '첨 부 서 류', 0, 1, 'C');
 	
 	$pdf->SetFont('cid0kr', '', 8);
@@ -178,7 +176,7 @@ function generateApplicationForm($pdf, $pdo, $case_no, $basic_info) {
 	$pdf->Cell(0, 8, '주민등록초본[주소변동내역(과거 주소 전체) 및 개명, 주민등록번호 변동사항 포함] 및 주민등록본 각 1부', 0, 1, 'L');
 	$pdf->SetFont('cid0kr', '', 8);
 	$pdf->Cell(5, 8, '', 0, 0, 'L');
-	$pdf->Cell(0, 8, '※ 가족관계증명서, 혼인관계증명서, 주민등록등본은 신청인 외 제3자의 주민등록번호 뒷자리가 표기되지 아니한 것을 제출(신청인 본인의 주민등록번호는 전체 표기)', 0, 1, 'L');
+	$pdf->MultiCell(0, 6, '※ 가족관계증명서, 혼인관계증명서, 주민등록등본은 신청인 외 제3자의 주민등록번호 뒷자리가 표기되지 아니한 것을 제출\n(신청인 본인의 주민등록번호는 전체 표기)', 0, 'L');
 	$pdf->SetFont('cid0kr', '', 8);
 	
 	$pdf->Cell(5, 8, '3.', 0, 0, 'L');
@@ -190,9 +188,9 @@ function generateApplicationForm($pdf, $pdo, $case_no, $basic_info) {
 	// 휴대전화 정보수신 신청서
 	$pdf->Ln(5);
 	$pdf->SetDrawColor(0, 0, 0);
-	$pdf->Rect(15, $pdf->GetY(), 180, 30);
+	$pdf->Rect(15, $pdf->GetY(), 180, 40);
 	
-	$pdf->SetFont('cid0kr', '', 10);
+	$pdf->SetFont('cid0kr', 'B', 10);
 	$pdf->Cell(0, 10, '휴대전화를 통한 정보수신 신청서', 0, 1, 'C');
 	
 	$pdf->SetFont('cid0kr', '', 8);
@@ -202,17 +200,22 @@ function generateApplicationForm($pdf, $pdo, $case_no, $basic_info) {
 	$pdf->SetX(20);
 	$pdf->Cell(0, 10, '휴대전화 번호 :', 0, 0, 'L');
 	
-	$pdf->Cell(0, 10, '신청인 채무자 ' . $basic_info['name'] . ' (날인 또는 서명)', 0, 1, 'R');
+	$pdf->Cell(0, 10, '신청인 채무자 ' . $basic_info['name'] . ' (날인 또는 서명)   ', 0, 1, 'R');
 	
-	$pdf->Cell(0, 10, '파산선고 및 이의기간지정 결정(또는 면책심문기일 결정), 면책결정이 있으면 신속하게 위 휴대전화로 문자메시지가 발송됩니다. 문자메시지 서비스 이용금액은 메시지 1건당 17원씩 납부된 송달료에서 지급됩니다(송달료가 부족하면 문자메시지가 발송되지 않습니다). 추후 서비스 대상 정보, 이용금액 등이 변동될 수 있습니다.', 0, 1, 'L');
+	$pdf->SetX(20);
+	$pdf->MultiCell(170, 6, '파산선고 및 이의기간지정 결정(또는 면책심문기일 결정), 면책결정이 있으면 신속하게 위 휴대전화로 문자메시지가 발송됩니다. 문자메시지 서비스 이용금액은 메시지 1건당 17원씩 납부된 송달료에서 지급됩니다(송달료가 부족하면 문자메시지가 발송되지 않습니다). 추후 서비스 대상 정보, 이용금액 등이 변동될 수 있습니다.', 0, 'L');
 	
 	
 	
 	// 법원 타기관을 통한 개인파산
 	$pdf->Ln(5);
-	$pdf->SetFont('cid0kr', '', 8);
-	$pdf->MultiCell(0, 6, "법원의 타기관을 통한 개인파산 신청에 대한 지원 여부(해당사항 있을시 기재)", 0, 'L');
+	$pdf->SetDrawColor(0, 0, 0);
+	$pdf->Rect(15, $pdf->GetY(), 180, 40);
 	
+	$pdf->SetFont('cid0kr', 'B', 10);
+	$pdf->MultiCell(0, 6, "법원의 타기관을 통한 개인파산 신청에 대한 지원 여부(해당사항 있을시 기재)", 0, 'C');
+	
+	$pdf->SetFont('cid0kr', '', 8);
 	$pdf->Cell(5, 8, '1.', 0, 0, 'L');
 	$pdf->Cell(0, 8, '지원기관 (1.신용회복위원회 2.          ) (예)신용회복위원회, 서울시복지재단, 법률구조공단 등', 0, 1, 'L');
 	
