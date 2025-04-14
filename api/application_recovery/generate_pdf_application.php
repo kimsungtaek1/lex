@@ -28,7 +28,7 @@ function generatePdfApplication($pdf, $pdo, $case_no) {
 		// 신청서 생성
 		generateApplicationForm($pdf, $pdo, $case_no, $basic_info);
 		
-		// 위임장 생성
+		// 위임장 생성 (테이블 형식으로 변경)
 		generatePowerOfAttorney($pdf, $basic_info);
 		
 	} catch (Exception $e) {
@@ -252,25 +252,31 @@ function generateApplicationForm($pdf, $pdo, $case_no, $basic_info) {
 	
 	$pdf->Cell(10, 8, '9.', 0, 0, 'L');
 	$pdf->Cell(0, 8, '위임장 1통(대리인에 의하여 신청하는 경우)', 0, 1, 'L');
-	
-	// 휴대전화 정보 수신 신청서
+
 	$pdf->Ln(5);
+	
+	// 박스 형태로 휴대전화 정보수신 신청서
+	$pdf->Rect(15, $pdf->GetY(), 180, 60); // 박스 그리기 (x, y, width, height)
+	
 	$pdf->SetFont('cid0kr', 'B', 12);
 	$pdf->Cell(0, 10, '휴대전화를 통한 정보수신 신청서', 0, 1, 'C');
 	
+	// 내용
 	$pdf->SetFont('cid0kr', '', 10);
-	$pdf->MultiCell(0, 6, '위 사건에 관한 개인회생절차 개시결정,폐지결정,면책결정, 월 변제액 3개월분 연체의 정보를 예납의무자가 납부한 송달료 잔액 범위 내에서 휴대전화를 통하여 알려주실 것을 신청합니다.', 0, 'L');
-	
-	$pdf->Cell(40, 10, '▣ 휴대전화 번호:', 0, 1, 'L');
-	
-	$pdf->Ln(5);
-	$pdf->Cell(100, 10, '신청인 채무자 ' . ($basic_info['name'] ?? '') . ' (날인 또는 서명)', 0, 1, 'C');
-	
+	$pdf->SetXY(20, $pdf->GetY() + 5);
+	$pdf->MultiCell(170, 6, '위 사건에 관한 개인회생절차 개시결정,폐지결정,면책결정, 월 변제액 3개월분 연체의 정보를 예납의무자가 납부한 송달료 잔액 범위 내에서 휴대전화를 통하여 알려주실 것을 신청합니다.', 0, 'L');
+	$pdf->SetXY(20, $pdf->GetY());
+	$pdf->Cell(0, 10, '▣ 휴대전화 번호:', 0, 1, 'L');
+	$pdf->SetXY(20, $pdf->GetY());
+	$pdf->Cell(170, 10, '신청인 채무자 ' . ($basic_info['name'] ?? '') . ' (날인 또는 서명)', 0, 1, 'C');
 	$pdf->SetFont('cid0kr', '', 8);
-	$pdf->MultiCell(0, 5, "※ 개인회생절차 개시결정,폐지결정,면책결정이 있거나, 변제계획 인가결정 후 월 변제액 3개월분 이상 연체시 위 휴대전화로 문자메시지가 발송됩니다.\n※ 문자메시지 서비스 이용금액은 메시지 1건당 17원씩 납부된 송달료에서 지급됩니다(송달료가 부족하면 문자메시지가 발송되지 않습니다). 추후 서비스 대상 정보, 이용금액 등이 변동될 수 있습니다.", 0, 'L');
+	$pdf->SetXY(20, $pdf->GetY());
+	$pdf->MultiCell(170, 5, "※ 개인회생절차 개시결정,폐지결정,면책결정이 있거나, 변제계획 인가결정 후 월 변제액 3개월분 이상 연체시 위 휴대전화로 문자메시지가 발송됩니다.\n※ 문자메시지 서비스 이용금액은 메시지 1건당 17원씩 납부된 송달료에서 지급됩니다(송달료가 부족하면 문자메시지가 발송되지 않습니다). 추후 서비스 대상 정보, 이용금액 등이 변동될 수 있습니다.", 0, 'L');
+	
+	// Y 위치 업데이트
+	$pdf->SetY($pdf->GetY() + 10);
 	
 	// 날짜와 서명
-	$pdf->Ln(5);
 	$pdf->SetFont('cid0kr', '', 10);
 	$pdf->Cell(0, 10, '20   .   .   .', 0, 1, 'R');
 	
@@ -290,49 +296,58 @@ function generatePowerOfAttorney($pdf, $basic_info) {
 	$pdf->Cell(0, 10, '위 임 장', 0, 1, 'C');
 	$pdf->Ln(5);
 	
-	// 위임장 내용
+	// 전체 테이블 설정
 	$pdf->SetFont('cid0kr', '', 10);
-	$pdf->Cell(20, 10, '사 건', 1, 0, 'C');
-	$pdf->Cell(60, 10, '개인회생', 1, 1, 'L');
 	
-	$pdf->Cell(20, 10, '당사자', 1, 0, 'C');
-	$pdf->Cell(60, 10, $basic_info['name'] ?? '', 1, 1, 'L');
+	// 테이블 시작 - 전체를 테이블로 구성
+	$tableWidth = 180; // 테이블 너비
+	$leftColumnWidth = 30; // 좌측 컬럼 너비
+	$rightColumnWidth = $tableWidth - $leftColumnWidth; // 우측 컬럼 너비
 	
-	$pdf->Ln(5);
-	$pdf->MultiCell(0, 6, '위 사건에 관하여 ' . ($basic_info['name'] ?? '') . '(은)는 아래 수임인을 대리인으로 선임하고, 다음 표시 권한을 수여합니다.', 0, 'L');
+	// 1. 사건 정보
+	$pdf->Cell($leftColumnWidth, 10, '사 건', 1, 0, 'C');
+	$pdf->Cell($rightColumnWidth, 10, '개인회생', 1, 1, 'L');
 	
-	$pdf->Ln(5);
-	$pdf->Cell(20, 10, '수 임 인', 1, 0, 'C');
-	$pdf->SetFont('cid0kr', '', 10);
-	$pdf->Cell(160, 10, $basic_info['customer_name'] ?? '', 1, 1, 'L');
+	// 2. 당사자 정보
+	$pdf->Cell($leftColumnWidth, 10, '당사자', 1, 0, 'C');
+	$pdf->Cell($rightColumnWidth, 10, $basic_info['name'] ?? '', 1, 1, 'L');
 	
-	$pdf->Cell(20, 0, '', 0, 0);
-	$pdf->Cell(160, 7, $basic_info['customer_representative'] ?? '', 0, 1, 'L');
+	// 3. 위임장 본문
+	$pdf->Cell($tableWidth, 15, '위 사건에 관하여 ' . ($basic_info['name'] ?? '') . '(은)는 아래 수임인을 대리인으로 선임하고, 다음 표시 권한을 수여합니다.', 1, 1, 'C');
 	
-	$pdf->Cell(20, 10, '', 0, 0);
-	$pdf->Cell(160, 7, '서울특별시 강남구 역삼로 558, 4층 (대치동)', 0, 1, 'L');
+	// 4. 수임인 정보
+	$pdf->Cell($leftColumnWidth, 40, '수 임 인', 1, 0, 'C');
 	
-	$pdf->Cell(20, 7, '', 0, 0);
-	$pdf->Cell(70, 7, '전화 : 02-553-8783', 0, 0);
-	$pdf->Cell(90, 7, '팩스 : 02-6008-5677', 0, 1);
+	// 오른쪽 셀 내용 작성을 위한 위치 저장
+	$startY = $pdf->GetY();
+	$pdf->Cell($rightColumnWidth, 40, '', 1, 1, 'L'); // 빈 셀 생성
 	
-	$pdf->Ln(5);
-	$pdf->Cell(20, 10, '수권사항', 1, 0, 'C');
-	$pdf->MultiCell(160, 10, '(「채무자 회생 및 파산에 관한 법률」에 따른 개인회생사건 신청의 대리. 다만, 각종 기일에서의 진술의 대리는 제외한다.)', 1, 'L');
+	// 오른쪽 셀 내부에 내용 작성
+	$pdf->SetXY($pdf->GetX() + $leftColumnWidth, $startY);
+	$pdf->Cell($rightColumnWidth, 10, $basic_info['customer_name'] ?? '', 0, 1, 'L');
+	$pdf->SetX($pdf->GetX() + $leftColumnWidth);
+	$pdf->Cell($rightColumnWidth, 10, $basic_info['customer_representative'] ?? '', 0, 1, 'L');
+	$pdf->SetX($pdf->GetX() + $leftColumnWidth);
+	$pdf->Cell($rightColumnWidth, 10, '서울특별시 강남구 역삼로 558, 4층 (대치동)', 0, 1, 'L');
+	$pdf->SetX($pdf->GetX() + $leftColumnWidth);
+	$pdf->Cell($rightColumnWidth / 2, 10, '전화 : 02-553-8783', 0, 0);
+	$pdf->Cell($rightColumnWidth / 2, 10, '팩스 : 02-6008-5677', 0, 1);
 	
-	// 날짜와 서명
-	$pdf->Ln(15);
-	$pdf->Cell(0, 10, '20   .   .   .', 0, 1, 'C');
+	// 5. 수권사항
+	$pdf->Cell($leftColumnWidth, 20, '수권사항', 1, 0, 'C');
+	$pdf->MultiCell($rightColumnWidth, 10, '(「채무자 회생 및 파산에 관한 법률」에 따른 개인회생사건 신청의 대리. 다만, 각종 기일에서의 진술의 대리는 제외한다.)', 1, 'L');
 	
-	$pdf->Ln(5);
-	$pdf->Cell(50, 10, '위임인 :', 0, 0, 'R');
-	$pdf->Cell(40, 10, $basic_info['name'] ?? '', 0, 0, 'L');
-	$pdf->Cell(10, 10, ' (', 0, 0);
-	$pdf->Cell(60, 10, $basic_info['resident_number'] ?? '', 0, 0);
-	$pdf->Cell(10, 10, ')', 0, 1);
+	// 6. 날짜와 서명 부분 (테이블 형식)
+	$pdf->Ln(10);
+	$pdf->Cell($tableWidth, 10, '20   .   .   .', 1, 1, 'C');
 	
-	$pdf->Ln(3);
-	$pdf->MultiCell(0, 6, '         ' . ($basic_info['registered_address'] ?? ''), 0, 'L');
+	// 7. 위임인 정보 (테이블 형식)
+	$pdf->Cell($leftColumnWidth, 10, '위임인', 1, 0, 'C');
+	$pdf->Cell($rightColumnWidth, 10, $basic_info['name'] ?? ' (' . ($basic_info['resident_number'] ?? '') . ')', 1, 1, 'L');
+	
+	// 8. 위임인 주소 (테이블 형식)
+	$pdf->Cell($leftColumnWidth, 10, '주소', 1, 0, 'C');
+	$pdf->Cell($rightColumnWidth, 10, $basic_info['registered_address'] ?? '', 1, 1, 'L');
 	
 	$pdf->Ln(10);
 	$pdf->SetFont('cid0kr', 'B', 14);
