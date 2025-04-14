@@ -197,7 +197,7 @@ function generateApplicationForm($pdf, $pdo, $case_no, $basic_info) {
 	
 	// 주채무자 정보
 	$pdf->Ln(5);
-	$pdf->MultiCell(0, 15, '주채무자가(또는 보증채무자가, 연대채무자가, 배우자가) 이미 귀 법원에 파산신청 또는 개인회생절차 개시신청을 하였으므로 그 사실을 아래와 같이 기재합니다.', 1, 'L');
+	$pdf->MultiCell(0, 10, '주채무자가(또는 보증채무자가, 연대채무자가, 배우자가) 이미 귀 법원에 파산신청 또는 개인회생절차 개시신청을 하였으므로 그 사실을 아래와 같이 기재합니다.', 1, 'L');
 	
 	$pdf->Cell(25, 10, '성 명', 1, 0, 'C');
 	$pdf->Cell(60, 10, '', 1, 0, 'L');
@@ -213,7 +213,6 @@ function generateApplicationForm($pdf, $pdo, $case_no, $basic_info) {
 	$pdf->MultiCell(0, 10, '「신청인에 대하여 개인회생절차를 개시한다.」라는 결정을 구합니다.', 0, 'L');
 	
 	// 신청 이유
-	$pdf->Ln(3);
 	$pdf->SetFont('cid0kr', 'B', 12);
 	$pdf->Cell(0, 10, '신 청 이 유', 0, 1, 'C');
 	
@@ -293,8 +292,8 @@ function generatePowerOfAttorney($pdf, $basic_info) {
 	
 	// 제목
 	$pdf->SetFont('cid0kr', 'B', 16);
-	$pdf->Cell(0, 10, '위 임 장', 0, 1, 'C');
-	$pdf->Ln(5);
+	$pdf->Cell(0, 20, '위 임 장', 1, 1, 'C');
+	
 	
 	// 전체 테이블 설정
 	$pdf->SetFont('cid0kr', '', 10);
@@ -328,29 +327,28 @@ function generatePowerOfAttorney($pdf, $basic_info) {
 	$pdf->SetX($pdf->GetX() + $leftColumnWidth);
 	$pdf->Cell($rightColumnWidth, 10, $basic_info['customer_representative'] ?? '', 0, 1, 'L');
 	$pdf->SetX($pdf->GetX() + $leftColumnWidth);
-	$pdf->Cell($rightColumnWidth, 10, '서울특별시 강남구 역삼로 558, 4층 (대치동)', 0, 1, 'L');
+	$pdf->Cell($rightColumnWidth, 10, $basic_info['customer_address'] ?? '', 0, 1, 'L');
 	$pdf->SetX($pdf->GetX() + $leftColumnWidth);
-	$pdf->Cell($rightColumnWidth / 2, 10, '전화 : 02-553-8783', 0, 0);
-	$pdf->Cell($rightColumnWidth / 2, 10, '팩스 : 02-6008-5677', 0, 1);
+	$pdf->Cell($rightColumnWidth / 2, 10, '전화 : '.$basic_info['phone'], 0, 0);
+	$pdf->Cell($rightColumnWidth / 2, 10, '팩스 : '.$basic_info['fax'], 0, 1);
 	
 	// 5. 수권사항
 	$pdf->Cell($leftColumnWidth, 20, '수권사항', 1, 0, 'C');
-	$pdf->MultiCell($rightColumnWidth, 10, '(「채무자 회생 및 파산에 관한 법률」에 따른 개인회생사건 신청의 대리. 다만, 각종 기일에서의 진술의 대리는 제외한다.)', 1, 'L');
+	$pdf->MultiCell($rightColumnWidth, 20, '(「채무자 회생 및 파산에 관한 법률」에 따른 개인회생사건 신청의 대리. 다만, 각종 기일에서의 진술의 대리는 제외한다.)', 1, 'L');
 	
-	// 6. 날짜와 서명 부분 (테이블 형식)
-	$pdf->Ln(10);
-	$pdf->Cell($tableWidth, 10, '20   .   .   .', 1, 1, 'C');
+	// 6. 날짜
+	$pdf->Cell($leftColumnWidth, 10, '날짜', 1, 0, 'C');
+	$pdf->Cell($rightColumnWidth, 10, '20   .   .   .', 1, 1, 'C');
 	
-	// 7. 위임인 정보 (테이블 형식)
+	// 7. 위임인 정보
 	$pdf->Cell($leftColumnWidth, 10, '위임인', 1, 0, 'C');
 	$pdf->Cell($rightColumnWidth, 10, $basic_info['name'] ?? ' (' . ($basic_info['resident_number'] ?? '') . ')', 1, 1, 'L');
 	
-	// 8. 위임인 주소 (테이블 형식)
+	// 8. 위임인 주소
 	$pdf->Cell($leftColumnWidth, 10, '주소', 1, 0, 'C');
 	$pdf->Cell($rightColumnWidth, 10, $basic_info['registered_address'] ?? '', 1, 1, 'L');
-	
-	$pdf->Ln(10);
+
 	$pdf->SetFont('cid0kr', 'B', 14);
-	$pdf->Cell(0, 10, '서울회생법원 귀중', 0, 1, 'C');
+	$pdf->Cell(0, 30, '서울회생법원 귀중', 1, 1, 'C');
 }
 ?>
