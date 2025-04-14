@@ -105,8 +105,8 @@ class AssetManager {
 	}
 
 	getAssetTypeFromBlock(block) {
-		// CSS 클래스에서 자산 유형 추출
-		// block이 유효한지, class 속성이 있는지 확인
+		
+		/*
 		if (!block || !block.attr || typeof block.attr !== 'function') {
 			console.error("유효하지 않은 block 객체입니다:", block);
 			return null;
@@ -137,6 +137,7 @@ class AssetManager {
 			if (cls === 'inherited-property-block') return 'inherited_property';
 		}
 		return null;
+		*/
 	}
 
 	loadAllAssets() {
