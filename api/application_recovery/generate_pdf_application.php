@@ -199,7 +199,7 @@ function generateApplicationForm($pdf, $pdo, $case_no, $basic_info) {
 	$pdf->Cell(30, 10, '성 명', 1, 0, 'C');
 	$pdf->Cell(60, 10, '', 1, 0, 'L');
 	$pdf->Cell(30, 10, '사건번호', 1, 0, 'C');
-	$pdf->Cell(60, 10, '', 1, 1, 'L');
+	$pdf->Cell(60, 10, $basic_info['case_number'], 1, 1, 'L');
 	
 	// 신청 취지
 	$pdf->Ln(5);
