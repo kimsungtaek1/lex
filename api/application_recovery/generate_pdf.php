@@ -24,6 +24,11 @@ if ($case_no <= 0 || empty($print_items)) {
 	die('필수 정보가 누락되었습니다.');
 }
 
+// '모두 선택' 항목이 있는지 확인하고, 있으면 모든 항목을 포함
+if (in_array('모두 선택', $print_items)) {
+	$print_items = ['채권자목록 열람', '재산목록 열람', '수입지출목록 열람', '진술서 열람', '개인회생신청서'];
+}
+
 // 기본 정보 조회
 try {
 	$stmt = $pdo->prepare("
@@ -87,6 +92,11 @@ foreach ($print_items as $item) {
 			// 외부 파일 포함
 			require_once 'generate_pdf_statements.php';
 			generatePdfStatements($pdf, $pdo, $case_no);
+			break;
+		case '개인회생신청서':
+			// 외부 파일 포함
+			require_once 'generate_pdf_application.php';
+			generatePdfApplication($pdf, $pdo, $case_no);
 			break;
 	}
 }
