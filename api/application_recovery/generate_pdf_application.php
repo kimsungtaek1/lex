@@ -213,7 +213,7 @@ function generateApplicationForm($pdf, $pdo, $case_no, $basic_info) {
 	$pdf->MultiCell(0, 10, '「신청인에 대하여 개인회생절차를 개시한다.」라는 결정을 구합니다.', 0, 'L');
 	
 	// 신청 이유
-	$pdf->Ln(5);
+	$pdf->Ln(3);
 	$pdf->SetFont('cid0kr', 'B', 12);
 	$pdf->Cell(0, 10, '신 청 이 유', 0, 1, 'C');
 	
@@ -223,34 +223,34 @@ function generateApplicationForm($pdf, $pdo, $case_no, $basic_info) {
 	// 첨부 서류
 	$pdf->Ln(5);
 	$pdf->SetFont('cid0kr', 'B', 12);
-	$pdf->Cell(0, 10, '첨 부 서 류', 0, 1, 'L');
+	$pdf->Cell(0, 5, '첨 부 서 류', 0, 1, 'L');
 	
-	$pdf->SetFont('cid0kr', '', 10);
-	$pdf->Cell(10, 8, '1.', 0, 0, 'L');
+	$pdf->SetFont('cid0kr', '', 8);
+	$pdf->Cell(5, 8, '1.', 0, 0, 'L');
 	$pdf->Cell(0, 8, '개인회생채권자목록 1통', 0, 1, 'L');
 	
-	$pdf->Cell(10, 8, '2.', 0, 0, 'L');
+	$pdf->Cell(5, 8, '2.', 0, 0, 'L');
 	$pdf->Cell(0, 8, '재산목록 1통', 0, 1, 'L');
 	
-	$pdf->Cell(10, 8, '3.', 0, 0, 'L');
+	$pdf->Cell(5, 8, '3.', 0, 0, 'L');
 	$pdf->Cell(0, 8, '수입 및 지출에 관한 목록 1 통', 0, 1, 'L');
 	
-	$pdf->Cell(10, 8, '4.', 0, 0, 'L');
+	$pdf->Cell(5, 8, '4.', 0, 0, 'L');
 	$pdf->Cell(0, 8, '진술서 1통', 0, 1, 'L');
 	
-	$pdf->Cell(10, 8, '5.', 0, 0, 'L');
+	$pdf->Cell(5, 8, '5.', 0, 0, 'L');
 	$pdf->Cell(0, 8, '신청서 부본 1통(위 1 내지 4의 첨부서류 및 소명방법을 모두 포함한 것)', 0, 1, 'L');
 	
-	$pdf->Cell(10, 8, '6.', 0, 0, 'L');
+	$pdf->Cell(5, 8, '6.', 0, 0, 'L');
 	$pdf->Cell(0, 8, '수입인지 1통', 0, 1, 'L');
 	
-	$pdf->Cell(10, 8, '7.', 0, 0, 'L');
+	$pdf->Cell(5, 8, '7.', 0, 0, 'L');
 	$pdf->Cell(0, 8, '송달료납부서 1통', 0, 1, 'L');
 	
-	$pdf->Cell(10, 8, '8.', 0, 0, 'L');
+	$pdf->Cell(5, 8, '8.', 0, 0, 'L');
 	$pdf->Cell(0, 8, '신청인 본인의 예금계좌 사본 1통(대리인의 예금계좌 사본 아님)', 0, 1, 'L');
 	
-	$pdf->Cell(10, 8, '9.', 0, 0, 'L');
+	$pdf->Cell(5, 8, '9.', 0, 0, 'L');
 	$pdf->Cell(0, 8, '위임장 1통(대리인에 의하여 신청하는 경우)', 0, 1, 'L');
 
 	$pdf->Ln(5);
