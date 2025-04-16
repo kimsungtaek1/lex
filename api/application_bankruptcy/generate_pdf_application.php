@@ -209,10 +209,10 @@ function generateApplicationForm($pdf, $pdo, $case_no, $basic_info) {
 	
 	$pdf->SetFont('cid0kr', '', 8);
 	$pdf->Cell(5, 8, '1.', 0, 0, 'L');
-	$pdf->Cell(0, 8, '지원기관 (1.신용회복위원회 2.          ) (예)신용회복위원회, 서울시복지재단, 법률구조공단 등', 0, 1, 'L');
+	$pdf->Cell(0, 8, '지원기관 ('.$basic_info['support_org'].') (예)신용회복위원회, 서울시복지재단, 법률구조공단 등', 0, 1, 'L');
 	
 	$pdf->Cell(5, 8, '2.', 0, 0, 'L');
-	$pdf->Cell(0, 8, '지원내역과 지원금액(1.)신청서작성지원 2.          )', 0, 1, 'L');
+	$pdf->Cell(0, 8, '지원내역과 지원금액('.$basic_info['support_details'].')', 0, 1, 'L');
 	
 	$pdf->SetX(20);
 	$pdf->Cell(0, 8, '(예)신청서 작성 지원, 변호사 수임료 지원, 송달료 지원, 파산관재인 보수 지원 등', 0, 1, 'L');
@@ -224,7 +224,7 @@ function generateApplicationForm($pdf, $pdo, $case_no, $basic_info) {
 	
 	$pdf->Cell(0, 10, '신 청 인    ' . $basic_info['name'] . '    (인)', 0, 1, 'R');
 	
-	$pdf->SetFont('cid0kr', 'B', 20);
+	$pdf->SetFont('cid0kr', 'B', 12);
 	$pdf->Cell(0, 10, $basic_info['court_name'] . ' 귀중', 0, 1, 'C');
 }
 
