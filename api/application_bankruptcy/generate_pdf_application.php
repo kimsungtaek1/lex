@@ -209,14 +209,13 @@ function generateApplicationForm($pdf, $pdo, $case_no, $basic_info) {
 	
 	$pdf->SetFont('cid0kr', '', 8);
 	$pdf->Cell(5, 8, '1.', 0, 0, 'L');
-	$pdf->Cell(0, 8, '지원기관 ('.$basic_info['support_org'].') (예)신용회복위원회, 서울시복지재단, 법률구조공단 등', 0, 1, 'L');
+	$pdf->Cell(0, 8, '지원기관 ( '.$basic_info['support_org'].' ) (예)신용회복위원회, 서울시복지재단, 법률구조공단 등', 0, 1, 'L');
 	
 	$pdf->Cell(5, 8, '2.', 0, 0, 'L');
-	$pdf->Cell(0, 8, '지원내역과 지원금액('.$basic_info['support_details'].')', 0, 1, 'L');
+	$pdf->Cell(0, 8, '지원내역과 지원금액( '.$basic_info['support_details'].' )', 0, 1, 'L');
 	
 	$pdf->SetX(20);
 	$pdf->Cell(0, 8, '(예)신청서 작성 지원, 변호사 수임료 지원, 송달료 지원, 파산관재인 보수 지원 등', 0, 1, 'L');
-	$pdf->Cell(0, 8, '서울시복지재단 - 파산관재인 보수 지원(30만원)', 0, 1, 'L');
 	
 	// 날짜와 서명
 	$pdf->Ln(10);
@@ -240,15 +239,13 @@ function generateDeliveryAddressForm($pdf, $basic_info) {
 	// 사건 정보
 	$pdf->SetFont('cid0kr', '', 8);
 	$pdf->Cell(20, 10, '사    건', 0, 0, 'L');
-	$pdf->Cell(80, 10, date('Y').'하단', 0, 0, 'L');
-	$pdf->Cell(20, 10, '파산', 0, 1, 'L');
+	$pdf->Cell(60, 10, date('Y').'하단 파산', 0, 1, 'L');
 	
-	$pdf->Cell(100, 10, '', 0, 0);
-	$pdf->Cell(80, 10, date('Y').'하면', 0, 0, 'L');
-	$pdf->Cell(20, 10, '면책', 0, 1, 'L');
+	$pdf->Cell(20, 10, '파산송달료', 0, 0, 'L');
+	$pdf->Cell(60, 10, date('Y').'하면 면책', 0, 1, 'L');
 	
 	$pdf->Cell(20, 10, '신 청 인', 0, 0, 'L');
-	$pdf->Cell(0, 10, $basic_info['name'], 0, 1, 'L');
+	$pdf->Cell(60, 10, $basic_info['name'], 0, 1, 'L');
 	$pdf->Ln(20);
 	
 	// 본문
