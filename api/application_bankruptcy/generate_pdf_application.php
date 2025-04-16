@@ -291,7 +291,7 @@ function generateStayOrderForm($pdf, $pdo, $case_no, $basic_info) {
 	$pdf->Cell(0, 10, $basic_info['name'].'( 주민등록번호: '.$basic_info['resident_number'].' )', 0, 1, 'L');
 	
 	$pdf->Cell(20, 10, '', 0, 0, 'L');
-	$pdf->Cell(0, 10, '주소 : '.$basic_info['registered_address'] . ' (상상동, 상상동센트럴아이파크)', 0, 1, 'L');
+	$pdf->Cell(0, 10, '주소 : '.$basic_info['registered_address'], 0, 1, 'L');
 	
 	$pdf->Cell(20, 10, '채 권 자', 0, 0, 'L');
 	$pdf->Cell(0, 10, '', 0, 1, 'L');
@@ -348,9 +348,9 @@ function generateExemptPropertyForm($pdf, $pdo, $case_no, $basic_info) {
 	// 사건 정보
 	$pdf->SetFont('cid0kr', '', 8);
 	$pdf->Cell(20, 10, '사    건', 0, 0, 'L');
-	$pdf->Cell(0, 10, date('Y').' 하단        파산선고', 0, 1, 'L');
+	$pdf->Cell(0, 10, date('Y').' 하단 '.''.' 파산선고', 0, 1, 'L');
 	
-	$pdf->Cell(30, 10, '신청인(채무자)', 0, 0, 'L');
+	$pdf->Cell(20, 10, '신청인(채무자)', 0, 0, 'L');
 	$pdf->Cell(0, 10, $basic_info['name'], 0, 1, 'L');
 	$pdf->Ln(10);
 	
@@ -360,7 +360,7 @@ function generateExemptPropertyForm($pdf, $pdo, $case_no, $basic_info) {
 	
 	// 면제재산 체크박스
 	$pdf->SetFont('cid0kr', '', 8);
-	$pdf->Cell(5, 10, '□', 0, 0, 'L');
+	$pdf->Cell(5, 10, '[   ]', 0, 0, 'L');
 	$pdf->Cell(0, 10, '1.주거용 건물 임차보증금반환청구권에 대한 면제재산결정 신청(법 제383조 제2항 제1호)', 0, 1, 'L');
 	
 	// 면제재산 테이블
@@ -385,7 +385,7 @@ function generateExemptPropertyForm($pdf, $pdo, $case_no, $basic_info) {
 	
 	// 면제재산 내용 테이블 5
 	$pdf->Cell(40, 10, '⑤학정일자보유여부', 1, 0, 'C');
-	$pdf->Cell(0, 10, '확정일자 있음 □   확정일자 없음 □', 1, 1, 'C');
+	$pdf->Cell(0, 10, '확정일자 있음 [   ]   확정일자 없음 [   ]', 1, 1, 'C');
 	
 	// 면제재산 내용 테이블 6
 	$pdf->Cell(40, 10, '⑥최우선변제금 액수(', 1, 0, 'C');
@@ -393,11 +393,11 @@ function generateExemptPropertyForm($pdf, $pdo, $case_no, $basic_info) {
 	
 	// 면제재산 내용 테이블 7
 	$pdf->Cell(40, 10, '⑦소명자료', 1, 0, 'C');
-	$pdf->Cell(0, 10, '임대차계약서 □   주민등록등본 □   기타증빙 □ [               ]', 1, 1, 'C');
+	$pdf->Cell(0, 10, '임대차계약서 [   ]   주민등록등본 [   ]   기타증빙 [   ] [               ]', 1, 1, 'C');
 	
 	// 면제재산 2번째 체크박스
 	$pdf->Ln(5);
-	$pdf->Cell(5, 10, '□', 0, 0, 'L');
+	$pdf->Cell(5, 10, '[   ]', 0, 0, 'L');
 	$pdf->Cell(0, 10, '2.6개월간의 생계비에 사용할 특정재산에 대한 면제재산결정 신청(법 제383조 제2항 제2호)', 0, 1, 'L');
 	
 	// 면제재산 생계비 테이블
@@ -418,7 +418,7 @@ function generateExemptPropertyForm($pdf, $pdo, $case_no, $basic_info) {
 	
 	// 소명자료
 	$pdf->Cell(30, 10, '※ 소명자료 :', 0, 0, 'L');
-	$pdf->Cell(0, 10, '□ (         )보증서 1통/ □ 사진 1장/ □ 기타 [                ]', 0, 1, 'L');
+	$pdf->Cell(0, 10, '[   ] (         )보증서 1통/ [   ] 사진 1장/ [   ] 기타 [                ]', 0, 1, 'L');
 	
 	// 날짜와 서명
 	$pdf->Ln(10);
