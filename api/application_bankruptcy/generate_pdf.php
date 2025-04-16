@@ -26,7 +26,7 @@ if ($case_no <= 0 || empty($print_items)) {
 
 // '모두 선택' 항목이 있는지 확인하고, 있으면 모든 항목을 포함
 if (in_array('모두 선택', $print_items)) {
-	$print_items = ['채권자목록 열람', '재산목록 열람', '수입지출목록 열람', '진술서 열람', '파산 및 면책신청서'];
+	$print_items = ['개인파산신청서', '진술서 열람', '채권자목록 열람', '재산목록 열람', '생활상황 열람', '수입지출목록 열람'];
 }
 
 // 기본 정보 조회
@@ -73,10 +73,15 @@ $pdf->SetFont('cid0kr', '', 12); // 한글 지원 폰트
 // 선택한 항목에 따라 데이터 추가
 foreach ($print_items as $item) {
 	switch ($item) {
-		case '파산 및 면책신청서':
+		case '개인파산신청서':
 			// 외부 파일 포함
 			require_once 'generate_pdf_application.php';
 			generatePdfApplication($pdf, $pdo, $case_no);
+			break;
+		case '진술서 열람':
+			// 외부 파일 포함
+			require_once 'generate_pdf_statements.php';
+			generatePdfStatements($pdf, $pdo, $case_no);
 			break;
 		case '채권자목록 열람':
 			// 외부 파일 포함
@@ -88,15 +93,15 @@ foreach ($print_items as $item) {
 			require_once 'generate_pdf_assets.php';
 			generatePdfAssets($pdf, $pdo, $case_no);
 			break;
+		case '생활상황 열람':
+			// 외부 파일 포함
+			require_once 'generate_pdf_living_status.php';
+			generatePdfIncome($pdf, $pdo, $case_no);
+			break;
 		case '수입지출목록 열람':
 			// 외부 파일 포함
 			require_once 'generate_pdf_income.php';
 			generatePdfIncome($pdf, $pdo, $case_no);
-			break;
-		case '진술서 열람':
-			// 외부 파일 포함
-			require_once 'generate_pdf_statements.php';
-			generatePdfStatements($pdf, $pdo, $case_no);
 			break;
 	}
 }

@@ -17,23 +17,27 @@
 				</div>
 				<div class="view-print-item">
 					<input type="checkbox" id="bankruptcy_view_print_item_0" name="bankruptcy_view_print[]" value="파산 및 면책신청서">
-					<label for="bankruptcy_view_print_item_0">파산 및 면책신청서</label>
+					<label for="bankruptcy_view_print_item_0">개인파산신청서</label>
 				</div>
 				<div class="view-print-item">
-					<input type="checkbox" id="bankruptcy_view_print_item_1" name="bankruptcy_view_print[]" value="채권자목록 열람">
-					<label for="bankruptcy_view_print_item_1">채권자목록 열람</label>
+					<input type="checkbox" id="bankruptcy_view_print_item_1" name="bankruptcy_view_print[]" value="진술서 열람">
+					<label for="bankruptcy_view_print_item_1">진술서 열람</label>
 				</div>
 				<div class="view-print-item">
-					<input type="checkbox" id="bankruptcy_view_print_item_2" name="bankruptcy_view_print[]" value="재산목록 열람">
-					<label for="bankruptcy_view_print_item_2">재산목록 열람</label>
+					<input type="checkbox" id="bankruptcy_view_print_item_2" name="bankruptcy_view_print[]" value="채권자목록 열람">
+					<label for="bankruptcy_view_print_item_2">채권자목록 열람</label>
 				</div>
 				<div class="view-print-item">
-					<input type="checkbox" id="bankruptcy_view_print_item_3" name="bankruptcy_view_print[]" value="수입지출목록 열람">
-					<label for="bankruptcy_view_print_item_3">수입지출목록 열람</label>
+					<input type="checkbox" id="bankruptcy_view_print_item_3" name="bankruptcy_view_print[]" value="재산목록 열람">
+					<label for="bankruptcy_view_print_item_3">재산목록 열람</label>
 				</div>
 				<div class="view-print-item">
-					<input type="checkbox" id="bankruptcy_view_print_item_4" name="bankruptcy_view_print[]" value="진술서 열람">
-					<label for="bankruptcy_view_print_item_4">진술서 열람</label>
+					<input type="checkbox" id="bankruptcy_view_print_item_4" name="bankruptcy_view_print[]" value="생활상황 열람">
+					<label for="bankruptcy_view_print_item_4">생활상황 열람</label>
+				</div>
+				<div class="view-print-item">
+					<input type="checkbox" id="bankruptcy_view_print_item_5" name="bankruptcy_view_print[]" value="수입지출목록 열람">
+					<label for="bankruptcy_view_print_item_5">수입지출목록 열람</label>
 				</div>
 				<input type="hidden" id="bankruptcy_case_no" value="<?php echo isset($_GET['case_no']) ? htmlspecialchars($_GET['case_no']) : ''; ?>">
 			</div>
