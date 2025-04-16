@@ -254,15 +254,12 @@ function generateDeliveryAddressForm($pdf, $basic_info) {
 	
 	// 다음
 	$pdf->Cell(0, 10, '다    음', 0, 1, 'C');
-	$pdf->Ln(10);
 	
 	// 송달 정보
 	$pdf->Cell(0, 10, '신청인의 송달장소 및 송달영수인', 0, 1, 'L');
-	$pdf->Ln(5);
 	
 	$pdf->Cell(20, 10, '송 달 장 소', 0, 0, 'L');
-	$pdf->Cell(0, 10, $basic_info['registered_address'].' '.$basic_info['now_address'] . ' 4층 (대치동)', 0, 1, 'L');
-	$pdf->Ln(5);
+	$pdf->Cell(0, 10, $basic_info['registered_address'], 0, 1, 'L');
 	
 	$pdf->Cell(20, 10, '송 달 영 수 인', 0, 0, 'L');
 	$pdf->Cell(0, 10, '', 0, 1, 'L');
@@ -270,11 +267,12 @@ function generateDeliveryAddressForm($pdf, $basic_info) {
 	
 	// 날짜와 서명
 	$pdf->Cell(0, 10, date('Y.m.d'), 0, 1, 'C');
-	$pdf->Ln(20);
+	$pdf->Ln(10);
 	
 	$pdf->Cell(0, 10, '위 신청인    ' . $basic_info['name'] . ' (서명 또는 날인)', 0, 1, 'C');
-	$pdf->Ln(20);
+	$pdf->Ln(10);
 	
+	$pdf->SetFont('cid0kr', 'B', 12);
 	$pdf->Cell(0, 10, $basic_info['court_name'] . ' 귀중', 0, 1, 'C');
 }
 
