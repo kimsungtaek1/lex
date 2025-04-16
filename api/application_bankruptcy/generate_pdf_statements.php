@@ -3,13 +3,6 @@ if (!defined('INCLUDED_FROM_MAIN')) {
 	die('이 파일은 직접 실행할 수 없습니다.');
 }
 
-/**
- * 파산 진술서 PDF 생성 함수
- * 
- * @param TCPDF $pdf PDF 객체
- * @param PDO $pdo 데이터베이스 연결 객체
- * @param int $case_no 사건 번호
- */
 function generatePdfStatements($pdf, $pdo, $case_no) {
 	// 오류 처리 활성화
 	$old_error_reporting = error_reporting(E_ALL);
@@ -82,43 +75,31 @@ function generateCoverPage($pdf, $basic_info) {
 	// 제목
 	$pdf->SetFont('cid0kr', 'B', 22);
 	$pdf->Cell(0, 20, '진 술 서', 0, 1, 'C');
-	$pdf->Ln(10);
 	
 	// 법원 정보
-	$pdf->SetFont('cid0kr', 'B', 14);
+	$pdf->SetFont('cid0kr', 'B', 12);
 	$pdf->Cell(0, 10, $basic_info['court_name'] . ' 귀중', 0, 1, 'C');
-	$pdf->Ln(20);
 	
 	// 신청인 정보
 	$pdf->SetFont('cid0kr', '', 10);
-	$pdf->Cell(30, 10, '신청인 이무기 (인)', 0, 1, 'R');
-	$pdf->Ln(10);
+	$pdf->Cell(0, 10, '신청인 '.$basic_info['name'].' (인)', 0, 1, 'R');
 	
 	// 진술서 내용 설명
 	$pdf->SetFont('cid0kr', '', 10);
 	$pdf->MultiCell(0, 6, "신청인은 다음과 같은 내용을 사실대로 진술합니다.\n또 본인의 현재의 재무, 자산, 생활의 상황 및 수입 지출 등은, 별지 「채권자목록」, 「재산목록」, 「현재의 생활상황」, 「수입 및 지출에 관한 목록」의 각 기재와 같습니다.", 0, 'L');
-	$pdf->Ln(5);
 	
 	// 경고 문구
 	$pdf->SetFont('cid0kr', 'B', 10);
 	$pdf->MultiCell(0, 6, "위 각 서류에 사실과 다른 내용이 있을 경우 면책불허가될 수 있음을 잘 알고 있습니다.", 0, 'L');
-	$pdf->Ln(10);
 	
-	// 하단 날짜 및 서명
-	$pdf->SetFont('cid0kr', '', 10);
-	$pdf->Cell(0, 10, date('Y년 m월 d일'), 0, 1, 'R');
-	$pdf->Cell(0, 10, '신청인 ' . $basic_info['name'] . ' (인)', 0, 1, 'R');
 }
 
 /**
  * 학력 및 경력 정보 진술서 생성
  */
 function generateEducationCareerPage($pdf, $pdo, $case_no, $basic_info) {
-	// 페이지 추가
-	$pdf->AddPage();
-	
 	// 제목
-	$pdf->SetFont('cid0kr', 'B', 14);
+	$pdf->SetFont('cid0kr', 'B', 12);
 	$pdf->Cell(0, 10, '1. 본인의 과거 경력은 다음과 같습니다.', 0, 1, 'L');
 	
 	// 최종 학력 정보 조회
@@ -180,7 +161,7 @@ function generateEducationCareerPage($pdf, $pdo, $case_no, $basic_info) {
 	$domestic_court = $stmt->fetch(PDO::FETCH_ASSOC);
 	
 	// 동시 개인파산 신청 가족 정보 출력
-	$pdf->SetFont('cid0kr', 'B', 10);
+	$pdf->SetFont('cid0kr', 'B', 12);
 	$pdf->Ln(5);
 	$pdf->Cell(0, 10, '2. 동시에 개인파산을 신청할 가족이 있는지 여부', 0, 1, 'L');
 	
@@ -203,8 +184,8 @@ function generateEducationCareerPage($pdf, $pdo, $case_no, $basic_info) {
 	}
 	
 	// 현재까지의 생활상황 제목
-	$pdf->SetFont('cid0kr', 'B', 14);
-	$pdf->Ln(10);
+	$pdf->SetFont('cid0kr', 'B', 12);
+
 	$pdf->Cell(0, 10, '3. 본인의 현재까지의 생활상황 등은 다음과 같습니다.', 0, 1, 'L');
 }
 
@@ -411,8 +392,7 @@ function generateCreditorStatusPage($pdf, $pdo, $case_no, $basic_info) {
 	$legal_actions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 	
 	// 채권자 상황 제목
-	$pdf->SetFont('cid0kr', 'B', 14);
-	$pdf->AddPage();
+	$pdf->SetFont('cid0kr', 'B', 12);
 	$pdf->Cell(0, 10, '4. 채권자와의 상황은 다음과 같습니다.', 0, 1, 'L');
 	
 	// 채권자 교섭 경험
@@ -490,8 +470,7 @@ function generateBankruptcyReasonPage($pdf, $pdo, $case_no, $basic_info) {
 	}
 	
 	// 파산신청 사유 제목
-	$pdf->SetFont('cid0kr', 'B', 14);
-	$pdf->AddPage();
+	$pdf->SetFont('cid0kr', 'B', 12);
 	$pdf->Cell(0, 10, '5. 파산신청에 이르게 된 사정 (채무 증대의 경위 및 지급이 불가능하게 된 사정)(구체적으로 표시)', 0, 1, 'L');
 	
 	// 채무 원인
@@ -592,8 +571,7 @@ function generateDebtAfterInsolvencyPage($pdf, $pdo, $case_no, $basic_info) {
 	}
 	
 	// 지급불능 이후 채무 제목
-	$pdf->SetFont('cid0kr', 'B', 14);
-	$pdf->AddPage();
+	$pdf->SetFont('cid0kr', 'B', 12);
 	$pdf->Cell(0, 10, '6. 지급이 불가능하게 된 시기 이후에 차용하거나 채무가 발생한 사실 (없음)', 0, 1, 'L');
 	
 	$pdf->SetFont('cid0kr', '', 9);
@@ -648,8 +626,7 @@ function generatePartialRepaymentPage($pdf, $pdo, $case_no, $basic_info) {
 	}
 	
 	// 일부 채권자 변제 제목
-	$pdf->SetFont('cid0kr', 'B', 14);
-	$pdf->AddPage();
+	$pdf->SetFont('cid0kr', 'B', 12);
 	$pdf->Cell(0, 10, '7. 채무의 지급이 불가능하게 된 시점 이후에 일부 채권자에게만 변제한 경험 (있음) (변제한 채권자의 성명, 변제시기, 금액을 전부 기재하여 주십시오)', 0, 1, 'L');
 	
 	$pdf->SetFont('cid0kr', '', 9);
