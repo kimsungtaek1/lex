@@ -343,7 +343,7 @@ function generateExemptPropertyForm($pdf, $pdo, $case_no, $basic_info) {
 	// 제목
 	$pdf->SetFont('cid0kr', 'B', 16);
 	$pdf->Cell(0, 10, '면제재산 결정신청서', 0, 1, 'C');
-	$pdf->Ln(10);
+	$pdf->Ln(5);
 	
 	// 사건 정보
 	$pdf->SetFont('cid0kr', '', 8);
@@ -352,11 +352,9 @@ function generateExemptPropertyForm($pdf, $pdo, $case_no, $basic_info) {
 	
 	$pdf->Cell(20, 10, '신청인(채무자)', 0, 0, 'L');
 	$pdf->Cell(0, 10, $basic_info['name'], 0, 1, 'L');
-	$pdf->Ln(10);
 	
 	// 신청 내용
 	$pdf->MultiCell(0, 6, "신청인은 채무자 회생 및 파산에 관한 법률 제383조 제2항에 따라 아래의 재산을 면제재산으로 정한다는 결정을 구합니다.", 0, 'L');
-	$pdf->Ln(5);
 	
 	// 면제재산 체크박스
 	$pdf->SetFont('cid0kr', '', 8);
@@ -364,12 +362,23 @@ function generateExemptPropertyForm($pdf, $pdo, $case_no, $basic_info) {
 	$pdf->Cell(0, 10, '1.주거용 건물 임차보증금반환청구권에 대한 면제재산결정 신청(법 제383조 제2항 제1호)', 0, 1, 'L');
 	
 	// 면제재산 테이블
-	$pdf->Cell(30, 10, '면제재산 금액', 1, 0, 'C');
+	$pdf->Cell(40, 10, '면제재산 금액', 1, 0, 'C');
 	$pdf->Cell(0, 10, '금                원', 1, 1, 'C');
 	
+	$x = $pdf->GetX();
+	$y = $pdf->GetY();
+
+	// 첫 번째 MultiCell
+	$pdf->MultiCell(40, 80, '1. 신청인에 대하여 파산을 선고한다.', 1, 'L', false, 0);
+
+	// X, Y 위치 수동으로 오른쪽으로 이동해서 두 번째 셀 출력
+	$pdf->SetXY($x + 40, $y);
+	$pdf->MultiCell(0, 80, '1. 신청인에 대하여 파산을 선고한다.', 1, 'L', false, 0);
+	
+	/*
 	// 면제재산 내용 테이블 1
-	$pdf->Cell(40, 10, '①임대차계약일자', 1, 0, 'C');
-	$pdf->Cell(0, 10, '(                부터                까지)', 1, 1, 'C');
+	$pdf->Cell(40, 10, '①임대차계약일자 (                              )', 1, 0, 'C');
+	$pdf->Cell(0, 10, '', 1, 1, 'C');
 	
 	// 면제재산 내용 테이블 2
 	$pdf->Cell(40, 10, '②임차목적물 소재지(', 1, 0, 'C');
@@ -394,9 +403,11 @@ function generateExemptPropertyForm($pdf, $pdo, $case_no, $basic_info) {
 	// 면제재산 내용 테이블 7
 	$pdf->Cell(40, 10, '⑦소명자료', 1, 0, 'C');
 	$pdf->Cell(0, 10, '임대차계약서 [   ]   주민등록등본 [   ]   기타증빙 [   ] [               ]', 1, 1, 'C');
+	*/
 	
 	// 면제재산 2번째 체크박스
-	$pdf->Ln(5);
+	$pdf->SetXY($x, $y + 80);
+	
 	$pdf->Cell(5, 10, '[   ]', 0, 0, 'L');
 	$pdf->Cell(0, 10, '2.6개월간의 생계비에 사용할 특정재산에 대한 면제재산결정 신청(법 제383조 제2항 제2호)', 0, 1, 'L');
 	
@@ -426,6 +437,7 @@ function generateExemptPropertyForm($pdf, $pdo, $case_no, $basic_info) {
 	
 	$pdf->Cell(0, 10, '신청인(채무자)    ' . $basic_info['name'] . ' (인)', 0, 1, 'R');
 	
+	$pdf->SetFont('cid0kr', 'B', 12);
 	$pdf->Cell(0, 10, $basic_info['court_name'] . ' 귀중', 0, 1, 'C');
 }
 
