@@ -41,9 +41,6 @@ function generatePdfApplication($pdf, $pdo, $case_no) {
 			generateExemptPropertyForm($pdf, $pdo, $case_no, $basic_info);
 		}
 		
-		// 위임장 생성
-		generatePowerOfAttorney($pdf, $basic_info);
-		
 	} catch (Exception $e) {
 		$pdf->MultiCell(0, 10, 
 			"데이터 조회 중 오류가 발생했습니다:\n" . 
@@ -288,19 +285,19 @@ function generateStayOrderForm($pdf, $pdo, $case_no, $basic_info) {
 	// 사건 정보
 	$pdf->SetFont('cid0kr', '', 8);
 	$pdf->Cell(20, 10, '사    건', 0, 0, 'L');
-	$pdf->Cell(0, 10, date('Y').' 하단 12312호 파산선고', 0, 1, 'L');
+	$pdf->Cell(0, 10, date('Y').' 하단 '.''.' 파산선고', 0, 1, 'L');
 	
-	$pdf->Cell(40, 10, '신청인(채무자) ', 0, 0, 'L');
-	$pdf->Cell(0, 10, $basic_info['name'].'(주민등록번호: 700000-1000000)', 0, 1, 'L');
+	$pdf->Cell(20, 10, '신청인(채무자) ', 0, 0, 'L');
+	$pdf->Cell(0, 10, $basic_info['name'].'( 주민등록번호: '.$basic_info['resident_number'].' )', 0, 1, 'L');
 	
-	$pdf->Cell(20, 10, '주소 : ', 0, 0, 'L');
-	$pdf->Cell(0, 10, $basic_info['registered_address'] . ' (상상동, 상상동센트럴아이파크)', 0, 1, 'L');
+	$pdf->Cell(20, 10, '', 0, 0, 'L');
+	$pdf->Cell(0, 10, '주소 : '.$basic_info['registered_address'] . ' (상상동, 상상동센트럴아이파크)', 0, 1, 'L');
 	
 	$pdf->Cell(20, 10, '채 권 자', 0, 0, 'L');
 	$pdf->Cell(0, 10, '', 0, 1, 'L');
 	
-	$pdf->Cell(20, 10, '주소 :', 0, 0, 'L');
-	$pdf->Cell(0, 10, '', 0, 1, 'L');
+	$pdf->Cell(20, 10, '', 0, 0, 'L');
+	$pdf->Cell(0, 10, '주소 :', 0, 1, 'L');
 	$pdf->Ln(10);
 	
 	// 신청 취지
@@ -335,7 +332,7 @@ function generateStayOrderForm($pdf, $pdo, $case_no, $basic_info) {
 	$pdf->Cell(0, 10, date('Y. m. d') . ' .', 0, 1, 'R');
 	
 	$pdf->Cell(0, 10, '신청인(채무자)    ' . $basic_info['name'] . ' (서명 또는 날인)', 0, 1, 'R');
-	
+	$pdf->SetFont('cid0kr', 'B', 12);
 	$pdf->Cell(0, 10, $basic_info['court_name'] . ' 귀중', 0, 1, 'C');
 }
 
@@ -432,68 +429,4 @@ function generateExemptPropertyForm($pdf, $pdo, $case_no, $basic_info) {
 	$pdf->Cell(0, 10, $basic_info['court_name'] . ' 귀중', 0, 1, 'C');
 }
 
-function generatePowerOfAttorney($pdf, $basic_info) {
-	// 위임장 페이지 추가
-	$pdf->AddPage();
-	
-	// 제목
-	$pdf->SetFont('cid0kr', 'B', 16);
-	$pdf->Cell(0, 20, '위 임 장', 0, 1, 'C');
-	
-	// 전체 테이블 설정
-	$pdf->SetFont('cid0kr', '', 8);
-	
-	// 테이블 시작 - 전체를 테이블로 구성
-	$tableWidth = 180; // 테이블 너비
-	$leftColumnWidth = 30; // 좌측 컬럼 너비
-	$rightColumnWidth = $tableWidth - $leftColumnWidth; // 우측 컬럼 너비
-	
-	// 1. 사건 정보
-	$pdf->Cell($leftColumnWidth, 10, '사 건', 1, 0, 'C');
-	$pdf->Cell($rightColumnWidth, 10, '파산 및 면책', 1, 1, 'L');
-	
-	// 2. 당사자 정보
-	$pdf->Cell($leftColumnWidth, 10, '당사자', 1, 0, 'C');
-	$pdf->Cell($rightColumnWidth, 10, $basic_info['name'] ?? '', 1, 1, 'L');
-	
-	// 3. 위임장 본문
-	$pdf->Cell($tableWidth, 15, '위 사건에 관하여 ' . ($basic_info['name'] ?? '') . '(은)는 아래 수임인을 대리인으로 선임하고, 다음 표시 권한을 수여합니다.', 1, 1, 'C');
-	
-	// 4. 수임인 정보
-	$pdf->Cell($leftColumnWidth, 40, '수 임 인', 1, 0, 'C');
-	
-	// 오른쪽 셀 내용 작성을 위한 위치 저장
-	$startY = $pdf->GetY();
-	$pdf->Cell($rightColumnWidth, 40, '', 1, 1, 'L'); // 빈 셀 생성
-	
-	// 오른쪽 셀 내부에 내용 작성
-	$pdf->SetXY($pdf->GetX() + $leftColumnWidth, $startY);
-	$pdf->Cell($rightColumnWidth, 10, $basic_info['customer_name'] ?? '', 0, 1, 'L');
-	$pdf->SetX($pdf->GetX() + $leftColumnWidth);
-	$pdf->Cell($rightColumnWidth, 10, $basic_info['customer_representative'] ?? '', 0, 1, 'L');
-	$pdf->SetX($pdf->GetX() + $leftColumnWidth);
-	$pdf->Cell($rightColumnWidth, 10, $basic_info['customer_address'] ?? '', 0, 1, 'L');
-	$pdf->SetX($pdf->GetX() + $leftColumnWidth);
-	$pdf->Cell($rightColumnWidth / 2, 10, '전화 : ' . ($basic_info['customer_phone'] ?? ''), 0, 0);
-	$pdf->Cell($rightColumnWidth / 2, 10, '팩스 : ' . ($basic_info['customer_fax'] ?? ''), 0, 1);
-	
-	// 5. 수권사항
-	$pdf->Cell($leftColumnWidth, 20, '수권사항', 1, 0, 'C');
-	$pdf->MultiCell($rightColumnWidth, 20, '(「채무자 회생 및 파산에 관한 법률」에 따른 파산 및 면책신청의 대리. 다만, 각종 기일에서의 진술의 대리는 제외한다.)', 1, 'L');
-	
-	// 6. 날짜
-	$pdf->Cell($leftColumnWidth, 10, '날짜', 1, 0, 'C');
-	$pdf->Cell($rightColumnWidth, 10, date('Y년 m월 d일'), 1, 1, 'L');
-	
-	// 7. 위임인 정보
-	$pdf->Cell($leftColumnWidth, 10, '위임인', 1, 0, 'C');
-	$pdf->Cell($rightColumnWidth, 10, ($basic_info['name'] ?? '') . ' (' . ($basic_info['resident_number'] ?? '') . ')', 1, 1, 'L');
-	
-	// 8. 위임인 주소
-	$pdf->Cell($leftColumnWidth, 10, '주소', 1, 0, 'C');
-	$pdf->Cell($rightColumnWidth, 10, $basic_info['registered_address'] ?? '', 1, 1, 'L');
-
-	$pdf->SetFont('cid0kr', 'B', 14);
-	$pdf->Cell(0, 10, $basic_info['court_name'] . ' 귀중', 0, 1, 'C');
-}
 ?>
