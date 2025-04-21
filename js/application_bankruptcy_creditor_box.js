@@ -56,21 +56,21 @@ window.creditorBoxTemplate = `<div class="creditor-box" data-count="{count}">
                 <div class="form">
                     <div class="form-title"><span>차용 또는 구입일자</span></div>
                     <div class="form-content">
-                        <input type="date" id="calculationDate_b{count}" name="calculationDate_b{count}" class="form-control" onchange="updateCalculations({count})">
+                        <input type="date" id="calculationDate_b{count}" name="calculationDate_b{count}" class="form-control">
                     </div>
                 </div>
 
                 <div class="form">
                     <div class="form-title form-notitle"><span>발생원인</span></div>
                     <div class="form-content form-nocontent">
-						<select class="form-select" id="separateBond_b{count}" name="separateBond_b{count}">
-							<option value="금원차용" selected>금원차용</option>
-							<option value="물품구입">물품구입</option>
-							<option value="보증(피보증인 기재)">보증(피보증인 기재)</option>
-							<option value="기타">기타</option>
-						</select>
-						&nbsp;&nbsp;&nbsp;&nbsp;
-						<input type="text" id="reasonDetail_b{count}" name="reasonDetail_b{count}" class="form-control number-input" placeholder="예 : 신용대출채무 / 담보대출채무">
+                        <select class="form-select" id="separateBond_b{count}" name="separateBond_b{count}">
+                            <option value="금원차용" selected>금원차용</option>
+                            <option value="물품구입">물품구입</option>
+                            <option value="보증(피보증인 기재)">보증(피보증인 기재)</option>
+                            <option value="기타">기타</option>
+                        </select>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <input type="text" id="reasonDetail_b{count}" name="reasonDetail_b{count}" class="form-control number-input" placeholder="예 : 신용대출채무 / 담보대출채무">
                     </div>
                 </div>
             </div>
@@ -79,7 +79,7 @@ window.creditorBoxTemplate = `<div class="creditor-box" data-count="{count}">
                 <div class="form">
                     <div class="form-title"><span>사용처</span></div>
                     <div class="form-content">
-                        <input type="text" id="claimReason_b{count}" name="claimReason_b{count}" class="form-control form-content-long" placeholder="예 : 2020.11.20자 발급된 신용카드 사용금액 / 2021.11.20자 담보대출 / 2023.11.20자 신용대출">
+                        <input type="text" id="usageDetail_b{count}" name="usageDetail_b{count}" class="form-control form-content-long" placeholder="예 : 2020.11.20자 발급된 신용카드 사용금액 / 2021.11.20자 담보대출 / 2023.11.20자 신용대출">
                     </div>
                 </div>
 
@@ -90,16 +90,16 @@ window.creditorBoxTemplate = `<div class="creditor-box" data-count="{count}">
                         <span>원</span>
                     </div>
                 </div>
-				
-				<div class="form">
+                
+                <div class="form">
                     <div class="form-title"><span>잔존원금</span></div>
                     <div class="form-content form-row">
                         <input type="text" id="remainingPrincipal_b{count}" name="remainingPrincipal_b{count}" class="form-control number-input">
                         <span>원</span>
                     </div>
                 </div>
-				
-				<div class="form">
+                
+                <div class="form">
                     <div class="form-title"><span>잔존이자ㆍ<br>지연손해금</span></div>
                     <div class="form-content form-row">
                         <input type="text" id="remainingInterest_b{count}" name="remainingInterest_b{count}" class="form-control number-input">
@@ -110,11 +110,11 @@ window.creditorBoxTemplate = `<div class="creditor-box" data-count="{count}">
                 <div class="form">
                     <div class="form-title"><span>선택사항</span></div>
                     <div class="form-content">
-						<button type="button" class="form-row" id="guarantorManage_b{count}">보증인 관리</button>&nbsp;&nbsp;보증인&nbsp;&nbsp;:&nbsp;&nbsp;<span id="guarantorCount_b{count}">0</span>&nbsp;개
+                        <button type="button" class="form-row" id="guarantorManage_b{count}">보증인 관리</button>&nbsp;&nbsp;보증인&nbsp;&nbsp;:&nbsp;&nbsp;<span id="guarantorCount_b{count}">0</span>&nbsp;개
                     </div>
                 </div>
-				
-				<div class="form">
+                
+                <div class="form">
                     <div class="form-title form-notitle"><span></span></div>
                     <div class="form-content form-nocontent">
                     </div>
@@ -124,7 +124,7 @@ window.creditorBoxTemplate = `<div class="creditor-box" data-count="{count}">
                     <div class="form-title"><span></span></div>
                     <div class="form-content btn-right">
                         <button type="button" id="deleteCreditor_b{count}">삭제</button>
-						<button type="button" id="saveCreditor_b{count}">저장</button>
+                        <button type="button" id="saveCreditor_b{count}">저장</button>
                     </div>
                 </div>
 

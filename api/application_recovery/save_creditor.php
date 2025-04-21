@@ -25,9 +25,9 @@ try {
     $pdo->beginTransaction();
     
     // 금액 데이터 전처리
-    $principal = !empty($_POST['principal']) ? str_replace(',', '', $_POST['principal']) : '0';
-    $interest = !empty($_POST['interest']) ? str_replace(',', '', $_POST['interest']) : '0';
-    $default_rate = !empty($_POST['default_rate']) ? $_POST['default_rate'] : '0';
+    $principal = !empty($_POST['principal']) ? str_replace(',', '', $_POST['principal']) : 0;
+    $interest = !empty($_POST['interest']) ? str_replace(',', '', $_POST['interest']) : 0;
+    $default_rate = !empty($_POST['default_rate']) ? $_POST['default_rate'] : 0;
 
     // 숫자 유효성 검사
     if (!is_numeric($principal) || !is_numeric($interest) || !is_numeric($default_rate)) {

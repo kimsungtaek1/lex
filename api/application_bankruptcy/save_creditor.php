@@ -25,9 +25,9 @@ try {
 	$pdo->beginTransaction();
 	
 	// 금액 데이터 전처리
-	$initial_claim = !empty($_POST['initial_claim']) ? str_replace(',', '', $_POST['initial_claim']) : '0';
-	$remaining_principal = !empty($_POST['remaining_principal']) ? str_replace(',', '', $_POST['remaining_principal']) : '0';
-	$remaining_interest = !empty($_POST['remaining_interest']) ? str_replace(',', '', $_POST['remaining_interest']) : '0';
+	$initial_claim = !empty($_POST['initial_claim']) ? str_replace(',', '', $_POST['initial_claim']) : 0;
+	$remaining_principal = !empty($_POST['remaining_principal']) ? str_replace(',', '', $_POST['remaining_principal']) : 0;
+	$remaining_interest = !empty($_POST['remaining_interest']) ? str_replace(',', '', $_POST['remaining_interest']) : 0;
 
 	// 숫자 유효성 검사
 	if (!is_numeric($initial_claim) || !is_numeric($remaining_principal) || !is_numeric($remaining_interest)) {
@@ -56,6 +56,7 @@ try {
 				fax = ?,
 				borrowing_date = ?,
 				separate_bond = ?,
+				reason_detail = ?,
 				usage_detail = ?,
 				initial_claim = ?,
 				remaining_principal = ?,
@@ -63,7 +64,6 @@ try {
 				updated_at = CURRENT_TIMESTAMP
 			WHERE case_no = ? AND creditor_count = ?
 		";
-		
 		$params = [
 			$_POST['financial_institution'] ?? '',
 			$_POST['address'] ?? '',
@@ -71,6 +71,7 @@ try {
 			$_POST['fax'] ?? '',
 			$borrowing_date,
 			$_POST['separate_bond'] ?? '금원차용',
+			$_POST['reason_detail'] ?? '',
 			$_POST['usage_detail'] ?? '',
 			$initial_claim,
 			$remaining_principal,
@@ -78,7 +79,6 @@ try {
 			$case_no,
 			$creditor_count
 		];
-		
 	} else {
 		// 신규 등록 쿼리
 		$sql = "
@@ -91,6 +91,7 @@ try {
 				fax,
 				borrowing_date,
 				separate_bond,
+				reason_detail,
 				usage_detail,
 				initial_claim,
 				remaining_principal,
@@ -98,11 +99,9 @@ try {
 				created_at,
 				updated_at
 			) VALUES (
-				?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-				?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+				?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 			)
 		";
-		
 		$params = [
 			$case_no,
 			$creditor_count,
@@ -112,6 +111,7 @@ try {
 			$_POST['fax'] ?? '',
 			$borrowing_date,
 			$_POST['separate_bond'] ?? '금원차용',
+			$_POST['reason_detail'] ?? '',
 			$_POST['usage_detail'] ?? '',
 			$initial_claim,
 			$remaining_principal,

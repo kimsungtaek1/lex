@@ -1,6 +1,30 @@
+// 전화번호 포맷팅 함수
+function formatPhoneNumber(value) {
+    if (!value) return '';
+    
+    value = value.replace(/[^\d]/g, '');
+    
+    if (value.length <= 3) {
+        return value;
+    } else if (value.length <= 7) {
+        return value.slice(0, 3) + '-' + value.slice(3);
+    } else {
+        return value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7, 11);
+    }
+}
+
 $(document).ready(function() {
 	let selectedGuarantorNo = null;
 	
+	// 메시지 리스너는 최초 1회만 등록 (팝업에서 postMessage 받을 때 항상 동작)
+	window.removeEventListener('message', window._financialInstitutionListener);
+	window._financialInstitutionListener = function(event) {
+		if (event.data.type === 'financialInstitutionSelectedForGuarantor') {
+			fillFinancialInstitution(event.data.institution, currentCreditorCount);
+		}
+	};
+	window.addEventListener('message', window._financialInstitutionListener);
+
 	// 초기화
 	loadGuarantors();
 	
@@ -70,30 +94,15 @@ $(document).ready(function() {
     $(document).on('click', '.btn-financial-institution', function(e) {
         e.preventDefault();
         const count = $(this).data('count');
-        
         const width = 1200;
         const height = 750;
         const left = (screen.width - width) / 2;
         const top = (screen.height - height) / 2;
-
-        const searchWindow = window.open(
-            'search_financial_institution.php',
+        window.open(
+            `search_financial_institution.php?source=guarantor&count=${count}`,
             'SearchFinancialInstitution',
             `width=${width},height=${height},left=${left},top=${top},scrollbars=yes`
         );
-
-        if (searchWindow === null) {
-            alert('팝업이 차단되어 있습니다. 팝업 차단을 해제해주세요.');
-            return;
-        }
-
-        // 금융기관 선택 이벤트 리스너
-        window.addEventListener('message', function(event) {
-            if (event.data.type === 'financialInstitutionSelected') {
-                fillFinancialInstitution(event.data.institution, count);
-                searchWindow.close();
-            }
-        });
     });
 	
 	// 보증인 목록 로드
@@ -312,9 +321,10 @@ $(document).ready(function() {
 	
 	// 금융기관 정보 채우기
     function fillFinancialInstitution(institution, count) {
-        $(`#financialInstitution${count}`).val(institution.name);
-        $(`#address${count}`).val(institution.address);
-        $(`#phone${count}`).val(formatPhoneNumber(institution.phone));
-        $(`#fax${count}`).val(institution.fax);
+		console.log(institution,count);
+        $(`#guarantor_name${count}`).val(institution.name);
+        $(`#guarantor_address${count}`).val(institution.address);
+        $(`#guarantor_phone${count}`).val(formatPhoneNumber(institution.phone));
+        $(`#guarantor_fax${count}`).val(institution.fax);
     }
 });

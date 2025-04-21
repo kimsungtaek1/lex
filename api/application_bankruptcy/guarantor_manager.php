@@ -54,7 +54,7 @@ $creditor_count = (int)$_GET['creditor_count'];
 			<div class="form">
 				<div class="form-title"><span>채권자명</span></div>
 				<div class="form-content">
-					<input type="text" id="" class="form-control form-control-long" >
+					<input type="text" id="guarantor_name<?= $creditor_count ?>" class="form-control form-control-long" >
 					<button type="button" class="btn-long btn-financial-institution">금융기관검색</button>
 				</div>
 			</div>
@@ -62,21 +62,21 @@ $creditor_count = (int)$_GET['creditor_count'];
 			<div class="form">
 				<div class="form-title"><span>연락처</span></div>
 				<div class="form-content form-row">
-					<input type="text" id="" class="form-control">
+					<input type="text" id="guarantor_phone<?= $creditor_count ?>" class="form-control">
 				</div>
 			</div>
 			
 			<div class="form">
 				<div class="form-title"><span>팩스</span></div>
 				<div class="form-content form-row">
-					<input type="text" id="" class="form-control">
+					<input type="text" id="guarantor_fax<?= $creditor_count ?>" class="form-control">
 				</div>
 			</div>
 
 			<div class="form">
 				<div class="form-title"><span>주소</span></div>
 				<div class="form-content">
-					<input type="text" id="guarantor_address" class="form-control form-control-long" >
+					<input type="text" id="guarantor_address<?= $creditor_count ?>" class="form-control form-control-long" >
 					<button type="button" class="btn-long" id="addressSearchBtn">주소찾기</button>
 				</div>
 			</div>

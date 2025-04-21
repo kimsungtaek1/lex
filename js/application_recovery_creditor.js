@@ -148,7 +148,7 @@ $(document).ready(function() {
         $(`#financialInstitution${count}`).val(data.financial_institution);
         $(`#address${count}`).val(data.address);
         $(`#phone${count}`).val(formatPhoneNumber(data.phone));
-        $(`#fax${count}`).val(data.fax);
+        $(`#fax${count}`).val(formatFaxNumber(data.fax));
         $(`#principal${count}`).val(numberWithCommas(data.principal));
         $(`#principalCalculation${count}`).val(data.principal_calculation);
         $(`#interest${count}`).val(numberWithCommas(data.interest));
@@ -514,7 +514,7 @@ $(document).ready(function() {
         $(`#financialInstitution${count}`).val(institution.name);
         $(`#address${count}`).val(institution.address);
         $(`#phone${count}`).val(formatPhoneNumber(institution.phone));
-        $(`#fax${count}`).val(institution.fax);
+        $(`#fax${count}`).val(formatFaxNumber(institution.fax));
     }
     
 	// 채권 관련 창 열기 통합 함수

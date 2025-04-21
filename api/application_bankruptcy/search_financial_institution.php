@@ -124,6 +124,34 @@ if(isset($_GET['ajax_search'])) {
     $(document).ready(function() {
         let currentPage = 1;
         
+        // URL 파라미터 추출 함수
+        function getUrlParam(name) {
+            const url = new URL(window.location.href);
+            return url.searchParams.get(name);
+        }
+        const source = getUrlParam('source');
+        const count = getUrlParam('count');
+
+        // 금융기관 선택 시 호출 (institution 객체는 실제 선택된 데이터)
+        function selectInstitution(institution) {
+            if (window.opener) {
+                if (source === 'creditor') {
+                    window.opener.postMessage({
+                        type: 'financialInstitutionSelectedForCreditor',
+                        institution: institution,
+                        count: count
+                    }, '*');
+                } else if (source === 'guarantor') {
+                    window.opener.postMessage({
+                        type: 'financialInstitutionSelectedForGuarantor',
+                        institution: institution,
+                        count: count
+                    }, '*');
+                }
+                window.close();
+            }
+        }
+
         // 검색 함수
         function searchInstitutions(page = 1) {
             const searchTerm = $('#searchInput').val();
@@ -167,7 +195,7 @@ if(isset($_GET['ajax_search'])) {
                     '<td>' + (item.postal_code || '') + '</td>' +
                     '<td>' + (item.phone || '') + '</td>' +
                     '<td>' + (item.fax || '') + '</td>' +
-                    '<td><button type="button" class="btn" onclick="openRequestModal(\'' + 
+                    '<td><button type="button" class="btn" onclick="selectInstitution(\'' + 
                         encodeURIComponent(JSON.stringify(item)) + '\')">수정요청</button></td>' +
                     '</tr>';
             });
@@ -192,13 +220,7 @@ if(isset($_GET['ajax_search'])) {
             $('.clickable-row').click(function(e) {
                 if(!$(e.target).is('button')) {
                     const institution = $(this).data('institution');
-                    if(window.opener && !window.opener.closed) {
-                        window.opener.postMessage({
-                            type: 'financialInstitutionSelected',
-                            institution: institution
-                        }, '*');
-                        window.close();
-                    }
+                    selectInstitution(institution);
                 }
             });
         }
