@@ -47,7 +47,7 @@ $creditor_count = (int)$_GET['creditor_count'];
 			<div class="form">
 				<div class="form-title"><span>채권번호</span></div>
 				<div class="form-content">
-					<input type="text" id="" class="form-control" >
+					<input type="text" id="guarantor_no<?= $creditor_count ?>" class="form-control" readonly>
 				</div>
 			</div>
 
