@@ -84,14 +84,14 @@ $creditor_count = (int)$_GET['creditor_count'];
 			<div class="form">
 				<div class="form-title"><span>차용 또는 구입일자</span></div>
 				<div class="form-content">
-					<input type="date" id="" class="form-control" >
+					<input type="date" id="guarantee_date<?= $creditor_count ?>" class="form-control" >
 				</div>
 			</div>
 			
 			<div class="form">
 				<div class="form-title"><span>발생원인/피보증인</span></div>
 				<div class="form-content">
-					<select class="form-select" id="">
+					<select class="form-select" id="dispute_reason<?= $creditor_count ?>">
 						<option value="금원차용" selected>금원차용</option>
 						<option value="물품구입">물품구입</option>
 						<option value="보증(피보증인 기재)">보증(피보증인 기재)</option>
@@ -99,21 +99,21 @@ $creditor_count = (int)$_GET['creditor_count'];
 						<option value="기타">기타</option>
 					</select>
 					&nbsp;&nbsp;&nbsp;&nbsp;
-					<input type="text" id="" class="form-control" >
+					<input type="text" id="dispute_reason_content<?= $creditor_count ?>" class="form-control" >
 				</div>
 			</div>
 			
 			<div class="form">
 				<div class="form-title"><span>잔존원금<br>(대위변제금액)</span></div>
 				<div class="form-content">
-					<input type="text" id="" class="form-control" >원
+					<input type="text" id="guarantee_amount<?= $creditor_count ?>" class="form-control" >원
 				</div>
 			</div>
 			
 			<div class="form">
-				<div class="form-title"><span>잔존원금<br>(대위변제금액)</span></div>
+				<div class="form-title"><span>잔존이자ㆍ<br>지연손해금</span></div>
 				<div class="form-content">
-					<input type="text" id="" class="form-control" >원
+					<input type="text" id="difference_interest<?= $creditor_count ?>" class="form-control" >원
 				</div>
 			</div>
 			

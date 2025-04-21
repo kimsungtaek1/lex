@@ -74,9 +74,9 @@ label:has(+ input[type="checkbox"]:disabled:checked):before,label:has(+ input[ty
 label:has(+ input[type="checkbox"]:disabled:checked):after,label:has(+ input[type="radio"]:disabled:checked):after,input[type="checkbox"]:disabled:checked+label:after,input[type="radio"]:disabled:checked+label:after{border-color:#999}
 
 .guarantor-table .col:nth-child(1) { flex: 0.7;}
-.guarantor-table .col:nth-child(2) { flex: 1.0;}
-.guarantor-table .col:nth-child(3) { flex: 1.5; text-align: left;}
-.guarantor-table .col:nth-child(4) { flex: 3.0; text-align: left;}
+.guarantor-table .col:nth-child(2) { flex: 1.5;}
+.guarantor-table .col:nth-child(3) { flex: 3.0; text-align: left;}
+.guarantor-table .col:nth-child(4) { flex: 0.9; text-align: left;}
 .guarantor-table .col:nth-child(5) { flex: 0.8;}
 
 .property_select .col:nth-child(1) { flex: 0.7;}
@@ -86,10 +86,6 @@ label:has(+ input[type="checkbox"]:disabled:checked):after,label:has(+ input[typ
 
 .no-data {background: #f7f7f7;padding: 2vw;color: #666;}
 
-
-
 .btn-search{margin-left:10px !important;min-width:7vw !important;}
 
 .radio-wrap {display: inline-block;margin-right: 20px;}
-
-
