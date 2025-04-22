@@ -308,12 +308,14 @@ $(document).ready(function() {
 			guarantor_fax: $('#guarantor_fax' + currentCreditorCount).val(),
 			guarantee_date: $('#guarantee_date' + currentCreditorCount).val()
 		};
+		console.log(formData);
 		$.ajax({
 			url: '../../api/application_bankruptcy/guarantor_api.php',
 			type: 'POST',
 			data: formData,
 			success: function(response) {
 				if (response.success) {
+					console.log(response.param);
 					alert('보증인 정보가 저장되었습니다.');
 					loadGuarantors();
 					clearForm();

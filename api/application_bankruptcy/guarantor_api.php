@@ -179,15 +179,15 @@ function saveGuarantor() {
         $guarantor_no_raw = $_POST['guarantor_no'] ?? null;
         $guarantor_no = $guarantor_no_raw ? parse_guarantor_no($guarantor_no_raw) : null;
         $exists = false;
-        if ($guarantor_no) {
-            $checkStmt = $pdo->prepare("SELECT COUNT(*) FROM application_bankruptcy_creditor_guaranteed_debts WHERE guarantor_no = ?");
-            $checkStmt->execute([$guarantor_no]);
+        if ($guarantor_no && $case_no && $creditor_count) {
+            $checkStmt = $pdo->prepare("SELECT COUNT(*) FROM application_bankruptcy_creditor_guaranteed_debts WHERE guarantor_no = ? AND case_no = ? AND creditor_count = ?");
+            $checkStmt->execute([$guarantor_no, $case_no, $creditor_count]);
             $exists = $checkStmt->fetchColumn() > 0;
         }
 
         if ($exists) {
             // UPDATE
-            $sql = "\n\t\t\tUPDATE application_bankruptcy_creditor_guaranteed_debts SET\n\t\t\t\tguarantor_name = ?,\n\t\t\t\tguarantor_address = ?,\n\t\t\t\tguarantor_phone = ?,\n\t\t\t\tguarantor_fax = ?,\n\t\t\t\tguarantee_amount = ?,\n\t\t\t\tguarantee_date = ?,\n\t\t\t\tdifference_interest = ?,\n\t\t\t\tdispute_reason = ?,\n\t\t\t\tdispute_reason_content = ?,\n\t\t\t\tupdated_at = CURRENT_TIMESTAMP\n\t\t\tWHERE guarantor_no = ?\n\t\t\t";
+            $sql = "UPDATE application_bankruptcy_creditor_guaranteed_debts SET guarantor_name = ?, guarantor_address = ?, guarantor_phone = ?, guarantor_fax = ?, guarantee_amount = ?, guarantee_date = ?, difference_interest = ?, dispute_reason = ?, dispute_reason_content = ?, updated_at = CURRENT_TIMESTAMP WHERE guarantor_no = ? ";
             $params = [
                 $guarantor_name,
                 $_POST['guarantor_address'] ?? '',
@@ -202,7 +202,7 @@ function saveGuarantor() {
             ];
         } else {
             // INSERT
-            $sql = "\n\t\t\tINSERT INTO application_bankruptcy_creditor_guaranteed_debts (\n\t\t\t\tguarantor_no,\n\t\t\t\tcase_no,\n\t\t\t\tcreditor_count,\n\t\t\t\tguarantor_name,\n\t\t\t\tguarantor_address,\n\t\t\t\tguarantor_phone,\n\t\t\t\tguarantor_fax,\n\t\t\t\tguarantee_amount,\n\t\t\t\tguarantee_date,\n\t\t\t\tdifference_interest,\n\t\t\t\tdispute_reason,\n\t\t\t\tdispute_reason_content,\n\t\t\t\tcreated_at,\n\t\t\t\tupdated_at\n\t\t\t) VALUES (\n\t\t\t\t?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, \n\t\t\t\tCURRENT_TIMESTAMP, CURRENT_TIMESTAMP\n\t\t\t)\n\t\t\t";
+            $sql = " INSERT INTO application_bankruptcy_creditor_guaranteed_debts ( guarantor_no, case_no, creditor_count, guarantor_name, guarantor_address, guarantor_phone, guarantor_fax, guarantee_amount, guarantee_date, difference_interest, dispute_reason, dispute_reason_content, created_at, updated_at ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,  CURRENT_TIMESTAMP, CURRENT_TIMESTAMP ) ";
             $params = [
                 $guarantor_no, // POST로 받은 보증인 번호
                 $case_no,
@@ -226,7 +226,8 @@ function saveGuarantor() {
             $pdo->commit();
             echo json_encode([
                 'success' => true,
-                'message' => '보증인 정보가 저장되었습니다.',
+				'message' => '보증인 정보가 저장되었습니다.',
+				'param' => $params,
                 'guarantor_no' => $guarantor_no ? $guarantor_no : $pdo->lastInsertId()
             ]);
         } else {
@@ -258,7 +259,7 @@ function deleteGuarantor() {
 		$pdo->beginTransaction();
 		
 		// 보증인 삭제
-		$stmt = $pdo->prepare("\n\t\t\tDELETE FROM application_bankruptcy_creditor_guaranteed_debts \n\t\t\tWHERE guarantor_no = ?\n\t\t\t");
+		$stmt = $pdo->prepare(" DELETE FROM application_bankruptcy_creditor_guaranteed_debts  WHERE guarantor_no = ? ");
 		$stmt->execute([$guarantor_no]);
 
 		if ($stmt->rowCount() > 0) {

@@ -106,11 +106,10 @@ window.creditorBoxTemplate = `<div class="creditor-box" data-count="{count}">
                         <span>원</span>
                     </div>
                 </div>
-
                 <div class="form">
                     <div class="form-title"><span>선택사항</span></div>
                     <div class="form-content">
-                        <button type="button" class="form-row" id="guarantorManage_b{count}">보증인 관리</button>&nbsp;&nbsp;보증인&nbsp;&nbsp;:&nbsp;&nbsp;<span id="guarantorCount_b{count}">0</span>&nbsp;개
+                        <button type="button" class="form-row" id="guarantorManage_b{count}">보증인 관리</button>&nbsp;&nbsp;보증인&nbsp;&nbsp;:&nbsp;&nbsp;<span id="guarantorCount_b{count}" style="flex:0;">0</span>&nbsp;개
                     </div>
                 </div>
                 
