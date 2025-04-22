@@ -96,7 +96,7 @@ foreach ($print_items as $item) {
 		case '생활상황 열람':
 			// 외부 파일 포함
 			require_once 'generate_pdf_living_status.php';
-			generatePdfIncome($pdf, $pdo, $case_no);
+			generatePdfLivingStatus($pdf, $pdo, $case_no);
 			break;
 		case '수입지출목록 열람':
 			// 외부 파일 포함

@@ -264,7 +264,7 @@ $(document).ready(function() {
     function getCreditorData(count) {
         return {
             address: $(`#address_b${count}`).val() || '',
-            borrowing_date: $(`#borrowingDate_b${count}`).val() || '',
+            borrowing_date: $(`#calculationDate_b${count}`).val() || '',
             claim_reason: $(`#claimReason_b${count}`).val() || '',
             fax: $(`#fax_b${count}`).val() || '',
             financial_institution: $(`#financialInstitution_b${count}`).val() || '',
