@@ -83,41 +83,156 @@ function generateCreditorList($pdf, $pdo, $basic_info, $creditors) {
 	// 페이지 너비에서 좌우 여백을 뺀 값
 	$tableWidth = $pdf->GetPageWidth() - 30; // 좌우 여백 각 15mm
 	
-	// 컬럼 너비 비율 조정 (총합 100%)
+	// 컬럼 너비 비율 조정 (총합 100%) - 8개 컬럼으로 수정
 	$colWidths = [
-		'번호' => $tableWidth * 0.08,  // 8%
-		'채권자명' => $tableWidth * 0.17, // 17%
-		'차용일' => $tableWidth * 0.12,  // 12%
-		'발생원인' => $tableWidth * 0.15, // 15%
-		'채권액' => $tableWidth * 0.15,  // 15%
-		'사용처' => $tableWidth * 0.23,  // 23%
-		'보증인' => $tableWidth * 0.10   // 10%
+		'순번' => $tableWidth * 0.07,      // 7%
+		'채권자명' => $tableWidth * 0.08,  // 8% (수정됨)
+		'차용일' => $tableWidth * 0.11,    // 11%
+		'발생원인' => $tableWidth * 0.08,  // 8%
+		'최초채권액' => $tableWidth * 0.12,// 12%
+		'사용처' => $tableWidth * 0.14,    // 14% (수정됨)
+		'보증인' => $tableWidth * 0.10,    // 10% (수정됨)
+		'잔존채권액' => $tableWidth * 0.30  // 30% (확대됨)
+	];
+	
+	// 잔존 채권액 하위 컬럼 너비
+	$remainingColWidths = [
+		'잔존원금' => $colWidths['잔존채권액'] * 0.5,     // 50%
+		'잔존이자' => $colWidths['잔존채권액'] * 0.5      // 50%
 	];
 
-	// 채권자 목록 테이블 헤더 (첫 번째 줄)
-	$pdf->SetFont('cid0kr', 'B', 9);
-	$pdf->SetFillColor(240, 240, 240); // 헤더 배경색
+	// 테이블 헤더 - 모든 헤더를 멀티셀로 처리
+	$pdf->SetFont('cid0kr', 'B', 8); // 폰트 크기 8로 변경
+
+	// 헤더 행 높이 설정
+	$headerRowHeight = 16; // 전체 헤더 행 높이
+	$subRowHeight = 8;    // 서브 헤더 행 높이
 	
-	$pdf->Cell($colWidths['번호'], 7, '번호', 1, 0, 'C', true);
-	$pdf->Cell($colWidths['채권자명'], 7, '채권자명', 1, 0, 'C', true);
-	$pdf->Cell($colWidths['차용일'], 7, '차용/구입일자', 1, 0, 'C', true);
-	$pdf->Cell($colWidths['발생원인'], 7, '발생원인', 1, 0, 'C', true);
-	$pdf->Cell($colWidths['채권액'], 7, '최초 채권액', 1, 0, 'C', true);
-	$pdf->Cell($colWidths['사용처'], 7, '사용처', 1, 0, 'C', true);
-	$pdf->Cell($colWidths['보증인'], 7, '보증인', 1, 1, 'C', true);
+	// 첫 번째 행 시작 위치 저장
+	$startX = $pdf->GetX();
+	$startY = $pdf->GetY();
 	
-	// 두 번째 줄 헤더
-	$pdf->SetFont('cid0kr', 'B', 9);
-	$pdf->Cell($colWidths['번호'], 7, '', 'LRB', 0, 'C');
-	$pdf->Cell($colWidths['채권자명'], 7, '', 'LRB', 0, 'C');
-	$pdf->Cell($colWidths['차용일'], 7, '', 'LRB', 0, 'C');
-	$pdf->Cell($colWidths['발생원인'], 7, '잔존 채권액', 1, 0, 'C', true);
-	$pdf->Cell($colWidths['채권액'], 7, '잔존 원금', 1, 0, 'C', true);
-	$pdf->Cell($colWidths['사용처'], 7, '잔존 이자·지연손해금', 1, 0, 'C', true);
-	$pdf->Cell($colWidths['보증인'], 7, '', 'LRB', 1, 'C');
+	// 헤더 텍스트 및 위치 설정
+	$headerTexts = [
+		'순번' => "순번",
+		'채권자명' => "채권자명",
+		'차용일' => "차용 또는\n구입일자",
+		'발생원인' => "발생원인",
+		'최초채권액' => "최초 채권액",
+		'사용처' => "사용처", 
+		'보증인' => "보증인"
+	];
+	
+	// TCPDF에서는 FontSize에 직접 접근할 수 없으므로 상수 값 사용
+	$lineHeight = 4; // 폰트 크기 8에 대한 적절한 라인 높이
+	
+	// 각 컬럼 출력
+	$currentX = $startX;
+	foreach ($headerTexts as $key => $text) {
+		// 텍스트 줄 수 계산
+		$lines = $pdf->GetNumLines($text, $colWidths[$key]);
+		
+		// 텍스트 전체 높이
+		$textHeight = $lines * $lineHeight;
+		
+		// 세로 정렬을 위한 Y 오프셋 계산 (중앙 정렬)
+		$yOffset = ($headerRowHeight - $textHeight) / 2;
+		
+		// 셀 테두리 그리기
+		$pdf->Rect($currentX, $startY, $colWidths[$key], $headerRowHeight);
+		
+		// 텍스트 출력 위치 설정 (세로 중앙)
+		$pdf->SetXY($currentX, $startY + $yOffset);
+		
+		// 텍스트 출력 (테두리 없이)
+		$pdf->MultiCell($colWidths[$key], $lineHeight, $text, 0, 'C');
+		
+		// 다음 셀 X 위치로 이동
+		$currentX += $colWidths[$key];
+		$pdf->SetXY($currentX, $startY);
+	}
+	
+	// 잔존 채권액 메인 헤더 (첫 번째 행)
+	$pdf->Rect($currentX, $startY, $colWidths['잔존채권액'], $subRowHeight);
+	
+	// 잔존 채권액 텍스트 세로 중앙 정렬
+	$mainHeaderText = "잔존 채권액";
+	$mainLines = $pdf->GetNumLines($mainHeaderText, $colWidths['잔존채권액']);
+	$mainTextHeight = $mainLines * $lineHeight;
+	$mainYOffset = ($subRowHeight - $mainTextHeight) / 2;
+	
+	$pdf->SetXY($currentX, $startY + $mainYOffset);
+	$pdf->MultiCell($colWidths['잔존채권액'], $lineHeight, $mainHeaderText, 0, 'C');
+	
+	// 잔존 채권액 하위 헤더 위치 설정
+	$subHeaderY = $startY + $subRowHeight;
+	
+	// 잔존 원금 하위 헤더
+	$pdf->Rect($currentX, $subHeaderY, $remainingColWidths['잔존원금'], $subRowHeight);
+	$subText1 = "잔존 원금";
+	$subLines1 = $pdf->GetNumLines($subText1, $remainingColWidths['잔존원금']);
+	$subTextHeight1 = $subLines1 * $lineHeight;
+	$subYOffset1 = ($subRowHeight - $subTextHeight1) / 2;
+	
+	$pdf->SetXY($currentX, $subHeaderY + $subYOffset1);
+	$pdf->MultiCell($remainingColWidths['잔존원금'], $lineHeight, $subText1, 0, 'C');
+	
+	// 잔존 이자 하위 헤더
+	$pdf->Rect($currentX + $remainingColWidths['잔존원금'], $subHeaderY, $remainingColWidths['잔존이자'], $subRowHeight);
+	$subText2 = "잔존 이자\n지연손해금";
+	$subLines2 = $pdf->GetNumLines($subText2, $remainingColWidths['잔존이자']);
+	$subTextHeight2 = $subLines2 * $lineHeight;
+	$subYOffset2 = ($subRowHeight - $subTextHeight2) / 2;
+	
+	$pdf->SetXY($currentX + $remainingColWidths['잔존원금'], $subHeaderY + $subYOffset2);
+	$pdf->MultiCell($remainingColWidths['잔존이자'], $lineHeight, $subText2, 0, 'C');
+	
+	// 다음 행의 시작 위치 설정 (헤더 아래)
+	$pdf->SetXY($startX, $startY + $headerRowHeight);
+	
+	// 잔존 채권액 메인 헤더 (첫 번째 행)
+	$pdf->Rect($currentX, $startY, $colWidths['잔존채권액'], $subRowHeight);
+	
+	// 잔존 채권액 텍스트 세로 중앙 정렬
+	$mainHeaderText = "잔존 채권액";
+	$mainLines = $pdf->GetNumLines($mainHeaderText, $colWidths['잔존채권액']);
+	$mainTextHeight = $mainLines * $lineHeight;
+	$mainYOffset = ($subRowHeight - $mainTextHeight) / 2;
+	
+	$pdf->SetXY($currentX, $startY + $mainYOffset);
+	$pdf->MultiCell($colWidths['잔존채권액'], $lineHeight, $mainHeaderText, 0, 'C');
+	
+	// 잔존 채권액 하위 헤더 위치 설정
+	$subHeaderY = $startY + $subRowHeight;
+	
+	// 잔존 원금 하위 헤더
+	$pdf->Rect($currentX, $subHeaderY, $remainingColWidths['잔존원금'], $subRowHeight);
+	$subText1 = "잔존 원금";
+	$subLines1 = $pdf->GetNumLines($subText1, $remainingColWidths['잔존원금']);
+	$subTextHeight1 = $subLines1 * $lineHeight;
+	$subYOffset1 = ($subRowHeight - $subTextHeight1) / 2;
+	
+	$pdf->SetXY($currentX, $subHeaderY + $subYOffset1);
+	$pdf->MultiCell($remainingColWidths['잔존원금'], $lineHeight, $subText1, 0, 'C');
+	
+	// 잔존 이자 하위 헤더
+	$pdf->Rect($currentX + $remainingColWidths['잔존원금'], $subHeaderY, $remainingColWidths['잔존이자'], $subRowHeight);
+	$subText2 = "잔존 이자\n지연손해금";
+	$subLines2 = $pdf->GetNumLines($subText2, $remainingColWidths['잔존이자']);
+	$subTextHeight2 = $subLines2 * $lineHeight;
+	$subYOffset2 = ($subRowHeight - $subTextHeight2) / 2;
+	
+	$pdf->SetXY($currentX + $remainingColWidths['잔존원금'], $subHeaderY + $subYOffset2);
+	$pdf->MultiCell($remainingColWidths['잔존이자'], $lineHeight, $subText2, 0, 'C');
+	
+	// 다음 행의 시작 위치 설정 (헤더 아래)
+	$pdf->SetXY($startX, $startY + $headerRowHeight);
+	
+	// 다음 행의 시작 위치 설정 (헤더 아래)
+	$pdf->SetXY($startX, $startY + $headerRowHeight);
 
 	// 채권자 목록 데이터
-	$pdf->SetFont('cid0kr', '', 8);
+	$pdf->SetFont('cid0kr', '', 8); // 폰트 크기 8로 통일
 
 	foreach($creditors as $index => $creditor) {
 		// 해당 채권자의 보증인 목록 조회
@@ -130,136 +245,157 @@ function generateCreditorList($pdf, $pdo, $basic_info, $creditors) {
 		$stmt->execute([$basic_info['case_no'], $creditor['creditor_count']]);
 		$guarantors = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
-		// 행 높이 설정
-		$lineHeight = 7;
+		// 채권자 행의 높이 계산을 위한 텍스트 저장
+		$texts = [
+			'채권자명' => $creditor['financial_institution'] ?? '',
+			'발생원인' => $creditor['separate_bond'] ?? '',
+			'사용처' => $creditor['usage_detail'] ?? ''
+		];
 		
-		// 채권자 순번
-		$pdf->Cell($colWidths['번호'], $lineHeight, $creditor['creditor_count'], 1, 0, 'C');
+		// 보증인 이름 목록
+		$guarantorCount = count($guarantors);
+		$guarantorNames = '';
 		
-		// 채권자명 (이름이 길 경우 줄바꿈 처리)
-		$startX = $pdf->GetX();
-		$startY = $pdf->GetY();
-		
-		$financial_institution = $creditor['financial_institution'] ?? '';
-		// 문자열 길이에 따라 폰트 크기 자동 조정
-		if (mb_strlen($financial_institution, 'UTF-8') > 10) {
-			$pdf->SetFont('cid0kr', '', 7);
+		if ($guarantorCount > 0) {
+			$nameList = [];
+			foreach ($guarantors as $g) {
+				if (!empty($g['guarantor_name'])) {
+					$nameList[] = $g['guarantor_name'];
+				}
+			}
+			$guarantorNames = implode(', ', $nameList);
+			$texts['보증인'] = $guarantorNames;
+		} else {
+			$texts['보증인'] = '-';
 		}
-		$pdf->Cell($colWidths['채권자명'], $lineHeight, $financial_institution, 1, 0, 'L');
-		$pdf->SetFont('cid0kr', '', 8); // 폰트 크기 복원
+		
+		// 각 셀의 필요 높이 계산
+		$maxLines = 1;
+		$lineHeightBase = 7; // 기본 라인 높이
+		
+		foreach ($texts as $key => $text) {
+			$lines = $pdf->GetNumLines($text, $colWidths[$key]);
+			$maxLines = max($maxLines, $lines);
+		}
+		
+		// 행 높이 설정 (가장 많은 줄 수를 기준으로)
+		$rowHeight = $lineHeightBase * $maxLines;
+		
+		// 행의 시작 위치 저장
+		$rowStartX = $pdf->GetX();
+		$rowStartY = $pdf->GetY();
+		
+		// 순번
+		$pdf->MultiCell($colWidths['순번'], $rowHeight, $creditor['creditor_count'], 1, 'C');
+		$pdf->SetXY($rowStartX + $colWidths['순번'], $rowStartY);
+		
+		// 채권자명
+		$financial_institution = $texts['채권자명'];
+		$pdf->MultiCell($colWidths['채권자명'], $rowHeight, $financial_institution, 1, 'L');
+		$pdf->SetXY($rowStartX + $colWidths['순번'] + $colWidths['채권자명'], $rowStartY);
 		
 		// 차용/구입일자
 		$borrowing_date = !empty($creditor['borrowing_date']) ? date('Y-m-d', strtotime($creditor['borrowing_date'])) : '';
-		$pdf->Cell($colWidths['차용일'], $lineHeight, $borrowing_date, 1, 0, 'C');
+		$pdf->MultiCell($colWidths['차용일'], $rowHeight, $borrowing_date, 1, 'C');
+		$pdf->SetXY($rowStartX + $colWidths['순번'] + $colWidths['채권자명'] + $colWidths['차용일'], $rowStartY);
 		
 		// 발생원인
-		$separate_bond = $creditor['separate_bond'] ?? '';
-		// 문자열 길이에 따라 폰트 크기 자동 조정
-		if (mb_strlen($separate_bond, 'UTF-8') > 10) {
-			$pdf->SetFont('cid0kr', '', 7);
-		}
-		$pdf->Cell($colWidths['발생원인'], $lineHeight, $separate_bond, 1, 0, 'L');
-		$pdf->SetFont('cid0kr', '', 8); // 폰트 크기 복원
+		$separate_bond = $texts['발생원인'];
+		$pdf->MultiCell($colWidths['발생원인'], $rowHeight, $separate_bond, 1, 'L');
+		$pdf->SetXY($rowStartX + $colWidths['순번'] + $colWidths['채권자명'] + $colWidths['차용일'] + $colWidths['발생원인'], $rowStartY);
 		
 		// 최초 채권액
-		$pdf->Cell($colWidths['채권액'], $lineHeight, number_format($creditor['initial_claim'] ?? 0), 1, 0, 'R');
+		$pdf->MultiCell($colWidths['최초채권액'], $rowHeight, number_format($creditor['initial_claim'] ?? 0), 1, 'R');
+		$pdf->SetXY($rowStartX + $colWidths['순번'] + $colWidths['채권자명'] + $colWidths['차용일'] + $colWidths['발생원인'] + $colWidths['최초채권액'], $rowStartY);
 		
 		// 사용처
-		$usage_detail = $creditor['usage_detail'] ?? '';
-		// 문자열 길이에 따라 폰트 크기 자동 조정
-		if (mb_strlen($usage_detail, 'UTF-8') > 15) {
-			$pdf->SetFont('cid0kr', '', 7);
-		}
-		$pdf->Cell($colWidths['사용처'], $lineHeight, $usage_detail, 1, 0, 'L');
-		$pdf->SetFont('cid0kr', '', 8); // 폰트 크기 복원
+		$usage_detail = $texts['사용처'];
+		$pdf->MultiCell($colWidths['사용처'], $rowHeight, $usage_detail, 1, 'L');
+		$pdf->SetXY($rowStartX + $colWidths['순번'] + $colWidths['채권자명'] + $colWidths['차용일'] + $colWidths['발생원인'] + $colWidths['최초채권액'] + $colWidths['사용처'], $rowStartY);
 		
-		// 보증인 수
-		$guarantorCount = count($guarantors);
-		$pdf->Cell($colWidths['보증인'], $lineHeight, $guarantorCount > 0 ? $guarantorCount . '명' : '-', 1, 1, 'C');
-		
-		// 채권자 정보 출력 (두 번째 줄)
-		$pdf->Cell($colWidths['번호'], $lineHeight, '', 'LRB', 0, 'C'); // 빈 칸
-		$pdf->Cell($colWidths['채권자명'], $lineHeight, '', 'LRB', 0, 'C'); // 빈 칸
-		$pdf->Cell($colWidths['차용일'], $lineHeight, '', 'LRB', 0, 'C'); // 빈 칸
-		
-		// 잔존 채권액 (원금 + 이자)
-		$total_remaining = (int)($creditor['remaining_principal'] ?? 0) + (int)($creditor['remaining_interest'] ?? 0);
-		$pdf->Cell($colWidths['발생원인'], $lineHeight, number_format($total_remaining), 1, 0, 'R');
+		// 보증인
+		$pdf->MultiCell($colWidths['보증인'], $rowHeight, $texts['보증인'], 1, 'L');
+		$pdf->SetXY($rowStartX + $colWidths['순번'] + $colWidths['채권자명'] + $colWidths['차용일'] + $colWidths['발생원인'] + $colWidths['최초채권액'] + $colWidths['사용처'] + $colWidths['보증인'], $rowStartY);
 		
 		// 잔존 원금
-		$pdf->Cell($colWidths['채권액'], $lineHeight, number_format($creditor['remaining_principal'] ?? 0), 1, 0, 'R');
+		$pdf->MultiCell($remainingColWidths['잔존원금'], $rowHeight, number_format($creditor['remaining_principal'] ?? 0), 1, 'R');
+		$pdf->SetXY($rowStartX + $colWidths['순번'] + $colWidths['채권자명'] + $colWidths['차용일'] + $colWidths['발생원인'] + $colWidths['최초채권액'] + $colWidths['사용처'] + $colWidths['보증인'] + $remainingColWidths['잔존원금'], $rowStartY);
 		
 		// 잔존 이자·지연손해금
-		$pdf->Cell($colWidths['사용처'], $lineHeight, number_format($creditor['remaining_interest'] ?? 0), 1, 0, 'R');
+		$pdf->MultiCell($remainingColWidths['잔존이자'], $rowHeight, number_format($creditor['remaining_interest'] ?? 0), 1, 'R');
 		
-		$pdf->Cell($colWidths['보증인'], $lineHeight, '', 'LRB', 1, 'C'); // 빈 칸
+		// 다음 행 시작 위치 설정
+		$pdf->SetXY($rowStartX, $rowStartY + $rowHeight);
 		
 		// 보증인 정보 출력
 		if ($guarantorCount > 0) {
 			foreach($guarantors as $guarantorIndex => $guarantor) {
+				// 보증인 행의 높이 계산을 위한 텍스트 저장
+				$guarantorTexts = [
+					'채권자명' => $guarantor['guarantor_name'] ?? '',
+					'발생원인' => $guarantor['dispute_reason'] ?? '보증',
+					'사용처' => $guarantor['dispute_reason_content'] ?? ''
+				];
+				
+				// 각 셀의 필요 높이 계산
+				$guarantorMaxLines = 1;
+				
+				foreach ($guarantorTexts as $key => $text) {
+					$lines = $pdf->GetNumLines($text, $colWidths[$key]);
+					$guarantorMaxLines = max($guarantorMaxLines, $lines);
+				}
+				
+				// 행 높이 설정 (가장 많은 줄 수를 기준으로)
+				$guarantorRowHeight = $lineHeightBase * $guarantorMaxLines;
+				
+				// 행의 시작 위치 저장
+				$guarantorRowStartX = $pdf->GetX();
+				$guarantorRowStartY = $pdf->GetY();
+				
 				// 보증인 순번 (예: 1-1, 1-2)
 				$subNum = $creditor['creditor_count'] . '-' . ($guarantorIndex + 1);
-				
-				// 첫 번째 줄
-				$pdf->Cell($colWidths['번호'], $lineHeight, $subNum, 1, 0, 'C');
+				$pdf->MultiCell($colWidths['순번'], $guarantorRowHeight, $subNum, 1, 'C');
+				$pdf->SetXY($guarantorRowStartX + $colWidths['순번'], $guarantorRowStartY);
 				
 				// 보증인명
-				$guarantor_name = $guarantor['guarantor_name'] ?? '';
-				// 문자열 길이에 따라 폰트 크기 자동 조정
-				if (mb_strlen($guarantor_name, 'UTF-8') > 10) {
-					$pdf->SetFont('cid0kr', '', 7);
-				}
-				$pdf->Cell($colWidths['채권자명'], $lineHeight, $guarantor_name, 1, 0, 'L');
-				$pdf->SetFont('cid0kr', '', 8); // 폰트 크기 복원
+				$guarantor_name = $guarantorTexts['채권자명'];
+				$pdf->MultiCell($colWidths['채권자명'], $guarantorRowHeight, $guarantor_name, 1, 'L');
+				$pdf->SetXY($guarantorRowStartX + $colWidths['순번'] + $colWidths['채권자명'], $guarantorRowStartY);
 				
 				// 보증일자
 				$guarantee_date = !empty($guarantor['guarantee_date']) ? date('Y-m-d', strtotime($guarantor['guarantee_date'])) : '';
-				$pdf->Cell($colWidths['차용일'], $lineHeight, $guarantee_date, 1, 0, 'C');
+				$pdf->MultiCell($colWidths['차용일'], $guarantorRowHeight, $guarantee_date, 1, 'C');
+				$pdf->SetXY($guarantorRowStartX + $colWidths['순번'] + $colWidths['채권자명'] + $colWidths['차용일'], $guarantorRowStartY);
 				
 				// 발생원인 (보증인의 경우 분쟁 사유 표시)
-				$dispute_reason = $guarantor['dispute_reason'] ?? '보증';
-				// 문자열 길이에 따라 폰트 크기 자동 조정
-				if (mb_strlen($dispute_reason, 'UTF-8') > 10) {
-					$pdf->SetFont('cid0kr', '', 7);
-				}
-				$pdf->Cell($colWidths['발생원인'], $lineHeight, $dispute_reason, 1, 0, 'L');
-				$pdf->SetFont('cid0kr', '', 8); // 폰트 크기 복원
+				$dispute_reason = $guarantorTexts['발생원인'];
+				$pdf->MultiCell($colWidths['발생원인'], $guarantorRowHeight, $dispute_reason, 1, 'L');
+				$pdf->SetXY($guarantorRowStartX + $colWidths['순번'] + $colWidths['채권자명'] + $colWidths['차용일'] + $colWidths['발생원인'], $guarantorRowStartY);
 				
 				// 보증금액
-				$pdf->Cell($colWidths['채권액'], $lineHeight, number_format($guarantor['guarantee_amount'] ?? 0), 1, 0, 'R');
+				$pdf->MultiCell($colWidths['최초채권액'], $guarantorRowHeight, number_format($guarantor['guarantee_amount'] ?? 0), 1, 'R');
+				$pdf->SetXY($guarantorRowStartX + $colWidths['순번'] + $colWidths['채권자명'] + $colWidths['차용일'] + $colWidths['발생원인'] + $colWidths['최초채권액'], $guarantorRowStartY);
 				
 				// 분쟁사유 상세
-				$dispute_content = $guarantor['dispute_reason_content'] ?? '';
-				// 문자열 길이에 따라 폰트 크기 자동 조정
-				if (mb_strlen($dispute_content, 'UTF-8') > 15) {
-					$pdf->SetFont('cid0kr', '', 7);
-				}
-				$pdf->Cell($colWidths['사용처'], $lineHeight, $dispute_content, 1, 0, 'L');
-				$pdf->SetFont('cid0kr', '', 8); // 폰트 크기 복원
+				$dispute_content = $guarantorTexts['사용처'];
+				$pdf->MultiCell($colWidths['사용처'], $guarantorRowHeight, $dispute_content, 1, 'L');
+				$pdf->SetXY($guarantorRowStartX + $colWidths['순번'] + $colWidths['채권자명'] + $colWidths['차용일'] + $colWidths['발생원인'] + $colWidths['최초채권액'] + $colWidths['사용처'], $guarantorRowStartY);
 				
 				// 보증인 표시
-				$pdf->Cell($colWidths['보증인'], $lineHeight, '보증인', 1, 1, 'C');
+				$pdf->MultiCell($colWidths['보증인'], $guarantorRowHeight, '보증인', 1, 'C');
+				$pdf->SetXY($guarantorRowStartX + $colWidths['순번'] + $colWidths['채권자명'] + $colWidths['차용일'] + $colWidths['발생원인'] + $colWidths['최초채권액'] + $colWidths['사용처'] + $colWidths['보증인'], $guarantorRowStartY);
 				
-				// 두 번째 줄
-				$pdf->Cell($colWidths['번호'], $lineHeight, '', 'LRB', 0, 'C'); // 빈 칸
-				$pdf->Cell($colWidths['채권자명'], $lineHeight, '', 'LRB', 0, 'C'); // 빈 칸
-				$pdf->Cell($colWidths['차용일'], $lineHeight, '', 'LRB', 0, 'C'); // 빈 칸
+				// 잔존 원금 부분에는 공백
+				$pdf->MultiCell($remainingColWidths['잔존원금'], $guarantorRowHeight, '', 1, 'C');
+				$pdf->SetXY($guarantorRowStartX + $colWidths['순번'] + $colWidths['채권자명'] + $colWidths['차용일'] + $colWidths['발생원인'] + $colWidths['최초채권액'] + $colWidths['사용처'] + $colWidths['보증인'] + $remainingColWidths['잔존원금'], $guarantorRowStartY);
 				
-				// 잔존 채권액 (보증인의 경우 공백)
-				$pdf->Cell($colWidths['발생원인'], $lineHeight, '', 1, 0, 'C');
+				// 이자 차액 표시
+				$pdf->MultiCell($remainingColWidths['잔존이자'], $guarantorRowHeight, $guarantor['difference_interest'] > 0 ? number_format($guarantor['difference_interest']) : '-', 1, 'R');
 				
-				// 잔존 원금 (보증인의 경우 공백)
-				$pdf->Cell($colWidths['채권액'], $lineHeight, '', 1, 0, 'C');
-				
-				// 이자 차액
-				$pdf->Cell($colWidths['사용처'], $lineHeight, $guarantor['difference_interest'] > 0 ? number_format($guarantor['difference_interest']) : '-', 1, 0, 'R');
-				
-				$pdf->Cell($colWidths['보증인'], $lineHeight, '', 'LRB', 1, 'C'); // 빈 칸
+				// 다음 행 시작 위치 설정
+				$pdf->SetXY($guarantorRowStartX, $guarantorRowStartY + $guarantorRowHeight);
 			}
 		}
-		
-		// 채권자 사이에 간격 추가
-		$pdf->Ln(1);
 	}
 
 	// 채권자가 없는 경우
@@ -292,8 +428,8 @@ function generateCreditorList($pdf, $pdo, $basic_info, $creditors) {
 	$pdf->MultiCell(0, 6, "※기재요령※\n1. 채권자의 주소는 신청일 당시의 주소로 번지까지 정확하게 기재하고, 채무자를 위하여 보증을 한 존재 있으면 그 보증인의 주소까지 정확히 기재하여야 합니다.\n2. 채권자가 금융기관이나 기타 법인인 경우에는 본점 소재지 또는 거래지점의 소재지를 정확하게 기재하여야 합니다.", 0, 'L');
 	$pdf->Ln(3);
 	
-	// 테이블 헤더
-	$pdf->SetFont('cid0kr', 'B', 9);
+	// 테이블 헤더 - 헤더 색상 제거
+	$pdf->SetFont('cid0kr', 'B', 8); // 폰트 크기 8로 변경
 	
 	// 테이블 너비 및 열 너비 설정 - A4에 맞게 조정
 	$addressTableWidth = $pdf->GetPageWidth() - 30; // 좌우 여백 각 15mm
@@ -306,63 +442,87 @@ function generateCreditorList($pdf, $pdo, $basic_info, $creditors) {
 		'비고' => $addressTableWidth * 0.11      // 11%
 	];
 	
-	// 테이블 헤더 (배경색 적용)
-	$pdf->SetFillColor(240, 240, 240);
-	$pdf->Cell($addressColWidths['순번'], 7, '순번', 1, 0, 'C', true);
-	$pdf->Cell($addressColWidths['채권자명'], 7, '채권자명', 1, 0, 'C', true);
-	$pdf->Cell($addressColWidths['주소'], 7, '주소', 1, 0, 'C', true);
-	$pdf->Cell($addressColWidths['전화번호'], 7, '전화번호', 1, 0, 'C', true);
-	$pdf->Cell($addressColWidths['팩스'], 7, '팩스', 1, 0, 'C', true);
-	$pdf->Cell($addressColWidths['비고'], 7, '비고', 1, 1, 'C', true);
-	$pdf->SetFont('cid0kr', '', 9);
+	// 테이블 헤더
+	$headerStartX = $pdf->GetX();
+	$headerStartY = $pdf->GetY();
+	$headerHeight = 7;
+	
+	// 헤더 텍스트 정의
+	$headerTexts = [
+		'순번' => '순번',
+		'채권자명' => '채권자명',
+		'주소' => '주소',
+		'전화번호' => '전화번호',
+		'팩스' => '팩스',
+		'비고' => '비고'
+	];
+	
+	// 헤더 출력 - 세로 중앙 정렬 적용
+	$currentX = $headerStartX;
+	foreach ($headerTexts as $key => $text) {
+		// 테두리만 그리기
+		$pdf->Rect($currentX, $headerStartY, $addressColWidths[$key], $headerHeight);
+		
+		// 텍스트 세로 중앙 정렬
+		$lines = $pdf->GetNumLines($text, $addressColWidths[$key]);
+		$textHeight = $lines * ($headerHeight / 2);
+		$verticalPadding = ($headerHeight - $textHeight) / 2;
+		
+		$pdf->SetXY($currentX, $headerStartY + $verticalPadding);
+		$pdf->MultiCell($addressColWidths[$key], $headerHeight / $lines, $text, 0, 'C');
+		
+		// 다음 셀 위치 계산
+		$currentX += $addressColWidths[$key];
+		$pdf->SetXY($currentX, $headerStartY);
+	}
+	
+	// 다음 행으로 이동
+	$pdf->SetXY($headerStartX, $headerStartY + $headerHeight);
+	$pdf->SetFont('cid0kr', '', 8); // 폰트 크기 8로 변경
 	
 	// 채권자 및 보증인 주소 목록
 	foreach($creditors as $creditor) {
 		// 주소 길이에 따른 행 높이 계산
-		$lineHeight = 7;
 		$address = $creditor['address'] ?? '';
+		$financial_institution = $creditor['financial_institution'] ?? '';
+		
+		// 각 셀의 필요 높이 계산
 		$addressLines = $pdf->GetNumLines($address, $addressColWidths['주소']);
-		if ($addressLines > 1) {
-			$lineHeight = $lineHeight * $addressLines;
-		}
+		$nameLines = $pdf->GetNumLines($financial_institution, $addressColWidths['채권자명']);
+		$maxLines = max($addressLines, $nameLines, 1);
+		
+		// 행 높이 계산
+		$lineHeight = 7 * $maxLines;
+		
+		// 행의 시작 위치 저장
+		$rowStartX = $pdf->GetX();
+		$rowStartY = $pdf->GetY();
 		
 		// 순번
-		$pdf->Cell($addressColWidths['순번'], $lineHeight, $creditor['creditor_count'], 1, 0, 'C');
+		$pdf->MultiCell($addressColWidths['순번'], $lineHeight, $creditor['creditor_count'], 1, 'C');
+		$pdf->SetXY($rowStartX + $addressColWidths['순번'], $rowStartY);
 		
 		// 채권자명
-		$financial_institution = $creditor['financial_institution'] ?? '';
-		if (mb_strlen($financial_institution, 'UTF-8') > 12) {
-			$pdf->SetFont('cid0kr', '', 8);
-		}
-		$pdf->Cell($addressColWidths['채권자명'], $lineHeight, $financial_institution, 1, 0, 'L');
-		$pdf->SetFont('cid0kr', '', 9);
+		$pdf->MultiCell($addressColWidths['채권자명'], $lineHeight, $financial_institution, 1, 'L');
+		$pdf->SetXY($rowStartX + $addressColWidths['순번'] + $addressColWidths['채권자명'], $rowStartY);
 		
-		// 주소 - MultiCell 사용
-		$startX = $pdf->GetX();
-		$startY = $pdf->GetY();
-		
-		// 현재 위치 저장
-		$currentX = $pdf->GetX();
-		$currentY = $pdf->GetY();
-		
-		// 실제 출력할 열 너비
-		$addressWidth = $addressColWidths['주소'];
-		
-		// MultiCell로 주소 출력
-		$pdf->MultiCell($addressWidth, $lineHeight / $addressLines, $address, 1, 'L');
-		
-		// 다음 열의 시작 위치 계산
-		$nextX = $currentX + $addressWidth;
-		$pdf->SetXY($nextX, $currentY);
+		// 주소
+		$pdf->MultiCell($addressColWidths['주소'], $lineHeight, $address, 1, 'L');
+		$pdf->SetXY($rowStartX + $addressColWidths['순번'] + $addressColWidths['채권자명'] + $addressColWidths['주소'], $rowStartY);
 		
 		// 전화번호
-		$pdf->Cell($addressColWidths['전화번호'], $lineHeight, $creditor['phone'] ?? '', 1, 0, 'C');
+		$pdf->MultiCell($addressColWidths['전화번호'], $lineHeight, $creditor['phone'] ?? '', 1, 'C');
+		$pdf->SetXY($rowStartX + $addressColWidths['순번'] + $addressColWidths['채권자명'] + $addressColWidths['주소'] + $addressColWidths['전화번호'], $rowStartY);
 		
 		// 팩스
-		$pdf->Cell($addressColWidths['팩스'], $lineHeight, $creditor['fax'] ?? '', 1, 0, 'C');
+		$pdf->MultiCell($addressColWidths['팩스'], $lineHeight, $creditor['fax'] ?? '', 1, 'C');
+		$pdf->SetXY($rowStartX + $addressColWidths['순번'] + $addressColWidths['채권자명'] + $addressColWidths['주소'] + $addressColWidths['전화번호'] + $addressColWidths['팩스'], $rowStartY);
 		
 		// 비고(우편번호)
-		$pdf->Cell($addressColWidths['비고'], $lineHeight, '', 1, 1, 'C');
+		$pdf->MultiCell($addressColWidths['비고'], $lineHeight, '', 1, 'C');
+		
+		// 다음 행 시작 위치 설정
+		$pdf->SetXY($rowStartX, $rowStartY + $lineHeight);
 		
 		// 해당 채권자의 보증인 목록 조회 및 출력
 		$stmt = $pdo->prepare("
@@ -378,44 +538,47 @@ function generateCreditorList($pdf, $pdo, $basic_info, $creditors) {
 			// 보증인 순번 (예: 1-1, 1-2)
 			$subNum = $creditor['creditor_count'] . '-' . ($guarantorIndex + 1);
 			
-			// 보증인 주소 행 높이 계산
+			// 보증인 주소 및 이름 텍스트
 			$guarantorAddress = $guarantor['guarantor_address'] ?? '';
+			$guarantor_name = $guarantor['guarantor_name'] ?? '';
+			
+			// 각 셀의 필요 높이 계산
 			$guarantorAddressLines = $pdf->GetNumLines($guarantorAddress, $addressColWidths['주소']);
-			$guarantorLineHeight = 7;
-			if ($guarantorAddressLines > 1) {
-				$guarantorLineHeight = $guarantorLineHeight * $guarantorAddressLines;
-			}
+			$guarantorNameLines = $pdf->GetNumLines($guarantor_name, $addressColWidths['채권자명']);
+			$guarantorMaxLines = max($guarantorAddressLines, $guarantorNameLines, 1);
+			
+			// 행 높이 계산
+			$guarantorLineHeight = 7 * $guarantorMaxLines;
+			
+			// 행의 시작 위치 저장
+			$guarantorRowStartX = $pdf->GetX();
+			$guarantorRowStartY = $pdf->GetY();
 			
 			// 순번
-			$pdf->Cell($addressColWidths['순번'], $guarantorLineHeight, $subNum, 1, 0, 'C');
+			$pdf->MultiCell($addressColWidths['순번'], $guarantorLineHeight, $subNum, 1, 'C');
+			$pdf->SetXY($guarantorRowStartX + $addressColWidths['순번'], $guarantorRowStartY);
 			
 			// 보증인명
-			$guarantor_name = $guarantor['guarantor_name'] ?? '';
-			if (mb_strlen($guarantor_name, 'UTF-8') > 12) {
-				$pdf->SetFont('cid0kr', '', 8);
-			}
-			$pdf->Cell($addressColWidths['채권자명'], $guarantorLineHeight, $guarantor_name, 1, 0, 'L');
-			$pdf->SetFont('cid0kr', '', 9);
+			$pdf->MultiCell($addressColWidths['채권자명'], $guarantorLineHeight, $guarantor_name, 1, 'L');
+			$pdf->SetXY($guarantorRowStartX + $addressColWidths['순번'] + $addressColWidths['채권자명'], $guarantorRowStartY);
 			
-			// 보증인 주소 - MultiCell 사용
-			$currentX = $pdf->GetX();
-			$currentY = $pdf->GetY();
-			
-			// MultiCell로 주소 출력
-			$pdf->MultiCell($addressColWidths['주소'], $guarantorLineHeight / $guarantorAddressLines, $guarantorAddress, 1, 'L');
-			
-			// 다음 열의 시작 위치 계산
-			$nextX = $currentX + $addressColWidths['주소'];
-			$pdf->SetXY($nextX, $currentY);
+			// 보증인 주소
+			$pdf->MultiCell($addressColWidths['주소'], $guarantorLineHeight, $guarantorAddress, 1, 'L');
+			$pdf->SetXY($guarantorRowStartX + $addressColWidths['순번'] + $addressColWidths['채권자명'] + $addressColWidths['주소'], $guarantorRowStartY);
 			
 			// 전화번호
-			$pdf->Cell($addressColWidths['전화번호'], $guarantorLineHeight, $guarantor['guarantor_phone'] ?? '', 1, 0, 'C');
+			$pdf->MultiCell($addressColWidths['전화번호'], $guarantorLineHeight, $guarantor['guarantor_phone'] ?? '', 1, 'C');
+			$pdf->SetXY($guarantorRowStartX + $addressColWidths['순번'] + $addressColWidths['채권자명'] + $addressColWidths['주소'] + $addressColWidths['전화번호'], $guarantorRowStartY);
 			
 			// 팩스
-			$pdf->Cell($addressColWidths['팩스'], $guarantorLineHeight, $guarantor['guarantor_fax'] ?? '', 1, 0, 'C');
+			$pdf->MultiCell($addressColWidths['팩스'], $guarantorLineHeight, $guarantor['guarantor_fax'] ?? '', 1, 'C');
+			$pdf->SetXY($guarantorRowStartX + $addressColWidths['순번'] + $addressColWidths['채권자명'] + $addressColWidths['주소'] + $addressColWidths['전화번호'] + $addressColWidths['팩스'], $guarantorRowStartY);
 			
 			// 비고
-			$pdf->Cell($addressColWidths['비고'], $guarantorLineHeight, '보증인', 1, 1, 'C');
+			$pdf->MultiCell($addressColWidths['비고'], $guarantorLineHeight, '보증인', 1, 'C');
+			
+			// 다음 행 시작 위치 설정
+			$pdf->SetXY($guarantorRowStartX, $guarantorRowStartY + $guarantorLineHeight);
 		}
 	}
 	
