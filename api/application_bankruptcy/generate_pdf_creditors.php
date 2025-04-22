@@ -75,74 +75,56 @@ function generateCreditorList($pdf, $basic_info, $creditors) {
 	
 	$pdf->Ln(5);
 	
+	// A4 portrait usable width: 190mm (with 10mm margins)
+	// Adjusted column widths: 번호(10), 금융기관명(40), 연락처(25), 차용일자(25), 최초채권액(30), 잔존원금(30), 발생원인(30)
+
+	// Set margins to ensure content stays within A4
+	$pdf->SetMargins(10, 10, 10);
+
 	// 채권자 목록 테이블 헤더
 	$pdf->SetFont('cid0kr', 'B', 9);
 	$pdf->Cell(10, 10, '번호', 1, 0, 'C');
-	$pdf->Cell(50, 10, '금융기관명', 1, 0, 'C');
-	$pdf->Cell(30, 10, '연락처', 1, 0, 'C');
-	$pdf->Cell(30, 10, '차용일자', 1, 0, 'C');
+	$pdf->Cell(40, 10, '금융기관명', 1, 0, 'C');
+	$pdf->Cell(25, 10, '연락처', 1, 0, 'C');
+	$pdf->Cell(25, 10, '차용일자', 1, 0, 'C');
 	$pdf->Cell(30, 10, '최초채권액', 1, 0, 'C');
 	$pdf->Cell(30, 10, '잔존원금', 1, 0, 'C');
-	$pdf->Cell(20, 10, '발생원인', 1, 1, 'C');
-	
+	$pdf->Cell(30, 10, '발생원인', 1, 1, 'C');
+
 	// 채권자 목록 데이터
 	$pdf->SetFont('cid0kr', '', 8);
-	
+
 	foreach($creditors as $index => $creditor) {
 		// 줄 높이 설정
 		$lineHeight = 8;
 		
-		// 금융기관명이 길면 줄바꿈 가능하도록 MultiCell 사용
+		// 번호
 		$pdf->Cell(10, $lineHeight, $creditor['creditor_count'], 1, 0, 'C');
-		
-		// 시작 Y 위치 저장
+		$startX = $pdf->GetX();
 		$startY = $pdf->GetY();
 		
 		// 금융기관명 - MultiCell을 사용하여 자동 줄바꿈
-		$pdf->MultiCell(50, $lineHeight, $creditor['financial_institution'] ?? '', 1, 'L');
+		$pdf->MultiCell(40, $lineHeight, $creditor['financial_institution'] ?? '', 1, 'L');
 		$endY = $pdf->GetY();
+		$rowHeight = $endY - $startY;
+		if ($rowHeight < $lineHeight) $rowHeight = $lineHeight;
 		
-		// 다음 셀의 위치 조정
-		$pdf->SetXY($pdf->GetX() + 60, $startY);
-		
-		// 나머지 필드 출력
-		$pdf->Cell(30, $endY - $startY, $creditor['phone'] ?? '', 1, 0, 'L');
+		// 연락처
+		$pdf->SetXY($startX + 40, $startY);
+		$pdf->Cell(25, $rowHeight, $creditor['phone'] ?? '', 1, 0, 'L');
 		
 		// 차용일자 포맷팅
 		$borrowing_date = !empty($creditor['borrowing_date']) ? date('Y-m-d', strtotime($creditor['borrowing_date'])) : '';
-		$pdf->Cell(30, $endY - $startY, $borrowing_date, 1, 0, 'C');
+		$pdf->Cell(25, $rowHeight, $borrowing_date, 1, 0, 'C');
 		
-		// 금액 필드 포맷팅
-		$initial_claim = !empty($creditor['initial_claim']) ? number_format($creditor['initial_claim']) : '0';
-		$remaining_principal = !empty($creditor['remaining_principal']) ? number_format($creditor['remaining_principal']) : '0';
-		
-		$pdf->Cell(30, $endY - $startY, $initial_claim, 1, 0, 'R');
-		$pdf->Cell(30, $endY - $startY, $remaining_principal, 1, 0, 'R');
-		$pdf->Cell(20, $endY - $startY, $creditor['separate_bond'] ?? '', 1, 1, 'C');
-		
-		// 페이지가 넘어갈 경우 헤더 다시 출력
-		if ($pdf->GetY() > 250) {
-			$pdf->AddPage();
-			
-			// 제목 (계속)
-			$pdf->SetFont('cid0kr', 'B', 16);
-			$pdf->Cell(0, 10, '채권자목록 (계속)', 0, 1, 'C');
-			$pdf->Ln(5);
-			
-			// 테이블 헤더 다시 출력
-			$pdf->SetFont('cid0kr', 'B', 9);
-			$pdf->Cell(10, 10, '번호', 1, 0, 'C');
-			$pdf->Cell(50, 10, '금융기관명', 1, 0, 'C');
-			$pdf->Cell(30, 10, '연락처', 1, 0, 'C');
-			$pdf->Cell(30, 10, '차용일자', 1, 0, 'C');
-			$pdf->Cell(30, 10, '최초채권액', 1, 0, 'C');
-			$pdf->Cell(30, 10, '잔존원금', 1, 0, 'C');
-			$pdf->Cell(20, 10, '발생원인', 1, 1, 'C');
-			
-			$pdf->SetFont('cid0kr', '', 8);
-		}
+		// 최초채권액
+		$pdf->Cell(30, $rowHeight, number_format($creditor['initial_claim'] ?? 0), 1, 0, 'R');
+		// 잔존원금
+		$pdf->Cell(30, $rowHeight, number_format($creditor['remaining_principal'] ?? 0), 1, 0, 'R');
+		// 발생원인
+		$pdf->Cell(30, $rowHeight, $creditor['cause'] ?? '', 1, 1, 'L');
 	}
-	
+
 	// 채권자가 없는 경우
 	if (count($creditors) == 0) {
 		$pdf->SetFont('cid0kr', '', 10);
