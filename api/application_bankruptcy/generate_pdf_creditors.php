@@ -30,8 +30,21 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 		$stmt->execute([$case_no]);
 		$creditors = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		
+		// 채권자별 보증인 수 조회
+		$creditor_guarantors = [];
+		foreach ($creditors as $creditor) {
+			$stmt = $pdo->prepare("
+				SELECT COUNT(*) as guarantor_count
+				FROM application_bankruptcy_creditor_guaranteed_debts
+				WHERE case_no = ? AND creditor_count = ?
+			");
+			$stmt->execute([$case_no, $creditor['creditor_count']]);
+			$guarantor_info = $stmt->fetch(PDO::FETCH_ASSOC);
+			$creditor_guarantors[$creditor['creditor_count']] = $guarantor_info['guarantor_count'];
+		}
+		
 		// 채권자 목록 페이지 생성
-		generateCreditorList($pdf, $basic_info, $creditors);
+		generateCreditorList($pdf, $pdo, $basic_info, $creditors, $creditor_guarantors);
 		
 	} catch (Exception $e) {
 		$pdf->MultiCell(0, 10, 
@@ -44,7 +57,7 @@ function generatePdfCreditors($pdf, $pdo, $case_no) {
 	}
 }
 
-function generateCreditorList($pdf, $basic_info, $creditors) {
+function generateCreditorList($pdf, $pdo, $basic_info, $creditors, $creditor_guarantors) {
 	// 페이지 추가
 	$pdf->AddPage();
 	
@@ -74,17 +87,11 @@ function generateCreditorList($pdf, $basic_info, $creditors) {
 	$pdf->Cell(80, 10, number_format($total_debt) . '원', 0, 1);
 	
 	$pdf->Ln(5);
-	
-	// A4 portrait usable width: 190mm (with 10mm margins)
-	// Adjusted column widths: 번호(10), 금융기관명(40), 연락처(25), 차용일자(25), 최초채권액(30), 잔존원금(30), 발생원인(30)
-
-	// Set margins to ensure content stays within A4
-	$pdf->SetMargins(10, 10, 10);
 
 	// 채권자 목록 테이블 헤더
 	$pdf->SetFont('cid0kr', 'B', 9);
 	$pdf->Cell(10, 10, '번호', 1, 0, 'C');
-	$pdf->Cell(40, 10, '금융기관명', 1, 0, 'C');
+	$pdf->Cell(30, 10, '금융기관명', 1, 0, 'C');
 	$pdf->Cell(25, 10, '연락처', 1, 0, 'C');
 	$pdf->Cell(25, 10, '차용일자', 1, 0, 'C');
 	$pdf->Cell(30, 10, '최초채권액', 1, 0, 'C');
@@ -104,7 +111,7 @@ function generateCreditorList($pdf, $basic_info, $creditors) {
 		$startY = $pdf->GetY();
 		
 		// 금융기관명 - MultiCell을 사용하여 자동 줄바꿈
-		$pdf->MultiCell(40, $lineHeight, $creditor['financial_institution'] ?? '', 1, 'L');
+		$pdf->MultiCell(30, $lineHeight, $creditor['financial_institution'] ?? '', 1, 'L');
 		$endY = $pdf->GetY();
 		$rowHeight = $endY - $startY;
 		if ($rowHeight < $lineHeight) $rowHeight = $lineHeight;
@@ -122,13 +129,97 @@ function generateCreditorList($pdf, $basic_info, $creditors) {
 		// 잔존원금
 		$pdf->Cell(30, $rowHeight, number_format($creditor['remaining_principal'] ?? 0), 1, 0, 'R');
 		// 발생원인
-		$pdf->Cell(30, $rowHeight, $creditor['cause'] ?? '', 1, 1, 'L');
+		$pdf->Cell(30, $rowHeight, $creditor['separate_bond'] ?? '', 1, 1, 'L');
 	}
 
 	// 채권자가 없는 경우
 	if (count($creditors) == 0) {
 		$pdf->SetFont('cid0kr', '', 10);
 		$pdf->Cell(0, 10, '등록된 채권자가 없습니다.', 1, 1, 'C');
+	}
+	
+	// 보증인 정보 표시 (별도 페이지)
+	if (!empty($creditors)) {
+		$pdf->AddPage();
+		$pdf->SetFont('cid0kr', 'B', 16);
+		$pdf->Cell(0, 10, '보증인 목록', 0, 1, 'C');
+		
+		$pdf->SetFont('cid0kr', '', 10);
+		$pdf->Cell(20, 10, '신청인:', 0, 0);
+		$pdf->Cell(80, 10, $basic_info['name'], 0, 0);
+		
+		$pdf->Cell(20, 10, '사건번호:', 0, 0);
+		$pdf->Cell(80, 10, $basic_info['case_number'] ?? '', 0, 1);
+		
+		$pdf->Ln(5);
+		
+		// 보증인 목록 테이블 헤더
+		$pdf->SetFont('cid0kr', 'B', 9);
+		$pdf->Cell(10, 10, '채권자', 1, 0, 'C');
+		$pdf->Cell(30, 10, '보증인명', 1, 0, 'C');
+		$pdf->Cell(25, 10, '연락처', 1, 0, 'C');
+		$pdf->Cell(40, 10, '주소', 1, 0, 'C');
+		$pdf->Cell(30, 10, '보증금액', 1, 0, 'C');
+		$pdf->Cell(25, 10, '이자차액', 1, 0, 'C');
+		$pdf->Cell(30, 10, '보증일자', 1, 1, 'C');
+		
+		$pdf->SetFont('cid0kr', '', 8);
+		$guarantorExists = false;
+		
+		foreach($creditors as $creditor) {
+			if ($creditor_guarantors[$creditor['creditor_count']] > 0) {
+				$guarantorExists = true;
+				
+				// 해당 채권자의 보증인 목록 조회
+				$stmt = $pdo->prepare("
+					SELECT *
+					FROM application_bankruptcy_creditor_guaranteed_debts
+					WHERE case_no = ? AND creditor_count = ?
+					ORDER BY guarantor_no
+				");
+				$stmt->execute([$basic_info['case_no'], $creditor['creditor_count']]);
+				$guarantors = $stmt->fetchAll(PDO::FETCH_ASSOC);
+				
+				foreach($guarantors as $guarantor) {
+					$lineHeight = 8;
+					
+					// 채권자번호
+					$pdf->Cell(10, $lineHeight, $creditor['creditor_count'], 1, 0, 'C');
+					$startX = $pdf->GetX();
+					$startY = $pdf->GetY();
+					
+					// 보증인명
+					$pdf->Cell(30, $lineHeight, $guarantor['guarantor_name'] ?? '', 1, 0, 'L');
+					
+					// 연락처
+					$pdf->Cell(25, $lineHeight, $guarantor['guarantor_phone'] ?? '', 1, 0, 'L');
+					
+					// 주소 (MultiCell 사용)
+					$pdf->MultiCell(40, $lineHeight, $guarantor['guarantor_address'] ?? '', 1, 'L');
+					$endY = $pdf->GetY();
+					$rowHeight = $endY - $startY;
+					if ($rowHeight < $lineHeight) $rowHeight = $lineHeight;
+					
+					// 다음 컬럼 위치 설정
+					$pdf->SetXY($startX + 95, $startY);
+					
+					// 보증금액
+					$pdf->Cell(30, $rowHeight, number_format($guarantor['guarantee_amount'] ?? 0), 1, 0, 'R');
+					
+					// 이자차액
+					$pdf->Cell(25, $rowHeight, number_format($guarantor['difference_interest'] ?? 0), 1, 0, 'R');
+					
+					// 보증일자
+					$guarantee_date = !empty($guarantor['guarantee_date']) ? date('Y-m-d', strtotime($guarantor['guarantee_date'])) : '';
+					$pdf->Cell(30, $rowHeight, $guarantee_date, 1, 1, 'C');
+				}
+			}
+		}
+		
+		if (!$guarantorExists) {
+			$pdf->SetFont('cid0kr', '', 10);
+			$pdf->Cell(0, 10, '등록된 보증인이 없습니다.', 1, 1, 'C');
+		}
 	}
 	
 	// 하단 서명
