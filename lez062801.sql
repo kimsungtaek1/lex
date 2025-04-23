@@ -1,4 +1,5 @@
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -1540,8 +1541,23 @@ CREATE TABLE inflow (
   status varchar(20) DEFAULT '신규'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
+CREATE TABLE ocr_documents (
+  document_id int(11) NOT NULL,
+  case_no int(11) DEFAULT NULL,
+  document_type varchar(50) DEFAULT NULL COMMENT '문서 유형',
+  file_name varchar(255) NOT NULL COMMENT '원본 파일명',
+  file_path varchar(255) NOT NULL COMMENT '저장된 파일 경로',
+  extracted_text longtext DEFAULT NULL COMMENT '추출된 텍스트',
+  extracted_table_json longtext DEFAULT NULL COMMENT '추출된 표 데이터(JSON)',
+  ocr_status enum('대기중','처리중','완료','실패') DEFAULT '대기중',
+  ocr_error_message text DEFAULT NULL COMMENT '에러 메시지',
+  created_at timestamp NOT NULL DEFAULT current_timestamp(),
+  updated_at timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 CREATE TABLE `schedule` (
   schedule_no int(11) NOT NULL,
+  employee_id int(11) NOT NULL,
   category varchar(50) DEFAULT NULL COMMENT '구분',
   name varchar(100) DEFAULT NULL COMMENT '이름',
   date date NOT NULL COMMENT '일자',
@@ -2002,6 +2018,10 @@ ALTER TABLE inflow
   ADD PRIMARY KEY (no),
   ADD KEY manager (manager);
 
+ALTER TABLE ocr_documents
+  ADD PRIMARY KEY (document_id),
+  ADD KEY idx_case_no (case_no);
+
 ALTER TABLE schedule
   ADD PRIMARY KEY (schedule_no);
 
@@ -2325,6 +2345,9 @@ ALTER TABLE employee_position
 ALTER TABLE inflow
   MODIFY no int(11) NOT NULL AUTO_INCREMENT;
 
+ALTER TABLE ocr_documents
+  MODIFY document_id int(11) NOT NULL AUTO_INCREMENT;
+
 ALTER TABLE schedule
   MODIFY schedule_no int(11) NOT NULL AUTO_INCREMENT;
 
@@ -2533,6 +2556,9 @@ ALTER TABLE consult_paper_content
 
 ALTER TABLE inflow
   ADD CONSTRAINT inflow_ibfk_1 FOREIGN KEY (manager) REFERENCES employee (employee_no);
+
+ALTER TABLE ocr_documents
+  ADD CONSTRAINT fk_ocr_case FOREIGN KEY (case_no) REFERENCES case_management (case_no) ON DELETE SET NULL;
 
 ALTER TABLE stay_orders
   ADD CONSTRAINT stay_orders_ibfk_1 FOREIGN KEY (case_no) REFERENCES case_management (case_no);
