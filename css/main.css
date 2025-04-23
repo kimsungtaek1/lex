@@ -30,3 +30,140 @@
 .calendar-day{border-right:0.1vh solid #eee;border-bottom:0.1vh solid #eee;padding:0.5vh 0.5vw;color:#aaa;font-size:1.1vw;font-weight:700;display:flex;flex-direction:column;}
 .calendar-day:nth-child(7n){border-right:none;}
 .calendar-day.today{background-color:#f8f8f8;border-color:#00e6c3;}
+
+/* 달력 테이블 스타일 개선 */
+.calendar-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    border-radius: 12px;
+    overflow: hidden;
+}
+.calendar-table th, .calendar-table td {
+    width: 14.2%;
+    height: 80px;
+    text-align: center;
+    vertical-align: top;
+    border: 1px solid #f0f0f0;
+    position: relative;
+    padding: 0;
+    background: #fafbfc;
+}
+.calendar-table th {
+    background: #f8f9fa;
+    font-weight: bold;
+    font-size: 1rem;
+    color: #888;
+    border-bottom: 2px solid #e0e0e0;
+}
+.calendar-table td.today {
+    background: #ffe6e6;
+    border: 2px solid #ff6b6b;
+}
+.calendar-table td.other-month {
+    background: #f4f4f4;
+    color: #ccc;
+}
+.date-number {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin: 7px 0 4px 0;
+    color: #222;
+}
+.schedule-dots {
+    display: flex;
+    justify-content: center;
+    margin-top: 4px;
+    gap: 4px;
+}
+.schedule-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #bbb;
+    border: 1.5px solid #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.07);
+}
+.schedule-dot.type-1 { background: #ff6b6b; }
+.schedule-dot.type-2 { background: #339af0; }
+.schedule-dot.type-3 { background: #51cf66; }
+.schedule-dot.type-4 { background: #ffa94d; }
+.calendar-table td:hover {
+    background: #f1f3f5;
+    cursor: pointer;
+}
+.calendar-table td .schedule-dot[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    left: 50%;
+    top: 30px;
+    transform: translateX(-50%);
+    background: #222;
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 0.9em;
+    white-space: pre;
+    z-index: 10;
+}
+
+/* 날짜 셀 내부 일정만 modern 스타일, 달력 전체는 기존 스타일 유지 */
+.schedule-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 4px;
+    gap: 2px;
+}
+.schedule-detail {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background: #f4f8fb;
+    border-radius: 5px;
+    padding: 2px 6px 2px 6px;
+    font-size: 0.93em;
+    margin-bottom: 2px;
+    min-width: 0;
+    word-break: break-all;
+    border-left: 4px solid #bbb;
+    width: 100%;
+}
+.schedule-detail.type-1 { border-left-color: #ff6b6b; }
+.schedule-detail.type-2 { border-left-color: #339af0; }
+.schedule-detail.type-3 { border-left-color: #51cf66; }
+.schedule-detail.type-4 { border-left-color: #ffa94d; }
+.schedule-detail > div:first-child {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px;
+}
+.schedule-time {
+    color: #555;
+    font-weight: bold;
+    margin-right: 3px;
+    font-size: 0.8em;
+}
+.schedule-name {
+    color: #222;
+    margin-right: 4px;
+    font-weight: 600;
+    font-size: 0.8em;
+}
+.schedule-content {
+    color: #666;
+    font-size: 0.8em;
+    white-space: pre-line;
+}
+.schedule-location {
+    color: #888;
+    font-size: 0.7em;
+    margin-left: 2px;
+    margin-top: 1px;
+    padding-left: 16px;
+    word-break: break-all;
+}
