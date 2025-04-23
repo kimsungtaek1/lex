@@ -46,34 +46,52 @@ function generatePdfAssets($pdf, $pdo, $case_no) {
 		$pdf->SetFont('cid0kr', 'B', 12);
 		$pdf->Cell(0, 10, '재산목록 요약표', 0, 1, 'C');
 		
-		// 테이블 시작 (멀티셀로 변경)
+		// 표를 이미지처럼 각 항목별 셀로, 일부는 MultiCell로(특히 11번 항목)
 		$pdf->SetFont('cid0kr', '', 9);
+		$cellH = 10;
+		$lineH = 5;
+		// 1행
+		$pdf->Cell(35, $cellH, '1.현금', 1, 0, 'L');
+		$pdf->Cell(25, $cellH, ($asset_summary['cash_exists']=='Y'?'■있음 □없음':'□있음 ■없음'), 1, 0, 'C');
+		$pdf->Cell(95, $cellH, '8.부동산', 1, 0, 'L');
+		$pdf->Cell(25, $cellH, ($asset_summary['real_estate_exists']=='Y'?'■있음 □없음':'□있음 ■없음'), 1, 1, 'C');
+		
+		// 2행
+		$pdf->Cell(35, $cellH, '2.예금', 1, 0, 'L');
+		$pdf->Cell(25, $cellH, ($asset_summary['deposit_exists']=='Y'?'■있음 □없음':'□있음 ■없음'), 1, 0, 'C');
+		$pdf->Cell(95, $cellH, '9.자동차오토바이', 1, 0, 'L');
+		$pdf->Cell(25, $cellH, ($asset_summary['vehicle_exists']=='Y'?'■있음 □없음':'□있음 ■없음'), 1, 1, 'C');
+		
+		// 3행
+		$pdf->Cell(35, $cellH, '3.보험', 1, 0, 'L');
+		$pdf->Cell(25, $cellH, ($asset_summary['insurance_exists']=='Y'?'■있음 □없음':'□있음 ■없음'), 1, 0, 'C');
+		$pdf->Cell(95, $cellH, '10.기타재산(주식,특허권,귀금속 등)', 1, 0, 'L');
+		$pdf->Cell(25, $cellH, ($asset_summary['other_assets_exists']=='Y'?'■있음 □없음':'□있음 ■없음'), 1, 1, 'C');
 
-		// 첫 번째 행
-		$pdf->MultiCell(0, 10, '1.현금: '.($asset_summary['cash_exists']=='Y'?'■있음 □없음':'□있음 ■없음')."    6.매출금: ".($asset_summary['sales_receivables_exists']=='Y'?'■있음 □없음':'□있음 ■없음')."    11.처분불가능: ".($asset_summary['disposed_assets_exists']=='Y'?'■있음 □없음':'□있음 ■없음'), 1, 'L');
-		$pdf->MultiCell(0, 10, '2.예금: '.($asset_summary['deposit_exists']=='Y'?'■있음 □없음':'□있음 ■없음')."    7.퇴직금: ".($asset_summary['severance_pay_exists']=='Y'?'■있음 □없음':'□있음 ■없음')."    시점의:", 1, 'L');
-		$pdf->MultiCell(0, 10, '3.보험: '.($asset_summary['insurance_exists']=='Y'?'■있음 □없음':'□있음 ■없음')."    8.부동산: ".($asset_summary['real_estate_exists']=='Y'?'■있음 □없음':'□있음 ■없음')."    1년이전부터: ".($asset_summary['received_deposit_exists']=='Y'?'■있음 □없음':'□있음 ■없음'), 1, 'L');
-		$pdf->MultiCell(0, 10, '4.임차보증금: '.($asset_summary['rent_deposit_exists']=='Y'?'■있음 □없음':'□있음 ■없음')."    9.자동차: ".($asset_summary['vehicle_exists']=='Y'?'■있음 □없음':'□있음 ■없음')."    현재까지 재산:", 1, 'L');
-		$pdf->MultiCell(0, 10, '5.대여금: '.($asset_summary['loan_receivables_exists']=='Y'?'■있음 □없음':'□있음 ■없음')."    10.기타: ".($asset_summary['other_assets_exists']=='Y'?'■있음 □없음':'□있음 ■없음')."    처분 여부:", 1, 'L');
-		$pdf->MultiCell(0, 10, '재산(주식,특허권): '.($asset_summary['divorce_property_exists']=='Y'?'■있음 □없음':'□있음 ■없음')."    받은 임차보증금:", 1, 'L');
-		$pdf->MultiCell(0, 10, '13.이혼재산분할: '.($asset_summary['divorce_property_exists']=='Y'?'■있음 □없음':'□있음 ■없음')."    14.상속재산: ".($asset_summary['inherited_property_exists']=='Y'?'■있음 □없음':'□있음 ■없음'), 1, 'L');
+		// 4행
+		$pdf->Cell(35, $cellH, '4.임차보증금', 1, 0, 'L');
+		$pdf->Cell(25, $cellH, ($asset_summary['rent_deposit_exists']=='Y'?'■있음 □없음':'□있음 ■없음'), 1, 0, 'C');
+		$pdf->Cell(95, $cellH, '11.지급불가능시점의 1년이전부터현재까지재산처분여부', 1, 0, 'L');
+		$pdf->Cell(25, $cellH, ($asset_summary['disposed_assets_exists']=='Y'?'■있음 □없음':'□있음 ■없음'), 1, 1, 'C');
+
+		// 5행
+		$pdf->Cell(35, $cellH, '5.대여금', 1, 0, 'L');
+		$pdf->Cell(25, $cellH, ($asset_summary['loan_receivables_exists']=='Y'?'■있음 □없음':'□있음 ■없음'), 1, 0, 'C');
+		$pdf->Cell(95, $cellH, '12.최근2년간받은임차보증금', 1, 0, 'L');
+		$pdf->Cell(25, $cellH, ($asset_summary['received_deposit_exists']=='Y'?'■있음 □없음':'□있음 ■없음'), 1, 1, 'C');
+
+		// 6행
+		$pdf->Cell(35, $cellH, '6.매출금', 1, 0, 'L');
+		$pdf->Cell(25, $cellH, ($asset_summary['sales_receivables_exists']=='Y'?'■있음 □없음':'□있음 ■없음'), 1, 0, 'C');
+		$pdf->Cell(95, $cellH, '13.이혼재산분할', 1, 0, 'L');
+		$pdf->Cell(25, $cellH, ($asset_summary['divorce_property_exists']=='Y'?'■있음 □없음':'□있음 ■없음'), 1, 1, 'C');
 		
-		// 빈 줄 추가
-		$pdf->Cell(60, 10, '', 0, 0);
-		$pdf->Cell(30, 10, ',권몰촉 등)', 1, 0, 'L');
-		$pdf->Cell(30, 10, '', 1, 0, 'C');
-		$pdf->Cell(40, 10, '받은 임차보증금', 1, 0, 'L');
-		$pdf->Cell(30, 10, '', 1, 1, 'C');
 		
-		// 이혼 상속 행
-		$pdf->Cell(120, 10, '', 0, 0);
-		$pdf->Cell(40, 10, '13.이혼재산분할', 1, 0, 'L');
-		$pdf->Cell(30, 10, $asset_summary['divorce_property_exists'] == 'Y' ? '■있음 □없음' : '□있음 ■없음', 1, 1, 'C');
-		
-		// 마지막 행
-		$pdf->Cell(120, 10, '', 0, 0);
-		$pdf->Cell(40, 10, '14.상속재산', 1, 0, 'L');
-		$pdf->Cell(30, 10, $asset_summary['inherited_property_exists'] == 'Y' ? '■있음 □없음' : '□있음 ■없음', 1, 1, 'C');
+		// 7행
+		$pdf->Cell(35, $cellH, '7.퇴직금', 1, 0, 'L');
+		$pdf->Cell(25, $cellH, ($asset_summary['severance_pay_exists']=='Y'?'■있음 □없음':'□있음 ■없음'), 1, 0, 'C');
+		$pdf->Cell(95, $cellH, '14.상속재산', 1, 0, 'L');
+		$pdf->Cell(25, $cellH, ($asset_summary['inherited_property_exists']=='Y'?'■있음 □없음':'□있음 ■없음'), 1, 1, 'C');
 		
 		$pdf->Ln(5);
 		

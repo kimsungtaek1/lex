@@ -944,6 +944,7 @@ class AssetManager {
 					block.find(".rent_deposit_asset_no").val(response.data.asset_no);
 					this.updateAssetSummary('rent_deposit', true);
 					this.invalidateCache('rent_deposit');
+					this.saveAssetSummary(); // 저장 후 요약표도 서버에 즉시 반영
 				} else {
 					alert(response.message || "임차보증금 저장 실패");
 				}
