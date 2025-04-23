@@ -443,7 +443,6 @@ $(document).ready(function() {
         }
 
 		if (type === 'living-status') {
-			console.log('생활상황 탭 로드, currentCaseNo:', currentCaseNo);
 			window.currentCaseNo = currentCaseNo; // 전역 변수에 명시적 할당
 			
 			if (window.livingStatusManager) {

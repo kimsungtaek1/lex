@@ -197,6 +197,7 @@ $(document).ready(function() {
             fillCreditorData(creditorCount, data);
         }
         initializeCreditorForm(creditorCount);
+        updateGuarantorCount(creditorCount);
         return creditorCount;
     }
 
@@ -263,7 +264,7 @@ $(document).ready(function() {
     function getCreditorData(count) {
         return {
             address: $(`#address_b${count}`).val() || '',
-            borrowing_date: $(`#borrowingDate_b${count}`).val() || '',
+            borrowing_date: $(`#calculationDate_b${count}`).val() || '',
             claim_reason: $(`#claimReason_b${count}`).val() || '',
             fax: $(`#fax_b${count}`).val() || '',
             financial_institution: $(`#financialInstitution_b${count}`).val() || '',
@@ -338,6 +339,24 @@ $(document).ready(function() {
             }
         }
     });
+
+    // 보증인 수 업데이트 (각 채권자 로드 시 호출)
+    function updateGuarantorCount(count) {
+        $.ajax({
+            url: './api/application_bankruptcy/get_guaranteed_debt_count.php',
+            type: 'GET',
+            data: {
+                case_no: currentCaseNo,
+                creditor_count: count
+            },
+            success: function(response) {
+                if (response.success) {
+                    console.log(response.count);
+                    $(`#guarantorCount_b${count}`).text(response.count);
+                }
+            }
+        });
+    }
 
     // 전화번호 포맷팅 함수
     function formatPhoneNumber(value) {
@@ -451,24 +470,6 @@ $(document).ready(function() {
         if (guarantorWindow === null) {
             alert('팝업이 차단되어 있습니다. 팝업 차단을 해제해주세요.');
         }
-    }
-
-    // 보증인 수 업데이트 (각 채권자 로드 시 호출)
-    function updateGuarantorCount(count) {
-        $.ajax({
-            url: './api/application_bankruptcy/guarantor_api.php',
-            type: 'GET',
-            data: {
-                action: 'count',
-                case_no: currentCaseNo,
-                creditor_count: count
-            },
-            success: function(response) {
-                if (response.success) {
-                    $(`#guarantorCount_b${count}`).text(response.count);
-                }
-            }
-        });
     }
 
     // 전역 함수로 노출

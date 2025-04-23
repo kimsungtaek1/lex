@@ -257,10 +257,29 @@ CREATE TABLE application_bankruptcy_creditor (
   fax varchar(20) DEFAULT NULL COMMENT '팩스번호',
   borrowing_date date DEFAULT NULL COMMENT '차용일자',
   separate_bond varchar(50) DEFAULT '금원차용' COMMENT '발생원인',
+  reason_detail text DEFAULT NULL COMMENT '발생원인상세',
   usage_detail text DEFAULT NULL COMMENT '사용처',
   initial_claim int(11) DEFAULT 0 COMMENT '최초채권액',
   remaining_principal int(11) DEFAULT 0 COMMENT '잔존원금',
   remaining_interest int(11) DEFAULT 0 COMMENT '잔존이자',
+  created_at datetime DEFAULT current_timestamp(),
+  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE application_bankruptcy_creditor_guaranteed_debts (
+  debt_no int(11) NOT NULL,
+  case_no int(11) NOT NULL,
+  creditor_count int(11) NOT NULL,
+  guarantor_no int(11) NOT NULL,
+  guarantor_name varchar(100) DEFAULT NULL,
+  guarantor_phone varchar(20) DEFAULT NULL,
+  guarantor_fax varchar(20) DEFAULT NULL,
+  guarantor_address varchar(255) DEFAULT NULL,
+  guarantee_amount int(11) DEFAULT NULL,
+  difference_interest int(11) DEFAULT NULL,
+  guarantee_date date DEFAULT NULL,
+  dispute_reason varchar(100) DEFAULT NULL,
+  dispute_reason_content varchar(255) DEFAULT NULL,
   created_at datetime DEFAULT current_timestamp(),
   updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -1122,6 +1141,18 @@ CREATE TABLE application_recovery_income_expenditure (
   updated_at timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT '수정일시'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='회생 소득/지출 관리';
 
+CREATE TABLE application_recovery_income_other_fee (
+  other_fee_id int(11) NOT NULL,
+  case_no int(11) NOT NULL COMMENT '사건 번호',
+  creditor_count int(11) NOT NULL COMMENT '채권자 순번 (기존 로직 호환용)',
+  claim_type varchar(100) DEFAULT NULL COMMENT '채권자/사건본인',
+  amount int(11) DEFAULT 0 COMMENT '채권 현재액',
+  description varchar(255) DEFAULT NULL COMMENT '채권 발생 원인',
+  payment_term varchar(100) DEFAULT NULL COMMENT '변제기',
+  created_at datetime DEFAULT current_timestamp(),
+  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='회생 소득 - 기타 개인회생재단 채권';
+
 CREATE TABLE application_recovery_income_salary (
   salary_no int(11) NOT NULL,
   case_no int(11) NOT NULL,
@@ -1134,6 +1165,16 @@ CREATE TABLE application_recovery_income_salary (
   created_at datetime DEFAULT current_timestamp(),
   updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE application_recovery_income_trustee_fee (
+  trustee_fee_id int(11) NOT NULL,
+  case_no int(11) NOT NULL COMMENT '사건 번호',
+  is_external_trustee enum('Y','N') DEFAULT 'N' COMMENT '외부회생위원 선임 여부',
+  trustee_fee_rate int(11) DEFAULT 0 COMMENT '보수 비율 (0-5)',
+  calculate_trustee_fee_after_disposal enum('Y','N') DEFAULT 'N' COMMENT '기타 재산권 처분 후 보수 산정 여부',
+  created_at datetime DEFAULT current_timestamp(),
+  updated_at datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='회생 소득 - 외부회생위원 보수 정보';
 
 CREATE TABLE application_recovery_living_expenses (
   expense_no int(11) NOT NULL,
@@ -1169,7 +1210,8 @@ CREATE TABLE application_recovery_salary_calculation (
   id int(11) NOT NULL,
   case_no int(11) NOT NULL,
   year int(4) NOT NULL,
-  calculation_type varchar(20) DEFAULT 'month',
+  month int(2) NOT NULL DEFAULT 12 COMMENT '시작 월',
+  period int(2) NOT NULL DEFAULT 12 COMMENT '소득산정개월수',
   monthly_average int(11) DEFAULT 0,
   yearly_amount int(11) DEFAULT 0,
   created_at datetime DEFAULT current_timestamp(),
@@ -1362,7 +1404,14 @@ CREATE TABLE chatbot_settings (
 CREATE TABLE config (
   no int(11) NOT NULL,
   customer_id varchar(255) NOT NULL,
+  customer_name varchar(100) NOT NULL,
+  customer_representative varchar(100) NOT NULL,
+  customer_fax varchar(20) NOT NULL,
   customer_number varchar(255) NOT NULL,
+  customer_email varchar(30) NOT NULL,
+  customer_phone varchar(20) NOT NULL,
+  customer_address text NOT NULL,
+  customer_zipcode varchar(20) NOT NULL,
   icode_key varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
@@ -1604,6 +1653,10 @@ ALTER TABLE application_bankruptcy_creditor
   ADD UNIQUE KEY case_creditor_unique (case_no,creditor_count),
   ADD KEY idx_case_no (case_no);
 
+ALTER TABLE application_bankruptcy_creditor_guaranteed_debts
+  ADD PRIMARY KEY (debt_no),
+  ADD KEY idx_case_creditor (case_no,creditor_count);
+
 ALTER TABLE application_bankruptcy_dependents
   ADD PRIMARY KEY (dependent_id),
   ADD KEY case_no (case_no);
@@ -1818,9 +1871,17 @@ ALTER TABLE application_recovery_income_expenditure
   ADD PRIMARY KEY (income_no),
   ADD UNIQUE KEY idx_case_year (case_no,year);
 
+ALTER TABLE application_recovery_income_other_fee
+  ADD PRIMARY KEY (other_fee_id),
+  ADD KEY idx_case_creditor (case_no,creditor_count);
+
 ALTER TABLE application_recovery_income_salary
   ADD PRIMARY KEY (salary_no),
   ADD KEY case_no (case_no);
+
+ALTER TABLE application_recovery_income_trustee_fee
+  ADD PRIMARY KEY (trustee_fee_id),
+  ADD UNIQUE KEY unique_case (case_no);
 
 ALTER TABLE application_recovery_living_expenses
   ADD PRIMARY KEY (expense_no),
@@ -2009,6 +2070,9 @@ ALTER TABLE application_bankruptcy_asset_vehicles
 ALTER TABLE application_bankruptcy_creditor
   MODIFY creditor_no int(11) NOT NULL AUTO_INCREMENT;
 
+ALTER TABLE application_bankruptcy_creditor_guaranteed_debts
+  MODIFY debt_no int(11) NOT NULL AUTO_INCREMENT;
+
 ALTER TABLE application_bankruptcy_dependents
   MODIFY dependent_id int(11) NOT NULL AUTO_INCREMENT;
 
@@ -2171,8 +2235,14 @@ ALTER TABLE application_recovery_income_business
 ALTER TABLE application_recovery_income_expenditure
   MODIFY income_no int(11) NOT NULL AUTO_INCREMENT;
 
+ALTER TABLE application_recovery_income_other_fee
+  MODIFY other_fee_id int(11) NOT NULL AUTO_INCREMENT;
+
 ALTER TABLE application_recovery_income_salary
   MODIFY salary_no int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE application_recovery_income_trustee_fee
+  MODIFY trustee_fee_id int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE application_recovery_living_expenses
   MODIFY expense_no int(11) NOT NULL AUTO_INCREMENT;
@@ -2383,8 +2453,14 @@ ALTER TABLE application_recovery_financial_institution_requests
 ALTER TABLE application_recovery_income_business
   ADD CONSTRAINT fk_business_case FOREIGN KEY (case_no) REFERENCES case_management (case_no) ON DELETE CASCADE;
 
+ALTER TABLE application_recovery_income_other_fee
+  ADD CONSTRAINT application_recovery_income_other_fee_ibfk_1 FOREIGN KEY (case_no) REFERENCES case_management (case_no) ON DELETE CASCADE;
+
 ALTER TABLE application_recovery_income_salary
   ADD CONSTRAINT fk_salary_case FOREIGN KEY (case_no) REFERENCES case_management (case_no) ON DELETE CASCADE;
+
+ALTER TABLE application_recovery_income_trustee_fee
+  ADD CONSTRAINT application_recovery_income_trustee_fee_ibfk_1 FOREIGN KEY (case_no) REFERENCES case_management (case_no) ON DELETE CASCADE;
 
 ALTER TABLE application_recovery_living_expenses
   ADD CONSTRAINT fk_living_expenses_case FOREIGN KEY (case_no) REFERENCES case_management (case_no) ON DELETE CASCADE;
