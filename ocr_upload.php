@@ -1,15 +1,20 @@
-<?php
-session_start();
-$additional_css = '<link rel="stylesheet" href="css/ocr.css">';
+<?php 
+// application_recovery.php
+
+// CSS 추가 (추가 CSS가 필요한 경우)
+$additional_css = '<link rel="stylesheet" href="css/application_recovery.css">';
+
+// 헤더 및 설정파일 포함
 include 'header.php';
+include 'config.php';
 
 // 권한 체크
-if (!isset($_SESSION['auth']) || $_SESSION['auth'] < 5) {
-	echo "<script>
-		alert('접근 권한이 없습니다.');
-		window.location.href = 'main.php';
-	</script>";
-	exit;
+if (!isset($_SESSION['auth']) || $_SESSION['auth'] < 1) {
+    echo "<script>
+            alert('접근 권한이 없습니다.');
+            window.location.href = 'main.php';
+          </script>";
+    exit;
 }
 
 // 사건 번호 목록 가져오기
