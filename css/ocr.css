@@ -1,0 +1,17 @@
+.container{margin:0 5vw}
+.tab{width:100%;overflow-x:auto;border:none;background:#6c6c6c;box-shadow:0 0.5vh 0.5vh rgba(0,0,0,0.4)}
+.tab table{width:100%;border-collapse:collapse}
+.tab th{width:15%;padding:0.7vw 0 0.7vw 3vw;text-align:left;color:#fff;font-weight:500;cursor:pointer;transition:background-color 0.3s ease}
+.tab th.active{color:#00e6c3}
+
+.ocr-container{display:flex;flex-wrap:wrap;margin-top:20px;gap:20px}
+.upload-form{flex:1;min-width:300px;background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 4px rgba(0,0,0,0.1)}
+.recent-documents{flex:2;min-width:500px;background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 4px rgba(0,0,0,0.1)}
+
+.form-group{margin-bottom:15px}
+.form-group label{display:block;margin-bottom:5px;font-weight:bold}
+.form-group input[type="file"],
+.form-group select{width:100%;padding:8px;border:1px solid #ddd;border-radius:4px}
+.file-info{margin-top:5px;color:#666;font-size:12px}
+
+.btn-primary{background:#00e6c3;color:#fff;border:none;padding:10px 20
