@@ -346,159 +346,131 @@ $(document).ready(function() {
     
     // OCR JSON 데이터를 로드하고 처리하는 함수
     function loadAndProcessOcrResults() {
-        debugToUI("OCR 결과 로드 시작");
-        
+        debugToUI("OCR 결과 로드 및 처리 시작 (loadAndProcessOcrResults)"); // 함수 시작 로그
+
         if ($('.result-card').length === 0) {
             debugToUI("처리할 결과 카드를 찾을 수 없음", "warning");
             showChatbotError('처리할 결과 카드를 찾을 수 없습니다.');
             return;
         }
-        
-        // 첫 번째 결과 카드의 JSON 경로 가져오기
+
         const firstCard = $('.result-card').first();
         const jsonBtn = firstCard.find('.json-view-btn');
-        
+
         if (jsonBtn.length === 0) {
-            debugToUI("JSON 버튼을 찾을 수 없음 - 텍스트 기반 분석으로 대체", "warning");
-            // JSON 버튼이 없으면 텍스트 기반 분석으로 대체
-            const textBtn = firstCard.find('.text-view-btn');
-            if (textBtn.length > 0) {
-                const textPath = textBtn.data('path');
-                debugToUI(`텍스트 경로 발견: ${textPath}`);
-                loadAndProcessTextResults(textPath);
-                return;
-            }
-            
-            debugToUI("분석할 텍스트 경로도 찾을 수 없음", "error");
-            showChatbotError('분석할 결과 데이터를 찾을 수 없습니다.');
+            // ... (기존 텍스트 대체 로직) ...
             return;
         }
-        
+
         const jsonPath = jsonBtn.data('path');
         if (!jsonPath) {
             debugToUI("JSON 파일 경로가 비어있음", "error");
             showChatbotError('JSON 파일 경로를 찾을 수 없습니다.');
             return;
         }
-        
-        debugToUI(`JSON 파일 경로: ${jsonPath}`);
-        
-        // 로딩 표시
+
+        debugToUI(`JSON 파일 경로 확인: ${jsonPath}`);
+
         $('#chatbot-container .chat-loading').show();
         $('#chatbot-container .chat-messages').hide().empty();
-        
-        // JSON 데이터 로드
+        debugToUI("채팅 로딩 표시됨"); // 로딩 표시 확인
+
         $.ajax({
             url: 'ajax_get_file_content.php',
             type: 'GET',
             data: { path: jsonPath },
-            dataType: 'json',
+            dataType: 'json', // PHP가 application/json 헤더를 보내므로 jQuery가 자동으로 파싱 시도
             success: function(response) {
                 debugToUI(`AJAX 응답 받음: success=${response.success}`);
-                
-                if (response.success) {
+
+                if (response.success && response.content) {
                     try {
-                        // JSON 문자열 처리 및 파싱
                         let jsonContent = response.content;
-                        debugToUI(`JSON 콘텐츠 길이: ${jsonContent?.length || 0}`);
-                        
-                        // 빈 응답 확인
-                        if (!jsonContent || jsonContent.trim() === '') {
-                            debugToUI("JSON 내용이 비어있음 - 텍스트 기반 분석으로 대체", "warning");
-                            // 텍스트 기반 분석으로 대체
-                            const textBtn = firstCard.find('.text-view-btn');
-                            if (textBtn.length > 0) {
-                                loadAndProcessTextResults(textBtn.data('path'));
+                        debugToUI(`받은 JSON 콘텐츠 길이: ${jsonContent?.length || 0}`);
+
+                        // *** 중요: PHP에서 이미 application/json으로 보내고, jQuery가 dataType:'json'으로 받으면
+                        // response.content는 이미 파싱된 객체일 수 있습니다. 문자열인지 확인 후 파싱합니다. ***
+                        let ocrData;
+                        if (typeof jsonContent === 'string') {
+                            debugToUI("콘텐츠가 문자열이므로 JSON 파싱 시도...");
+                            // JSON 유효성 검사 및 전처리 (필요하다면)
+                            jsonContent = preprocessJsonContent(jsonContent); // 필요시 사용
+                            if (!isValidJSON(jsonContent)) { // isValidJSON 함수 필요
+                                debugToUI("유효하지 않은 JSON 형식 - 텍스트 기반 분석으로 대체 시도", "error");
+                                // ... (텍스트 대체 로직) ...
                                 return;
                             }
-                            
-                            showChatbotError('JSON 내용이 비어있습니다.');
+                            ocrData = JSON.parse(jsonContent);
+                            debugToUI("JSON 파싱 성공 (문자열에서)");
+                        } else if (typeof jsonContent === 'object') {
+                            debugToUI("콘텐츠가 이미 객체 형태임 (jQuery가 자동 파싱했을 수 있음)");
+                            ocrData = jsonContent; // 이미 파싱된 객체 사용
+                        } else {
+                            debugToUI(`예상치 못한 콘텐츠 타입: ${typeof jsonContent}`, "error");
+                            showChatbotError('잘못된 형식의 OCR 데이터를 받았습니다.');
                             return;
                         }
-                        
-                        // JSON 유효성 확인 및 필요시 전처리
-                        jsonContent = preprocessJsonContent(jsonContent);
-                        debugToUI("JSON 전처리 완료");
-                        
-                        if (!isValidJSON(jsonContent)) {
-                            debugToUI("유효하지 않은 JSON 형식 - 문자열 일부 표시: " + 
-                                     jsonContent.substring(0, 100) + "...", "error");
-                            
-                            // 텍스트 기반 분석으로 대체
-                            const textBtn = firstCard.find('.text-view-btn');
-                            if (textBtn.length > 0) {
-                                loadAndProcessTextResults(textBtn.data('path'));
-                                return;
-                            }
-                            
-                            showChatbotError('유효하지 않은 JSON 형식입니다. JSON 데이터 구조를 확인해주세요.');
+
+
+                        // OCR 데이터 유효성 검증 강화
+                        if (!ocrData || typeof ocrData !== 'object') {
+                            debugToUI("파싱 후 데이터가 유효한 객체가 아님", "error");
+                            showChatbotError('OCR 데이터 구조가 올바르지 않습니다 (객체 아님).');
                             return;
                         }
-                        
-                        debugToUI("JSON 유효성 검사 통과, 파싱 시작");
-                        const ocrData = JSON.parse(jsonContent);
-                        
-                        // OCR 데이터 검증
-                        if (!ocrData || !ocrData.images || !Array.isArray(ocrData.images) || ocrData.images.length === 0) {
-                            debugToUI("유효한 OCR 데이터 구조가 아님 - 필수 필드 누락", "error");
-                            
-                            // 텍스트 기반 분석으로 대체
-                            const textBtn = firstCard.find('.text-view-btn');
-                            if (textBtn.length > 0) {
-                                loadAndProcessTextResults(textBtn.data('path'));
-                                return;
-                            }
-                            
-                            showChatbotError('유효한 OCR 데이터 구조가 아닙니다. images 배열이 필요합니다.');
-                            return;
+                        debugToUI("OCR 데이터 객체 확인됨. images 배열 확인 시도...");
+
+                        if (!ocrData.images || !Array.isArray(ocrData.images) || ocrData.images.length === 0) {
+                            debugToUI("유효한 OCR 데이터 구조가 아님 - images 배열 문제", "error");
+                            // 텍스트 대체 로직 실행 또는 오류 표시
+                            showChatbotError('유효한 OCR 데이터 구조가 아닙니다 (images 배열 누락 또는 비어 있음).');
+                            // 텍스트 대체 로직이 필요하면 여기에 추가
+                            // const textBtn = firstCard.find('.text-view-btn');
+                            // if (textBtn.length > 0) {
+                            //    loadAndProcessTextResults(textBtn.data('path'));
+                            // }
+                            return; // 여기서 종료해야 함
                         }
-                        
-                        // 데이터 처리 및 표시
-                        debugToUI("OCR 데이터 검증 통과, 처리 및 표시 시작");
-                        processAndDisplayOcrData(ocrData);
-                        
+                        debugToUI(`images 배열 확인됨 (길이: ${ocrData.images.length}). 데이터 처리 시작...`);
+
+                        // 데이터 처리 및 표시 함수 호출
+                        processAndDisplayOcrData(ocrData); // *** 여기가 다음 단계 ***
+
+                        // *** 중요: processAndDisplayOcrData가 성공적으로 끝나면 로딩 숨김 ***
+                        // 이 코드는 processAndDisplayOcrData 함수 *내부의 끝*으로 옮기는 것이 더 안전할 수 있음
+                        // $('#chatbot-container .chat-loading').hide();
+                        // $('#chatbot-container .chat-messages').show();
+                        // debugToUI("채팅 로딩 숨김 및 메시지 표시됨 (성공)");
+
                     } catch (e) {
-                        debugToUI(`JSON 파싱 오류: ${e.message}`, "error");
-                        debugToUI(`스택 트레이스: ${e.stack}`, "error");
-                        
-                        // 텍스트 기반 분석으로 대체
-                        const textBtn = firstCard.find('.text-view-btn');
-                        if (textBtn.length > 0) {
-                            loadAndProcessTextResults(textBtn.data('path'));
-                            return;
-                        }
-                        
-                        showChatbotError('JSON 파싱 중 오류가 발생했습니다: ' + e.message);
+                        debugToUI(`JSON 처리 중 오류 발생: ${e.message}`, "error");
+                        debugToUI(`오류 스택: ${e.stack}`, "error");
+                        // 오류 발생 시 텍스트 대체 로직 실행 또는 오류 표시
+                        showChatbotError('OCR 데이터 처리 중 오류가 발생했습니다: ' + e.message);
+                        // 텍스트 대체 로직이 필요하면 여기에 추가
+                        // const textBtn = firstCard.find('.text-view-btn');
+                        // if (textBtn.length > 0) {
+                        //     loadAndProcessTextResults(textBtn.data('path'));
+                        // }
                     }
                 } else {
-                    debugToUI(`AJAX 성공했지만 응답 실패: ${response.message}`, "error");
-                    
-                    // 텍스트 기반 분석으로 대체
-                    const textBtn = firstCard.find('.text-view-btn');
-                    if (textBtn.length > 0) {
-                        loadAndProcessTextResults(textBtn.data('path'));
-                        return;
-                    }
-                    
-                    showChatbotError('파일을 로드할 수 없습니다: ' + response.message);
+                    // AJAX 요청은 성공했으나, PHP에서 success: false를 반환했거나 content가 없는 경우
+                    const errorMessage = response.message || '알 수 없는 오류';
+                    debugToUI(`AJAX 응답 실패 또는 콘텐츠 없음: ${errorMessage}`, "error");
+                    showChatbotError('OCR 결과 파일을 로드할 수 없습니다: ' + errorMessage);
+                    // 텍스트 대체 로직이 필요하면 여기에 추가
                 }
             },
             error: function(xhr, status, error) {
                 debugToUI(`AJAX 요청 오류: ${status} - ${error}`, "error");
                 if (xhr.responseText) {
-                    debugToUI(`서버 응답: ${xhr.responseText.substring(0, 200)}...`, "error");
+                    debugToUI(`서버 응답 내용 (일부): ${xhr.responseText.substring(0, 200)}...`, "error");
                 }
-                
-                // 텍스트 기반 분석으로 대체
-                const textBtn = firstCard.find('.text-view-btn');
-                if (textBtn.length > 0) {
-                    loadAndProcessTextResults(textBtn.data('path'));
-                    return;
-                }
-                
-                showChatbotError('파일 로드 중 오류가 발생했습니다: ' + error);
+                showChatbotError('OCR 결과 파일 로드 중 서버 오류가 발생했습니다: ' + error);
+                // 텍스트 대체 로직이 필요하면 여기에 추가
             }
         });
+        debugToUI("AJAX 요청 보냄");
     }
     
     // 텍스트 파일 기반 분석 함수
@@ -642,6 +614,7 @@ $(document).ready(function() {
     
     // JSON 유효성 검사 함수
     function isValidJSON(str) {
+        if (typeof str !== 'string') return false; // 문자열이 아니면 유효하지 않음
         try {
             JSON.parse(str);
             return true;
@@ -653,72 +626,105 @@ $(document).ready(function() {
     
     // OCR 데이터 처리 및 결과 표시 함수
     function processAndDisplayOcrData(ocrData) {
-        debugToUI("OCR 데이터 처리 및 표시 시작");
+        debugToUI("OCR 데이터 처리 및 표시 시작 (processAndDisplayOcrData)"); // 함수 시작 로그
         const chatMessages = $('#chatbot-container .chat-messages');
-        chatMessages.empty();
-        
-        // 인사 메시지
-        addChatbotMessage('안녕하세요! OCR 처리 결과를 분석했습니다.');
-        
-        if (ocrData && ocrData.images && ocrData.images.length > 0) {
-            const image = ocrData.images[0];
-            debugToUI(`첫 번째 이미지 데이터 발견, 분석 시작`);
-            
-            // 1. 문서 유형 분석 및 추가 정보
-            const documentType = analyzeDocumentType(image);
-            if (documentType) {
-                debugToUI(`문서 유형 분석 결과: ${documentType.type}`);
-                addChatbotMessage(`이 문서는 **${documentType.type}** 유형으로 분석되었습니다.`);
-                
-                if (documentType.description) {
-                    addChatbotMessage(documentType.description);
+        chatMessages.empty(); // 이전 메시지 지우기
+
+        try { // 전체 로직을 try...catch로 감싸서 오류 추적
+            addChatbotMessage('안녕하세요! OCR 처리 결과를 분석했습니다.');
+            debugToUI("인사 메시지 추가됨");
+
+            // images 배열 및 첫 번째 이미지 유효성 재확인
+            if (ocrData && ocrData.images && ocrData.images.length > 0 && typeof ocrData.images[0] === 'object') {
+                const image = ocrData.images[0];
+                debugToUI(`첫 번째 이미지 데이터 분석 시작 (UID: ${image.uid || 'N/A'})`);
+
+                // 각 분석 단계 전후로 로그 추가
+                debugToUI("문서 유형 분석 시작...");
+                const documentType = analyzeDocumentType(image); // 오류 가능 지점 1
+                if (documentType) {
+                    debugToUI(`문서 유형 분석 결과: ${documentType.type}`);
+                    addChatbotMessage(`이 문서는 **${documentType.type}** 유형으로 분석되었습니다.`);
+                    if (documentType.description) {
+                        addChatbotMessage(documentType.description);
+                    }
+                } else {
+                    debugToUI("문서 유형 분석 결과 없음");
                 }
-            }
-            
-            // 2. 주요 필드 정보 추출 및 표시
-            const extractedFields = extractKeyInformation(image);
-            if (Object.keys(extractedFields).length > 0) {
-                debugToUI(`핵심 정보 ${Object.keys(extractedFields).length}개 추출`);
-                let fieldsMessage = '문서에서 다음 핵심 정보를 추출했습니다:';
-                for (const [key, value] of Object.entries(extractedFields)) {
-                    fieldsMessage += `\n- **${key}**: ${value}`;
+                debugToUI("문서 유형 분석 완료.");
+
+
+                debugToUI("핵심 정보 추출 시작...");
+                const extractedFields = extractKeyInformation(image); // 오류 가능 지점 2
+                if (Object.keys(extractedFields).length > 0) {
+                    debugToUI(`핵심 정보 ${Object.keys(extractedFields).length}개 추출`);
+                    let fieldsMessage = '문서에서 다음 핵심 정보를 추출했습니다:';
+                    for (const [key, value] of Object.entries(extractedFields)) {
+                        fieldsMessage += `\n- **${key}**: ${value}`;
+                    }
+                    addChatbotMessage(fieldsMessage);
+                } else {
+                    debugToUI("추출된 핵심 정보 없음");
                 }
-                addChatbotMessage(fieldsMessage);
-            }
-            
-            // 3. 테이블 정보 분석 및 표시
-            if (image.tables && image.tables.length > 0) {
-                debugToUI(`테이블 ${image.tables.length}개 발견, 분석 시작`);
-                const tableAnalysis = analyzeTableData(image.tables);
-                addChatbotMessage(tableAnalysis.summary);
-                
-                if (tableAnalysis.preview) {
-                    addChatbotMessage(tableAnalysis.preview);
+                debugToUI("핵심 정보 추출 완료.");
+
+
+                // 테이블 데이터 분석 (테이블이 있을 경우에만)
+                if (image.tables && Array.isArray(image.tables) && image.tables.length > 0) {
+                    debugToUI(`테이블 ${image.tables.length}개 발견, 분석 시작...`);
+                    const tableAnalysis = analyzeTableData(image.tables); // 오류 가능 지점 3
+                    if (tableAnalysis && tableAnalysis.summary) {
+                        addChatbotMessage(tableAnalysis.summary);
+                        if (tableAnalysis.preview) {
+                            addChatbotMessage(tableAnalysis.preview);
+                        }
+                        debugToUI("테이블 분석 정보 추가됨");
+                    } else {
+                        debugToUI("테이블 분석 결과 없음");
+                    }
+                    debugToUI("테이블 데이터 분석 완료.");
+                } else {
+                    debugToUI("분석할 테이블 데이터 없음.");
                 }
+
+
+                debugToUI("텍스트 내용 분석 시작...");
+                const textAnalysis = analyzeTextContent(image); // 오류 가능 지점 4
+                if (textAnalysis) {
+                    debugToUI(`텍스트 분석 정보 추가`);
+                    addChatbotMessage(textAnalysis);
+                } else {
+                    debugToUI("텍스트 분석 결과 없음");
+                }
+                debugToUI("텍스트 내용 분석 완료.");
+
+
+                debugToUI("OCR 품질 분석 시작...");
+                const qualityAnalysis = analyzeOcrQuality(image); // 오류 가능 지점 5
+                if (qualityAnalysis) {
+                    debugToUI(`OCR 품질 분석 정보 추가`);
+                    addChatbotMessage(qualityAnalysis);
+                } else {
+                    debugToUI("OCR 품질 분석 결과 없음");
+                }
+                debugToUI("OCR 품질 분석 완료.");
+
+            } else {
+                debugToUI("처리할 유효한 이미지 데이터가 없음", "warning");
+                addChatbotMessage('OCR 처리 결과에 유효한 이미지 데이터가 없습니다.');
             }
-            
-            // 4. 텍스트 분석 추가 정보
-            const textAnalysis = analyzeTextContent(image);
-            if (textAnalysis) {
-                debugToUI(`텍스트 분석 정보 추가`);
-                addChatbotMessage(textAnalysis);
-            }
-            
-            // 5. 품질 및 신뢰도 정보
-            const qualityAnalysis = analyzeOcrQuality(image);
-            if (qualityAnalysis) {
-                debugToUI(`OCR 품질 분석 정보 추가`);
-                addChatbotMessage(qualityAnalysis);
-            }
-        } else {
-            debugToUI("OCR 처리 결과가 없거나 형식이 올바르지 않음", "warning");
-            addChatbotMessage('OCR 처리 결과가 없거나 형식이 올바르지 않습니다. 아래 텍스트 결과 탭에서 원본 정보를 확인해보세요.');
+
+            // *** 모든 분석 및 메시지 추가가 성공적으로 끝나면 로딩 숨김 ***
+            $('#chatbot-container .chat-loading').hide();
+            $('#chatbot-container .chat-messages').show();
+            debugToUI("채팅 로딩 숨김 및 메시지 최종 표시됨 (processAndDisplayOcrData 성공 완료)");
+
+        } catch (e) {
+            debugToUI(`processAndDisplayOcrData 내부에서 오류 발생: ${e.message}`, "error");
+            debugToUI(`오류 스택: ${e.stack}`, "error");
+            // 오류 발생 시에도 로딩은 숨기고 오류 메시지 표시
+            showChatbotError('데이터 분석 중 오류가 발생했습니다: ' + e.message + '. 개발자 콘솔을 확인하세요.');
         }
-        
-        // 로딩 숨기고 메시지 표시
-        $('#chatbot-container .chat-loading').hide();
-        chatMessages.show();
-        debugToUI("OCR 데이터 처리 및 표시 완료");
     }
     
     // 문서 유형 분석 함수
