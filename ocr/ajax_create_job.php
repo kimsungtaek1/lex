@@ -1,4 +1,5 @@
 <?php
+session_start();
 /**
  * ajax_create_job.php
  * 파일 업로드 및 작업 생성 처리
@@ -7,14 +8,6 @@
 require_once 'config.php';
 require_once 'process_monitor.php';
 require_once 'utils.php';
-
-// CSRF 토큰 검증
-function validateCSRFToken($token) {
-    if (!isset($_SESSION['csrf_token']) || $token !== $_SESSION['csrf_token']) {
-        return false;
-    }
-    return true;
-}
 
 // 안전한 파일 업로드 검증
 function validateUploadedFile($file) {
@@ -144,11 +137,6 @@ function checkDirectoryWritable($dir) {
 // POST 요청 확인
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     sendJsonResponse(false, '잘못된 요청 메소드입니다.');
-}
-
-// CSRF 토큰 검증
-if (!isset($_POST['csrf_token']) || !validateCSRFToken($_POST['csrf_token'])) {
-    sendJsonResponse(false, '보안 검증에 실패했습니다. 페이지를 새로고침하고 다시 시도하세요.');
 }
 
 // 작업 이름 확인

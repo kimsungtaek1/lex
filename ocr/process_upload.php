@@ -10,13 +10,6 @@ require_once 'utils.php';
 
 header('Content-Type: application/json; charset=UTF-8');
 
-// CSRF 토큰 검증
-if (!isset($_POST['csrf_token']) || empty($_SESSION['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-    echo json_encode(['success' => false, 'message' => '잘못된 접근입니다. (CSRF)']);
-    http_response_code(400);
-    exit;
-}
-
 // 파일 업로드 검증
 if (!isset($_FILES['file'])) {
     echo json_encode(['success' => false, 'message' => '업로드된 파일이 없습니다.']);

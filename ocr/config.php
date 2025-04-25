@@ -125,21 +125,6 @@ function logMessage($message, $level = 'info') {
     }
 }
 
-// CSRF 토큰 생성 및 검증 함수
-function generateCSRFToken() {
-    if (empty($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-    }
-    return $_SESSION['csrf_token'];
-}
-
-function validateCSRFToken($token) {
-    if (!isset($_SESSION['csrf_token']) || $token !== $_SESSION['csrf_token']) {
-        return false;
-    }
-    return true;
-}
-
 /**
  * 안전한 파일 읽기 함수
  * @param string $filePath 파일 경로

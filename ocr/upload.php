@@ -127,7 +127,7 @@ $successMessage = null;
 
 // 페이지 제목
 $pageTitle = '이미지 업로드 및 OCR 처리';
-$csrfToken = generateCSRFToken();
+
 ?>
 
 <!DOCTYPE html>
@@ -236,9 +236,6 @@ $csrfToken = generateCSRFToken();
                     </div>
                     <div class="card-body">
                         <form id="uploadForm" action="process_upload.php" method="post" enctype="multipart/form-data">
-                            <!-- CSRF 토큰 -->
-                            <input type="hidden" name="csrf_token" value="<?php echo h($csrfToken); ?>">
-                            
                             <div class="mb-3">
                                 <label for="jobName" class="form-label">작업 이름</label>
                                 <input type="text" class="form-control" id="jobName" name="job_name" required
@@ -649,8 +646,7 @@ $csrfToken = generateCSRFToken();
                 url: 'ajax_process_file.php',
                 type: 'POST',
                 data: { 
-                    job_id: jobId,
-                    csrf_token: '<?php echo h($csrfToken); ?>'
+                    job_id: jobId
                 },
                 dataType: 'json',
                 success: function(response) {

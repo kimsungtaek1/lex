@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 // ajax_process_file.php
 require_once 'ajax_handler.php';
 require_once 'process_monitor.php';
