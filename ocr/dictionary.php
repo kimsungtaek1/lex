@@ -128,6 +128,8 @@ $pageTitle = '사전 관리';
     </style>
 </head>
 <body>
+    <?php include 'navbar.php'; ?>
+
     <!-- 메인 컨텐츠 -->
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
