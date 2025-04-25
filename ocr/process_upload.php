@@ -7,7 +7,6 @@ error_reporting(E_ALL);
 
 require_once 'config.php';
 require_once 'utils.php';
-session_start();
 
 header('Content-Type: application/json; charset=UTF-8');
 

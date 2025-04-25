@@ -6,6 +6,7 @@
 
 require_once 'config.php';
 require_once 'document_learning.php';
+require_once 'utils.php';
 
 // 문서 학습 시스템 초기화
 $learningSystem = new DocumentLearningSystem();
