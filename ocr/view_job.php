@@ -165,6 +165,152 @@ $pageTitle = '작업 상세 정보: ' . htmlspecialchars($jobDetails['job']['nam
         #autoRefresh {
             margin-left: 10px;
         }
+
+        /* OCR 결과 뷰어 스타일 */
+        .result-container {
+            margin-top: 20px;
+        }
+
+        .result-card {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .result-card:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .content-viewer {
+            transition: all 0.3s ease;
+        }
+
+        .text-content, .json-content {
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            font-size: 14px;
+            line-height: 1.5;
+            border-radius: 5px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .table-content {
+            max-height: 500px;
+            overflow-y: auto;
+            border-radius: 5px;
+        }
+
+        .table-content table {
+            margin-bottom: 0;
+        }
+
+        .list-group-item {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .list-group-item:hover:not(.active) {
+            background-color: #f8f9fa;
+        }
+
+        .list-group-item.active {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+
+        .feedback-form {
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+
+        /* 텍스트 결과 강조 스타일 */
+        .text-content .key {
+            color: #0d6efd;
+            font-weight: bold;
+        }
+
+        .text-content .value {
+            color: #212529;
+        }
+
+        .text-content .date {
+            color: #198754;
+        }
+
+        .text-content .amount {
+            color: #dc3545;
+        }
+
+        /* 스크롤바 스타일 */
+        .text-content::-webkit-scrollbar,
+        .json-content::-webkit-scrollbar,
+        .table-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .text-content::-webkit-scrollbar-track,
+        .json-content::-webkit-scrollbar-track,
+        .table-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 5px;
+        }
+
+        .text-content::-webkit-scrollbar-thumb,
+        .json-content::-webkit-scrollbar-thumb,
+        .table-content::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 5px;
+        }
+
+        .text-content::-webkit-scrollbar-thumb:hover,
+        .json-content::-webkit-scrollbar-thumb:hover,
+        .table-content::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* 로딩 스피너 스타일 */
+        .spinner-border {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+
+        /* 테이블 스타일 개선 */
+        .table-content table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table-content th {
+            background-color: #f8f9fa;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .table-content th, .table-content td {
+            padding: 8px 12px;
+            border: 1px solid #dee2e6;
+        }
+
+        .table-content tr:nth-child(even) {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .table-content tr:hover {
+            background-color: rgba(0, 123, 255, 0.05);
+        }
+
+        /* 피드백 버튼 스타일 */
+        .provide-feedback-btn {
+            transition: all 0.2s ease;
+        }
+
+        .provide-feedback-btn:hover {
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
@@ -307,109 +453,173 @@ $pageTitle = '작업 상세 정보: ' . htmlspecialchars($jobDetails['job']['nam
                         </div>
                     </div>
                     
-                    <!-- 결과 탭 -->
-                    <div class="tab-pane fade" id="results" role="tabpanel" aria-labelledby="results-tab">
-                        <div class="card">
-                            <div class="card-header bg-success text-white">
-                                <i class="bi bi-card-text me-2"></i>OCR 처리 결과
+                    <!-- OCR 결과 탭 개선 코드 -->
+<div class="tab-pane fade" id="results" role="tabpanel" aria-labelledby="results-tab">
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <i class="bi bi-card-text me-2"></i>OCR 처리 결과
+        </div>
+        <div class="card-body">
+            <?php if ($jobDetails['job']['status'] !== 'completed'): ?>
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>작업이 완료되면 결과를 확인할 수 있습니다.
+                </div>
+            <?php elseif (empty($jobResults['files'])): ?>
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>처리된 결과가 없습니다.
+                </div>
+            <?php else: ?>
+                <div class="result-container">
+                    <?php foreach ($jobResults['files'] as $idx => $result): ?>
+                        <div class="card mb-4 result-card" id="result-card-<?php echo h($idx); ?>">
+                            <div class="card-header bg-light">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0"><?php echo h(basename($result['original_file'])); ?></h5>
+                                    <div>
+                                        <span class="badge bg-primary">결과 #<?php echo h($idx + 1); ?></span>
+                                    </div>
+                                </div>
                             </div>
                             <div class="card-body">
-                                <?php if ($jobDetails['job']['status'] !== 'completed'): ?>
-                                    <div class="alert alert-info">
-                                        <i class="bi bi-info-circle me-2"></i>작업이 완료되면 결과를 확인할 수 있습니다.
-                                    </div>
-                                <?php elseif (empty($jobResults['files'])): ?>
-                                    <div class="alert alert-warning">
-                                        <i class="bi bi-exclamation-triangle me-2"></i>처리된 결과가 없습니다.
-                                    </div>
-                                <?php else: ?>
-                                    <div class="result-container">
+                                <!-- 결과 뷰어 컨테이너 -->
+                                <div class="row">
+                                    <!-- 왼쪽: 제어 버튼 패널 -->
+                                    <div class="col-md-3 mb-3">
                                         <div class="list-group">
-                                            <?php foreach ($jobResults['files'] as $idx => $result): ?>
-                                                <div class="list-group-item list-group-item-action">
-                                                    <div class="d-flex w-100 justify-content-between">
-                                                        <h5 class="mb-1"><?php echo h(basename($result['original_file'])); ?></h5>
-                                                        <small class="text-muted">결과 #<?php echo h($idx + 1); ?></small>
-                                                    </div>
-                                                    <div class="mt-3">
-                                                        <?php if (!empty($result['text_file'])): ?>
-                                                            <button class="btn btn-sm btn-outline-primary me-2 view-text-btn" 
-                                                                    data-path="<?php echo h($result['text_file']); ?>">
-                                                                <i class="bi bi-file-text me-1"></i>텍스트 결과
-                                                            </button>
-                                                        <?php endif; ?>
-                                                        
-                                                        <?php if (!empty($result['table_file'])): ?>
-                                                            <button class="btn btn-sm btn-outline-info me-2 view-table-btn" 
-                                                                    data-path="<?php echo h($result['table_file']); ?>">
-                                                                <i class="bi bi-table me-1"></i>테이블 결과
-                                                            </button>
-                                                        <?php endif; ?>
-                                                        
-                                                        <?php if (!empty($result['json_file'])): ?>
-                                                            <button class="btn btn-sm btn-outline-secondary me-2 view-json-btn" 
-                                                                    data-path="<?php echo h($result['json_file']); ?>">
-                                                                <i class="bi bi-code me-1"></i>JSON 데이터
-                                                            </button>
-                                                        <?php endif; ?>
-                                                        
-                                                        <a href="download.php?file=<?php echo urlencode($result['text_file']); ?>" 
-                                                           class="btn btn-sm btn-outline-success me-2">
-                                                            <i class="bi bi-download me-1"></i>다운로드
-                                                        </a>
-                                                        
-                                                        <button class="btn btn-sm btn-outline-primary provide-feedback-btn"
-                                                                data-file-id="<?php echo h($jobDetails['files'][$idx]['id'] ?? ''); ?>"
-                                                                data-job-id="<?php echo h($jobId); ?>">
-                                                            <i class="bi bi-chat-dots me-1"></i>피드백 제공
-                                                        </button>
-                                                    </div>
-                                                    
-                                                    <!-- 피드백 폼 -->
-                                                    <div class="feedback-form" id="feedback-form-<?php echo h($jobDetails['files'][$idx]['id'] ?? ''); ?>">
-                                                        <h6>피드백 제공</h6>
-                                                        <p class="small text-muted">오인식된 내용과 올바른 내용을 입력하세요. 이 피드백은 향후 OCR 인식률 향상에 사용됩니다.</p>
-                                                        
-                                                        <div class="mb-3">
-                                                            <label class="form-label">필드 이름</label>
-                                                            <input type="text" class="form-control field-name" placeholder="예: 금액, 날짜, 상품명">
-                                                        </div>
-                                                        
-                                                        <div class="row">
-                                                            <div class="col-md-6 mb-3">
-                                                                <label class="form-label">오인식된 텍스트</label>
-                                                                <input type="text" class="form-control original-text" placeholder="잘못 인식된 텍스트">
-                                                            </div>
-                                                            <div class="col-md-6 mb-3">
-                                                                <label class="form-label">올바른 텍스트</label>
-                                                                <input type="text" class="form-control corrected-text" placeholder="실제 올바른 텍스트">
-                                                            </div>
-                                                        </div>
-                                                        
-                                                        <div class="mb-3">
-                                                            <button type="button" class="btn btn-sm btn-primary submit-feedback-btn" 
-                                                                    data-file-id="<?php echo h($jobDetails['files'][$idx]['id'] ?? ''); ?>"
-                                                                    data-job-id="<?php echo h($jobId); ?>">
-                                                                피드백 저장
-                                                            </button>
-                                                            <button type="button" class="btn btn-sm btn-secondary ms-2 cancel-feedback-btn">
-                                                                취소
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            <?php endforeach; ?>
+                                            <button class="list-group-item list-group-item-action active text-view-btn" 
+                                                    data-idx="<?php echo h($idx); ?>" 
+                                                    data-path="<?php echo h($result['text_file']); ?>">
+                                                <i class="bi bi-file-text me-2"></i>텍스트 결과
+                                            </button>
+                                            
+                                            <?php if (!empty($result['table_file'])): ?>
+                                            <button class="list-group-item list-group-item-action table-view-btn" 
+                                                    data-idx="<?php echo h($idx); ?>" 
+                                                    data-path="<?php echo h($result['table_file']); ?>">
+                                                <i class="bi bi-table me-2"></i>테이블 결과
+                                            </button>
+                                            <?php endif; ?>
+                                            
+                                            <?php if (!empty($result['json_file'])): ?>
+                                            <button class="list-group-item list-group-item-action json-view-btn" 
+                                                    data-idx="<?php echo h($idx); ?>" 
+                                                    data-path="<?php echo h($result['json_file']); ?>">
+                                                <i class="bi bi-code me-2"></i>JSON 데이터
+                                            </button>
+                                            <?php endif; ?>
+                                            
+                                            <div class="list-group-item">
+                                                <a href="download.php?file=<?php echo urlencode($result['text_file']); ?>" 
+                                                   class="btn btn-sm btn-success w-100">
+                                                    <i class="bi bi-download me-1"></i>다운로드
+                                                </a>
+                                            </div>
+                                            
+                                            <div class="list-group-item">
+                                                <button class="btn btn-sm btn-primary w-100 provide-feedback-btn"
+                                                        data-file-id="<?php echo h($jobDetails['files'][$idx]['id'] ?? ''); ?>"
+                                                        data-job-id="<?php echo h($jobId); ?>">
+                                                    <i class="bi bi-chat-dots me-1"></i>피드백 제공
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                     
-                                    <div class="mt-3">
-                                        <a href="download_all.php?job_id=<?php echo h($jobId); ?>" class="btn btn-success">
-                                            <i class="bi bi-download me-1"></i>모든 결과 다운로드 (ZIP)
-                                        </a>
+                                    <!-- 오른쪽: 결과 표시 영역 -->
+                                    <div class="col-md-9">
+                                        <!-- 텍스트 결과 영역 -->
+                                        <div class="content-viewer text-viewer-<?php echo h($idx); ?>" style="display: block;">
+                                            <div class="p-3 border rounded bg-light">
+                                                <div class="text-content" style="white-space: pre-wrap; font-family: monospace; max-height: 500px; overflow-y: auto;">
+                                                    <!-- 텍스트 내용은 JavaScript로 로드됨 -->
+                                                    <div class="spinner-border text-primary" role="status">
+                                                        <span class="visually-hidden">로딩중...</span>
+                                                    </div>
+                                                    <span class="ms-2">텍스트 결과 로딩 중...</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- 테이블 결과 영역 -->
+                                        <div class="content-viewer table-viewer-<?php echo h($idx); ?>" style="display: none;">
+                                            <div class="p-3 border rounded bg-light">
+                                                <div class="table-content" style="max-height: 500px; overflow-y: auto;">
+                                                    <!-- 테이블 내용은 JavaScript로 로드됨 -->
+                                                    <div class="spinner-border text-primary" role="status">
+                                                        <span class="visually-hidden">로딩중...</span>
+                                                    </div>
+                                                    <span class="ms-2">테이블 결과 로딩 중...</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- JSON 결과 영역 -->
+                                        <div class="content-viewer json-viewer-<?php echo h($idx); ?>" style="display: none;">
+                                            <div class="p-3 border rounded bg-light">
+                                                <div class="json-content" style="white-space: pre-wrap; font-family: monospace; max-height: 500px; overflow-y: auto;">
+                                                    <!-- JSON 내용은 JavaScript로 로드됨 -->
+                                                    <div class="spinner-border text-primary" role="status">
+                                                        <span class="visually-hidden">로딩중...</span>
+                                                    </div>
+                                                    <span class="ms-2">JSON 데이터 로딩 중...</span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                <?php endif; ?>
+                                </div>
+                                
+                                <!-- 피드백 폼 -->
+                                <div class="feedback-form mt-3" id="feedback-form-<?php echo h($jobDetails['files'][$idx]['id'] ?? ''); ?>" style="display: none;">
+                                    <div class="card">
+                                        <div class="card-header bg-light">
+                                            <h6 class="mb-0">피드백 제공</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <p class="small text-muted">오인식된 내용과 올바른 내용을 입력하세요. 이 피드백은 향후 OCR 인식률 향상에 사용됩니다.</p>
+                                            
+                                            <div class="mb-3">
+                                                <label class="form-label">필드 이름</label>
+                                                <input type="text" class="form-control field-name" placeholder="예: 금액, 날짜, 상품명">
+                                            </div>
+                                            
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">오인식된 텍스트</label>
+                                                    <input type="text" class="form-control original-text" placeholder="잘못 인식된 텍스트">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">올바른 텍스트</label>
+                                                    <input type="text" class="form-control corrected-text" placeholder="실제 올바른 텍스트">
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <button type="button" class="btn btn-primary submit-feedback-btn" 
+                                                        data-file-id="<?php echo h($jobDetails['files'][$idx]['id'] ?? ''); ?>"
+                                                        data-job-id="<?php echo h($jobId); ?>">
+                                                    <i class="bi bi-check-circle me-1"></i>피드백 저장
+                                                </button>
+                                                <button type="button" class="btn btn-secondary ms-2 cancel-feedback-btn">
+                                                    <i class="bi bi-x-circle me-1"></i>취소
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                    <?php endforeach; ?>
+                </div>
+                
+                <div class="mt-3">
+                    <a href="download_all.php?job_id=<?php echo h($jobId); ?>" class="btn btn-success">
+                        <i class="bi bi-download me-1"></i>모든 결과 다운로드 (ZIP)
+                    </a>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
                         
                         <!-- 결과 미리보기 모달 -->
                         <div class="mt-3">
@@ -492,288 +702,6 @@ $pageTitle = '작업 상세 정보: ' . htmlspecialchars($jobDetails['job']['nam
     <!-- JavaScript 추가 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-    $(document).ready(function() {
-        // 자동 새로고침 기능
-        const autoRefreshCheckbox = $('#autoRefresh');
-        let refreshInterval;
-        
-        if (autoRefreshCheckbox.is(':checked')) {
-            startAutoRefresh();
-        }
-        
-        autoRefreshCheckbox.change(function() {
-            if ($(this).is(':checked')) {
-                startAutoRefresh();
-            } else {
-                stopAutoRefresh();
-            }
-        });
-        
-        function startAutoRefresh() {
-            refreshInterval = setInterval(refreshJobStatus, 5000); // 5초마다 갱신
-        }
-        
-        function stopAutoRefresh() {
-            clearInterval(refreshInterval);
-        }
-        
-        function refreshJobStatus() {
-            const jobId = <?php echo h($jobId); ?>;
-            
-            $.ajax({
-                url: 'ajax_job_status.php',
-                type: 'GET',
-                data: { job_id: jobId },
-                dataType: 'json',
-                success: function(response) {
-                    if (response.success) {
-                        const job = response.progress.job;
-                        const status = job.status;
-                        
-                        // 진행률 업데이트
-                        $('#progressBar').width(job.progress + '%');
-                        $('#progressBar').text(job.progress + '%');
-                        $('#processedFiles').text(job.processed_files);
-                        $('#lastUpdated').text(new Date().toLocaleString());
-                        
-                        // 작업이 완료되면 새로고침 중지
-                        if (status !== 'processing' && status !== 'queued') {
-                            stopAutoRefresh();
-                            autoRefreshCheckbox.prop('checked', false);
-                            location.reload(); // 페이지 새로고침
-                        }
-                    }
-                }
-            });
-        }
-        
-        // 결과 보기 버튼 클릭
-        $('.view-result-btn').click(function() {
-            const fileId = $(this).data('file-id');
-            const textPath = $(this).data('text-path');
-            const jsonPath = $(this).data('json-path');
-            const tablePath = $(this).data('table-path');
-            
-            // 텍스트 결과 로드
-            if (textPath) {
-                loadTextResult(textPath);
-            }
-            
-            // 탭 전환
-            $('#resultPreview').show();
-            $('#results-tab').tab('show');
-        });
-        
-        // 텍스트 결과 보기 버튼
-        $('.view-text-btn').click(function() {
-            const path = $(this).data('path');
-            loadTextResult(path);
-        });
-        
-        // JSON 결과 보기 버튼
-        $('.view-json-btn').click(function() {
-            const path = $(this).data('path');
-            loadJsonResult(path);
-        });
-        
-        // 테이블 결과 보기 버튼
-        $('.view-table-btn').click(function() {
-            const path = $(this).data('path');
-            loadTableResult(path);
-        });
-        
-        // 미리보기 닫기 버튼
-        $('#closePreview').click(function() {
-            $('#resultPreview').hide();
-            $('#textPreview, #jsonPreview, #tablePreview').hide();
-        });
-        
-        // 텍스트 결과 로드
-        function loadTextResult(path) {
-            $.ajax({
-                url: 'ajax_get_file_content.php',
-                type: 'GET',
-                data: { path: path },
-                dataType: 'json',
-                success: function(response) {
-                    if (response.success) {
-                        $('#previewTitle').text('텍스트 결과');
-                        $('#textPreview').html(response.content.replace(/\n/g, '<br>')).show();
-                        $('#jsonPreview, #tablePreview').hide();
-                        $('#resultPreview').show();
-                    } else {
-                        alert('파일을 로드할 수 없습니다: ' + response.message);
-                    }
-                },
-                error: function() {
-                    alert('파일 로드 중 오류가 발생했습니다.');
-                }
-            });
-        }
-        
-        // JSON 결과 로드
-        function loadJsonResult(path) {
-            $.ajax({
-                url: 'ajax_get_file_content.php',
-                type: 'GET',
-                data: { path: path },
-                dataType: 'json',
-                success: function(response) {
-                    if (response.success) {
-                        $('#previewTitle').text('JSON 데이터');
-                        try {
-                            const jsonObj = JSON.parse(response.content);
-                            const formattedJson = JSON.stringify(jsonObj, null, 4);
-                            $('#jsonPreview').text(formattedJson).show();
-                        } catch (e) {
-                            $('#jsonPreview').text(response.content).show();
-                        }
-                        $('#textPreview, #tablePreview').hide();
-                        $('#resultPreview').show();
-                    } else {
-                        alert('파일을 로드할 수 없습니다: ' + response.message);
-                    }
-                },
-                error: function() {
-                    alert('파일 로드 중 오류가 발생했습니다.');
-                }
-            });
-        }
-        
-        // 테이블 결과 로드
-        function loadTableResult(path) {
-            $.ajax({
-                url: 'ajax_get_file_content.php',
-                type: 'GET',
-                data: { path: path, raw: true },
-                dataType: 'json',
-                success: function(response) {
-                    if (response.success) {
-                        $('#previewTitle').text('테이블 결과');
-                        $('#tablePreview').html(response.content).show();
-                        $('#textPreview, #jsonPreview').hide();
-                        $('#resultPreview').show();
-                    } else {
-                        alert('파일을 로드할 수 없습니다: ' + response.message);
-                    }
-                },
-                error: function() {
-                    alert('파일 로드 중 오류가 발생했습니다.');
-                }
-            });
-        }
-        
-        // 작업 취소 버튼
-        $('#cancelJobBtn').click(function() {
-            if (confirm('정말로 이 작업을 취소하시겠습니까?')) {
-                const jobId = $(this).data('job-id');
-                
-                $.ajax({
-                    url: 'ajax_cancel_job.php',
-                    type: 'POST',
-                    data: { job_id: jobId },
-                    dataType: 'json',
-                    success: function(response) {
-                        if (response.success) {
-                            alert('작업이 취소되었습니다.');
-                            location.reload();
-                        } else {
-                            alert('작업 취소 중 오류가 발생했습니다: ' + response.message);
-                        }
-                    },
-                    error: function() {
-                        alert('요청 중 오류가 발생했습니다.');
-                    }
-                });
-            }
-        });
-        
-        // 작업 삭제 버튼
-        $('#deleteJobBtn').click(function() {
-            if (confirm('정말로 이 작업을 삭제하시겠습니까? 모든 결과 파일이 삭제됩니다.')) {
-                const jobId = $(this).data('job-id');
-                
-                $.ajax({
-                    url: 'ajax_delete_job.php',
-                    type: 'POST',
-                    data: { job_id: jobId },
-                    dataType: 'json',
-                    success: function(response) {
-                        if (response.success) {
-                            alert('작업이 삭제되었습니다.');
-                            window.location.href = 'jobs.php';
-                        } else {
-                            alert('작업 삭제 중 오류가 발생했습니다: ' + response.message);
-                        }
-                    },
-                    error: function() {
-                        alert('요청 중 오류가 발생했습니다.');
-                    }
-                });
-            }
-        });
-        
-        // 피드백 제공 버튼
-        $('.provide-feedback-btn').click(function() {
-            const fileId = $(this).data('file-id');
-            $('#feedback-form-' + fileId).toggle();
-        });
-        
-        // 피드백 취소 버튼
-        $('.cancel-feedback-btn').click(function() {
-            $(this).closest('.feedback-form').hide();
-        });
-        
-        // 피드백 제출 버튼
-        $('.submit-feedback-btn').click(function() {
-            const fileId = $(this).data('file-id');
-            const jobId = $(this).data('job-id');
-            const form = $('#feedback-form-' + fileId);
-            
-            const fieldName = form.find('.field-name').val();
-            const originalText = form.find('.original-text').val();
-            const correctedText = form.find('.corrected-text').val();
-            
-            if (!fieldName || !originalText || !correctedText) {
-                alert('모든 필드를 입력해주세요.');
-                return;
-            }
-            
-            const feedbackData = {
-                job_id: jobId,
-                file_id: fileId,
-                corrections: [
-                    {
-                        type: 'field',
-                        field: fieldName,
-                        original: originalText,
-                        corrected: correctedText
-                    }
-                ]
-            };
-            
-            $.ajax({
-                url: 'ajax_save_feedback.php',
-                type: 'POST',
-                data: JSON.stringify(feedbackData),
-                contentType: 'application/json',
-                dataType: 'json',
-                success: function(response) {
-                    if (response.success) {
-                        alert('피드백이 저장되었습니다. 향후 OCR 인식률 향상에 사용됩니다.');
-                        form.hide();
-                        form.find('.field-name, .original-text, .corrected-text').val('');
-                    } else {
-                        alert('피드백 저장 중 오류가 발생했습니다: ' + response.message);
-                    }
-                },
-                error: function() {
-                    alert('요청 중 오류가 발생했습니다.');
-                }
-            });
-        });
-    });
-    </script>
+    <script src="js/view_job.js"></script>
 </body>
 </html>
