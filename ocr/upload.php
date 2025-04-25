@@ -20,7 +20,7 @@ if ($templateId) {
 }
 
 // 사용 가능한 템플릿 목록 가져오기 (모든 템플릿)
-$templates = $learningSystem->getUserTemplates(null);
+$templates = $learningSystem->getTemplates(true);
 
 // 페이지 제목
 $pageTitle = '이미지 업로드 및 OCR 처리';

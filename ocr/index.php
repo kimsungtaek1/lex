@@ -46,7 +46,7 @@ function getStatusText($status) {
 $learningSystem = new DocumentLearningSystem();
 
 // 사용 가능한 템플릿 가져오기
-$templates = $learningSystem->getUserTemplates(null);
+$templates = $learningSystem->getTemplates(true);
 
 // 작업 통계
 $stmt = getDB()->prepare("

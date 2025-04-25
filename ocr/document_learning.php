@@ -106,10 +106,9 @@ class DocumentLearningSystem {
      */
     public function getTemplate($templateId) {
         $stmt = $this->db->prepare("
-            SELECT t.*, u.username
-            FROM ocr_document_templates t
-            LEFT JOIN ocr_users u ON t.user_id = u.id
-            WHERE t.id = ?
+            SELECT *
+            FROM ocr_document_templates
+            WHERE id = ?
         ");
         
         $stmt->execute([$templateId]);
@@ -135,11 +134,8 @@ class DocumentLearningSystem {
      */
     public function getTemplates($includePublic = true) {
         $sql = "
-            SELECT t.id, t.name, t.description, t.is_public, t.created_at, t.updated_at,
-                   u.username,
-                   (SELECT COUNT(*) FROM ocr_jobs WHERE document_type = t.id) as usage_count
+            SELECT t.id, t.name, t.description, t.is_public, t.created_at, t.updated_at
             FROM ocr_document_templates t
-            LEFT JOIN ocr_users u ON t.user_id = u.id
             WHERE t.is_active = 1
         ";
         
@@ -154,7 +150,14 @@ class DocumentLearningSystem {
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
         
-        return $stmt->fetchAll();
+        $templates = $stmt->fetchAll();
+        foreach ($templates as &$template) {
+            $template['fields'] = json_decode($template['fields'], true) ?: [];
+            $template['table_structure'] = json_decode($template['table_structure'], true) ?: [];
+            $template['learning_data'] = json_decode($template['learning_data'], true) ?: [];
+            $template['learning_statistics'] = json_decode($template['learning_statistics'], true) ?: [];
+        }
+        return $templates;
     }
     
     /**
@@ -292,7 +295,7 @@ class DocumentLearningSystem {
                     $tableStructure['header_learning'] = [];
                 }
                 
-                // 특정 열의 학습 데이터가 없으면 초기화
+                // 헤더 학습 데이터가 없으면 초기화
                 if (!isset($tableStructure['header_learning'][$columnIndex])) {
                     $tableStructure['header_learning'][$columnIndex] = [];
                 }

@@ -11,7 +11,7 @@ require_once 'document_learning.php';
 $learningSystem = new DocumentLearningSystem();
 
 // 템플릿 목록 가져오기 (모든 템플릿)
-$templates = $learningSystem->getUserTemplates(null); // null로 모든 템플릿
+$templates = $learningSystem->getTemplates(true); // true로 모든 템플릿
 
 // 템플릿 삭제 처리
 if (isset($_POST['action']) && $_POST['action'] === 'delete' && isset($_POST['template_id'])) {
@@ -30,7 +30,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete' && isset($_POST['te
         $successMessage = "템플릿이 삭제되었습니다.";
         
         // 템플릿 목록 갱신
-        $templates = $learningSystem->getUserTemplates(null);
+        $templates = $learningSystem->getTemplates(true);
     } catch (Exception $e) {
         $errorMessage = "템플릿 삭제 중 오류가 발생했습니다: " . $e->getMessage();
     }
