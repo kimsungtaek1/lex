@@ -1,31 +1,83 @@
 /**
- * OCR 인식률 향상 시스템 - 결과 분석 및 피드백 기능
- * 
- * 이 JavaScript 코드는 OCR로 처리된 이미지 결과를 분석하고 시각화하는 기능을 제공합니다.
- * 주요 기능:
- * - OCR 처리 결과 분석 및 요약 (문서 유형, 핵심 정보 등)
- * - 텍스트, 테이블, JSON 결과 시각화
- * - 사용자 피드백 시스템 (OCR 정확도 향상을 위한)
- * - 자동 작업 상태 새로고침
+ * OCR 인식률 향상 시스템 - 결과 분석 및 피드백 기능 (디버깅 개선 버전)
  */
 
 // 전역 변수로 OCR 결과 처리 함수 선언
 var ocrResultProcessor = null;
+var debugMode = true; // 디버깅 모드 켜기
 
 $(document).ready(function() {
     // 전역 변수
     let currentJobId = null;
     
+    // UI에 디버그 메시지 표시 함수
+    function debugToUI(message, type = 'info') {
+        if (!debugMode) return;
+        
+        // 디버그 컨테이너가 없으면 생성
+        if ($('#debug-container').length === 0) {
+            $('<div id="debug-container" class="mt-3 p-3 border rounded bg-light" style="display:none;">' +
+              '<h6><i class="bi bi-bug"></i> 디버그 정보 <button id="toggle-debug" class="btn btn-sm btn-outline-secondary float-end">숨기기</button></h6>' +
+              '<div id="debug-messages" style="max-height: 200px; overflow-y: auto;"></div>' +
+              '</div>').insertAfter('#chatbot-container');
+            
+            // 토글 버튼 이벤트
+            $(document).on('click', '#toggle-debug', function() {
+                const $messages = $('#debug-messages');
+                if ($messages.is(':visible')) {
+                    $messages.hide();
+                    $(this).text('보이기');
+                } else {
+                    $messages.show();
+                    $(this).text('숨기기');
+                }
+            });
+        }
+        
+        // 컨테이너 표시
+        $('#debug-container').show();
+        
+        // 타입에 따른 스타일 클래스
+        const typeClass = type === 'error' ? 'text-danger' :
+                         type === 'warning' ? 'text-warning' : 'text-info';
+        
+        // 타임스탬프 추가
+        const now = new Date();
+        const timestamp = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}.${now.getMilliseconds()}`;
+        
+        // 메시지 추가
+        $('#debug-messages').append(
+            `<div class="${typeClass} small">[${timestamp}] ${message}</div>`
+        );
+        
+        // 콘솔에도 출력 (브라우저 콘솔용)
+        if (type === 'error') {
+            console.error(message);
+        } else if (type === 'warning') {
+            console.warn(message);
+        } else {
+            console.log(message);
+        }
+        
+        // 스크롤 최하단으로
+        const $debugMessages = $('#debug-messages');
+        $debugMessages.scrollTop($debugMessages[0].scrollHeight);
+    }
+    
     // 초기화 함수 - 페이지 로드 시 실행
     function initialize() {
+        debugToUI('초기화 함수 실행 시작');
+        
         // 현재 작업 ID 확인
         currentJobId = $('#cancelJobBtn').data('job-id') || $('#deleteJobBtn').data('job-id');
+        debugToUI(`현재 작업 ID: ${currentJobId}`);
         
         // 페이지 로드 시 각 파일의 첫 번째 결과(텍스트)를 자동으로 로드
         $('.result-card').each(function() {
             const idx = $(this).attr('id').split('-').pop();
             const textBtn = $(this).find('.text-view-btn');
             if (textBtn.length) {
+                debugToUI(`텍스트 뷰 버튼 발견: 인덱스 ${idx}`);
                 const path = textBtn.data('path');
                 loadTextResult(path, idx);
             }
@@ -33,19 +85,30 @@ $(document).ready(function() {
 
         // 자동 새로고침 설정
         if ($('#autoRefresh').length) {
+            debugToUI('자동 새로고침 기능 설정');
             setupAutoRefresh();
         }
         
+        // 결과 탭이 활성화되어 있는지 확인
+        const resultsTabActive = $('#results-tab').hasClass('active');
+        debugToUI(`결과 탭 활성화 상태: ${resultsTabActive}`);
+        
         // 결과 탭이 활성화되어 있으면 OCR 결과 로드
-        if ($('#results-tab').hasClass('active')) {
-            loadAndProcessOcrResults();
+        if (resultsTabActive) {
+            debugToUI('결과 탭이 활성화되어 있어 OCR 결과 로드 시작');
+            setTimeout(function() {
+                loadAndProcessOcrResults();
+            }, 500); // 약간의 지연 추가
         }
+        
+        debugToUI('초기화 함수 실행 완료');
     }
     
     // 텍스트 결과 보기 버튼
     $(document).on('click', '.text-view-btn', function() {
         const idx = $(this).data('idx');
         const path = $(this).data('path');
+        debugToUI(`텍스트 뷰 버튼 클릭: 인덱스 ${idx}, 경로 ${path}`);
         
         // 활성 버튼 스타일 변경
         $(this).closest('.list-group').find('.list-group-item').removeClass('active');
@@ -65,6 +128,7 @@ $(document).ready(function() {
     $(document).on('click', '.table-view-btn', function() {
         const idx = $(this).data('idx');
         const path = $(this).data('path');
+        debugToUI(`테이블 뷰 버튼 클릭: 인덱스 ${idx}, 경로 ${path}`);
         
         // 활성 버튼 스타일 변경
         $(this).closest('.list-group').find('.list-group-item').removeClass('active');
@@ -84,6 +148,7 @@ $(document).ready(function() {
     $(document).on('click', '.json-view-btn', function() {
         const idx = $(this).data('idx');
         const path = $(this).data('path');
+        debugToUI(`JSON 뷰 버튼 클릭: 인덱스 ${idx}, 경로 ${path}`);
         
         // 활성 버튼 스타일 변경
         $(this).closest('.list-group').find('.list-group-item').removeClass('active');
@@ -103,6 +168,7 @@ $(document).ready(function() {
     $(document).on('click', '.view-result-btn', function() {
         const fileId = $(this).data('file-id');
         const textPath = $(this).data('text-path');
+        debugToUI(`결과 보기 버튼 클릭: 파일 ID ${fileId}, 텍스트 경로 ${textPath}`);
         
         // 텍스트 결과 로드
         if (textPath) {
@@ -116,6 +182,7 @@ $(document).ready(function() {
                 const resultFileId = $(this).find('.submit-feedback-btn').data('file-id');
                 
                 if (resultFileId == fileId) {
+                    debugToUI(`해당 결과 카드 발견: 인덱스 ${idx}, 파일 ID ${resultFileId}`);
                     // 텍스트 버튼 클릭 이벤트 트리거
                     $(this).find('.text-view-btn').click();
                     
@@ -130,130 +197,22 @@ $(document).ready(function() {
         }
     });
     
-    // 피드백 제공 버튼
-    $(document).on('click', '.provide-feedback-btn', function() {
-        const fileId = $(this).data('file-id');
-        $(`#feedback-form-${fileId}`).slideToggle();
-    });
-    
-    // 피드백 취소 버튼
-    $(document).on('click', '.cancel-feedback-btn', function() {
-        $(this).closest('.feedback-form').slideUp();
-    });
-    
-    // 피드백 제출 버튼
-    $(document).on('click', '.submit-feedback-btn', function() {
-        const fileId = $(this).data('file-id');
-        const jobId = $(this).data('job-id');
-        const form = $(`#feedback-form-${fileId}`);
-        
-        const fieldName = form.find('.field-name').val();
-        const originalText = form.find('.original-text').val();
-        const correctedText = form.find('.corrected-text').val();
-        
-        if (!fieldName || !originalText || !correctedText) {
-            showAlert('warning', '모든 필드를 입력해주세요.');
-            return;
-        }
-        
-        const feedbackData = {
-            job_id: jobId,
-            file_id: fileId,
-            corrections: [
-                {
-                    type: 'field',
-                    field: fieldName,
-                    original: originalText,
-                    corrected: correctedText
-                }
-            ]
-        };
-        
-        // 피드백 저장 AJAX 요청
-        $.ajax({
-            url: 'ajax_save_feedback.php',
-            type: 'POST',
-            data: JSON.stringify(feedbackData),
-            contentType: 'application/json',
-            dataType: 'json',
-            success: function(response) {
-                if (response.success) {
-                    showAlert('success', '피드백이 저장되었습니다. 향후 OCR 인식률 향상에 사용됩니다.');
-                    form.slideUp();
-                    form.find('.field-name, .original-text, .corrected-text').val('');
-                } else {
-                    showAlert('danger', '피드백 저장 중 오류가 발생했습니다: ' + response.message);
-                }
-            },
-            error: function() {
-                showAlert('danger', '요청 중 오류가 발생했습니다.');
-            }
-        });
-    });
-    
-    // 작업 취소 버튼
-    $('#cancelJobBtn').click(function() {
-        if (!confirm('정말로 이 작업을 취소하시겠습니까?')) return;
-        
-        const jobId = $(this).data('job-id');
-        
-        $.ajax({
-            url: 'ajax_cancel_job.php',
-            type: 'POST',
-            data: { job_id: jobId },
-            dataType: 'json',
-            success: function(response) {
-                if (response.success) {
-                    alert('작업이 취소되었습니다.');
-                    location.reload();
-                } else {
-                    alert('작업 취소 중 오류: ' + response.message);
-                }
-            },
-            error: function() {
-                alert('요청 중 오류가 발생했습니다.');
-            }
-        });
-    });
-    
-    // 작업 삭제 버튼
-    $('#deleteJobBtn').click(function() {
-        if (!confirm('정말로 이 작업을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
-        
-        const jobId = $(this).data('job-id');
-        
-        $.ajax({
-            url: 'ajax_delete_job.php',
-            type: 'POST',
-            data: { job_id: jobId },
-            dataType: 'json',
-            success: function(response) {
-                if (response.success) {
-                    alert('작업이 삭제되었습니다.');
-                    window.location.href = 'jobs.php';
-                } else {
-                    alert('작업 삭제 중 오류: ' + response.message);
-                }
-            },
-            error: function() {
-                alert('요청 중 오류가 발생했습니다.');
-            }
-        });
-    });
-    
     // 결과 탭 클릭 시 OCR 결과 자동 로드
     $('#results-tab').on('click', function() {
-        if ($('#chatbot-container .chat-messages').is(':empty')) {
+        debugToUI('결과 탭 클릭됨');
+        const chatMessagesEmpty = $('#chatbot-container .chat-messages').is(':empty');
+        debugToUI(`채팅 메시지 비어있음: ${chatMessagesEmpty}`);
+        
+        if (chatMessagesEmpty) {
+            debugToUI('OCR 결과 로드 시작 (탭 클릭에 의해)');
             loadAndProcessOcrResults();
         }
     });
     
-    // --------------------------------------------------------------------------------
-    // 파일 내용 로드 함수
-    // --------------------------------------------------------------------------------
-    
     // 텍스트 결과 로드 함수
     function loadTextResult(path, idx) {
+        debugToUI(`텍스트 결과 로드 시작: 경로 ${path}, 인덱스 ${idx}`);
+        
         $(`.text-viewer-${idx} .text-content`).html(`
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">로딩중...</span>
@@ -267,11 +226,15 @@ $(document).ready(function() {
             data: { path: path },
             dataType: 'json',
             success: function(response) {
+                debugToUI(`텍스트 로드 AJAX 성공: ${path}`);
+                
                 if (response.success) {
                     // HTML 안전 처리 및 줄바꿈 유지
                     const formattedText = processTextForDisplay(response.content);
                     $(`.text-viewer-${idx} .text-content`).html(formattedText);
+                    debugToUI(`텍스트 표시 완료: 길이 ${response.content?.length || 0}자`);
                 } else {
+                    debugToUI(`텍스트 로드 실패: ${response.message}`, 'error');
                     $(`.text-viewer-${idx} .text-content`).html(`
                         <div class="alert alert-danger">
                             <i class="bi bi-exclamation-triangle me-2"></i>파일을 로드할 수 없습니다: ${response.message}
@@ -279,10 +242,11 @@ $(document).ready(function() {
                     `);
                 }
             },
-            error: function() {
+            error: function(xhr, status, error) {
+                debugToUI(`텍스트 로드 AJAX 오류: ${status} - ${error}`, 'error');
                 $(`.text-viewer-${idx} .text-content`).html(`
                     <div class="alert alert-danger">
-                        <i class="bi bi-exclamation-triangle me-2"></i>파일 로드 중 오류가 발생했습니다.
+                        <i class="bi bi-exclamation-triangle me-2"></i>파일 로드 중 오류가 발생했습니다: ${error}
                     </div>
                 `);
             }
@@ -291,6 +255,8 @@ $(document).ready(function() {
     
     // JSON 결과 로드 함수
     function loadJsonResult(path, idx) {
+        debugToUI(`JSON 결과 로드 시작: 경로 ${path}, 인덱스 ${idx}`);
+        
         $(`.json-viewer-${idx} .json-content`).html(`
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">로딩중...</span>
@@ -304,15 +270,20 @@ $(document).ready(function() {
             data: { path: path },
             dataType: 'json',
             success: function(response) {
+                debugToUI(`JSON 로드 AJAX 성공: ${path}`);
+                
                 if (response.success) {
                     try {
                         const jsonObj = JSON.parse(response.content);
                         const formattedJson = JSON.stringify(jsonObj, null, 4);
                         $(`.json-viewer-${idx} .json-content`).html(escapeHtml(formattedJson));
+                        debugToUI(`JSON 표시 완료: 길이 ${formattedJson.length}자`);
                     } catch (e) {
+                        debugToUI(`JSON 파싱 오류: ${e.message}`, 'error');
                         $(`.json-viewer-${idx} .json-content`).html(escapeHtml(response.content));
                     }
                 } else {
+                    debugToUI(`JSON 로드 실패: ${response.message}`, 'error');
                     $(`.json-viewer-${idx} .json-content`).html(`
                         <div class="alert alert-danger">
                             <i class="bi bi-exclamation-triangle me-2"></i>파일을 로드할 수 없습니다: ${response.message}
@@ -320,10 +291,11 @@ $(document).ready(function() {
                     `);
                 }
             },
-            error: function() {
+            error: function(xhr, status, error) {
+                debugToUI(`JSON 로드 AJAX 오류: ${status} - ${error}`, 'error');
                 $(`.json-viewer-${idx} .json-content`).html(`
                     <div class="alert alert-danger">
-                        <i class="bi bi-exclamation-triangle me-2"></i>파일 로드 중 오류가 발생했습니다.
+                        <i class="bi bi-exclamation-triangle me-2"></i>파일 로드 중 오류가 발생했습니다: ${error}
                     </div>
                 `);
             }
@@ -332,6 +304,8 @@ $(document).ready(function() {
     
     // 테이블 결과 로드 함수
     function loadTableResult(path, idx) {
+        debugToUI(`테이블 결과 로드 시작: 경로 ${path}, 인덱스 ${idx}`);
+        
         $(`.table-viewer-${idx} .table-content`).html(`
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">로딩중...</span>
@@ -345,9 +319,13 @@ $(document).ready(function() {
             data: { path: path, raw: true },
             dataType: 'json',
             success: function(response) {
+                debugToUI(`테이블 로드 AJAX 성공: ${path}`);
+                
                 if (response.success) {
                     $(`.table-viewer-${idx} .table-content`).html(response.content);
+                    debugToUI(`테이블 표시 완료: 길이 ${response.content?.length || 0}자`);
                 } else {
+                    debugToUI(`테이블 로드 실패: ${response.message}`, 'error');
                     $(`.table-viewer-${idx} .table-content`).html(`
                         <div class="alert alert-danger">
                             <i class="bi bi-exclamation-triangle me-2"></i>파일을 로드할 수 없습니다: ${response.message}
@@ -355,25 +333,23 @@ $(document).ready(function() {
                     `);
                 }
             },
-            error: function() {
+            error: function(xhr, status, error) {
+                debugToUI(`테이블 로드 AJAX 오류: ${status} - ${error}`, 'error');
                 $(`.table-viewer-${idx} .table-content`).html(`
                     <div class="alert alert-danger">
-                        <i class="bi bi-exclamation-triangle me-2"></i>파일 로드 중 오류가 발생했습니다.
+                        <i class="bi bi-exclamation-triangle me-2"></i>파일 로드 중 오류가 발생했습니다: ${error}
                     </div>
                 `);
             }
         });
     }
     
-    // --------------------------------------------------------------------------------
-    // OCR 결과 분석 및 표시 함수
-    // --------------------------------------------------------------------------------
-    
     // OCR JSON 데이터를 로드하고 처리하는 함수
     function loadAndProcessOcrResults() {
-        console.log("OCR 결과 로드 시작");
+        debugToUI("OCR 결과 로드 시작");
         
         if ($('.result-card').length === 0) {
+            debugToUI("처리할 결과 카드를 찾을 수 없음", "warning");
             showChatbotError('처리할 결과 카드를 찾을 수 없습니다.');
             return;
         }
@@ -383,24 +359,29 @@ $(document).ready(function() {
         const jsonBtn = firstCard.find('.json-view-btn');
         
         if (jsonBtn.length === 0) {
+            debugToUI("JSON 버튼을 찾을 수 없음 - 텍스트 기반 분석으로 대체", "warning");
             // JSON 버튼이 없으면 텍스트 기반 분석으로 대체
             const textBtn = firstCard.find('.text-view-btn');
             if (textBtn.length > 0) {
-                loadAndProcessTextResults(textBtn.data('path'));
+                const textPath = textBtn.data('path');
+                debugToUI(`텍스트 경로 발견: ${textPath}`);
+                loadAndProcessTextResults(textPath);
                 return;
             }
             
+            debugToUI("분석할 텍스트 경로도 찾을 수 없음", "error");
             showChatbotError('분석할 결과 데이터를 찾을 수 없습니다.');
             return;
         }
         
         const jsonPath = jsonBtn.data('path');
         if (!jsonPath) {
+            debugToUI("JSON 파일 경로가 비어있음", "error");
             showChatbotError('JSON 파일 경로를 찾을 수 없습니다.');
             return;
         }
         
-        console.log("JSON 파일 경로:", jsonPath);
+        debugToUI(`JSON 파일 경로: ${jsonPath}`);
         
         // 로딩 표시
         $('#chatbot-container .chat-loading').show();
@@ -413,16 +394,17 @@ $(document).ready(function() {
             data: { path: jsonPath },
             dataType: 'json',
             success: function(response) {
-                console.log("AJAX 응답 받음:", response.success);
+                debugToUI(`AJAX 응답 받음: success=${response.success}`);
                 
                 if (response.success) {
                     try {
                         // JSON 문자열 처리 및 파싱
                         let jsonContent = response.content;
-                        console.log("JSON 콘텐츠 길이:", jsonContent.length);
+                        debugToUI(`JSON 콘텐츠 길이: ${jsonContent?.length || 0}`);
                         
                         // 빈 응답 확인
                         if (!jsonContent || jsonContent.trim() === '') {
+                            debugToUI("JSON 내용이 비어있음 - 텍스트 기반 분석으로 대체", "warning");
                             // 텍스트 기반 분석으로 대체
                             const textBtn = firstCard.find('.text-view-btn');
                             if (textBtn.length > 0) {
@@ -436,9 +418,11 @@ $(document).ready(function() {
                         
                         // JSON 유효성 확인 및 필요시 전처리
                         jsonContent = preprocessJsonContent(jsonContent);
+                        debugToUI("JSON 전처리 완료");
                         
                         if (!isValidJSON(jsonContent)) {
-                            console.log("유효하지 않은 JSON 형식");
+                            debugToUI("유효하지 않은 JSON 형식 - 문자열 일부 표시: " + 
+                                     jsonContent.substring(0, 100) + "...", "error");
                             
                             // 텍스트 기반 분석으로 대체
                             const textBtn = firstCard.find('.text-view-btn');
@@ -451,11 +435,12 @@ $(document).ready(function() {
                             return;
                         }
                         
+                        debugToUI("JSON 유효성 검사 통과, 파싱 시작");
                         const ocrData = JSON.parse(jsonContent);
                         
                         // OCR 데이터 검증
                         if (!ocrData || !ocrData.images || !Array.isArray(ocrData.images) || ocrData.images.length === 0) {
-                            console.log("유효한 OCR 데이터 구조가 아님");
+                            debugToUI("유효한 OCR 데이터 구조가 아님 - 필수 필드 누락", "error");
                             
                             // 텍스트 기반 분석으로 대체
                             const textBtn = firstCard.find('.text-view-btn');
@@ -469,10 +454,12 @@ $(document).ready(function() {
                         }
                         
                         // 데이터 처리 및 표시
+                        debugToUI("OCR 데이터 검증 통과, 처리 및 표시 시작");
                         processAndDisplayOcrData(ocrData);
                         
                     } catch (e) {
-                        console.error("JSON 파싱 오류:", e);
+                        debugToUI(`JSON 파싱 오류: ${e.message}`, "error");
+                        debugToUI(`스택 트레이스: ${e.stack}`, "error");
                         
                         // 텍스트 기반 분석으로 대체
                         const textBtn = firstCard.find('.text-view-btn');
@@ -484,7 +471,7 @@ $(document).ready(function() {
                         showChatbotError('JSON 파싱 중 오류가 발생했습니다: ' + e.message);
                     }
                 } else {
-                    console.log("AJAX 실패:", response.message);
+                    debugToUI(`AJAX 성공했지만 응답 실패: ${response.message}`, "error");
                     
                     // 텍스트 기반 분석으로 대체
                     const textBtn = firstCard.find('.text-view-btn');
@@ -497,7 +484,10 @@ $(document).ready(function() {
                 }
             },
             error: function(xhr, status, error) {
-                console.error("AJAX 요청 오류:", status, error);
+                debugToUI(`AJAX 요청 오류: ${status} - ${error}`, "error");
+                if (xhr.responseText) {
+                    debugToUI(`서버 응답: ${xhr.responseText.substring(0, 200)}...`, "error");
+                }
                 
                 // 텍스트 기반 분석으로 대체
                 const textBtn = firstCard.find('.text-view-btn');
@@ -513,7 +503,10 @@ $(document).ready(function() {
     
     // 텍스트 파일 기반 분석 함수
     function loadAndProcessTextResults(textPath) {
+        debugToUI(`텍스트 파일 기반 분석 시작: ${textPath}`);
+        
         if (!textPath) {
+            debugToUI("텍스트 파일 경로를 찾을 수 없음", "error");
             showChatbotError('텍스트 파일 경로를 찾을 수 없습니다.');
             return;
         }
@@ -529,21 +522,28 @@ $(document).ready(function() {
             data: { path: textPath },
             dataType: 'json',
             success: function(response) {
+                debugToUI(`텍스트 파일 로드 AJAX 성공: ${textPath}`);
+                
                 if (response.success) {
                     const text = response.content || '';
+                    debugToUI(`텍스트 내용 길이: ${text.length}`);
                     
                     if (!text || text.trim() === '') {
+                        debugToUI("텍스트 내용이 비어있음", "warning");
                         showChatbotError('텍스트 내용이 비어있습니다.');
                         return;
                     }
                     
                     // 텍스트 기반 분석 및 표시
+                    debugToUI("텍스트 분석 시작");
                     analyzeAndDisplayText(text);
                 } else {
+                    debugToUI(`텍스트 파일 로드 실패: ${response.message}`, "error");
                     showChatbotError('텍스트 파일을 로드할 수 없습니다: ' + response.message);
                 }
             },
             error: function(xhr, status, error) {
+                debugToUI(`텍스트 파일 로드 AJAX 오류: ${status} - ${error}`, "error");
                 showChatbotError('파일 로드 중 오류가 발생했습니다: ' + error);
             }
         });
@@ -551,6 +551,7 @@ $(document).ready(function() {
     
     // 텍스트 분석 및 표시 함수
     function analyzeAndDisplayText(text) {
+        debugToUI("텍스트 분석 및 표시 시작");
         const chatMessages = $('#chatbot-container .chat-messages');
         chatMessages.empty();
         
@@ -560,12 +561,14 @@ $(document).ready(function() {
         // 문서 유형 추측
         const documentType = guessDocumentTypeFromText(text);
         if (documentType) {
+            debugToUI(`문서 유형 추측: ${documentType}`);
             addChatbotMessage(`이 문서는 **${documentType}** 유형으로 보입니다.`);
         }
         
         // 키-값 쌍 찾기
         const keyValues = extractKeyValuePairsFromText(text);
         if (Object.keys(keyValues).length > 0) {
+            debugToUI(`키-값 쌍 ${Object.keys(keyValues).length}개 추출`);
             let fieldsMessage = '문서에서 다음 정보를 확인했습니다:';
             for (const [key, value] of Object.entries(keyValues)) {
                 fieldsMessage += `\n- **${key}**: ${value}`;
@@ -576,23 +579,27 @@ $(document).ready(function() {
         // 날짜 추출
         const dates = extractDatesFromText(text);
         if (dates.length > 0) {
+            debugToUI(`날짜 정보 ${dates.length}개 추출`);
             addChatbotMessage(`문서에서 다음 날짜 정보를 발견했습니다: **${dates.join('**, **')}**`);
         }
         
         // 금액 추출
         const amounts = extractAmountsFromText(text);
         if (amounts.length > 0) {
+            debugToUI(`금액 정보 ${amounts.length}개 추출`);
             addChatbotMessage(`문서에서 다음 금액 정보를 발견했습니다: **${amounts.join('**, **')}**`);
         }
         
         // 표가 있는지 확인
         if (hasTableInText(text)) {
+            debugToUI("텍스트에서 테이블 구조 발견");
             addChatbotMessage('문서에 테이블이 포함되어 있는 것 같습니다. 테이블 탭에서 확인해보세요.');
         }
         
         // 텍스트 길이 정보
         const textLength = text.length;
         const lineCount = text.split('\n').length;
+        debugToUI(`텍스트 길이: ${textLength}자, ${lineCount}줄`);
         addChatbotMessage(`문서 텍스트는 총 **${textLength}자**, **${lineCount}개** 줄로 구성되어 있습니다.`);
         
         // 전체 텍스트는 아래 탭에서 확인 가능
@@ -601,113 +608,12 @@ $(document).ready(function() {
         // 로딩 숨기고 메시지 표시
         $('#chatbot-container .chat-loading').hide();
         chatMessages.show();
-    }
-    
-    // 텍스트에서 문서 유형 추측
-    function guessDocumentTypeFromText(text) {
-        const lowerText = text.toLowerCase();
-        
-        const documentTypes = [
-            { type: '영수증', keywords: ['영수증', '매출', '결제', 'pos', '카드'] },
-            { type: '청구서', keywords: ['청구서', '청구금액', '납부', '고지서'] },
-            { type: '계약서', keywords: ['계약서', '계약', '동의', '당사자'] },
-            { type: '송장', keywords: ['송장', '인보이스', '배송', '배달', '택배'] },
-            { type: '견적서', keywords: ['견적서', '견적', '금액', '제안'] },
-            { type: '세금계산서', keywords: ['세금계산서', '부가가치세', '공급가액', '사업자등록번호'] },
-            { type: '보고서', keywords: ['보고서', '리포트', '분석', '결과'] }
-        ];
-        
-        for (const doc of documentTypes) {
-            for (const keyword of doc.keywords) {
-                if (lowerText.includes(keyword)) {
-                    return doc.type;
-                }
-            }
-        }
-        
-        return '일반 문서';
-    }
-    
-    // 텍스트에서 키-값 쌍 추출
-    function extractKeyValuePairsFromText(text) {
-        const result = {};
-        const lines = text.split('\n');
-        
-        // 키:값 패턴 찾기
-        const keyValuePattern = /([^:]+):\s*(.+)/;
-        
-        for (const line of lines) {
-            const match = line.match(keyValuePattern);
-            if (match) {
-                const key = match[1].trim();
-                const value = match[2].trim();
-                
-                // 의미있는 키-값 쌍만 추가
-                if (key.length > 1 && value.length > 1) {
-                    result[key] = value;
-                }
-            }
-        }
-        
-        return result;
-    }
-    
-    // 텍스트에서 날짜 추출
-    function extractDatesFromText(text) {
-        const datePatterns = [
-            /\d{4}[-\.\/](0?[1-9]|1[0-2])[-\.\/](0?[1-9]|[12][0-9]|3[01])/g,  // YYYY-MM-DD
-            /(0?[1-9]|1[0-2])[-\.\/](0?[1-9]|[12][0-9]|3[01])[-\.\/]\d{4}/g,  // MM-DD-YYYY
-            /\d{4}년\s*(0?[1-9]|1[0-2])월\s*(0?[1-9]|[12][0-9]|3[01])일/g     // YYYY년 MM월 DD일
-        ];
-        
-        let dates = [];
-        for (const pattern of datePatterns) {
-            const matches = text.match(pattern) || [];
-            dates = dates.concat(matches);
-        }
-        
-        // 중복 제거
-        return [...new Set(dates)];
-    }
-    
-    // 텍스트에서 금액 추출
-    function extractAmountsFromText(text) {
-        const amountPatterns = [
-            /((합계|총액|금액|총금액|결제금액|청구금액)\s*:?\s*)?([\d,]+)(\s*원|\s*₩)?/g,
-            /([\d,]+)(원|₩)/g
-        ];
-        
-        let amounts = [];
-        for (const pattern of amountPatterns) {
-            const matches = text.match(pattern) || [];
-            amounts = amounts.concat(matches);
-        }
-        
-        // 중복 제거
-        return [...new Set(amounts)].map(amt => amt.trim());
-    }
-    
-    // 텍스트에서 테이블 형태 확인
-    function hasTableInText(text) {
-        // 테이블 형태의 패턴 검색
-        const tablePatterns = [
-            /[+\-|]{3,}/,               // +---+---+ 형태
-            /\|\s*[^|]+\s*\|/,          // | 내용 | 형태
-            /\+[=\-]+\+[=\-]+\+/,       // +=====+=====+ 형태
-            /[^\|]\|[^\|]+\|[^\|]+\|/   // 값|값|값 형태
-        ];
-        
-        for (const pattern of tablePatterns) {
-            if (pattern.test(text)) {
-                return true;
-            }
-        }
-        
-        return false;
+        debugToUI("텍스트 분석 및 표시 완료");
     }
     
     // JSON 문자열 전처리 함수
     function preprocessJsonContent(jsonContent) {
+        debugToUI("JSON 문자열 전처리 시작");
         // 줄바꿈이나 불필요한 공백 제거
         let processed = jsonContent.trim();
         
@@ -717,12 +623,18 @@ $(document).ready(function() {
         // JSON 시작/끝 확인 및 보정
         if (!processed.startsWith('{') && !processed.startsWith('[')) {
             const startIdx = processed.indexOf('{');
-            if (startIdx > -1) processed = processed.substring(startIdx);
+            if (startIdx > -1) {
+                debugToUI(`JSON 시작 문자({)가 ${startIdx}번째 위치에서 발견됨, 앞부분 제거`, "warning");
+                processed = processed.substring(startIdx);
+            }
         }
         
         if (!processed.endsWith('}') && !processed.endsWith(']')) {
             const endIdx = processed.lastIndexOf('}');
-            if (endIdx > -1) processed = processed.substring(0, endIdx + 1);
+            if (endIdx > -1) {
+                debugToUI(`JSON 종료 문자(})가 끝에 없음, ${endIdx}번째 위치 이후 제거`, "warning");
+                processed = processed.substring(0, endIdx + 1);
+            }
         }
         
         return processed;
@@ -734,12 +646,14 @@ $(document).ready(function() {
             JSON.parse(str);
             return true;
         } catch (e) {
+            debugToUI(`JSON 유효성 검사 실패: ${e.message}`, "error");
             return false;
         }
     }
     
     // OCR 데이터 처리 및 결과 표시 함수
     function processAndDisplayOcrData(ocrData) {
+        debugToUI("OCR 데이터 처리 및 표시 시작");
         const chatMessages = $('#chatbot-container .chat-messages');
         chatMessages.empty();
         
@@ -748,10 +662,12 @@ $(document).ready(function() {
         
         if (ocrData && ocrData.images && ocrData.images.length > 0) {
             const image = ocrData.images[0];
+            debugToUI(`첫 번째 이미지 데이터 발견, 분석 시작`);
             
             // 1. 문서 유형 분석 및 추가 정보
             const documentType = analyzeDocumentType(image);
             if (documentType) {
+                debugToUI(`문서 유형 분석 결과: ${documentType.type}`);
                 addChatbotMessage(`이 문서는 **${documentType.type}** 유형으로 분석되었습니다.`);
                 
                 if (documentType.description) {
@@ -762,6 +678,7 @@ $(document).ready(function() {
             // 2. 주요 필드 정보 추출 및 표시
             const extractedFields = extractKeyInformation(image);
             if (Object.keys(extractedFields).length > 0) {
+                debugToUI(`핵심 정보 ${Object.keys(extractedFields).length}개 추출`);
                 let fieldsMessage = '문서에서 다음 핵심 정보를 추출했습니다:';
                 for (const [key, value] of Object.entries(extractedFields)) {
                     fieldsMessage += `\n- **${key}**: ${value}`;
@@ -771,6 +688,7 @@ $(document).ready(function() {
             
             // 3. 테이블 정보 분석 및 표시
             if (image.tables && image.tables.length > 0) {
+                debugToUI(`테이블 ${image.tables.length}개 발견, 분석 시작`);
                 const tableAnalysis = analyzeTableData(image.tables);
                 addChatbotMessage(tableAnalysis.summary);
                 
@@ -782,21 +700,25 @@ $(document).ready(function() {
             // 4. 텍스트 분석 추가 정보
             const textAnalysis = analyzeTextContent(image);
             if (textAnalysis) {
+                debugToUI(`텍스트 분석 정보 추가`);
                 addChatbotMessage(textAnalysis);
             }
             
             // 5. 품질 및 신뢰도 정보
             const qualityAnalysis = analyzeOcrQuality(image);
             if (qualityAnalysis) {
+                debugToUI(`OCR 품질 분석 정보 추가`);
                 addChatbotMessage(qualityAnalysis);
             }
         } else {
+            debugToUI("OCR 처리 결과가 없거나 형식이 올바르지 않음", "warning");
             addChatbotMessage('OCR 처리 결과가 없거나 형식이 올바르지 않습니다. 아래 텍스트 결과 탭에서 원본 정보를 확인해보세요.');
         }
         
         // 로딩 숨기고 메시지 표시
         $('#chatbot-container .chat-loading').hide();
         chatMessages.show();
+        debugToUI("OCR 데이터 처리 및 표시 완료");
     }
     
     // 문서 유형 분석 함수
@@ -1452,9 +1374,108 @@ $(document).ready(function() {
         return analysis;
     }
     
-    // --------------------------------------------------------------------------------
-    // 유틸리티 함수
-    // --------------------------------------------------------------------------------
+    // 텍스트에서 문서 유형 추측
+    function guessDocumentTypeFromText(text) {
+        const lowerText = text.toLowerCase();
+        
+        const documentTypes = [
+            { type: '영수증', keywords: ['영수증', '매출', '결제', 'pos', '카드'] },
+            { type: '청구서', keywords: ['청구서', '청구금액', '납부', '고지서'] },
+            { type: '계약서', keywords: ['계약서', '계약', '동의', '당사자'] },
+            { type: '송장', keywords: ['송장', '인보이스', '배송', '배달', '택배'] },
+            { type: '견적서', keywords: ['견적서', '견적', '금액', '제안'] },
+            { type: '세금계산서', keywords: ['세금계산서', '부가가치세', '공급가액', '사업자등록번호'] },
+            { type: '보고서', keywords: ['보고서', '리포트', '분석', '결과'] }
+        ];
+        
+        for (const doc of documentTypes) {
+            for (const keyword of doc.keywords) {
+                if (lowerText.includes(keyword)) {
+                    return doc.type;
+                }
+            }
+        }
+        
+        return '일반 문서';
+    }
+    
+    // 텍스트에서 키-값 쌍 추출
+    function extractKeyValuePairsFromText(text) {
+        const result = {};
+        const lines = text.split('\n');
+        
+        // 키:값 패턴 찾기
+        const keyValuePattern = /([^:]+):\s*(.+)/;
+        
+        for (const line of lines) {
+            const match = line.match(keyValuePattern);
+            if (match) {
+                const key = match[1].trim();
+                const value = match[2].trim();
+                
+                // 의미있는 키-값 쌍만 추가
+                if (key.length > 1 && value.length > 1) {
+                    result[key] = value;
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    // 텍스트에서 날짜 추출
+    function extractDatesFromText(text) {
+        const datePatterns = [
+            /\d{4}[-\.\/](0?[1-9]|1[0-2])[-\.\/](0?[1-9]|[12][0-9]|3[01])/g,  // YYYY-MM-DD
+            /(0?[1-9]|1[0-2])[-\.\/](0?[1-9]|[12][0-9]|3[01])[-\.\/]\d{4}/g,  // MM-DD-YYYY
+            /\d{4}년\s*(0?[1-9]|1[0-2])월\s*(0?[1-9]|[12][0-9]|3[01])일/g     // YYYY년 MM월 DD일
+        ];
+        
+        let dates = [];
+        for (const pattern of datePatterns) {
+            const matches = text.match(pattern) || [];
+            dates = dates.concat(matches);
+        }
+        
+        // 중복 제거
+        return [...new Set(dates)];
+    }
+    
+    // 텍스트에서 금액 추출
+    function extractAmountsFromText(text) {
+        const amountPatterns = [
+            /((합계|총액|금액|총금액|결제금액|청구금액)\s*:?\s*)?([\d,]+)(\s*원|\s*₩)?/g,
+            /([\d,]+)(원|₩)/g
+        ];
+        
+        let amounts = [];
+        for (const pattern of amountPatterns) {
+            const matches = text.match(pattern) || [];
+            amounts = amounts.concat(matches);
+        }
+        
+        // 중복 제거
+        return [...new Set(amounts)].map(amt => amt.trim());
+    }
+    
+    // 텍스트에서 테이블 형태 확인
+    function hasTableInText(text) {
+        // 테이블 형태의 패턴 검색
+        const tablePatterns = [
+            /[+\-|]{3,}/,               // +---+---+ 형태
+            /\|\s*[^|]+\s*\|/,          // | 내용 | 형태
+            /\+[=\-]+\+[=\-]+\+/,       // +=====+=====+ 형태
+            /[^\|]\|[^\|]+\|[^\|]+\|/   // 값|값|값 형태
+        ];
+        
+        for (const pattern of tablePatterns) {
+            if (pattern.test(text)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
     
     // 텍스트 내용 처리 및 표시 개선
     function processTextForDisplay(text) {
@@ -1529,6 +1550,7 @@ $(document).ready(function() {
     
     // 챗봇 오류 메시지 표시
     function showChatbotError(message) {
+        debugToUI(`챗봇 오류 메시지 표시: ${message}`, "error");
         $('#chatbot-container .chat-loading').hide();
         const chatMessages = $('#chatbot-container .chat-messages');
         chatMessages.html(`
@@ -1624,8 +1646,10 @@ $(document).ready(function() {
         
         if (autoRefresh) {
             refreshInterval = setInterval(refreshJobStatus, 5000);
+            debugToUI("자동 새로고침 활성화됨 (5초 간격)");
         } else {
             clearInterval(refreshInterval);
+            debugToUI("자동 새로고침 비활성화됨");
         }
     }
     
@@ -1656,6 +1680,7 @@ $(document).ready(function() {
                     
                     // 완료 시 페이지 새로고침
                     if (job.status === 'completed') {
+                        debugToUI("작업 완료됨, 페이지 새로고침");
                         clearInterval(refreshInterval);
                         location.reload();
                     }
