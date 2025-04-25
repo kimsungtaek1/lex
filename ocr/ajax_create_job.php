@@ -1,9 +1,15 @@
 <?php
+// 모든 출력 버퍼링 시작
+ob_start();
 session_start();
 /**
  * ajax_create_job.php
  * 파일 업로드 및 작업 생성 처리
  */
+
+// 오류 표시 끄기 (중요: JSON 응답에 영향을 주지 않도록)
+error_reporting(0);
+ini_set('display_errors', 0);
 
 require_once 'config.php';
 require_once 'process_monitor.php';
@@ -105,6 +111,9 @@ function sanitizeFileName($fileName) {
 
 // JSON 응답 반환
 function sendJsonResponse($success, $message, $data = []) {
+    // 기존 출력 모두 지우기
+    ob_clean();
+    
     $response = [
         'success' => $success,
         'message' => $message
