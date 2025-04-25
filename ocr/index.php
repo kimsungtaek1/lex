@@ -17,7 +17,7 @@ require_once 'utils.php';
 $processMonitor = new OCRProcessMonitor();
 
 // 최근 작업 목록 가져오기
-$recentJobs = $processMonitor->getUserJobs(null, 5, 0);
+$recentJobs = $processMonitor->getJobs(5, 0);
 
 // 작업 상태별 색상 정의
 function getStatusColor($status) {

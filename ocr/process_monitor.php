@@ -427,7 +427,7 @@ class OCRProcessMonitor {
      * @param int $offset 시작 위치
      * @return array 작업 목록
      */
-    public function getUserJobs($limit = 20, $offset = 0) {
+    public function getJobs($limit = 20, $offset = 0) {
         $stmt = $this->db->prepare("
             SELECT id, name, total_files, processed_files, progress, status, created_at, updated_at
             FROM ocr_jobs
