@@ -81,8 +81,8 @@ $pageTitle = '작업 리스트';
                         <td>
                             <?php
                                 $progress = 0;
-                                if (isset($job['processed_count']) && isset($job['total_files']) && $job['total_files'] > 0) {
-                                    $progress = round($job['processed_count'] / $job['total_files'] * 100);
+                                if (isset($job['processed_files']) && isset($job['total_files']) && $job['total_files'] > 0) {
+                                    $progress = round($job['processed_files'] / $job['total_files'] * 100);
                                 }
                             ?>
                             <div class="progress" style="height: 18px;">
