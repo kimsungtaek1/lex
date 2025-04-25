@@ -1,13 +1,46 @@
+/**
+ * OCR 인식률 향상 시스템 - 결과 분석 및 피드백 기능
+ * 
+ * 이 JavaScript 코드는 OCR로 처리된 이미지 결과를 분석하고 시각화하는 기능을 제공합니다.
+ * 주요 기능:
+ * - OCR 처리 결과 분석 및 요약 (문서 유형, 핵심 정보 등)
+ * - 텍스트, 테이블, JSON 결과 시각화
+ * - 사용자 피드백 시스템 (OCR 정확도 향상을 위한)
+ * - 자동 작업 상태 새로고침
+ */
+
+// 전역 변수로 OCR 결과 처리 함수 선언
+var ocrResultProcessor = null;
+
 $(document).ready(function() {
-    // 페이지 로드 시 각 파일의 첫 번째 결과(텍스트)를 자동으로 로드
-    $('.result-card').each(function() {
-        const idx = $(this).attr('id').split('-').pop();
-        const textBtn = $(this).find('.text-view-btn');
-        if (textBtn.length) {
-            const path = textBtn.data('path');
-            loadTextResult(path, idx);
+    // 전역 변수
+    let currentJobId = null;
+    
+    // 초기화 함수 - 페이지 로드 시 실행
+    function initialize() {
+        // 현재 작업 ID 확인
+        currentJobId = $('#cancelJobBtn').data('job-id') || $('#deleteJobBtn').data('job-id');
+        
+        // 페이지 로드 시 각 파일의 첫 번째 결과(텍스트)를 자동으로 로드
+        $('.result-card').each(function() {
+            const idx = $(this).attr('id').split('-').pop();
+            const textBtn = $(this).find('.text-view-btn');
+            if (textBtn.length) {
+                const path = textBtn.data('path');
+                loadTextResult(path, idx);
+            }
+        });
+
+        // 자동 새로고침 설정
+        if ($('#autoRefresh').length) {
+            setupAutoRefresh();
         }
-    });
+        
+        // 결과 탭이 활성화되어 있으면 OCR 결과 로드
+        if ($('#results-tab').hasClass('active')) {
+            loadAndProcessOcrResults();
+        }
+    }
     
     // 텍스트 결과 보기 버튼
     $(document).on('click', '.text-view-btn', function() {
@@ -63,6 +96,37 @@ $(document).ready(function() {
         // 내용이 없으면 로드
         if ($(`.json-viewer-${idx} .json-content`).html().includes('로딩 중')) {
             loadJsonResult(path, idx);
+        }
+    });
+    
+    // 파일 목록에서 결과 보기 버튼
+    $(document).on('click', '.view-result-btn', function() {
+        const fileId = $(this).data('file-id');
+        const textPath = $(this).data('text-path');
+        
+        // 텍스트 결과 로드
+        if (textPath) {
+            // 현재 탭에서 결과 보기
+            $('#results-tab').tab('show');
+            
+            // 해당 파일의 결과 카드 찾기
+            const resultCards = $('.result-card');
+            resultCards.each(function() {
+                const idx = $(this).attr('id').split('-').pop();
+                const resultFileId = $(this).find('.submit-feedback-btn').data('file-id');
+                
+                if (resultFileId == fileId) {
+                    // 텍스트 버튼 클릭 이벤트 트리거
+                    $(this).find('.text-view-btn').click();
+                    
+                    // 해당 결과 카드로 스크롤
+                    $('html, body').animate({
+                        scrollTop: $(this).offset().top - 100
+                    }, 500);
+                    
+                    return false; // 루프 종료
+                }
+            });
         }
     });
     
@@ -126,6 +190,67 @@ $(document).ready(function() {
             }
         });
     });
+    
+    // 작업 취소 버튼
+    $('#cancelJobBtn').click(function() {
+        if (!confirm('정말로 이 작업을 취소하시겠습니까?')) return;
+        
+        const jobId = $(this).data('job-id');
+        
+        $.ajax({
+            url: 'ajax_cancel_job.php',
+            type: 'POST',
+            data: { job_id: jobId },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    alert('작업이 취소되었습니다.');
+                    location.reload();
+                } else {
+                    alert('작업 취소 중 오류: ' + response.message);
+                }
+            },
+            error: function() {
+                alert('요청 중 오류가 발생했습니다.');
+            }
+        });
+    });
+    
+    // 작업 삭제 버튼
+    $('#deleteJobBtn').click(function() {
+        if (!confirm('정말로 이 작업을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
+        
+        const jobId = $(this).data('job-id');
+        
+        $.ajax({
+            url: 'ajax_delete_job.php',
+            type: 'POST',
+            data: { job_id: jobId },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    alert('작업이 삭제되었습니다.');
+                    window.location.href = 'jobs.php';
+                } else {
+                    alert('작업 삭제 중 오류: ' + response.message);
+                }
+            },
+            error: function() {
+                alert('요청 중 오류가 발생했습니다.');
+            }
+        });
+    });
+    
+    // 결과 탭 클릭 시 OCR 결과 자동 로드
+    $('#results-tab').on('click', function() {
+        if ($('#chatbot-container .chat-messages').is(':empty')) {
+            loadAndProcessOcrResults();
+        }
+    });
+    
+    // --------------------------------------------------------------------------------
+    // 파일 내용 로드 함수
+    // --------------------------------------------------------------------------------
     
     // 텍스트 결과 로드 함수
     function loadTextResult(path, idx) {
@@ -240,6 +365,1097 @@ $(document).ready(function() {
         });
     }
     
+    // --------------------------------------------------------------------------------
+    // OCR 결과 분석 및 표시 함수
+    // --------------------------------------------------------------------------------
+    
+    // OCR JSON 데이터를 로드하고 처리하는 함수
+    function loadAndProcessOcrResults() {
+        console.log("OCR 결과 로드 시작");
+        
+        if ($('.result-card').length === 0) {
+            showChatbotError('처리할 결과 카드를 찾을 수 없습니다.');
+            return;
+        }
+        
+        // 첫 번째 결과 카드의 JSON 경로 가져오기
+        const firstCard = $('.result-card').first();
+        const jsonBtn = firstCard.find('.json-view-btn');
+        
+        if (jsonBtn.length === 0) {
+            // JSON 버튼이 없으면 텍스트 기반 분석으로 대체
+            const textBtn = firstCard.find('.text-view-btn');
+            if (textBtn.length > 0) {
+                loadAndProcessTextResults(textBtn.data('path'));
+                return;
+            }
+            
+            showChatbotError('분석할 결과 데이터를 찾을 수 없습니다.');
+            return;
+        }
+        
+        const jsonPath = jsonBtn.data('path');
+        if (!jsonPath) {
+            showChatbotError('JSON 파일 경로를 찾을 수 없습니다.');
+            return;
+        }
+        
+        console.log("JSON 파일 경로:", jsonPath);
+        
+        // 로딩 표시
+        $('#chatbot-container .chat-loading').show();
+        $('#chatbot-container .chat-messages').hide().empty();
+        
+        // JSON 데이터 로드
+        $.ajax({
+            url: 'ajax_get_file_content.php',
+            type: 'GET',
+            data: { path: jsonPath },
+            dataType: 'json',
+            success: function(response) {
+                console.log("AJAX 응답 받음:", response.success);
+                
+                if (response.success) {
+                    try {
+                        // JSON 문자열 처리 및 파싱
+                        let jsonContent = response.content;
+                        console.log("JSON 콘텐츠 길이:", jsonContent.length);
+                        
+                        // 빈 응답 확인
+                        if (!jsonContent || jsonContent.trim() === '') {
+                            // 텍스트 기반 분석으로 대체
+                            const textBtn = firstCard.find('.text-view-btn');
+                            if (textBtn.length > 0) {
+                                loadAndProcessTextResults(textBtn.data('path'));
+                                return;
+                            }
+                            
+                            showChatbotError('JSON 내용이 비어있습니다.');
+                            return;
+                        }
+                        
+                        // JSON 유효성 확인 및 필요시 전처리
+                        jsonContent = preprocessJsonContent(jsonContent);
+                        
+                        if (!isValidJSON(jsonContent)) {
+                            console.log("유효하지 않은 JSON 형식");
+                            
+                            // 텍스트 기반 분석으로 대체
+                            const textBtn = firstCard.find('.text-view-btn');
+                            if (textBtn.length > 0) {
+                                loadAndProcessTextResults(textBtn.data('path'));
+                                return;
+                            }
+                            
+                            showChatbotError('유효하지 않은 JSON 형식입니다. JSON 데이터 구조를 확인해주세요.');
+                            return;
+                        }
+                        
+                        const ocrData = JSON.parse(jsonContent);
+                        
+                        // OCR 데이터 검증
+                        if (!ocrData || !ocrData.images || !Array.isArray(ocrData.images) || ocrData.images.length === 0) {
+                            console.log("유효한 OCR 데이터 구조가 아님");
+                            
+                            // 텍스트 기반 분석으로 대체
+                            const textBtn = firstCard.find('.text-view-btn');
+                            if (textBtn.length > 0) {
+                                loadAndProcessTextResults(textBtn.data('path'));
+                                return;
+                            }
+                            
+                            showChatbotError('유효한 OCR 데이터 구조가 아닙니다. images 배열이 필요합니다.');
+                            return;
+                        }
+                        
+                        // 데이터 처리 및 표시
+                        processAndDisplayOcrData(ocrData);
+                        
+                    } catch (e) {
+                        console.error("JSON 파싱 오류:", e);
+                        
+                        // 텍스트 기반 분석으로 대체
+                        const textBtn = firstCard.find('.text-view-btn');
+                        if (textBtn.length > 0) {
+                            loadAndProcessTextResults(textBtn.data('path'));
+                            return;
+                        }
+                        
+                        showChatbotError('JSON 파싱 중 오류가 발생했습니다: ' + e.message);
+                    }
+                } else {
+                    console.log("AJAX 실패:", response.message);
+                    
+                    // 텍스트 기반 분석으로 대체
+                    const textBtn = firstCard.find('.text-view-btn');
+                    if (textBtn.length > 0) {
+                        loadAndProcessTextResults(textBtn.data('path'));
+                        return;
+                    }
+                    
+                    showChatbotError('파일을 로드할 수 없습니다: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX 요청 오류:", status, error);
+                
+                // 텍스트 기반 분석으로 대체
+                const textBtn = firstCard.find('.text-view-btn');
+                if (textBtn.length > 0) {
+                    loadAndProcessTextResults(textBtn.data('path'));
+                    return;
+                }
+                
+                showChatbotError('파일 로드 중 오류가 발생했습니다: ' + error);
+            }
+        });
+    }
+    
+    // 텍스트 파일 기반 분석 함수
+    function loadAndProcessTextResults(textPath) {
+        if (!textPath) {
+            showChatbotError('텍스트 파일 경로를 찾을 수 없습니다.');
+            return;
+        }
+        
+        // 로딩 표시
+        $('#chatbot-container .chat-loading').show();
+        $('#chatbot-container .chat-messages').hide().empty();
+        
+        // 텍스트 파일 로드
+        $.ajax({
+            url: 'ajax_get_file_content.php',
+            type: 'GET',
+            data: { path: textPath },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    const text = response.content || '';
+                    
+                    if (!text || text.trim() === '') {
+                        showChatbotError('텍스트 내용이 비어있습니다.');
+                        return;
+                    }
+                    
+                    // 텍스트 기반 분석 및 표시
+                    analyzeAndDisplayText(text);
+                } else {
+                    showChatbotError('텍스트 파일을 로드할 수 없습니다: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                showChatbotError('파일 로드 중 오류가 발생했습니다: ' + error);
+            }
+        });
+    }
+    
+    // 텍스트 분석 및 표시 함수
+    function analyzeAndDisplayText(text) {
+        const chatMessages = $('#chatbot-container .chat-messages');
+        chatMessages.empty();
+        
+        // 인사 메시지
+        addChatbotMessage('안녕하세요! OCR 처리 결과를 분석했습니다.');
+        
+        // 문서 유형 추측
+        const documentType = guessDocumentTypeFromText(text);
+        if (documentType) {
+            addChatbotMessage(`이 문서는 **${documentType}** 유형으로 보입니다.`);
+        }
+        
+        // 키-값 쌍 찾기
+        const keyValues = extractKeyValuePairsFromText(text);
+        if (Object.keys(keyValues).length > 0) {
+            let fieldsMessage = '문서에서 다음 정보를 확인했습니다:';
+            for (const [key, value] of Object.entries(keyValues)) {
+                fieldsMessage += `\n- **${key}**: ${value}`;
+            }
+            addChatbotMessage(fieldsMessage);
+        }
+        
+        // 날짜 추출
+        const dates = extractDatesFromText(text);
+        if (dates.length > 0) {
+            addChatbotMessage(`문서에서 다음 날짜 정보를 발견했습니다: **${dates.join('**, **')}**`);
+        }
+        
+        // 금액 추출
+        const amounts = extractAmountsFromText(text);
+        if (amounts.length > 0) {
+            addChatbotMessage(`문서에서 다음 금액 정보를 발견했습니다: **${amounts.join('**, **')}**`);
+        }
+        
+        // 표가 있는지 확인
+        if (hasTableInText(text)) {
+            addChatbotMessage('문서에 테이블이 포함되어 있는 것 같습니다. 테이블 탭에서 확인해보세요.');
+        }
+        
+        // 텍스트 길이 정보
+        const textLength = text.length;
+        const lineCount = text.split('\n').length;
+        addChatbotMessage(`문서 텍스트는 총 **${textLength}자**, **${lineCount}개** 줄로 구성되어 있습니다.`);
+        
+        // 전체 텍스트는 아래 탭에서 확인 가능
+        addChatbotMessage('전체 텍스트 내용은 아래 텍스트 결과 탭에서 확인하실 수 있습니다.');
+        
+        // 로딩 숨기고 메시지 표시
+        $('#chatbot-container .chat-loading').hide();
+        chatMessages.show();
+    }
+    
+    // 텍스트에서 문서 유형 추측
+    function guessDocumentTypeFromText(text) {
+        const lowerText = text.toLowerCase();
+        
+        const documentTypes = [
+            { type: '영수증', keywords: ['영수증', '매출', '결제', 'pos', '카드'] },
+            { type: '청구서', keywords: ['청구서', '청구금액', '납부', '고지서'] },
+            { type: '계약서', keywords: ['계약서', '계약', '동의', '당사자'] },
+            { type: '송장', keywords: ['송장', '인보이스', '배송', '배달', '택배'] },
+            { type: '견적서', keywords: ['견적서', '견적', '금액', '제안'] },
+            { type: '세금계산서', keywords: ['세금계산서', '부가가치세', '공급가액', '사업자등록번호'] },
+            { type: '보고서', keywords: ['보고서', '리포트', '분석', '결과'] }
+        ];
+        
+        for (const doc of documentTypes) {
+            for (const keyword of doc.keywords) {
+                if (lowerText.includes(keyword)) {
+                    return doc.type;
+                }
+            }
+        }
+        
+        return '일반 문서';
+    }
+    
+    // 텍스트에서 키-값 쌍 추출
+    function extractKeyValuePairsFromText(text) {
+        const result = {};
+        const lines = text.split('\n');
+        
+        // 키:값 패턴 찾기
+        const keyValuePattern = /([^:]+):\s*(.+)/;
+        
+        for (const line of lines) {
+            const match = line.match(keyValuePattern);
+            if (match) {
+                const key = match[1].trim();
+                const value = match[2].trim();
+                
+                // 의미있는 키-값 쌍만 추가
+                if (key.length > 1 && value.length > 1) {
+                    result[key] = value;
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    // 텍스트에서 날짜 추출
+    function extractDatesFromText(text) {
+        const datePatterns = [
+            /\d{4}[-\.\/](0?[1-9]|1[0-2])[-\.\/](0?[1-9]|[12][0-9]|3[01])/g,  // YYYY-MM-DD
+            /(0?[1-9]|1[0-2])[-\.\/](0?[1-9]|[12][0-9]|3[01])[-\.\/]\d{4}/g,  // MM-DD-YYYY
+            /\d{4}년\s*(0?[1-9]|1[0-2])월\s*(0?[1-9]|[12][0-9]|3[01])일/g     // YYYY년 MM월 DD일
+        ];
+        
+        let dates = [];
+        for (const pattern of datePatterns) {
+            const matches = text.match(pattern) || [];
+            dates = dates.concat(matches);
+        }
+        
+        // 중복 제거
+        return [...new Set(dates)];
+    }
+    
+    // 텍스트에서 금액 추출
+    function extractAmountsFromText(text) {
+        const amountPatterns = [
+            /((합계|총액|금액|총금액|결제금액|청구금액)\s*:?\s*)?([\d,]+)(\s*원|\s*₩)?/g,
+            /([\d,]+)(원|₩)/g
+        ];
+        
+        let amounts = [];
+        for (const pattern of amountPatterns) {
+            const matches = text.match(pattern) || [];
+            amounts = amounts.concat(matches);
+        }
+        
+        // 중복 제거
+        return [...new Set(amounts)].map(amt => amt.trim());
+    }
+    
+    // 텍스트에서 테이블 형태 확인
+    function hasTableInText(text) {
+        // 테이블 형태의 패턴 검색
+        const tablePatterns = [
+            /[+\-|]{3,}/,               // +---+---+ 형태
+            /\|\s*[^|]+\s*\|/,          // | 내용 | 형태
+            /\+[=\-]+\+[=\-]+\+/,       // +=====+=====+ 형태
+            /[^\|]\|[^\|]+\|[^\|]+\|/   // 값|값|값 형태
+        ];
+        
+        for (const pattern of tablePatterns) {
+            if (pattern.test(text)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    // JSON 문자열 전처리 함수
+    function preprocessJsonContent(jsonContent) {
+        // 줄바꿈이나 불필요한 공백 제거
+        let processed = jsonContent.trim();
+        
+        // 특수 케이스 처리: 잘못된 이스케이프 문자 처리
+        processed = processed.replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+        
+        // JSON 시작/끝 확인 및 보정
+        if (!processed.startsWith('{') && !processed.startsWith('[')) {
+            const startIdx = processed.indexOf('{');
+            if (startIdx > -1) processed = processed.substring(startIdx);
+        }
+        
+        if (!processed.endsWith('}') && !processed.endsWith(']')) {
+            const endIdx = processed.lastIndexOf('}');
+            if (endIdx > -1) processed = processed.substring(0, endIdx + 1);
+        }
+        
+        return processed;
+    }
+    
+    // JSON 유효성 검사 함수
+    function isValidJSON(str) {
+        try {
+            JSON.parse(str);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+    
+    // OCR 데이터 처리 및 결과 표시 함수
+    function processAndDisplayOcrData(ocrData) {
+        const chatMessages = $('#chatbot-container .chat-messages');
+        chatMessages.empty();
+        
+        // 인사 메시지
+        addChatbotMessage('안녕하세요! OCR 처리 결과를 분석했습니다.');
+        
+        if (ocrData && ocrData.images && ocrData.images.length > 0) {
+            const image = ocrData.images[0];
+            
+            // 1. 문서 유형 분석 및 추가 정보
+            const documentType = analyzeDocumentType(image);
+            if (documentType) {
+                addChatbotMessage(`이 문서는 **${documentType.type}** 유형으로 분석되었습니다.`);
+                
+                if (documentType.description) {
+                    addChatbotMessage(documentType.description);
+                }
+            }
+            
+            // 2. 주요 필드 정보 추출 및 표시
+            const extractedFields = extractKeyInformation(image);
+            if (Object.keys(extractedFields).length > 0) {
+                let fieldsMessage = '문서에서 다음 핵심 정보를 추출했습니다:';
+                for (const [key, value] of Object.entries(extractedFields)) {
+                    fieldsMessage += `\n- **${key}**: ${value}`;
+                }
+                addChatbotMessage(fieldsMessage);
+            }
+            
+            // 3. 테이블 정보 분석 및 표시
+            if (image.tables && image.tables.length > 0) {
+                const tableAnalysis = analyzeTableData(image.tables);
+                addChatbotMessage(tableAnalysis.summary);
+                
+                if (tableAnalysis.preview) {
+                    addChatbotMessage(tableAnalysis.preview);
+                }
+            }
+            
+            // 4. 텍스트 분석 추가 정보
+            const textAnalysis = analyzeTextContent(image);
+            if (textAnalysis) {
+                addChatbotMessage(textAnalysis);
+            }
+            
+            // 5. 품질 및 신뢰도 정보
+            const qualityAnalysis = analyzeOcrQuality(image);
+            if (qualityAnalysis) {
+                addChatbotMessage(qualityAnalysis);
+            }
+        } else {
+            addChatbotMessage('OCR 처리 결과가 없거나 형식이 올바르지 않습니다. 아래 텍스트 결과 탭에서 원본 정보를 확인해보세요.');
+        }
+        
+        // 로딩 숨기고 메시지 표시
+        $('#chatbot-container .chat-loading').hide();
+        chatMessages.show();
+    }
+    
+    // 문서 유형 분석 함수
+    function analyzeDocumentType(imageData) {
+        if (!imageData || !imageData.fields) return null;
+        
+        // 전체 텍스트 추출
+        const allText = extractAllText(imageData).toLowerCase();
+        
+        // 문서 유형 정의
+        const documentTypes = [
+            {
+                type: '영수증',
+                keywords: ['영수증', '매출', '결제', 'pos', '카드', '금액', '부가세', '합계', '소계'],
+                description: '결제 금액, 항목, 날짜 등의 정보가 포함된 영수증입니다.'
+            },
+            {
+                type: '세금계산서',
+                keywords: ['세금계산서', '공급가액', '부가가치세', '사업자등록번호', '공급자', '공급받는자'],
+                description: '사업자 간 거래를 증빙하는 세금계산서입니다. 공급가액, 부가세, 사업자 정보 등이 포함되어 있습니다.'
+            },
+            {
+                type: '견적서',
+                keywords: ['견적서', '견적', '금액', '제안', '유효기간', '견적금액'],
+                description: '제품이나 서비스에 대한 가격과 조건을 제시하는 견적서입니다.'
+            },
+            {
+                type: '송장',
+                keywords: ['송장', '인보이스', '배송', '배달', '택배', '운송장', '송하인', '수하인'],
+                description: '배송 정보가 포함된 송장 또는 운송장입니다. 발신자, 수신자, 배송 항목 정보가 포함되어 있습니다.'
+            },
+            {
+                type: '계약서',
+                keywords: ['계약서', '계약', '동의', '당사자', '갑', '을', '계약조건', '서명'],
+                description: '법적 합의 내용이 담긴 계약서입니다. 계약 당사자, 조건, 서명 등이 포함되어 있습니다.'
+            },
+            {
+                type: '청구서',
+                keywords: ['청구서', '인보이스', '납부', '지불', '청구액', '미납', '납기일'],
+                description: '지불해야 할 금액과 기한이 명시된 청구서입니다.'
+            },
+            {
+                type: '명세서',
+                keywords: ['명세서', '내역', '상세', '품목', '목록'],
+                description: '상품이나 서비스의 상세 내역이 포함된 명세서입니다.'
+            }
+        ];
+        
+        // 테이블 내용 검사
+        let hasTable = false;
+        let tableHeaders = [];
+        
+        if (imageData.tables && imageData.tables.length > 0) {
+            hasTable = true;
+            
+            // 첫 번째 테이블의 헤더 추출
+            const table = imageData.tables[0];
+            if (table.cells) {
+                const headerCells = table.cells.filter(cell => 
+                    (cell.rowIndex === 0 || cell.rowSpan > 1) && cell.inferText
+                );
+                
+                tableHeaders = headerCells.map(cell => cell.inferText.trim().toLowerCase());
+            }
+        }
+        
+        // 가장 적합한 문서 유형 찾기
+        let bestMatch = null;
+        let highestScore = 0;
+        
+        for (const docType of documentTypes) {
+            let score = 0;
+            
+            // 키워드 매칭
+            for (const keyword of docType.keywords) {
+                if (allText.includes(keyword)) {
+                    score += 2;
+                }
+            }
+            
+            // 테이블 헤더 분석 (특정 문서 유형에 특화된 테이블 헤더 검사)
+            if (hasTable) {
+                if (docType.type === '영수증' && 
+                    (tableHeaders.some(h => h.includes('상품') || h.includes('품목')) && 
+                     tableHeaders.some(h => h.includes('금액') || h.includes('가격')))) {
+                    score += 3;
+                }
+                else if (docType.type === '세금계산서' && 
+                        (tableHeaders.some(h => h.includes('품목')) && 
+                         tableHeaders.some(h => h.includes('공급가액')))) {
+                    score += 3;
+                }
+                else if (docType.type === '송장' && 
+                        (tableHeaders.some(h => h.includes('품목')) && 
+                         tableHeaders.some(h => h.includes('수량')))) {
+                    score += 3;
+                }
+            }
+            
+            // 베스트 매치 업데이트
+            if (score > highestScore) {
+                highestScore = score;
+                bestMatch = docType;
+            }
+        }
+        
+        // 최소 점수 이상인 경우만 반환
+        if (highestScore >= 2) {
+            return bestMatch;
+        }
+        
+        // 기본 문서 유형
+        return {
+            type: '일반 문서',
+            description: '특정 문서 유형을 식별할 수 없습니다. 일반적인 문서로 처리됩니다.'
+        };
+    }
+    
+    // 모든 텍스트 추출 함수
+    function extractAllText(imageData) {
+        let fullText = '';
+        
+        // 필드 텍스트 추출
+        if (imageData.fields && imageData.fields.length > 0) {
+            fullText += imageData.fields.map(field => field.inferText || '').join(' ');
+        }
+        
+        // 테이블 텍스트 추출
+        if (imageData.tables && imageData.tables.length > 0) {
+            for (const table of imageData.tables) {
+                if (table.cells && table.cells.length > 0) {
+                    fullText += ' ' + table.cells.map(cell => cell.inferText || '').join(' ');
+                }
+            }
+        }
+        
+        return fullText;
+    }
+    
+    // 핵심 정보 추출 함수
+    function extractKeyInformation(imageData) {
+        const result = {};
+        
+        if (!imageData || !imageData.fields) return result;
+        
+        // 주요 필드 카테고리 및 관련 키워드
+        const fieldCategories = {
+            '날짜': ['날짜', '발행일', '작성일', '등록일', '계약일', '거래일', 'date'],
+            '금액': ['금액', '합계', '총액', '총합계', '결제금액', '청구금액', '금액합계', '공급가액', '공급가액합계', '최종금액'],
+            '거래처': ['상호', '업체명', '거래처', '회사명', '공급자', '공급받는자', '매입처', '매출처'],
+            '사업자번호': ['사업자등록번호', '사업자번호', '등록번호', '사업자'],
+            '담당자': ['담당자', '작성자', '연락처', '담당', '문의'],
+            '품목': ['품목', '상품명', '제품명', '서비스명', '공급내역'],
+            '결제방법': ['결제방법', '지불방법', '카드', '현금', '계좌이체', '결제수단']
+        };
+        
+        // 키-값 쌍 패턴 추출
+        const keyValuePairs = extractKeyValuePairs(imageData.fields);
+        for (const [key, value] of Object.entries(keyValuePairs)) {
+            for (const [category, keywords] of Object.entries(fieldCategories)) {
+                for (const keyword of keywords) {
+                    if (key.includes(keyword)) {
+                        result[category] = value;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // 특정 패턴 검색 (날짜, 금액, 사업자번호 등)
+        const allText = extractAllText(imageData);
+        
+        // 날짜 패턴
+        if (!result['날짜']) {
+            const dateMatches = allText.match(/\d{4}[-\.\/](0?[1-9]|1[0-2])[-\.\/](0?[1-9]|[12][0-9]|3[01])/g);
+            if (dateMatches && dateMatches.length > 0) {
+                result['날짜'] = dateMatches[0];
+            }
+        }
+        
+        // 금액 패턴
+        if (!result['금액']) {
+            const amountMatches = allText.match(/((합계|총액|금액|총금액|결제금액|청구금액)\s*:?\s*)?([\d,]+)(\s*원|\s*₩)?/g);
+            if (amountMatches && amountMatches.length > 0) {
+                // 가장 큰 금액 선택
+                let maxAmount = 0;
+                let maxAmountStr = '';
+                
+                for (const match of amountMatches) {
+                    const numStr = match.replace(/[^0-9]/g, '');
+                    if (numStr) {
+                        const amount = parseInt(numStr, 10);
+                        if (amount > maxAmount) {
+                            maxAmount = amount;
+                            maxAmountStr = match.trim();
+                        }
+                    }
+                }
+                
+                if (maxAmountStr) {
+                    result['금액'] = maxAmountStr;
+                }
+            }
+        }
+        
+        // 사업자번호 패턴
+        if (!result['사업자번호']) {
+            const bizNumMatches = allText.match(/\d{3}[-\s]?\d{2}[-\s]?\d{5}/g);
+            if (bizNumMatches && bizNumMatches.length > 0) {
+                result['사업자번호'] = bizNumMatches[0];
+            }
+        }
+        
+        return result;
+    }
+    
+    // 키-값 쌍 추출 함수
+    function extractKeyValuePairs(fields) {
+        const result = {};
+        
+        if (!fields || !Array.isArray(fields)) return result;
+        
+        // 가능한 키-값 쌍 패턴들
+        const patterns = [
+            // '키 : 값' 패턴
+            { regex: /^(.*?)[:\s]\s*(.+)$/, keyIndex: 1, valueIndex: 2 },
+            // '키 값' 패턴 (특정 키워드에만 적용)
+            { regex: /^(날짜|금액|담당자|상호|결제방법|사업자등록번호)\s+(.+)$/, keyIndex: 1, valueIndex: 2 }
+        ];
+        
+        for (const field of fields) {
+            if (!field.inferText) continue;
+            
+            const text = field.inferText.trim();
+            let matched = false;
+            
+            // 패턴 매칭 시도
+            for (const pattern of patterns) {
+                const match = text.match(pattern.regex);
+                if (match) {
+                    const key = match[pattern.keyIndex].trim();
+                    const value = match[pattern.valueIndex].trim();
+                    
+                    // 의미있는 키-값 쌍만 추가 (너무 짧거나 긴 경우 제외)
+                    if (key.length >= 1 && key.length <= 20 && 
+                        value.length >= 1 && value.length <= 50) {
+                        result[key] = value;
+                        matched = true;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    // 테이블 데이터 분석 함수
+    function analyzeTableData(tables) {
+        if (!tables || tables.length === 0) {
+            return {
+                summary: "문서에서 테이블 정보를 찾을 수 없습니다."
+            };
+        }
+        
+        const result = {
+            summary: "",
+            preview: null
+        };
+        
+        // 테이블 개수 및 기본 정보
+        result.summary = `문서에서 **${tables.length}개의 테이블**을 발견했습니다.`;
+        
+        // 첫 번째 테이블 분석
+        const firstTable = tables[0];
+        if (firstTable.cells && firstTable.cells.length > 0) {
+            // 테이블 구조 분석
+            const tableStructure = reconstructTable(firstTable);
+            
+            // 헤더 분석
+            const headers = tableStructure.headers;
+            if (headers && headers.length > 0) {
+                result.summary += `\n\n첫 번째 테이블의 헤더는 다음과 같습니다: **${headers.join('**, **')}**`;
+                
+                // 테이블 유형 추론
+                const tableType = inferTableType(headers);
+                if (tableType) {
+                    result.summary += `\n\n이는 **${tableType}** 유형의 테이블로 보입니다.`;
+                }
+            }
+            
+            // 테이블 데이터 행 수
+            const rowCount = tableStructure.data ? tableStructure.data.length : 0;
+            if (rowCount > 0) {
+                result.summary += `\n\n테이블에는 헤더를 제외하고 **${rowCount}개의 데이터 행**이 있습니다.`;
+                
+                // 데이터 합계/평균 계산 (숫자 열이 있는 경우)
+                const numericColumnSummary = analyzeNumericColumns(tableStructure);
+                if (numericColumnSummary) {
+                    result.summary += `\n\n${numericColumnSummary}`;
+                }
+            }
+            
+            // 테이블 미리보기 생성
+            result.preview = generateTablePreview(tableStructure);
+        }
+        
+        return result;
+    }
+    
+    // 테이블 재구성 함수
+    function reconstructTable(table) {
+        if (!table.cells || table.cells.length === 0) {
+            return { headers: [], data: [] };
+        }
+        
+        const result = {
+            headers: [],
+            data: []
+        };
+        
+        // 행과 열 최대 크기 파악
+        let maxRow = 0;
+        let maxCol = 0;
+        
+        for (const cell of table.cells) {
+            const rowIndex = cell.rowIndex || 0;
+            const colIndex = cell.colIndex || 0;
+            const rowSpan = cell.rowSpan || 1;
+            const colSpan = cell.colSpan || 1;
+            
+            maxRow = Math.max(maxRow, rowIndex + rowSpan);
+            maxCol = Math.max(maxCol, colIndex + colSpan);
+        }
+        
+        // 2D 배열 초기화
+        const grid = Array(maxRow).fill().map(() => Array(maxCol).fill(null));
+        
+        // 셀 채우기
+        for (const cell of table.cells) {
+            const rowIndex = cell.rowIndex || 0;
+            const colIndex = cell.colIndex || 0;
+            const rowSpan = cell.rowSpan || 1;
+            const colSpan = cell.colSpan || 1;
+            const text = cell.inferText || '';
+            
+            // 셀 채우기 (rowSpan, colSpan 고려)
+            for (let r = 0; r < rowSpan; r++) {
+                for (let c = 0; c < colSpan; c++) {
+                    if (r === 0 && c === 0) {
+                        // 원본 셀
+                        grid[rowIndex][colIndex] = text;
+                    } else {
+                        // 확장 셀 (spanCell 표시)
+                        grid[rowIndex + r][colIndex + c] = ''; // 빈 문자열로 표시
+                    }
+                }
+            }
+        }
+        
+        // 헤더 행 추출 (첫 번째 행)
+        if (grid.length > 0) {
+            result.headers = grid[0].filter(cell => cell !== null);
+        }
+        
+        // 데이터 행 추출 (두 번째 행부터)
+        for (let r = 1; r < grid.length; r++) {
+            const row = grid[r].filter(cell => cell !== null);
+            if (row.some(cell => cell)) { // 빈 행 제외
+                result.data.push(row);
+            }
+        }
+        
+        return result;
+    }
+    
+    // 테이블 유형 추론 함수
+    function inferTableType(headers) {
+        if (!headers || headers.length === 0) return null;
+        
+        // 헤더 텍스트를 소문자로 변환
+        const lowerHeaders = headers.map(h => h.toLowerCase());
+        
+        // 특정 테이블 유형 패턴
+        const tablePatterns = [
+            {
+                type: '상품 목록',
+                required: ['상품명', '품목', '제품명', '항목', '내역'],
+                optional: ['단가', '수량', '금액', '가격', '소계', '부가세']
+            },
+            {
+                type: '가격표',
+                required: ['가격', '금액', '단가'],
+                optional: ['할인', '할인율', '부가세', '합계']
+            },
+            {
+                type: '거래 내역',
+                required: ['날짜', '거래일', '일자'],
+                optional: ['금액', '거래처', '비고', '적요', '내역']
+            },
+            {
+                type: '배송 정보',
+                required: ['배송', '배달', '주소', '수취인', '수령인'],
+                optional: ['연락처', '배송료', '배송상태']
+            }
+        ];
+        
+        // 테이블 유형 매칭
+        for (const pattern of tablePatterns) {
+            // 필수 키워드 매칭
+            const hasRequired = pattern.required.some(keyword => 
+                lowerHeaders.some(header => header.includes(keyword))
+            );
+            
+            // 옵션 키워드 매칭
+            const hasOptional = pattern.optional.some(keyword => 
+                lowerHeaders.some(header => header.includes(keyword))
+            );
+            
+            if (hasRequired && hasOptional) {
+                return pattern.type;
+            }
+        }
+        
+        return null;
+    }
+    
+    // 숫자 열 분석 함수
+    function analyzeNumericColumns(tableStructure) {
+        if (!tableStructure.headers || !tableStructure.data || tableStructure.data.length === 0) {
+            return null;
+        }
+        
+        const headers = tableStructure.headers;
+        const data = tableStructure.data;
+        let summary = '';
+        
+        // 금액 관련 열 찾기
+        const amountColumnIndices = [];
+        
+        headers.forEach((header, index) => {
+            const lowerHeader = header.toLowerCase();
+            if (lowerHeader.includes('금액') || 
+                lowerHeader.includes('가격') || 
+                lowerHeader.includes('합계') || 
+                lowerHeader.includes('소계') || 
+                lowerHeader.includes('부가세') || 
+                lowerHeader.includes('원')) {
+                amountColumnIndices.push(index);
+            }
+        });
+        
+        // 금액 열이 있으면 합계 계산
+        if (amountColumnIndices.length > 0) {
+            for (const colIndex of amountColumnIndices) {
+                if (colIndex >= headers.length) continue;
+                
+                const columnName = headers[colIndex];
+                let sum = 0;
+                let validCount = 0;
+                
+                for (const row of data) {
+                    if (colIndex < row.length) {
+                        // 숫자만 추출
+                        const numStr = row[colIndex].replace(/[^0-9]/g, '');
+                        if (numStr) {
+                            const num = parseInt(numStr, 10);
+                            if (!isNaN(num)) {
+                                sum += num;
+                                validCount++;
+                            }
+                        }
+                    }
+                }
+                
+                if (validCount > 0) {
+                    // 천 단위 구분자 추가
+                    const formattedSum = sum.toLocaleString('ko-KR');
+                    summary += `**${columnName}** 열의 합계: **${formattedSum}**\n`;
+                }
+            }
+        }
+        
+        return summary.trim();
+    }
+    
+    // 테이블 미리보기 생성 함수
+    function generateTablePreview(tableStructure) {
+        if (!tableStructure.headers || !tableStructure.data || tableStructure.data.length === 0) {
+            return null;
+        }
+        
+        const headers = tableStructure.headers;
+        const data = tableStructure.data;
+        
+        // 최대 5개 행까지만 표시
+        const maxRows = Math.min(5, data.length);
+        let preview = '**테이블 미리보기:**\n\n';
+        
+        // 헤더 행
+        let headerRow = '';
+        for (const header of headers) {
+            headerRow += `| ${header} `;
+        }
+        preview += headerRow + '|\n';
+        
+        // 구분선
+        let separatorRow = '';
+        for (let i = 0; i < headers.length; i++) {
+            separatorRow += '| --- ';
+        }
+        preview += separatorRow + '|\n';
+        
+        // 데이터 행
+        for (let i = 0; i < maxRows; i++) {
+            let row = '';
+            const dataRow = data[i];
+            
+            for (let j = 0; j < headers.length; j++) {
+                if (j < dataRow.length) {
+                    row += `| ${dataRow[j]} `;
+                } else {
+                    row += '|  ';
+                }
+            }
+            
+            preview += row + '|\n';
+        }
+        
+        // 생략 표시
+        if (data.length > maxRows) {
+            preview += `\n_...외 ${data.length - maxRows}개의 행이 더 있습니다._`;
+        }
+        
+        return preview;
+    }
+    
+    // 텍스트 내용 분석 함수
+    function analyzeTextContent(imageData) {
+        if (!imageData || !imageData.fields || imageData.fields.length === 0) {
+            return null;
+        }
+        
+        // 텍스트 특성 분석
+        const allText = extractAllText(imageData);
+        const textLength = allText.length;
+        
+        // 결과 메시지 구성
+        let analysis = `문서 텍스트 분석 결과, 총 **${textLength}자**의 텍스트가 추출되었습니다.`;
+        
+        // 텍스트 패턴 분석
+        const patterns = [
+            { type: '이메일', regex: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, found: [] },
+            { type: '전화번호', regex: /(\d{2,3}[-\s]?\d{3,4}[-\s]?\d{4})/g, found: [] },
+            { type: '웹사이트', regex: /(https?:\/\/[^\s]+|www\.[^\s]+\.[^\s]+)/g, found: [] },
+            { type: '주소', regex: /([가-힣]+(시|도|군|구|읍|면|동)\s[가-힣]+(로|길|가)\s?\d+)/g, found: [] }
+        ];
+        
+        let foundPatterns = false;
+        
+        for (const pattern of patterns) {
+            const matches = allText.match(pattern.regex);
+            if (matches && matches.length > 0) {
+                pattern.found = [...new Set(matches)]; // 중복 제거
+                foundPatterns = true;
+            }
+        }
+        
+        if (foundPatterns) {
+            analysis += '\n\n문서에서 다음 정보를 발견했습니다:';
+            
+            for (const pattern of patterns) {
+                if (pattern.found.length > 0) {
+                    analysis += `\n- **${pattern.type}**: ${pattern.found.join(', ')}`;
+                }
+            }
+        }
+        
+        return analysis;
+    }
+    
+    // OCR 품질 및 신뢰도 분석 함수
+    function analyzeOcrQuality(imageData) {
+        if (!imageData || !imageData.fields) return null;
+        
+        let totalConfidence = 0;
+        let fieldsCount = 0;
+        let lowConfidenceCount = 0;
+        
+        // 필드 신뢰도 분석
+        if (imageData.fields && imageData.fields.length > 0) {
+            for (const field of imageData.fields) {
+                if (field.inferConfidence !== undefined) {
+                    totalConfidence += field.inferConfidence;
+                    fieldsCount++;
+                    
+                    if (field.inferConfidence < 0.7) {
+                        lowConfidenceCount++;
+                    }
+                }
+            }
+        }
+        
+        // 테이블 셀 신뢰도 분석
+        if (imageData.tables && imageData.tables.length > 0) {
+            for (const table of imageData.tables) {
+                if (table.cells && table.cells.length > 0) {
+                    for (const cell of table.cells) {
+                        if (cell.inferConfidence !== undefined) {
+                            totalConfidence += cell.inferConfidence;
+                            fieldsCount++;
+                            
+                            if (cell.inferConfidence < 0.7) {
+                                lowConfidenceCount++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        // 평균 신뢰도 계산
+        if (fieldsCount === 0) return null;
+        
+        const avgConfidence = totalConfidence / fieldsCount;
+        const lowConfidencePercent = (lowConfidenceCount / fieldsCount) * 100;
+        
+        // 품질 레벨 결정
+        let qualityLevel;
+        if (avgConfidence >= 0.9) {
+            qualityLevel = '매우 높음';
+        } else if (avgConfidence >= 0.8) {
+            qualityLevel = '높음';
+        } else if (avgConfidence >= 0.7) {
+            qualityLevel = '양호';
+        } else if (avgConfidence >= 0.6) {
+            qualityLevel = '보통';
+        } else {
+            qualityLevel = '낮음';
+        }
+        
+        // 결과 메시지 구성
+        let analysis = `OCR 인식 품질: **${qualityLevel}** (평균 신뢰도: ${(avgConfidence * 100).toFixed(1)}%)`;
+        
+        if (lowConfidenceCount > 0) {
+            analysis += `\n\n전체 텍스트 중 약 ${lowConfidencePercent.toFixed(1)}%가 낮은 신뢰도로 인식되었습니다. `;
+            
+            if (lowConfidencePercent > 30) {
+                analysis += '원본 이미지를 확인하고 필요시 수정하는 것이 좋습니다.';
+            }
+        }
+        
+        return analysis;
+    }
+    
+    // --------------------------------------------------------------------------------
+    // 유틸리티 함수
+    // --------------------------------------------------------------------------------
+    
     // 텍스트 내용 처리 및 표시 개선
     function processTextForDisplay(text) {
         if (!text) return '';
@@ -294,273 +1510,6 @@ $(document).ready(function() {
             alertDiv.alert('close');
         }, 5000);
     }
-
-    // 파일 목록에서 결과 보기 버튼
-    $(document).on('click', '.view-result-btn', function() {
-        const fileId = $(this).data('file-id');
-        const textPath = $(this).data('text-path');
-        const jsonPath = $(this).data('json-path');
-        const tablePath = $(this).data('table-path');
-        
-        // 텍스트 결과 로드
-        if (textPath) {
-            // 현재 탭에서 결과 보기
-            $('#results-tab').tab('show');
-            
-            // 해당 파일의 결과 카드 찾기
-            const resultCards = $('.result-card');
-            resultCards.each(function() {
-                const idx = $(this).attr('id').split('-').pop();
-                const resultFileId = $(this).find('.submit-feedback-btn').data('file-id');
-                
-                if (resultFileId == fileId) {
-                    // 텍스트 버튼 클릭 이벤트 트리거
-                    $(this).find('.text-view-btn').click();
-                    
-                    // 해당 결과 카드로 스크롤
-                    $('html, body').animate({
-                        scrollTop: $(this).offset().top - 100
-                    }, 500);
-                    
-                    return false; // 루프 종료
-                }
-            });
-        }
-    });
-    
-    // OCR JSON 데이터를 로드하고 챗봇 스타일로 처리하는 함수
-    function loadAndProcessChatbotResults() {
-        if ($('.result-card').length === 0) return;
-        
-        // 첫 번째 결과 카드의 JSON 경로 가져오기
-        const firstCard = $('.result-card').first();
-        const jsonBtn = firstCard.find('.json-view-btn');
-        
-        if (jsonBtn.length === 0) return;
-        
-        const jsonPath = jsonBtn.data('path');
-        if (!jsonPath) return;
-        
-        // 로딩 표시
-        $('#chatbot-container .chat-loading').show();
-        $('#chatbot-container .chat-messages').hide();
-        
-        // JSON 데이터 로드
-        $.ajax({
-            url: 'ajax_get_file_content.php',
-            type: 'GET',
-            data: { path: jsonPath },
-            dataType: 'json',
-            success: function(response) {
-                if (response.success) {
-                    try {
-                        // JSON 문자열 전처리 - 잘못된 형식 수정 시도
-                        let jsonContent = response.content;
-                        
-                        // 줄바꿈이나 불필요한 공백 제거
-                        jsonContent = jsonContent.replace(/\n\s*/g, ' ').trim();
-                        
-                        // 대체 방법: 텍스트 파일 로드를 시도합니다
-                        if (!isValidJSON(jsonContent)) {
-                            // JSON 파싱에 실패했으므로 텍스트 기반 결과로 대체
-                            showTextBasedResults(firstCard);
-                            return;
-                        }
-                        
-                        const ocrData = JSON.parse(jsonContent);
-                        generateChatbotMessages(ocrData);
-                    } catch (e) {
-                        console.error("JSON 파싱 오류:", e);
-                        // 텍스트 기반 결과로 대체
-                        showTextBasedResults(firstCard);
-                    }
-                } else {
-                    showChatbotError('파일을 로드할 수 없습니다: ' + response.message);
-                }
-            },
-            error: function() {
-                showChatbotError('파일 로드 중 오류가 발생했습니다.');
-            }
-        });
-    }
-    
-    // JSON 유효성 검사 함수
-    function isValidJSON(str) {
-        try {
-            JSON.parse(str);
-            return true;
-        } catch (e) {
-            return false;
-        }
-    }
-    
-    // 텍스트 기반 결과를 보여주는 함수
-    function showTextBasedResults(card) {
-        const textBtn = card.find('.text-view-btn');
-        if (textBtn.length > 0) {
-            const textPath = textBtn.data('path');
-            
-            // 텍스트 파일 내용 가져오기
-            $.ajax({
-                url: 'ajax_get_file_content.php',
-                type: 'GET',
-                data: { path: textPath },
-                dataType: 'json',
-                success: function(response) {
-                    if (response.success) {
-                        const chatMessages = $('#chatbot-container .chat-messages');
-                        chatMessages.empty();
-                        
-                        // 인사 메시지
-                        addChatbotMessage('안녕하세요! OCR 처리 결과를 분석했습니다.');
-                        
-                        // 텍스트 내용으로 간단 분석
-                        const text = response.content;
-                        
-                        // 문서 유형 추측
-                        const documentType = guessDocumentTypeFromText(text);
-                        if (documentType) {
-                            addChatbotMessage(`이 문서는 **${documentType}** 유형으로 보입니다.`);
-                        }
-                        
-                        // 키-값 쌍 찾기
-                        const keyValues = extractKeyValuePairs(text);
-                        if (Object.keys(keyValues).length > 0) {
-                            let fieldsMessage = '문서에서 다음 정보를 확인했습니다:';
-                            for (const [key, value] of Object.entries(keyValues)) {
-                                fieldsMessage += `\n- **${key}**: ${value}`;
-                            }
-                            addChatbotMessage(fieldsMessage);
-                        }
-                        
-                        // 표가 있는지 확인
-                        if (text.includes('|') && text.includes('-')) {
-                            addChatbotMessage('문서에 테이블이 포함되어 있는 것 같습니다. 테이블 탭에서 확인해보세요.');
-                        }
-                        
-                        // 전체 텍스트는 아래 탭에서 확인 가능
-                        addChatbotMessage('전체 텍스트 내용은 아래 텍스트 결과 탭에서 확인하실 수 있습니다.');
-                        
-                        // 로딩 숨기고 메시지 표시
-                        $('#chatbot-container .chat-loading').hide();
-                        chatMessages.show();
-                    } else {
-                        showChatbotError('텍스트 파일을 로드할 수 없습니다.');
-                    }
-                },
-                error: function() {
-                    showChatbotError('파일 로드 중 오류가 발생했습니다.');
-                }
-            });
-        } else {
-            showChatbotError('JSON 파싱에 실패했으며 대체 텍스트를 찾을 수 없습니다.');
-        }
-    }
-    
-    // 텍스트에서 문서 유형 추측
-    function guessDocumentTypeFromText(text) {
-        const lowerText = text.toLowerCase();
-        
-        const documentTypes = [
-            { type: '영수증', keywords: ['영수증', '매출', '결제', 'pos', '카드'] },
-            { type: '청구서', keywords: ['청구서', '청구금액', '납부', '고지서'] },
-            { type: '계약서', keywords: ['계약서', '계약', '동의', '당사자'] },
-            { type: '송장', keywords: ['송장', '인보이스', '배송', '배달', '택배'] },
-            { type: '견적서', keywords: ['견적서', '견적', '금액', '제안'] },
-            { type: '대금청구서', keywords: ['대금청구서', '세금계산서', '부가세', '공급가액'] },
-            { type: '보고서', keywords: ['보고서', '리포트', '분석', '결과'] }
-        ];
-        
-        for (const doc of documentTypes) {
-            for (const keyword of doc.keywords) {
-                if (lowerText.includes(keyword)) {
-                    return doc.type;
-                }
-            }
-        }
-        
-        return '일반 문서';
-    }
-    
-    // 텍스트에서 키-값 쌍 추출
-    function extractKeyValuePairs(text) {
-        const result = {};
-        const lines = text.split('\n');
-        
-        // 키:값 패턴 찾기
-        const keyValuePattern = /([^:]+):\s*(.+)/;
-        
-        for (const line of lines) {
-            const match = line.match(keyValuePattern);
-            if (match) {
-                const key = match[1].trim();
-                const value = match[2].trim();
-                
-                // 의미있는 키-값 쌍만 추가
-                if (key.length > 1 && value.length > 1) {
-                    result[key] = value;
-                }
-            }
-        }
-        
-        return result;
-    }
-    
-    // 챗봇 메시지 생성 함수
-    function generateChatbotMessages(ocrData) {
-        const chatMessages = $('#chatbot-container .chat-messages');
-        chatMessages.empty();
-        
-        // 인사 메시지
-        addChatbotMessage('안녕하세요! OCR 처리 결과를 분석했습니다. 어떤 정보를 찾고 계신가요?');
-        
-        // OCR 데이터 분석
-        if (ocrData && ocrData.images && ocrData.images.length > 0) {
-            const image = ocrData.images[0];
-            
-            // 1. 텍스트 필드 정보 요약
-            if (image.fields && image.fields.length > 0) {
-                const keyFields = extractKeyFields(image.fields);
-                if (Object.keys(keyFields).length > 0) {
-                    let fieldsMessage = '문서에서 다음 정보를 확인했습니다:'
-                    for (const [key, value] of Object.entries(keyFields)) {
-                        fieldsMessage += `\n- **${key}**: ${value}`;
-                    }
-                    addChatbotMessage(fieldsMessage);
-                }
-            }
-            
-            // 2. 테이블 정보 요약
-            if (image.tables && image.tables.length > 0) {
-                addChatbotMessage(`문서에서 ${image.tables.length}개의 테이블을 찾았습니다. 테이블 정보가 필요하시면 알려주세요.`);
-                
-                // 첫 번째 테이블 요약 제공
-                if (image.tables[0].cells && image.tables[0].cells.length > 0) {
-                    const tablePreview = generateTablePreview(image.tables[0]);
-                    if (tablePreview) {
-                        addChatbotMessage('첫 번째 테이블 미리보기입니다:\n' + tablePreview);
-                    }
-                }
-            } else {
-                addChatbotMessage('이 문서에는 테이블이 없는 것 같습니다.');
-            }
-            
-            // 3. 문서 유형 추측
-            const documentType = guessDocumentType(image);
-            if (documentType) {
-                addChatbotMessage(`이 문서는 **${documentType}** 유형으로 보입니다. 특정 정보가 필요하시면 말씀해 주세요.`);
-            }
-            
-            // 4. 추가 안내 메시지
-            addChatbotMessage('전체 텍스트 내용이나 테이블 정보는 아래 탭을 통해 확인하실 수 있습니다.');
-        } else {
-            addChatbotMessage('OCR 처리 결과가 없거나 형식이 올바르지 않습니다.');
-        }
-        
-        // 로딩 숨기고 메시지 표시
-        $('#chatbot-container .chat-loading').hide();
-        chatMessages.show();
-    }
     
     // 챗봇 메시지 추가 함수
     function addChatbotMessage(message) {
@@ -581,15 +1530,25 @@ $(document).ready(function() {
     // 챗봇 오류 메시지 표시
     function showChatbotError(message) {
         $('#chatbot-container .chat-loading').hide();
-        $('#chatbot-container .chat-messages').html(`
-            <div class="alert alert-danger">
-                <i class="bi bi-exclamation-triangle me-2"></i>${message}
+        const chatMessages = $('#chatbot-container .chat-messages');
+        chatMessages.html(`
+            <div class="chat-message">
+                <div class="chat-avatar">
+                    <i class="bi bi-robot"></i>
+                </div>
+                <div class="chat-content">
+                    <div class="alert alert-warning mb-0">
+                        <i class="bi bi-exclamation-triangle me-2"></i>${message}
+                    </div>
+                </div>
             </div>
         `).show();
     }
     
-    // 메시지 포맷팅 (마크다운 스타일 지원)
+    // 메시지 포맷팅 함수 (마크다운 스타일 지원)
     function formatMessage(message) {
+        if (!message) return '';
+        
         // 줄바꿈을 <br>로 변환
         let formatted = message.replace(/\n/g, '<br>');
         
@@ -599,184 +1558,63 @@ $(document).ready(function() {
         // 이탤릭 텍스트 처리 (*텍스트*)
         formatted = formatted.replace(/\*([^*]+)\*/g, '<em>$1</em>');
         
+        // 인라인 코드 처리 (`텍스트`)
+        formatted = formatted.replace(/`([^`]+)`/g, '<code>$1</code>');
+        
+        // 테이블 마크다운 처리
+        if (formatted.includes('|') && formatted.includes('---')) {
+            const lines = formatted.split('<br>');
+            let inTable = false;
+            let tableHtml = '<table class="table table-sm table-bordered mb-3">';
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                
+                if (line.includes('|')) {
+                    if (!inTable) {
+                        inTable = true;
+                    }
+                    
+                    // 구분선 행 건너뛰기
+                    if (line.includes('---')) continue;
+                    
+                    // 헤더 또는 데이터 행 처리
+                    const isHeader = i === 0 || (i > 0 && lines[i-1].includes('|') && lines[i+1] && lines[i+1].includes('---'));
+                    const cells = line.split('|').filter(cell => cell.trim() !== '');
+                    
+                    if (isHeader) {
+                        tableHtml += '<thead><tr>';
+                        cells.forEach(cell => {
+                            tableHtml += `<th>${cell.trim()}</th>`;
+                        });
+                        tableHtml += '</tr></thead><tbody>';
+                    } else {
+                        tableHtml += '<tr>';
+                        cells.forEach(cell => {
+                            tableHtml += `<td>${cell.trim()}</td>`;
+                        });
+                        tableHtml += '</tr>';
+                    }
+                } else if (inTable && line === '') {
+                    // 테이블 종료
+                    inTable = false;
+                    tableHtml += '</tbody></table>';
+                    lines[i] = tableHtml;
+                    tableHtml = '<table class="table table-sm table-bordered mb-3">';
+                }
+            }
+            
+            // 마지막 테이블 닫기
+            if (inTable) {
+                tableHtml += '</tbody></table>';
+                lines.push(tableHtml);
+            }
+            
+            formatted = lines.join('<br>');
+        }
+        
         return formatted;
     }
-    
-    // 주요 필드 정보 추출
-    function extractKeyFields(fields) {
-        const result = {};
-        const keywordMap = {
-            '날짜': ['date', '기준일', '발행일', '작성일'],
-            '금액': ['amount', '총액', '합계', '총합계', '공급가액', '결제금액'],
-            '거래처': ['company', '상호', '업체명', '거래처', '공급자', '판매자'],
-            '담당자': ['담당자', '작성자', '성명', '신청자'],
-            '제목': ['title', '제목', '문서명', '건명']
-        };
-        
-        // 키워드 기반 필드 분류
-        fields.forEach(field => {
-            if (!field.inferText) return;
-            
-            const text = field.inferText.trim();
-            let matched = false;
-            
-            // 키:값 형태 체크
-            const keyValueMatch = text.match(/([^:]+)\s*:\s*(.+)/);
-            if (keyValueMatch) {
-                const key = keyValueMatch[1].trim();
-                const value = keyValueMatch[2].trim();
-                result[key] = value;
-                matched = true;
-            }
-            
-            // 키워드 체크
-            if (!matched) {
-                for (const [category, keywords] of Object.entries(keywordMap)) {
-                    for (const keyword of keywords) {
-                        if (text.includes(keyword) && text.length < 30) {
-                            // 이미 카테고리가 존재하면 추가하지 않음
-                            if (!result[category]) {
-                                result[category] = text;
-                            }
-                            break;
-                        }
-                    }
-                }
-            }
-        });
-        
-        return result;
-    }
-    
-    // 테이블 미리보기 생성
-    function generateTablePreview(table) {
-        if (!table.cells || table.cells.length === 0) return null;
-        
-        // 테이블 구조 분석
-        const tableData = {};
-        let maxRow = 0;
-        let maxCol = 0;
-        
-        table.cells.forEach(cell => {
-            const rowIndex = cell.rowIndex || 0;
-            const colIndex = cell.colIndex || 0;
-            
-            if (!tableData[rowIndex]) tableData[rowIndex] = {};
-            tableData[rowIndex][colIndex] = cell.inferText || '';
-            
-            maxRow = Math.max(maxRow, rowIndex);
-            maxCol = Math.max(maxCol, colIndex);
-        });
-        
-        // 최대 3행까지만 미리보기
-        const maxPreviewRows = Math.min(3, maxRow + 1);
-        
-        // 마크다운 테이블 형식으로 생성
-        let preview = '';
-        
-        // 헤더 (첫 번째 행)
-        if (tableData[0]) {
-            for (let col = 0; col <= maxCol; col++) {
-                preview += (tableData[0][col] || '열' + (col + 1)) + ' | ';
-            }
-            preview = preview.slice(0, -2) + '\n';
-        }
-        
-        // 구분선
-        for (let col = 0; col <= maxCol; col++) {
-            preview += '------ | ';
-        }
-        preview = preview.slice(0, -2) + '\n';
-        
-        // 데이터 행 (2~3행)
-        for (let row = 1; row < maxPreviewRows; row++) {
-            if (tableData[row]) {
-                for (let col = 0; col <= maxCol; col++) {
-                    preview += (tableData[row][col] || '') + ' | ';
-                }
-                preview = preview.slice(0, -2) + '\n';
-            }
-        }
-        
-        return preview;
-    }
-    
-    // 문서 유형 추측
-    function guessDocumentType(image) {
-        if (!image.fields || image.fields.length === 0) return null;
-        
-        const fullText = image.fields.map(f => f.inferText || '').join(' ');
-        const lowerText = fullText.toLowerCase();
-        
-        const documentTypes = [
-            { type: '영수증', keywords: ['영수증', '매출', '결제', 'pos', '카드'] },
-            { type: '청구서', keywords: ['청구서', '청구금액', '납부', '고지서'] },
-            { type: '계약서', keywords: ['계약서', '계약', '동의', '당사자'] },
-            { type: '송장', keywords: ['송장', '인보이스', '배송', '배달', '택배'] },
-            { type: '견적서', keywords: ['견적서', '견적', '금액', '제안'] },
-            { type: '대금청구서', keywords: ['대금청구서', '세금계산서', '부가세', '공급가액'] },
-            { type: '보고서', keywords: ['보고서', '리포트', '분석', '결과'] }
-        ];
-        
-        for (const doc of documentTypes) {
-            for (const keyword of doc.keywords) {
-                if (lowerText.includes(keyword)) {
-                    return doc.type;
-                }
-            }
-        }
-        
-        return '일반 문서';
-    }
-    
-    // 작업 제어 버튼 이벤트
-    $('#cancelJobBtn').click(function() {
-        if (!confirm('정말로 이 작업을 취소하시겠습니까?')) return;
-        
-        const jobId = $(this).data('job-id');
-        
-        $.ajax({
-            url: 'ajax_cancel_job.php',
-            type: 'POST',
-            data: { job_id: jobId },
-            dataType: 'json',
-            success: function(response) {
-                if (response.success) {
-                    alert('작업이 취소되었습니다.');
-                    location.reload();
-                } else {
-                    alert('작업 취소 중 오류: ' + response.message);
-                }
-            },
-            error: function() {
-                alert('요청 중 오류가 발생했습니다.');
-            }
-        });
-    });
-    
-    $('#deleteJobBtn').click(function() {
-        if (!confirm('정말로 이 작업을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
-        
-        const jobId = $(this).data('job-id');
-        
-        $.ajax({
-            url: 'ajax_delete_job.php',
-            type: 'POST',
-            data: { job_id: jobId },
-            dataType: 'json',
-            success: function(response) {
-                if (response.success) {
-                    alert('작업이 삭제되었습니다.');
-                    window.location.href = 'jobs.php';
-                } else {
-                    alert('작업 삭제 중 오류: ' + response.message);
-                }
-            },
-            error: function() {
-                alert('요청 중 오류가 발생했습니다.');
-            }
-        });
-    });
     
     // 자동 새로고침 기능 (처리 중인 작업의 경우)
     let refreshInterval;
@@ -826,18 +1664,9 @@ $(document).ready(function() {
         });
     }
     
-    // 페이지 로드 시 자동 새로고침 설정
-    if ($('#autoRefresh').length) {
-        setupAutoRefresh();
-    }
+    // 페이지 초기화 실행
+    initialize();
     
-    // 챗봇 결과 로드
-    loadAndProcessChatbotResults();
-    
-    // 결과 탭 클릭 시 챗봇 결과 새로 로드
-    $('#results-tab').on('click', function() {
-        if ($('#chatbot-container .chat-messages').is(':empty')) {
-            loadAndProcessChatbotResults();
-        }
-    });
+    // 전역 함수 참조 설정
+    ocrResultProcessor = loadAndProcessOcrResults;
 });
