@@ -67,40 +67,41 @@ $(document).ready(function() {
     // 초기화 함수 - 페이지 로드 시 실행
     function initialize() {
         debugToUI('초기화 함수 실행 시작');
-        
-        // 현재 작업 ID 확인
         currentJobId = $('#cancelJobBtn').data('job-id') || $('#deleteJobBtn').data('job-id');
         debugToUI(`현재 작업 ID: ${currentJobId}`);
-        
-        // 페이지 로드 시 각 파일의 첫 번째 결과(텍스트)를 자동으로 로드
+    
+        // 페이지 로드 시 각 파일의 첫 번째 결과(텍스트) 자동 로드
         $('.result-card').each(function() {
             const idx = $(this).attr('id').split('-').pop();
             const textBtn = $(this).find('.text-view-btn');
             if (textBtn.length) {
-                debugToUI(`텍스트 뷰 버튼 발견: 인덱스 ${idx}`);
+                debugToUI(`자동 텍스트 로드: 인덱스 ${idx}`);
                 const path = textBtn.data('path');
-                loadTextResult(path, idx);
+                // loadTextResult(path, idx); // 필요하면 텍스트 로드 유지
             }
         });
-
-        // 자동 새로고침 설정
+    
         if ($('#autoRefresh').length) {
             debugToUI('자동 새로고침 기능 설정');
             setupAutoRefresh();
         }
-        
-        // 결과 탭이 활성화되어 있는지 확인
+    
         const resultsTabActive = $('#results-tab').hasClass('active');
         debugToUI(`결과 탭 활성화 상태: ${resultsTabActive}`);
-        
-        // 결과 탭이 활성화되어 있으면 OCR 결과 로드
-        if (resultsTabActive) {
-            debugToUI('결과 탭이 활성화되어 있어 OCR 결과 로드 시작');
-            setTimeout(function() {
-                loadAndProcessOcrResults();
-            }, 500); // 약간의 지연 추가
+    
+        // 결과 탭이 활성화 상태이고, 결과 카드가 있으면 바로 분석 시작
+        if (resultsTabActive && $('.result-card').length > 0) {
+            debugToUI('결과 탭 활성화 확인, OCR 결과 로드 시작 (초기화)');
+            // 약간의 지연을 주어 다른 요소 로딩 시간을 확보할 수 있음
+            setTimeout(loadAndProcessOcrResults, 500);
+        } else {
+             debugToUI("결과 탭이 비활성화 상태이거나 결과 카드가 없어 자동 분석 시작 안 함");
+             // 만약 결과 카드가 있는데도 분석이 안된다면, 결과 탭이 기본 active 상태인지 PHP 코드 확인 필요
+             if ($('.result-card').length > 0 && !resultsTabActive) {
+                 debugToUI("결과 카드는 있으나 결과 탭이 active 상태가 아님. PHP 파일에서 #results-tab에 active 클래스 추가 고려.", "warning");
+             }
         }
-        
+    
         debugToUI('초기화 함수 실행 완료');
     }
     
@@ -168,32 +169,57 @@ $(document).ready(function() {
     $(document).on('click', '.view-result-btn', function() {
         const fileId = $(this).data('file-id');
         const textPath = $(this).data('text-path');
-        debugToUI(`결과 보기 버튼 클릭: 파일 ID ${fileId}, 텍스트 경로 ${textPath}`);
-        
-        // 텍스트 결과 로드
-        if (textPath) {
-            // 현재 탭에서 결과 보기
-            $('#results-tab').tab('show');
-            
-            // 해당 파일의 결과 카드 찾기
-            const resultCards = $('.result-card');
-            resultCards.each(function() {
-                const idx = $(this).attr('id').split('-').pop();
-                const resultFileId = $(this).find('.submit-feedback-btn').data('file-id');
-                
-                if (resultFileId == fileId) {
-                    debugToUI(`해당 결과 카드 발견: 인덱스 ${idx}, 파일 ID ${resultFileId}`);
-                    // 텍스트 버튼 클릭 이벤트 트리거
-                    $(this).find('.text-view-btn').click();
-                    
-                    // 해당 결과 카드로 스크롤
-                    $('html, body').animate({
-                        scrollTop: $(this).offset().top - 100
-                    }, 500);
-                    
-                    return false; // 루프 종료
-                }
-            });
+        const jsonPath = $(this).data('json-path'); // JSON 경로도 가져옵니다.
+    
+        debugToUI(`결과 보기 버튼 클릭: 파일 ID ${fileId}, 텍스트 경로 ${textPath}, JSON 경로 ${jsonPath}`);
+    
+        // 1. 결과 탭으로 전환
+        $('#results-tab').tab('show');
+        debugToUI("결과 탭으로 전환됨");
+    
+        // 2. 해당 파일의 결과 카드 찾기 및 스크롤
+        const resultCards = $('.result-card');
+        let targetCard = null;
+        resultCards.each(function() {
+            const idx = $(this).attr('id').split('-').pop();
+            const resultFileId = $(this).find('.provide-feedback-btn').data('file-id'); // 피드백 버튼에서 file-id 확인
+    
+            if (resultFileId == fileId) {
+                debugToUI(`해당 결과 카드 발견: 인덱스 ${idx}, 파일 ID ${resultFileId}`);
+                targetCard = $(this);
+    
+                // 해당 카드로 스크롤
+                $('html, body').animate({
+                    scrollTop: $(this).offset().top - 100 // 상단 네비게이션 바 높이 고려
+                }, 500);
+    
+                // 3. 텍스트 뷰 활성화 (선택적이지만 사용자 경험상 좋음)
+                // $(this).find('.text-view-btn').click(); // 이전에 이미 텍스트는 로드되었을 수 있음
+    
+                return false; // 루프 종료
+            }
+        });
+    
+        // 4. *** JSON 분석 시작 (가장 중요) ***
+        if (targetCard && jsonPath) {
+             debugToUI("타겟 카드와 JSON 경로 확인됨, loadAndProcessOcrResults 호출 시도");
+             // loadAndProcessOcrResults 함수가 특정 카드에 종속되지 않고
+             // 첫 번째 카드의 JSON을 기준으로 분석한다면, 그냥 호출해도 됩니다.
+             // 만약 클릭된 카드의 JSON을 분석해야 한다면, loadAndProcessOcrResults 함수를 수정해야 합니다.
+             // 현재 로직은 첫 번째 카드를 기준으로 하므로, 그냥 호출합니다.
+             loadAndProcessOcrResults();
+        } else if (!targetCard) {
+             debugToUI(`파일 ID ${fileId}에 해당하는 결과 카드를 찾지 못함`, 'warning');
+        } else if (!jsonPath) {
+             debugToUI(`파일 ID ${fileId}에 대한 JSON 경로가 없음`, 'warning');
+             // JSON 경로가 없으면 텍스트 기반 분석을 시도할 수 있습니다.
+             if (textPath) {
+                  debugToUI("JSON 경로가 없어 텍스트 기반 분석 시도");
+                  // loadAndProcessTextResults(textPath); // 텍스트 분석 함수 호출 (필요시 주석 해제)
+                  showChatbotError("JSON 결과 파일이 없어 분석을 진행할 수 없습니다. 텍스트 결과만 확인 가능합니다."); // 또는 오류 메시지
+             } else {
+                  showChatbotError("분석할 결과 데이터(JSON 또는 Text)를 찾을 수 없습니다.");
+             }
         }
     });
     
@@ -626,221 +652,116 @@ $(document).ready(function() {
     
     // OCR 데이터 처리 및 결과 표시 함수
     function processAndDisplayOcrData(ocrData) {
-        debugToUI("OCR 데이터 처리 및 표시 시작 (processAndDisplayOcrData)"); // 함수 시작 로그
+        debugToUI("OCR 데이터 처리 및 표시 시작 (processAndDisplayOcrData - JSON 필드 표시 버전)");
         const chatMessages = $('#chatbot-container .chat-messages');
         chatMessages.empty(); // 이전 메시지 지우기
-
-        try { // 전체 로직을 try...catch로 감싸서 오류 추적
-            addChatbotMessage('안녕하세요! OCR 처리 결과를 분석했습니다.');
-            debugToUI("인사 메시지 추가됨");
-
-            // images 배열 및 첫 번째 이미지 유효성 재확인
-            if (ocrData && ocrData.images && ocrData.images.length > 0 && typeof ocrData.images[0] === 'object') {
-                const image = ocrData.images[0];
-                debugToUI(`첫 번째 이미지 데이터 분석 시작 (UID: ${image.uid || 'N/A'})`);
-
-                // 각 분석 단계 전후로 로그 추가
-                debugToUI("문서 유형 분석 시작...");
-                const documentType = analyzeDocumentType(image); // 오류 가능 지점 1
-                if (documentType) {
-                    debugToUI(`문서 유형 분석 결과: ${documentType.type}`);
-                    addChatbotMessage(`이 문서는 **${documentType.type}** 유형으로 분석되었습니다.`);
-                    if (documentType.description) {
-                        addChatbotMessage(documentType.description);
-                    }
-                } else {
-                    debugToUI("문서 유형 분석 결과 없음");
-                }
-                debugToUI("문서 유형 분석 완료.");
-
-
-                debugToUI("핵심 정보 추출 시작...");
-                const extractedFields = extractKeyInformation(image); // 오류 가능 지점 2
-                if (Object.keys(extractedFields).length > 0) {
-                    debugToUI(`핵심 정보 ${Object.keys(extractedFields).length}개 추출`);
-                    let fieldsMessage = '문서에서 다음 핵심 정보를 추출했습니다:';
-                    for (const [key, value] of Object.entries(extractedFields)) {
-                        fieldsMessage += `\n- **${key}**: ${value}`;
-                    }
-                    addChatbotMessage(fieldsMessage);
-                } else {
-                    debugToUI("추출된 핵심 정보 없음");
-                }
-                debugToUI("핵심 정보 추출 완료.");
-
-
-                // 테이블 데이터 분석 (테이블이 있을 경우에만)
-                if (image.tables && Array.isArray(image.tables) && image.tables.length > 0) {
-                    debugToUI(`테이블 ${image.tables.length}개 발견, 분석 시작...`);
-                    const tableAnalysis = analyzeTableData(image.tables); // 오류 가능 지점 3
-                    if (tableAnalysis && tableAnalysis.summary) {
-                        addChatbotMessage(tableAnalysis.summary);
-                        if (tableAnalysis.preview) {
-                            addChatbotMessage(tableAnalysis.preview);
-                        }
-                        debugToUI("테이블 분석 정보 추가됨");
-                    } else {
-                        debugToUI("테이블 분석 결과 없음");
-                    }
-                    debugToUI("테이블 데이터 분석 완료.");
-                } else {
-                    debugToUI("분석할 테이블 데이터 없음.");
-                }
-
-
-                debugToUI("텍스트 내용 분석 시작...");
-                const textAnalysis = analyzeTextContent(image); // 오류 가능 지점 4
-                if (textAnalysis) {
-                    debugToUI(`텍스트 분석 정보 추가`);
-                    addChatbotMessage(textAnalysis);
-                } else {
-                    debugToUI("텍스트 분석 결과 없음");
-                }
-                debugToUI("텍스트 내용 분석 완료.");
-
-
-                debugToUI("OCR 품질 분석 시작...");
-                const qualityAnalysis = analyzeOcrQuality(image); // 오류 가능 지점 5
-                if (qualityAnalysis) {
-                    debugToUI(`OCR 품질 분석 정보 추가`);
-                    addChatbotMessage(qualityAnalysis);
-                } else {
-                    debugToUI("OCR 품질 분석 결과 없음");
-                }
-                debugToUI("OCR 품질 분석 완료.");
-
-            } else {
-                debugToUI("처리할 유효한 이미지 데이터가 없음", "warning");
-                addChatbotMessage('OCR 처리 결과에 유효한 이미지 데이터가 없습니다.');
+    
+        try {
+            // 1. 기본 정보 표시
+            addChatbotMessage(`**OCR 결과 분석 (JSON 기반)**\n요청 ID: \`${ocrData.requestId || 'N/A'}\`\n타임스탬프: ${ocrData.timestamp ? new Date(ocrData.timestamp).toLocaleString() : 'N/A'}`);
+            debugToUI("기본 정보 메시지 추가됨");
+    
+            if (!ocrData.images || !Array.isArray(ocrData.images) || ocrData.images.length === 0) {
+                debugToUI("처리할 이미지 데이터 없음", "warning");
+                addChatbotMessage("오류: 분석할 이미지 데이터가 없습니다.");
+                // 로딩 숨기기 및 종료
+                $('#chatbot-container .chat-loading').hide();
+                $('#chatbot-container .chat-messages').show();
+                return;
             }
-
-            // *** 모든 분석 및 메시지 추가가 성공적으로 끝나면 로딩 숨김 ***
+    
+            // 여러 이미지가 있을 수 있으므로 반복 처리 (여기서는 첫 번째 이미지만 처리)
+            const image = ocrData.images[0];
+            if (typeof image !== 'object' || image === null) {
+                debugToUI("첫 번째 이미지 데이터가 유효하지 않음", "warning");
+                addChatbotMessage("오류: 첫 번째 이미지 데이터가 올바르지 않습니다.");
+                // 로딩 숨기기 및 종료
+                $('#chatbot-container .chat-loading').hide();
+                $('#chatbot-container .chat-messages').show();
+                return;
+            }
+    
+            debugToUI(`이미지 분석 시작 (UID: ${image.uid || 'N/A'})`);
+            let imageInfoMsg = `**이미지 정보**\n- UID: \`${image.uid || 'N/A'}\`\n- 이름: \`${image.name || 'N/A'}\``;
+            imageInfoMsg += `\n- 처리 결과: ${image.inferResult || 'N/A'} (${image.message || 'N/A'})`;
+            if (image.convertedImageInfo) {
+                imageInfoMsg += `\n- 변환된 이미지 크기: ${image.convertedImageInfo.width || '?'} x ${image.convertedImageInfo.height || '?'}`;
+                imageInfoMsg += `\n- 페이지 인덱스: ${image.convertedImageInfo.pageIndex !== undefined ? image.convertedImageInfo.pageIndex : 'N/A'}`;
+                imageInfoMsg += `\n- 긴 이미지 여부: ${image.convertedImageInfo.longImage ? '예' : '아니오'}`;
+            }
+            addChatbotMessage(imageInfoMsg);
+            debugToUI("이미지 정보 메시지 추가됨");
+    
+            // 2. 필드 정보 테이블 표시
+            if (image.fields && Array.isArray(image.fields) && image.fields.length > 0) {
+                debugToUI(`${image.fields.length}개의 필드 발견, 테이블 생성 시작...`);
+                let fieldTable = '**인식된 필드 목록**\n\n';
+                // 테이블 헤더 (마크다운)
+                fieldTable += '| # | 인식된 텍스트 | 신뢰도 | 타입 | 줄바꿈 | 위치 (시작점) |\n';
+                fieldTable += '|---|---------------|--------|------|-------|----------------|\n';
+    
+                // 테이블 내용 (마크다운)
+                image.fields.forEach((field, index) => {
+                    const text = field.inferText || '';
+                    // 텍스트가 너무 길면 자르기 (테이블 깨짐 방지)
+                    const displayText = text.length > 30 ? text.substring(0, 28) + '...' : text;
+                    const confidence = field.inferConfidence !== undefined ? (field.inferConfidence * 100).toFixed(1) + '%' : 'N/A';
+                    const type = field.type || 'N/A';
+                    const lineBreak = field.lineBreak ? '예' : '아니오';
+                    // 위치 정보 요약 (첫 번째 꼭지점)
+                    let position = 'N/A';
+                    if (field.boundingPoly && field.boundingPoly.vertices && field.boundingPoly.vertices.length > 0) {
+                        const startVertex = field.boundingPoly.vertices[0];
+                        position = `(${startVertex.x || '?'}, ${startVertex.y || '?'})`;
+                    }
+    
+                    // 마크다운 테이블 행 추가 (파이프 문자가 텍스트에 포함될 경우 HTML 엔티티로 변경)
+                    fieldTable += `| ${index + 1} | \`${displayText.replace(/\|/g, '|')}\` | ${confidence} | ${type} | ${lineBreak} | ${position} |\n`;
+                });
+    
+                addChatbotMessage(fieldTable);
+                debugToUI("필드 정보 테이블 메시지 추가됨");
+    
+                // 추가: 평균 신뢰도 계산 및 표시 (기존 OCR 품질 분석 함수 활용 가능)
+                const qualityAnalysis = analyzeOcrQuality(image); // 기존 함수 재활용
+                if (qualityAnalysis) {
+                    addChatbotMessage("**전체 필드 품질 분석**\n" + qualityAnalysis);
+                    debugToUI("품질 분석 메시지 추가됨");
+                }
+    
+            } else {
+                debugToUI("이미지에서 필드 정보를 찾을 수 없음", "warning");
+                addChatbotMessage("이미지에서 인식된 텍스트 필드를 찾을 수 없습니다.");
+            }
+    
+            // 3. 테이블 데이터 요약 (선택적)
+            // JSON에 'tables' 필드가 있다면 간단히 요약 정보만 표시할 수 있습니다.
+            // 상세 테이블 내용은 별도 뷰어에서 확인하도록 유도
+            if (image.tables && Array.isArray(image.tables) && image.tables.length > 0) {
+                debugToUI(`${image.tables.length}개의 테이블 구조 발견`);
+                let tableSummary = `**인식된 테이블 구조**\n\n문서 내에서 ${image.tables.length}개의 테이블 구조가 인식되었습니다.`;
+                // 첫 번째 테이블의 셀 개수 정도만 요약
+                if (image.tables[0].cells && Array.isArray(image.tables[0].cells)) {
+                    tableSummary += `\n첫 번째 테이블에는 약 ${image.tables[0].cells.length}개의 셀이 포함되어 있습니다.`;
+                }
+                tableSummary += "\n\n상세한 테이블 내용은 아래 '테이블 결과' 탭 또는 'JSON 데이터' 탭에서 확인하세요.";
+                addChatbotMessage(tableSummary);
+                debugToUI("테이블 요약 메시지 추가됨");
+            } else {
+                debugToUI("테이블 구조 데이터 없음");
+            }
+    
+    
+            // 모든 분석 및 메시지 추가 완료 후 로딩 숨기기
             $('#chatbot-container .chat-loading').hide();
             $('#chatbot-container .chat-messages').show();
-            debugToUI("채팅 로딩 숨김 및 메시지 최종 표시됨 (processAndDisplayOcrData 성공 완료)");
-
-        } catch (e) {
-            debugToUI(`processAndDisplayOcrData 내부에서 오류 발생: ${e.message}`, "error");
-            debugToUI(`오류 스택: ${e.stack}`, "error");
-            // 오류 발생 시에도 로딩은 숨기고 오류 메시지 표시
-            showChatbotError('데이터 분석 중 오류가 발생했습니다: ' + e.message + '. 개발자 콘솔을 확인하세요.');
-        }
-    }
+            debugToUI("채팅 로딩 숨김 및 메시지 최종 표시됨 (processAndDisplayOcrData - JSON 필드 표시 버전 완료)");
     
-    // 문서 유형 분석 함수
-    function analyzeDocumentType(imageData) {
-        if (!imageData || !imageData.fields) return null;
-        
-        // 전체 텍스트 추출
-        const allText = extractAllText(imageData).toLowerCase();
-        
-        // 문서 유형 정의
-        const documentTypes = [
-            {
-                type: '영수증',
-                keywords: ['영수증', '매출', '결제', 'pos', '카드', '금액', '부가세', '합계', '소계'],
-                description: '결제 금액, 항목, 날짜 등의 정보가 포함된 영수증입니다.'
-            },
-            {
-                type: '세금계산서',
-                keywords: ['세금계산서', '공급가액', '부가가치세', '사업자등록번호', '공급자', '공급받는자'],
-                description: '사업자 간 거래를 증빙하는 세금계산서입니다. 공급가액, 부가세, 사업자 정보 등이 포함되어 있습니다.'
-            },
-            {
-                type: '견적서',
-                keywords: ['견적서', '견적', '금액', '제안', '유효기간', '견적금액'],
-                description: '제품이나 서비스에 대한 가격과 조건을 제시하는 견적서입니다.'
-            },
-            {
-                type: '송장',
-                keywords: ['송장', '인보이스', '배송', '배달', '택배', '운송장', '송하인', '수하인'],
-                description: '배송 정보가 포함된 송장 또는 운송장입니다. 발신자, 수신자, 배송 항목 정보가 포함되어 있습니다.'
-            },
-            {
-                type: '계약서',
-                keywords: ['계약서', '계약', '동의', '당사자', '갑', '을', '계약조건', '서명'],
-                description: '법적 합의 내용이 담긴 계약서입니다. 계약 당사자, 조건, 서명 등이 포함되어 있습니다.'
-            },
-            {
-                type: '청구서',
-                keywords: ['청구서', '인보이스', '납부', '지불', '청구액', '미납', '납기일'],
-                description: '지불해야 할 금액과 기한이 명시된 청구서입니다.'
-            },
-            {
-                type: '명세서',
-                keywords: ['명세서', '내역', '상세', '품목', '목록'],
-                description: '상품이나 서비스의 상세 내역이 포함된 명세서입니다.'
-            }
-        ];
-        
-        // 테이블 내용 검사
-        let hasTable = false;
-        let tableHeaders = [];
-        
-        if (imageData.tables && imageData.tables.length > 0) {
-            hasTable = true;
-            
-            // 첫 번째 테이블의 헤더 추출
-            const table = imageData.tables[0];
-            if (table.cells) {
-                const headerCells = table.cells.filter(cell => 
-                    (cell.rowIndex === 0 || cell.rowSpan > 1) && cell.inferText
-                );
-                
-                tableHeaders = headerCells.map(cell => cell.inferText.trim().toLowerCase());
-            }
+        } catch (e) {
+            debugToUI(`processAndDisplayOcrData (JSON 필드 표시 버전) 내부 오류: ${e.message}`, "error");
+            debugToUI(`오류 스택: ${e.stack}`, "error");
+            showChatbotError('JSON 결과 표시 중 오류 발생: ' + e.message + '. 개발자 콘솔 확인 요망.');
         }
-        
-        // 가장 적합한 문서 유형 찾기
-        let bestMatch = null;
-        let highestScore = 0;
-        
-        for (const docType of documentTypes) {
-            let score = 0;
-            
-            // 키워드 매칭
-            for (const keyword of docType.keywords) {
-                if (allText.includes(keyword)) {
-                    score += 2;
-                }
-            }
-            
-            // 테이블 헤더 분석 (특정 문서 유형에 특화된 테이블 헤더 검사)
-            if (hasTable) {
-                if (docType.type === '영수증' && 
-                    (tableHeaders.some(h => h.includes('상품') || h.includes('품목')) && 
-                     tableHeaders.some(h => h.includes('금액') || h.includes('가격')))) {
-                    score += 3;
-                }
-                else if (docType.type === '세금계산서' && 
-                        (tableHeaders.some(h => h.includes('품목')) && 
-                         tableHeaders.some(h => h.includes('공급가액')))) {
-                    score += 3;
-                }
-                else if (docType.type === '송장' && 
-                        (tableHeaders.some(h => h.includes('품목')) && 
-                         tableHeaders.some(h => h.includes('수량')))) {
-                    score += 3;
-                }
-            }
-            
-            // 베스트 매치 업데이트
-            if (score > highestScore) {
-                highestScore = score;
-                bestMatch = docType;
-            }
-        }
-        
-        // 최소 점수 이상인 경우만 반환
-        if (highestScore >= 2) {
-            return bestMatch;
-        }
-        
-        // 기본 문서 유형
-        return {
-            type: '일반 문서',
-            description: '특정 문서 유형을 식별할 수 없습니다. 일반적인 문서로 처리됩니다.'
-        };
     }
     
     // 모든 텍스트 추출 함수
@@ -864,519 +785,70 @@ $(document).ready(function() {
         return fullText;
     }
     
-    // 핵심 정보 추출 함수
-    function extractKeyInformation(imageData) {
-        const result = {};
-        
-        if (!imageData || !imageData.fields) return result;
-        
-        // 주요 필드 카테고리 및 관련 키워드
-        const fieldCategories = {
-            '날짜': ['날짜', '발행일', '작성일', '등록일', '계약일', '거래일', 'date'],
-            '금액': ['금액', '합계', '총액', '총합계', '결제금액', '청구금액', '금액합계', '공급가액', '공급가액합계', '최종금액'],
-            '거래처': ['상호', '업체명', '거래처', '회사명', '공급자', '공급받는자', '매입처', '매출처'],
-            '사업자번호': ['사업자등록번호', '사업자번호', '등록번호', '사업자'],
-            '담당자': ['담당자', '작성자', '연락처', '담당', '문의'],
-            '품목': ['품목', '상품명', '제품명', '서비스명', '공급내역'],
-            '결제방법': ['결제방법', '지불방법', '카드', '현금', '계좌이체', '결제수단']
-        };
-        
-        // 키-값 쌍 패턴 추출
-        const keyValuePairs = extractKeyValuePairs(imageData.fields);
-        for (const [key, value] of Object.entries(keyValuePairs)) {
-            for (const [category, keywords] of Object.entries(fieldCategories)) {
-                for (const keyword of keywords) {
-                    if (key.includes(keyword)) {
-                        result[category] = value;
-                        break;
-                    }
-                }
-            }
-        }
-        
-        // 특정 패턴 검색 (날짜, 금액, 사업자번호 등)
-        const allText = extractAllText(imageData);
-        
-        // 날짜 패턴
-        if (!result['날짜']) {
-            const dateMatches = allText.match(/\d{4}[-\.\/](0?[1-9]|1[0-2])[-\.\/](0?[1-9]|[12][0-9]|3[01])/g);
-            if (dateMatches && dateMatches.length > 0) {
-                result['날짜'] = dateMatches[0];
-            }
-        }
-        
-        // 금액 패턴
-        if (!result['금액']) {
-            const amountMatches = allText.match(/((합계|총액|금액|총금액|결제금액|청구금액)\s*:?\s*)?([\d,]+)(\s*원|\s*₩)?/g);
-            if (amountMatches && amountMatches.length > 0) {
-                // 가장 큰 금액 선택
-                let maxAmount = 0;
-                let maxAmountStr = '';
-                
-                for (const match of amountMatches) {
-                    const numStr = match.replace(/[^0-9]/g, '');
-                    if (numStr) {
-                        const amount = parseInt(numStr, 10);
-                        if (amount > maxAmount) {
-                            maxAmount = amount;
-                            maxAmountStr = match.trim();
-                        }
-                    }
-                }
-                
-                if (maxAmountStr) {
-                    result['금액'] = maxAmountStr;
-                }
-            }
-        }
-        
-        // 사업자번호 패턴
-        if (!result['사업자번호']) {
-            const bizNumMatches = allText.match(/\d{3}[-\s]?\d{2}[-\s]?\d{5}/g);
-            if (bizNumMatches && bizNumMatches.length > 0) {
-                result['사업자번호'] = bizNumMatches[0];
-            }
-        }
-        
-        return result;
-    }
-    
-    // 키-값 쌍 추출 함수
-    function extractKeyValuePairs(fields) {
-        const result = {};
-        
-        if (!fields || !Array.isArray(fields)) return result;
-        
-        // 가능한 키-값 쌍 패턴들
-        const patterns = [
-            // '키 : 값' 패턴
-            { regex: /^(.*?)[:\s]\s*(.+)$/, keyIndex: 1, valueIndex: 2 },
-            // '키 값' 패턴 (특정 키워드에만 적용)
-            { regex: /^(날짜|금액|담당자|상호|결제방법|사업자등록번호)\s+(.+)$/, keyIndex: 1, valueIndex: 2 }
-        ];
-        
-        for (const field of fields) {
-            if (!field.inferText) continue;
-            
-            const text = field.inferText.trim();
-            let matched = false;
-            
-            // 패턴 매칭 시도
-            for (const pattern of patterns) {
-                const match = text.match(pattern.regex);
-                if (match) {
-                    const key = match[pattern.keyIndex].trim();
-                    const value = match[pattern.valueIndex].trim();
-                    
-                    // 의미있는 키-값 쌍만 추가 (너무 짧거나 긴 경우 제외)
-                    if (key.length >= 1 && key.length <= 20 && 
-                        value.length >= 1 && value.length <= 50) {
-                        result[key] = value;
-                        matched = true;
-                        break;
-                    }
-                }
-            }
-        }
-        
-        return result;
-    }
-    
-    // 테이블 데이터 분석 함수
-    function analyzeTableData(tables) {
-        if (!tables || tables.length === 0) {
-            return {
-                summary: "문서에서 테이블 정보를 찾을 수 없습니다."
-            };
-        }
-        
-        const result = {
-            summary: "",
-            preview: null
-        };
-        
-        // 테이블 개수 및 기본 정보
-        result.summary = `문서에서 **${tables.length}개의 테이블**을 발견했습니다.`;
-        
-        // 첫 번째 테이블 분석
-        const firstTable = tables[0];
-        if (firstTable.cells && firstTable.cells.length > 0) {
-            // 테이블 구조 분석
-            const tableStructure = reconstructTable(firstTable);
-            
-            // 헤더 분석
-            const headers = tableStructure.headers;
-            if (headers && headers.length > 0) {
-                result.summary += `\n\n첫 번째 테이블의 헤더는 다음과 같습니다: **${headers.join('**, **')}**`;
-                
-                // 테이블 유형 추론
-                const tableType = inferTableType(headers);
-                if (tableType) {
-                    result.summary += `\n\n이는 **${tableType}** 유형의 테이블로 보입니다.`;
-                }
-            }
-            
-            // 테이블 데이터 행 수
-            const rowCount = tableStructure.data ? tableStructure.data.length : 0;
-            if (rowCount > 0) {
-                result.summary += `\n\n테이블에는 헤더를 제외하고 **${rowCount}개의 데이터 행**이 있습니다.`;
-                
-                // 데이터 합계/평균 계산 (숫자 열이 있는 경우)
-                const numericColumnSummary = analyzeNumericColumns(tableStructure);
-                if (numericColumnSummary) {
-                    result.summary += `\n\n${numericColumnSummary}`;
-                }
-            }
-            
-            // 테이블 미리보기 생성
-            result.preview = generateTablePreview(tableStructure);
-        }
-        
-        return result;
-    }
-    
-    // 테이블 재구성 함수
-    function reconstructTable(table) {
-        if (!table.cells || table.cells.length === 0) {
-            return { headers: [], data: [] };
-        }
-        
-        const result = {
-            headers: [],
-            data: []
-        };
-        
-        // 행과 열 최대 크기 파악
-        let maxRow = 0;
-        let maxCol = 0;
-        
-        for (const cell of table.cells) {
-            const rowIndex = cell.rowIndex || 0;
-            const colIndex = cell.colIndex || 0;
-            const rowSpan = cell.rowSpan || 1;
-            const colSpan = cell.colSpan || 1;
-            
-            maxRow = Math.max(maxRow, rowIndex + rowSpan);
-            maxCol = Math.max(maxCol, colIndex + colSpan);
-        }
-        
-        // 2D 배열 초기화
-        const grid = Array(maxRow).fill().map(() => Array(maxCol).fill(null));
-        
-        // 셀 채우기
-        for (const cell of table.cells) {
-            const rowIndex = cell.rowIndex || 0;
-            const colIndex = cell.colIndex || 0;
-            const rowSpan = cell.rowSpan || 1;
-            const colSpan = cell.colSpan || 1;
-            const text = cell.inferText || '';
-            
-            // 셀 채우기 (rowSpan, colSpan 고려)
-            for (let r = 0; r < rowSpan; r++) {
-                for (let c = 0; c < colSpan; c++) {
-                    if (r === 0 && c === 0) {
-                        // 원본 셀
-                        grid[rowIndex][colIndex] = text;
-                    } else {
-                        // 확장 셀 (spanCell 표시)
-                        grid[rowIndex + r][colIndex + c] = ''; // 빈 문자열로 표시
-                    }
-                }
-            }
-        }
-        
-        // 헤더 행 추출 (첫 번째 행)
-        if (grid.length > 0) {
-            result.headers = grid[0].filter(cell => cell !== null);
-        }
-        
-        // 데이터 행 추출 (두 번째 행부터)
-        for (let r = 1; r < grid.length; r++) {
-            const row = grid[r].filter(cell => cell !== null);
-            if (row.some(cell => cell)) { // 빈 행 제외
-                result.data.push(row);
-            }
-        }
-        
-        return result;
-    }
-    
-    // 테이블 유형 추론 함수
-    function inferTableType(headers) {
-        if (!headers || headers.length === 0) return null;
-        
-        // 헤더 텍스트를 소문자로 변환
-        const lowerHeaders = headers.map(h => h.toLowerCase());
-        
-        // 특정 테이블 유형 패턴
-        const tablePatterns = [
-            {
-                type: '상품 목록',
-                required: ['상품명', '품목', '제품명', '항목', '내역'],
-                optional: ['단가', '수량', '금액', '가격', '소계', '부가세']
-            },
-            {
-                type: '가격표',
-                required: ['가격', '금액', '단가'],
-                optional: ['할인', '할인율', '부가세', '합계']
-            },
-            {
-                type: '거래 내역',
-                required: ['날짜', '거래일', '일자'],
-                optional: ['금액', '거래처', '비고', '적요', '내역']
-            },
-            {
-                type: '배송 정보',
-                required: ['배송', '배달', '주소', '수취인', '수령인'],
-                optional: ['연락처', '배송료', '배송상태']
-            }
-        ];
-        
-        // 테이블 유형 매칭
-        for (const pattern of tablePatterns) {
-            // 필수 키워드 매칭
-            const hasRequired = pattern.required.some(keyword => 
-                lowerHeaders.some(header => header.includes(keyword))
-            );
-            
-            // 옵션 키워드 매칭
-            const hasOptional = pattern.optional.some(keyword => 
-                lowerHeaders.some(header => header.includes(keyword))
-            );
-            
-            if (hasRequired && hasOptional) {
-                return pattern.type;
-            }
-        }
-        
-        return null;
-    }
-    
-    // 숫자 열 분석 함수
-    function analyzeNumericColumns(tableStructure) {
-        if (!tableStructure.headers || !tableStructure.data || tableStructure.data.length === 0) {
-            return null;
-        }
-        
-        const headers = tableStructure.headers;
-        const data = tableStructure.data;
-        let summary = '';
-        
-        // 금액 관련 열 찾기
-        const amountColumnIndices = [];
-        
-        headers.forEach((header, index) => {
-            const lowerHeader = header.toLowerCase();
-            if (lowerHeader.includes('금액') || 
-                lowerHeader.includes('가격') || 
-                lowerHeader.includes('합계') || 
-                lowerHeader.includes('소계') || 
-                lowerHeader.includes('부가세') || 
-                lowerHeader.includes('원')) {
-                amountColumnIndices.push(index);
-            }
-        });
-        
-        // 금액 열이 있으면 합계 계산
-        if (amountColumnIndices.length > 0) {
-            for (const colIndex of amountColumnIndices) {
-                if (colIndex >= headers.length) continue;
-                
-                const columnName = headers[colIndex];
-                let sum = 0;
-                let validCount = 0;
-                
-                for (const row of data) {
-                    if (colIndex < row.length) {
-                        // 숫자만 추출
-                        const numStr = row[colIndex].replace(/[^0-9]/g, '');
-                        if (numStr) {
-                            const num = parseInt(numStr, 10);
-                            if (!isNaN(num)) {
-                                sum += num;
-                                validCount++;
-                            }
-                        }
-                    }
-                }
-                
-                if (validCount > 0) {
-                    // 천 단위 구분자 추가
-                    const formattedSum = sum.toLocaleString('ko-KR');
-                    summary += `**${columnName}** 열의 합계: **${formattedSum}**\n`;
-                }
-            }
-        }
-        
-        return summary.trim();
-    }
-    
-    // 테이블 미리보기 생성 함수
-    function generateTablePreview(tableStructure) {
-        if (!tableStructure.headers || !tableStructure.data || tableStructure.data.length === 0) {
-            return null;
-        }
-        
-        const headers = tableStructure.headers;
-        const data = tableStructure.data;
-        
-        // 최대 5개 행까지만 표시
-        const maxRows = Math.min(5, data.length);
-        let preview = '**테이블 미리보기:**\n\n';
-        
-        // 헤더 행
-        let headerRow = '';
-        for (const header of headers) {
-            headerRow += `| ${header} `;
-        }
-        preview += headerRow + '|\n';
-        
-        // 구분선
-        let separatorRow = '';
-        for (let i = 0; i < headers.length; i++) {
-            separatorRow += '| --- ';
-        }
-        preview += separatorRow + '|\n';
-        
-        // 데이터 행
-        for (let i = 0; i < maxRows; i++) {
-            let row = '';
-            const dataRow = data[i];
-            
-            for (let j = 0; j < headers.length; j++) {
-                if (j < dataRow.length) {
-                    row += `| ${dataRow[j]} `;
-                } else {
-                    row += '|  ';
-                }
-            }
-            
-            preview += row + '|\n';
-        }
-        
-        // 생략 표시
-        if (data.length > maxRows) {
-            preview += `\n_...외 ${data.length - maxRows}개의 행이 더 있습니다._`;
-        }
-        
-        return preview;
-    }
-    
-    // 텍스트 내용 분석 함수
-    function analyzeTextContent(imageData) {
-        if (!imageData || !imageData.fields || imageData.fields.length === 0) {
-            return null;
-        }
-        
-        // 텍스트 특성 분석
-        const allText = extractAllText(imageData);
-        const textLength = allText.length;
-        
-        // 결과 메시지 구성
-        let analysis = `문서 텍스트 분석 결과, 총 **${textLength}자**의 텍스트가 추출되었습니다.`;
-        
-        // 텍스트 패턴 분석
-        const patterns = [
-            { type: '이메일', regex: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, found: [] },
-            { type: '전화번호', regex: /(\d{2,3}[-\s]?\d{3,4}[-\s]?\d{4})/g, found: [] },
-            { type: '웹사이트', regex: /(https?:\/\/[^\s]+|www\.[^\s]+\.[^\s]+)/g, found: [] },
-            { type: '주소', regex: /([가-힣]+(시|도|군|구|읍|면|동)\s[가-힣]+(로|길|가)\s?\d+)/g, found: [] }
-        ];
-        
-        let foundPatterns = false;
-        
-        for (const pattern of patterns) {
-            const matches = allText.match(pattern.regex);
-            if (matches && matches.length > 0) {
-                pattern.found = [...new Set(matches)]; // 중복 제거
-                foundPatterns = true;
-            }
-        }
-        
-        if (foundPatterns) {
-            analysis += '\n\n문서에서 다음 정보를 발견했습니다:';
-            
-            for (const pattern of patterns) {
-                if (pattern.found.length > 0) {
-                    analysis += `\n- **${pattern.type}**: ${pattern.found.join(', ')}`;
-                }
-            }
-        }
-        
-        return analysis;
-    }
-    
     // OCR 품질 및 신뢰도 분석 함수
     function analyzeOcrQuality(imageData) {
-        if (!imageData || !imageData.fields) return null;
-        
+        if (!imageData) return null;
+    
         let totalConfidence = 0;
-        let fieldsCount = 0;
+        let fieldCount = 0; // 필드 개수만 카운트 (테이블 셀 제외 가능)
         let lowConfidenceCount = 0;
-        
+        const lowConfidenceThreshold = 0.7; // 낮은 신뢰도 기준
+    
         // 필드 신뢰도 분석
-        if (imageData.fields && imageData.fields.length > 0) {
-            for (const field of imageData.fields) {
-                if (field.inferConfidence !== undefined) {
+        if (imageData.fields && Array.isArray(imageData.fields)) {
+            imageData.fields.forEach(field => {
+                if (field.inferConfidence !== undefined && typeof field.inferConfidence === 'number') {
                     totalConfidence += field.inferConfidence;
-                    fieldsCount++;
-                    
-                    if (field.inferConfidence < 0.7) {
+                    fieldCount++;
+                    if (field.inferConfidence < lowConfidenceThreshold) {
                         lowConfidenceCount++;
                     }
+                } else {
+                    // 신뢰도 값이 없거나 숫자가 아닌 필드도 카운트할 수 있음 (선택적)
+                    // fieldCount++;
                 }
-            }
+            });
         }
-        
-        // 테이블 셀 신뢰도 분석
-        if (imageData.tables && imageData.tables.length > 0) {
-            for (const table of imageData.tables) {
-                if (table.cells && table.cells.length > 0) {
-                    for (const cell of table.cells) {
-                        if (cell.inferConfidence !== undefined) {
+    
+        // 테이블 셀 신뢰도 분석 (선택적: 포함하려면 주석 해제)
+        /*
+        if (imageData.tables && Array.isArray(imageData.tables)) {
+            imageData.tables.forEach(table => {
+                if (table.cells && Array.isArray(table.cells)) {
+                    table.cells.forEach(cell => {
+                        if (cell.inferConfidence !== undefined && typeof cell.inferConfidence === 'number') {
                             totalConfidence += cell.inferConfidence;
-                            fieldsCount++;
-                            
-                            if (cell.inferConfidence < 0.7) {
+                            fieldCount++; // fieldCount를 같이 사용하면 필드+셀 전체 평균이 됨
+                            if (cell.inferConfidence < lowConfidenceThreshold) {
                                 lowConfidenceCount++;
                             }
                         }
-                    }
+                    });
                 }
-            }
+            });
         }
-        
-        // 평균 신뢰도 계산
-        if (fieldsCount === 0) return null;
-        
-        const avgConfidence = totalConfidence / fieldsCount;
-        const lowConfidencePercent = (lowConfidenceCount / fieldsCount) * 100;
-        
-        // 품질 레벨 결정
+        */
+    
+        if (fieldCount === 0) return "신뢰도를 계산할 필드가 없습니다."; // 필드가 없을 때 메시지
+    
+        const avgConfidence = totalConfidence / fieldCount;
+        const lowConfidencePercent = (lowConfidenceCount / fieldCount) * 100;
+    
         let qualityLevel;
-        if (avgConfidence >= 0.9) {
-            qualityLevel = '매우 높음';
-        } else if (avgConfidence >= 0.8) {
-            qualityLevel = '높음';
-        } else if (avgConfidence >= 0.7) {
-            qualityLevel = '양호';
-        } else if (avgConfidence >= 0.6) {
-            qualityLevel = '보통';
-        } else {
-            qualityLevel = '낮음';
-        }
-        
-        // 결과 메시지 구성
-        let analysis = `OCR 인식 품질: **${qualityLevel}** (평균 신뢰도: ${(avgConfidence * 100).toFixed(1)}%)`;
-        
+        if (avgConfidence >= 0.95) qualityLevel = '매우 높음';
+        else if (avgConfidence >= 0.85) qualityLevel = '높음';
+        else if (avgConfidence >= 0.75) qualityLevel = '양호';
+        else if (avgConfidence >= 0.60) qualityLevel = '보통';
+        else qualityLevel = '낮음';
+    
+        let analysis = `평균 신뢰도: **${(avgConfidence * 100).toFixed(1)}%** (품질: **${qualityLevel}**)`;
         if (lowConfidenceCount > 0) {
-            analysis += `\n\n전체 텍스트 중 약 ${lowConfidencePercent.toFixed(1)}%가 낮은 신뢰도로 인식되었습니다. `;
-            
-            if (lowConfidencePercent > 30) {
-                analysis += '원본 이미지를 확인하고 필요시 수정하는 것이 좋습니다.';
+            analysis += `\n- 낮은 신뢰도 필드 (<${lowConfidenceThreshold*100}%): ${lowConfidenceCount}개 (${lowConfidencePercent.toFixed(1)}%)`;
+            if (lowConfidencePercent > 20) { // 낮은 신뢰도 비율이 높으면 경고 추가
+                analysis += "\n- _주의: 낮은 신뢰도의 필드가 많아 일부 텍스트가 부정확할 수 있습니다._";
             }
         }
-        
+    
         return analysis;
     }
     
@@ -1514,11 +986,17 @@ $(document).ready(function() {
         return withAmounts;
     }
     
-    // HTML 이스케이프 함수
+    // HTML 이스케이프 함수 (XSS 방지용)
     function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+        if (typeof text !== 'string') return text; // 문자열 아니면 그대로 반환
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;',
+        };
+        return text.replace(/[&<>"']/g, function(m) { return map[m]; });
     }
     
     // 알림 표시 함수
@@ -1576,71 +1054,94 @@ $(document).ready(function() {
     // 메시지 포맷팅 함수 (마크다운 스타일 지원)
     function formatMessage(message) {
         if (!message) return '';
-        
-        // 줄바꿈을 <br>로 변환
+    
+        // 1. 기본 HTML 이스케이프 (XSS 방지) - 테이블 변환 전에 하면 안됨
+        // let formatted = escapeHtml(message); // 여기서 하면 마크다운 태그까지 이스케이프됨
+    
+        // 2. 줄바꿈 처리
         let formatted = message.replace(/\n/g, '<br>');
-        
-        // 볼드 텍스트 처리 (**텍스트**)
-        formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-        
-        // 이탤릭 텍스트 처리 (*텍스트*)
-        formatted = formatted.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-        
-        // 인라인 코드 처리 (`텍스트`)
-        formatted = formatted.replace(/`([^`]+)`/g, '<code>$1</code>');
-        
-        // 테이블 마크다운 처리
-        if (formatted.includes('|') && formatted.includes('---')) {
+    
+        // 3. 마크다운 스타일 처리 (볼드, 이탤릭, 코드)
+        formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        formatted = formatted.replace(/`(.*?)`/g, '<code>$1</code>');
+    
+        // 4. 테이블 마크다운 처리
+        // 테이블 시작 패턴 확인 (| 헤더 | 형식과 |---| 구분선)
+        if (formatted.includes('|') && formatted.includes('<br>|---')) {
             const lines = formatted.split('<br>');
+            let tableHtml = '';
             let inTable = false;
-            let tableHtml = '<table class="table table-sm table-bordered mb-3">';
-            
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i].trim();
-                
-                if (line.includes('|')) {
+            let headerProcessed = false;
+    
+            lines.forEach((line, index) => {
+                const trimmedLine = line.trim();
+                // 테이블 행 시작 조건: 파이프로 시작하고 끝나며, 구분선 다음 행이거나 첫 테이블 행
+                if (trimmedLine.startsWith('|') && trimmedLine.endsWith('|')) {
                     if (!inTable) {
+                        // 새 테이블 시작
+                        tableHtml += '<div class="table-responsive mb-3"><table class="table table-sm table-bordered table-hover chatbot-table">';
                         inTable = true;
+                        headerProcessed = false;
                     }
-                    
-                    // 구분선 행 건너뛰기
-                    if (line.includes('---')) continue;
-                    
-                    // 헤더 또는 데이터 행 처리
-                    const isHeader = i === 0 || (i > 0 && lines[i-1].includes('|') && lines[i+1] && lines[i+1].includes('---'));
-                    const cells = line.split('|').filter(cell => cell.trim() !== '');
-                    
-                    if (isHeader) {
+    
+                    const cells = trimmedLine.split('|').slice(1, -1); // 양 끝 빈 문자열 제거
+    
+                    // 구분선인지 확인 (|---|---| 형식)
+                    const isSeparator = cells.every(cell => /^\s*-{3,}\s*$/.test(cell));
+    
+                    if (isSeparator) {
+                        if (!headerProcessed) {
+                             // 헤더가 없는데 구분선만 있는 이상한 경우, 무시하거나 헤더 추가
+                             tableHtml += '<tbody>'; // 바로 tbody 시작
+                             headerProcessed = true; // 구분선 처리 완료 (헤더 없이)
+                        }
+                        // 구분선 자체는 HTML로 변환하지 않음
+                    } else if (!headerProcessed) {
+                        // 헤더 행 처리
                         tableHtml += '<thead><tr>';
                         cells.forEach(cell => {
-                            tableHtml += `<th>${cell.trim()}</th>`;
+                            // 헤더 셀 내부의 마크다운(`) 처리
+                            const headerContent = cell.trim().replace(/`(.*?)`/g, '<code>$1</code>');
+                            tableHtml += `<th>${headerContent}</th>`;
                         });
                         tableHtml += '</tr></thead><tbody>';
+                        headerProcessed = true;
                     } else {
+                        // 데이터 행 처리
                         tableHtml += '<tr>';
                         cells.forEach(cell => {
-                            tableHtml += `<td>${cell.trim()}</td>`;
+                             // 데이터 셀 내부의 마크다운(`) 처리 및 HTML 허용 안 함 (이스케이프 필요)
+                             const cellContent = escapeHtml(cell.trim()).replace(/`(.*?)`/g, '<code>$1</code>');
+                             tableHtml += `<td>${cellContent}</td>`; // 데이터는 escapeHtml 적용
                         });
                         tableHtml += '</tr>';
                     }
-                } else if (inTable && line === '') {
-                    // 테이블 종료
-                    inTable = false;
-                    tableHtml += '</tbody></table>';
-                    lines[i] = tableHtml;
-                    tableHtml = '<table class="table table-sm table-bordered mb-3">';
+                } else {
+                    // 테이블이 아닌 행
+                    if (inTable) {
+                        // 테이블 종료
+                        tableHtml += '</tbody></table></div>';
+                        inTable = false;
+                        // 이전에 테이블이 아닌 행도 추가
+                        formatted = formatted.replace(line, tableHtml + line); // 테이블 HTML 삽입
+                        tableHtml = ''; // 테이블 HTML 초기화
+                    }
+                    // 테이블 아닌 행은 그대로 둠 (이미 <br> 처리됨)
                 }
-            }
-            
-            // 마지막 테이블 닫기
+            });
+    
+            // 마지막 줄까지 테이블이었을 경우 닫기
             if (inTable) {
-                tableHtml += '</tbody></table>';
-                lines.push(tableHtml);
+                tableHtml += '</tbody></table></div>';
+                formatted += tableHtml; // 마지막 테이블 추가
             }
-            
-            formatted = lines.join('<br>');
         }
-        
+    
+        // 테이블 처리 후에는 일반 줄바꿈만 남도록 정리
+        // (주의: 복잡한 중첩 구조에서는 문제가 될 수 있음)
+        // formatted = formatted.replace(/<br>\s*$/, ''); // 마지막 줄바꿈 제거
+    
         return formatted;
     }
     
