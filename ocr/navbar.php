@@ -44,12 +44,6 @@
                     </a>
                 </li>
             </ul>
-            
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="login.php"><i class="bi bi-box-arrow-in-right me-1"></i>로그인</a>
-                </li>
-            </ul>
         </div>
     </div>
 </nav>
