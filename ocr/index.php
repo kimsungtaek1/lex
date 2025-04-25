@@ -11,6 +11,7 @@ ini_set('display_errors', 1);
 require_once 'config.php';
 require_once 'process_monitor.php';
 require_once 'document_learning.php';
+require_once 'utils.php';
 
 // 프로세스 모니터 초기화
 $processMonitor = new OCRProcessMonitor();
@@ -69,7 +70,7 @@ $pageTitle = 'OCR 인식률 향상 시스템';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $pageTitle; ?></title>
+    <title><?php echo h($pageTitle); ?></title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -117,14 +118,14 @@ $pageTitle = 'OCR 인식률 향상 시스템';
 
     <!-- 메인 컨텐츠 -->
     <div class="container mt-4">
-        <h1 class="mb-4"><?php echo $pageTitle; ?> - 대시보드</h1>
+        <h1 class="mb-4"><?php echo h($pageTitle); ?> - 대시보드</h1>
         
         <!-- 통계 카드 -->
         <div class="row mb-4">
             <div class="col-md-4">
                 <div class="card bg-light">
                     <div class="card-body stat-card">
-                        <h3 class="text-primary"><?php echo number_format($stats['total_jobs'] ?? 0); ?></h3>
+                        <h3 class="text-primary"><?php echo number_format(h($stats['total_jobs'] ?? 0)); ?></h3>
                         <p>총 작업 수</p>
                     </div>
                 </div>
@@ -132,7 +133,7 @@ $pageTitle = 'OCR 인식률 향상 시스템';
             <div class="col-md-4">
                 <div class="card bg-light">
                     <div class="card-body stat-card">
-                        <h3 class="text-success"><?php echo number_format($stats['completed_jobs'] ?? 0); ?></h3>
+                        <h3 class="text-success"><?php echo number_format(h($stats['completed_jobs'] ?? 0)); ?></h3>
                         <p>완료된 작업</p>
                     </div>
                 </div>
@@ -140,7 +141,7 @@ $pageTitle = 'OCR 인식률 향상 시스템';
             <div class="col-md-4">
                 <div class="card bg-light">
                     <div class="card-body stat-card">
-                        <h3 class="text-info"><?php echo number_format($stats['processed_files'] ?? 0); ?></h3>
+                        <h3 class="text-info"><?php echo number_format(h($stats['processed_files'] ?? 0)); ?></h3>
                         <p>처리된 파일</p>
                     </div>
                 </div>
@@ -174,7 +175,7 @@ $pageTitle = 'OCR 인식률 향상 시스템';
                                     <tbody>
                                         <?php foreach ($recentJobs as $job): ?>
                                             <tr>
-                                                <td><?php echo htmlspecialchars($job['name']); ?></td>
+                                                <td><?php echo h($job['name']); ?></td>
                                                 <td>
                                                     <span class="badge bg-<?php echo getStatusColor($job['status']); ?>">
                                                         <?php echo getStatusText($job['status']); ?>
@@ -184,17 +185,17 @@ $pageTitle = 'OCR 인식률 향상 시스템';
                                                     <div class="progress">
                                                         <div class="progress-bar bg-<?php echo getStatusColor($job['status']); ?>" 
                                                              role="progressbar" 
-                                                             style="width: <?php echo $job['progress']; ?>%"
-                                                             aria-valuenow="<?php echo $job['progress']; ?>" 
+                                                             style="width: <?php echo h($job['progress']); ?>%"
+                                                             aria-valuenow="<?php echo h($job['progress']); ?>" 
                                                              aria-valuemin="0" 
                                                              aria-valuemax="100">
-                                                            <?php echo $job['progress']; ?>%
+                                                            <?php echo h($job['progress']); ?>%
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td><?php echo date('Y-m-d H:i', strtotime($job['created_at'])); ?></td>
+                                                <td><?php echo h(date('Y-m-d H:i', strtotime($job['created_at']))); ?></td>
                                                 <td>
-                                                    <a href="view_job.php?id=<?php echo $job['id']; ?>" 
+                                                    <a href="view_job.php?id=<?php echo h($job['id']); ?>" 
                                                        class="btn btn-sm btn-outline-primary">
                                                         보기
                                                     </a>
@@ -252,8 +253,8 @@ $pageTitle = 'OCR 인식률 향상 시스템';
                             <ul class="list-group">
                                 <?php foreach (array_slice($templates, 0, 3) as $template): ?>
                                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        <span><?php echo htmlspecialchars($template['name']); ?></span>
-                                        <a href="upload.php?template=<?php echo $template['id']; ?>" 
+                                        <span><?php echo h($template['name']); ?></span>
+                                        <a href="upload.php?template=<?php echo h($template['id']); ?>" 
                                            class="btn btn-sm btn-outline-primary">
                                             사용
                                         </a>

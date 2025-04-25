@@ -74,7 +74,7 @@ $pageTitle = '작업 상세 정보: ' . htmlspecialchars($jobDetails['job']['nam
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $pageTitle; ?></title>
+    <title><?php echo h($pageTitle); ?></title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -173,7 +173,7 @@ $pageTitle = '작업 상세 정보: ' . htmlspecialchars($jobDetails['job']['nam
     <!-- 메인 컨텐츠 -->
     <div class="container mt-4">
         <h1 class="mb-4">
-            <?php echo $pageTitle; ?>
+            <?php echo h($pageTitle); ?>
             <span class="badge bg-<?php echo getStatusColor($jobDetails['job']['status']); ?> ms-2">
                 <?php echo getStatusText($jobDetails['job']['status']); ?>
             </span>
@@ -196,30 +196,30 @@ $pageTitle = '작업 상세 정보: ' . htmlspecialchars($jobDetails['job']['nam
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6">
-                                <p><strong>작업 ID:</strong> <?php echo $jobDetails['job']['id']; ?></p>
-                                <p><strong>생성 일시:</strong> <?php echo date('Y-m-d H:i:s', strtotime($jobDetails['job']['created_at'])); ?></p>
+                                <p><strong>작업 ID:</strong> <?php echo h($jobDetails['job']['id']); ?></p>
+                                <p><strong>생성 일시:</strong> <?php echo h(date('Y-m-d H:i:s', strtotime($jobDetails['job']['created_at']))); ?></p>
                                 <p><strong>최종 업데이트:</strong> 
                                     <span id="lastUpdated">
-                                        <?php echo $jobDetails['job']['updated_at'] ? date('Y-m-d H:i:s', strtotime($jobDetails['job']['updated_at'])) : '-'; ?>
+                                        <?php echo $jobDetails['job']['updated_at'] ? h(date('Y-m-d H:i:s', strtotime($jobDetails['job']['updated_at']))) : '-'; ?>
                                     </span>
                                 </p>
                             </div>
                             <div class="col-md-6">
-                                <p><strong>처리 파일:</strong> <span id="processedFiles"><?php echo $jobDetails['job']['processed_files']; ?></span> / <?php echo $jobDetails['job']['total_files']; ?></p>
+                                <p><strong>처리 파일:</strong> <span id="processedFiles"><?php echo h($jobDetails['job']['processed_files']); ?></span> / <?php echo h($jobDetails['job']['total_files']); ?></p>
                                 <p><strong>문서 유형:</strong> 
                                     <?php
                                     $options = json_decode($jobDetails['job']['options'], true);
-                                    echo !empty($options['document_type']) ? $options['document_type'] : '자동 감지';
+                                    echo !empty($options['document_type']) ? h($options['document_type']) : '자동 감지';
                                     ?>
                                 </p>
                                 <div class="progress">
                                     <div id="progressBar" class="progress-bar bg-<?php echo getStatusColor($jobDetails['job']['status']); ?>" 
                                          role="progressbar" 
-                                         style="width: <?php echo $jobDetails['job']['progress']; ?>%" 
-                                         aria-valuenow="<?php echo $jobDetails['job']['progress']; ?>" 
+                                         style="width: <?php echo h($jobDetails['job']['progress']); ?>%" 
+                                         aria-valuenow="<?php echo h($jobDetails['job']['progress']); ?>" 
                                          aria-valuemin="0" 
                                          aria-valuemax="100">
-                                        <?php echo $jobDetails['job']['progress']; ?>%
+                                        <?php echo h($jobDetails['job']['progress']); ?>%
                                     </div>
                                 </div>
                             </div>
@@ -271,7 +271,7 @@ $pageTitle = '작업 상세 정보: ' . htmlspecialchars($jobDetails['job']['nam
                                                     <?php endif; ?>
                                                 </div>
                                                 <div class="file-info">
-                                                    <h5><?php echo basename($file['file_path']); ?></h5>
+                                                    <h5><?php echo h(basename($file['file_path'])); ?></h5>
                                                     <div>
                                                         <span class="status-indicator bg-<?php echo getStatusColor($file['status']); ?>"></span>
                                                         <span class="text-<?php echo getStatusColor($file['status']); ?>">
@@ -279,7 +279,7 @@ $pageTitle = '작업 상세 정보: ' . htmlspecialchars($jobDetails['job']['nam
                                                         </span>
                                                         <span class="text-muted ms-2">
                                                             마지막 업데이트: 
-                                                            <?php echo $file['updated_at'] ? date('Y-m-d H:i:s', strtotime($file['updated_at'])) : date('Y-m-d H:i:s', strtotime($file['created_at'])); ?>
+                                                            <?php echo $file['updated_at'] ? h(date('Y-m-d H:i:s', strtotime($file['updated_at']))) : h(date('Y-m-d H:i:s', strtotime($file['created_at']))); ?>
                                                         </span>
                                                     </div>
                                                 </div>
@@ -290,10 +290,10 @@ $pageTitle = '작업 상세 정보: ' . htmlspecialchars($jobDetails['job']['nam
                                                     ?>
                                                     <div>
                                                         <button class="btn btn-sm btn-outline-primary view-result-btn" 
-                                                                data-file-id="<?php echo $fileId; ?>"
-                                                                data-text-path="<?php echo htmlspecialchars($resultPaths['text'] ?? ''); ?>"
-                                                                data-json-path="<?php echo htmlspecialchars($resultPaths['json'] ?? ''); ?>"
-                                                                data-table-path="<?php echo htmlspecialchars($resultPaths['table'] ?? ''); ?>">
+                                                                data-file-id="<?php echo h($fileId); ?>"
+                                                                data-text-path="<?php echo h($resultPaths['text'] ?? ''); ?>"
+                                                                data-json-path="<?php echo h($resultPaths['json'] ?? ''); ?>"
+                                                                data-table-path="<?php echo h($resultPaths['table'] ?? ''); ?>">
                                                             <i class="bi bi-eye me-1"></i>결과 보기
                                                         </button>
                                                     </div>
@@ -327,27 +327,27 @@ $pageTitle = '작업 상세 정보: ' . htmlspecialchars($jobDetails['job']['nam
                                             <?php foreach ($jobResults['files'] as $idx => $result): ?>
                                                 <div class="list-group-item list-group-item-action">
                                                     <div class="d-flex w-100 justify-content-between">
-                                                        <h5 class="mb-1"><?php echo basename($result['original_file']); ?></h5>
-                                                        <small class="text-muted">결과 #<?php echo $idx + 1; ?></small>
+                                                        <h5 class="mb-1"><?php echo h(basename($result['original_file'])); ?></h5>
+                                                        <small class="text-muted">결과 #<?php echo h($idx + 1); ?></small>
                                                     </div>
                                                     <div class="mt-3">
                                                         <?php if (!empty($result['text_file'])): ?>
                                                             <button class="btn btn-sm btn-outline-primary me-2 view-text-btn" 
-                                                                    data-path="<?php echo htmlspecialchars($result['text_file']); ?>">
+                                                                    data-path="<?php echo h($result['text_file']); ?>">
                                                                 <i class="bi bi-file-text me-1"></i>텍스트 결과
                                                             </button>
                                                         <?php endif; ?>
                                                         
                                                         <?php if (!empty($result['table_file'])): ?>
                                                             <button class="btn btn-sm btn-outline-info me-2 view-table-btn" 
-                                                                    data-path="<?php echo htmlspecialchars($result['table_file']); ?>">
+                                                                    data-path="<?php echo h($result['table_file']); ?>">
                                                                 <i class="bi bi-table me-1"></i>테이블 결과
                                                             </button>
                                                         <?php endif; ?>
                                                         
                                                         <?php if (!empty($result['json_file'])): ?>
                                                             <button class="btn btn-sm btn-outline-secondary me-2 view-json-btn" 
-                                                                    data-path="<?php echo htmlspecialchars($result['json_file']); ?>">
+                                                                    data-path="<?php echo h($result['json_file']); ?>">
                                                                 <i class="bi bi-code me-1"></i>JSON 데이터
                                                             </button>
                                                         <?php endif; ?>
@@ -358,14 +358,14 @@ $pageTitle = '작업 상세 정보: ' . htmlspecialchars($jobDetails['job']['nam
                                                         </a>
                                                         
                                                         <button class="btn btn-sm btn-outline-primary provide-feedback-btn"
-                                                                data-file-id="<?php echo $jobDetails['files'][$idx]['id']; ?>"
-                                                                data-job-id="<?php echo $jobId; ?>">
+                                                                data-file-id="<?php echo h($jobDetails['files'][$idx]['id']); ?>"
+                                                                data-job-id="<?php echo h($jobId); ?>">
                                                             <i class="bi bi-chat-dots me-1"></i>피드백 제공
                                                         </button>
                                                     </div>
                                                     
                                                     <!-- 피드백 폼 -->
-                                                    <div class="feedback-form" id="feedback-form-<?php echo $jobDetails['files'][$idx]['id']; ?>">
+                                                    <div class="feedback-form" id="feedback-form-<?php echo h($jobDetails['files'][$idx]['id']); ?>">
                                                         <h6>피드백 제공</h6>
                                                         <p class="small text-muted">오인식된 내용과 올바른 내용을 입력하세요. 이 피드백은 향후 OCR 인식률 향상에 사용됩니다.</p>
                                                         
@@ -387,8 +387,8 @@ $pageTitle = '작업 상세 정보: ' . htmlspecialchars($jobDetails['job']['nam
                                                         
                                                         <div class="mb-3">
                                                             <button type="button" class="btn btn-sm btn-primary submit-feedback-btn" 
-                                                                    data-file-id="<?php echo $jobDetails['files'][$idx]['id']; ?>"
-                                                                    data-job-id="<?php echo $jobId; ?>">
+                                                                    data-file-id="<?php echo h($jobDetails['files'][$idx]['id']); ?>"
+                                                                    data-job-id="<?php echo h($jobId); ?>">
                                                                 피드백 저장
                                                             </button>
                                                             <button type="button" class="btn btn-sm btn-secondary ms-2 cancel-feedback-btn">
@@ -402,7 +402,7 @@ $pageTitle = '작업 상세 정보: ' . htmlspecialchars($jobDetails['job']['nam
                                     </div>
                                     
                                     <div class="mt-3">
-                                        <a href="download_all.php?job_id=<?php echo $jobId; ?>" class="btn btn-success">
+                                        <a href="download_all.php?job_id=<?php echo h($jobId); ?>" class="btn btn-success">
                                             <i class="bi bi-download me-1"></i>모든 결과 다운로드 (ZIP)
                                         </a>
                                     </div>
@@ -448,11 +448,11 @@ $pageTitle = '작업 상세 정보: ' . htmlspecialchars($jobDetails['job']['nam
                                     <?php else: ?>
                                         <?php foreach ($jobDetails['logs'] as $log): ?>
                                             <div class="log-entry">
-                                                <span class="text-muted"><?php echo date('Y-m-d H:i:s', strtotime($log['created_at'])); ?></span>
-                                                <span class="badge bg-<?php echo getLogLevelColor($log['level']); ?> ms-1"><?php echo $log['level']; ?></span>
-                                                <span><?php echo htmlspecialchars($log['message']); ?></span>
+                                                <span class="text-muted"><?php echo h(date('Y-m-d H:i:s', strtotime($log['created_at']))); ?></span>
+                                                <span class="badge bg-<?php echo getLogLevelColor($log['level']); ?> ms-1"><?php echo h($log['level']); ?></span>
+                                                <span><?php echo h($log['message']); ?></span>
                                                 <?php if (!empty($log['context'])): ?>
-                                                    <pre class="mt-1 ms-4 small"><?php echo htmlspecialchars(json_encode(json_decode($log['context']), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)); ?></pre>
+                                                    <pre class="mt-1 ms-4 small"><?php echo h(json_encode(json_decode($log['context']), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)); ?></pre>
                                                 <?php endif; ?>
                                             </div>
                                         <?php endforeach; ?>
@@ -471,12 +471,12 @@ $pageTitle = '작업 상세 정보: ' . htmlspecialchars($jobDetails['job']['nam
                     
                     <div>
                         <?php if ($jobDetails['job']['status'] === 'processing' || $jobDetails['job']['status'] === 'queued'): ?>
-                            <button type="button" id="cancelJobBtn" class="btn btn-warning me-2" data-job-id="<?php echo $jobId; ?>">
+                            <button type="button" id="cancelJobBtn" class="btn btn-warning me-2" data-job-id="<?php echo h($jobId); ?>">
                                 <i class="bi bi-x-circle me-1"></i>작업 취소
                             </button>
                         <?php endif; ?>
                         
-                        <button type="button" id="deleteJobBtn" class="btn btn-danger" data-job-id="<?php echo $jobId; ?>">
+                        <button type="button" id="deleteJobBtn" class="btn btn-danger" data-job-id="<?php echo h($jobId); ?>">
                             <i class="bi bi-trash me-1"></i>작업 삭제
                         </button>
                     </div>
@@ -518,7 +518,7 @@ $pageTitle = '작업 상세 정보: ' . htmlspecialchars($jobDetails['job']['nam
         }
         
         function refreshJobStatus() {
-            const jobId = <?php echo $jobId; ?>;
+            const jobId = <?php echo h($jobId); ?>;
             
             $.ajax({
                 url: 'ajax_job_status.php',

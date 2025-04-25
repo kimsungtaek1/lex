@@ -19,7 +19,25 @@ define('MODEL_PATH', ROOT_PATH . '/models');
 $required_dirs = [UPLOAD_PATH, TEMP_PATH, OUTPUT_PATH, MODEL_PATH];
 foreach ($required_dirs as $dir) {
     if (!file_exists($dir)) {
-        mkdir($dir, 0755, true);
+        // 디렉토리 생성 시도
+        if (!@mkdir($dir, 0755, true)) {
+            // 오류 발생 시 오류 로깅
+            $error = error_get_last();
+            logMessage("디렉토리 생성 실패: {$dir} - {$error['message']}", 'error');
+            
+            // 상위 디렉토리 쓰기 권한 확인
+            $parentDir = dirname($dir);
+            if (!is_writable($parentDir)) {
+                logMessage("상위 디렉토리 {$parentDir}에 쓰기 권한이 없습니다.", 'error');
+            }
+        } else {
+            logMessage("디렉토리 생성 성공: {$dir}", 'info');
+        }
+    } else {
+        // 기존 디렉토리 쓰기 권한 확인
+        if (!is_writable($dir)) {
+            logMessage("디렉토리 {$dir}에 쓰기 권한이 없습니다.", 'warning');
+        }
     }
 }
 
@@ -106,3 +124,101 @@ function logMessage($message, $level = 'info') {
         echo $formattedMessage;
     }
 }
+
+// CSRF 토큰 생성 및 검증 함수
+function generateCSRFToken() {
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+function validateCSRFToken($token) {
+    if (!isset($_SESSION['csrf_token']) || $token !== $_SESSION['csrf_token']) {
+        return false;
+    }
+    return true;
+}
+
+/**
+ * 안전한 파일 읽기 함수
+ * @param string $filePath 파일 경로
+ * @param bool $asJson JSON으로 디코딩 여부
+ * @return mixed 파일 내용 또는 실패 시 false
+ */
+function safeReadFile($filePath, $asJson = false) {
+    try {
+        if (!file_exists($filePath)) {
+            throw new Exception("파일이 존재하지 않습니다: $filePath");
+        }
+        
+        if (!is_readable($filePath)) {
+            throw new Exception("파일을 읽을 수 없습니다: $filePath");
+        }
+        
+        $content = file_get_contents($filePath);
+        
+        if ($content === false) {
+            throw new Exception("파일 읽기 실패: $filePath");
+        }
+        
+        if ($asJson) {
+            $decoded = json_decode($content, true);
+            
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception("JSON 파싱 오류: " . json_last_error_msg());
+            }
+            
+            return $decoded;
+        }
+        
+        return $content;
+    } catch (Exception $e) {
+        logMessage($e->getMessage(), 'error');
+        return false;
+    }
+}
+
+/**
+ * 안전한 파일 쓰기 함수
+ * @param string $filePath 파일 경로
+ * @param mixed $content 쓸 내용
+ * @param bool $asJson JSON으로 인코딩 여부
+ * @return bool 성공 여부
+ */
+function safeWriteFile($filePath, $content, $asJson = false) {
+    try {
+        // 디렉토리 확인 및 생성
+        $dir = dirname($filePath);
+        if (!file_exists($dir)) {
+            if (!@mkdir($dir, 0755, true)) {
+                throw new Exception("디렉토리를 생성할 수 없습니다: $dir");
+            }
+        }
+        
+        if (file_exists($filePath) && !is_writable($filePath)) {
+            throw new Exception("파일에 쓰기 권한이 없습니다: $filePath");
+        }
+        
+        // 내용 준비
+        $dataToWrite = $asJson ? json_encode($content, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) : $content;
+        
+        // 안전한 파일 쓰기 (임시 파일 사용)
+        $tempFile = $filePath . '.tmp';
+        if (file_put_contents($tempFile, $dataToWrite) === false) {
+            throw new Exception("임시 파일 쓰기 실패: $tempFile");
+        }
+        
+        // 원자적 파일 교체
+        if (!rename($tempFile, $filePath)) {
+            @unlink($tempFile); // 임시 파일 정리
+            throw new Exception("파일 교체 실패: $filePath");
+        }
+        
+        return true;
+    } catch (Exception $e) {
+        logMessage($e->getMessage(), 'error');
+        return false;
+    }
+}
+?>

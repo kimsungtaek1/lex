@@ -142,21 +142,47 @@ function enhancedOCRProcess($imagePath, $options = []) {
 }
 
 /**
- * 이미지 전처리 함수 (GD 라이브러리 사용)
- * 카페24 웹호스팅 환경에 맞게 최적화됨
+ * 이미지 전처리 함수 - 메모리 최적화 버전
  * @param string $imagePath 원본 이미지 경로
  * @param string $outputPath 출력 이미지 경로
  * @return string|bool 처리된 이미지 경로 또는 실패 시 false
  */
 function preprocessImage($imagePath, $outputPath) {
     try {
-        // 이미지 포맷 확인
+        // 이미지 정보 확인
         $imageInfo = getimagesize($imagePath);
         if (!$imageInfo) {
             throw new Exception("이미지 정보를 읽을 수 없습니다.");
         }
         
-        // 이미지 로드
+        // 큰 이미지 처리 최적화
+        $width = $imageInfo[0];
+        $height = $imageInfo[1];
+        
+        // 최대 크기 제한 (메모리 관리)
+        $maxDimension = 2500; // 최대 너비/높이
+        $scaleFactor = 1.5;  // 기본 확대 비율
+        
+        // 이미지가 너무 크면 스케일링 조정
+        if (max($width, $height) > $maxDimension) {
+            $scaleFactor = 1.0; // 큰 이미지는 확대하지 않음
+            
+            if (max($width, $height) > $maxDimension * 2) {
+                // 메모리 관리를 위해 매우 큰 이미지는 ImageMagick 사용 권장
+                // 카페24에서 exec() 함수 사용 가능한 경우
+                if (function_exists('exec')) {
+                    $cmd = "convert \"$imagePath\" -resize {$maxDimension}x{$maxDimension}\\> -quality 90 \"$outputPath\"";
+                    exec($cmd, $output, $returnVar);
+                    
+                    if ($returnVar === 0 && file_exists($outputPath)) {
+                        // 이미지 매직으로 처리 성공
+                        return $outputPath;
+                    }
+                }
+            }
+        }
+        
+        // 이미지 로드 - 점진적으로 메모리 해제
         $mimeType = $imageInfo['mime'];
         switch ($mimeType) {
             case 'image/jpeg':
@@ -176,17 +202,32 @@ function preprocessImage($imagePath, $outputPath) {
             throw new Exception("이미지 로드 실패");
         }
         
-        // 원본 크기 가져오기
-        $width = imagesx($image);
-        $height = imagesy($image);
-        
-        // 1. 크기 조정 (업스케일링: 더 선명한 텍스트 인식을 위해)
-        $scaleFactor = 1.5;  // 1.5배 확대
+        // 새 크기 계산
         $newWidth = (int)($width * $scaleFactor);
         $newHeight = (int)($height * $scaleFactor);
         
+        // 메모리 사용량 계산 및 확인 (추정치: 4바이트/픽셀 * 픽셀 수)
+        $memoryNeeded = $newWidth * $newHeight * 4;
+        $memoryLimit = ini_get('memory_limit');
+        
+        // MB 단위를 바이트로 변환
+        if (preg_match('/^(\d+)M$/i', $memoryLimit, $matches)) {
+            $memoryLimitBytes = $matches[1] * 1024 * 1024;
+            
+            // 안전 마진 70%
+            $safeMemoryLimit = $memoryLimitBytes * 0.7;
+            
+            if ($memoryNeeded > $safeMemoryLimit) {
+                // 메모리 초과 가능성 - 크기 조정
+                $resizeFactor = sqrt($safeMemoryLimit / $memoryNeeded);
+                $newWidth = (int)($newWidth * $resizeFactor);
+                $newHeight = (int)($newHeight * $resizeFactor);
+            }
+        }
+        
+        // 메모리 효율적인 처리 - 단계별 이미지 처리
         $resized = imagecreatetruecolor($newWidth, $newHeight);
-        imagefill($resized, 0, 0, imagecolorallocate($resized, 255, 255, 255));  // 흰색 배경
+        imagefill($resized, 0, 0, imagecolorallocate($resized, 255, 255, 255));
         
         // PNG 투명도 유지
         if ($mimeType == 'image/png') {
@@ -197,105 +238,38 @@ function preprocessImage($imagePath, $outputPath) {
         }
         
         imagecopyresampled($resized, $image, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-        imagedestroy($image);
-        $image = $resized;
+        imagedestroy($image); // 원본 이미지 즉시 메모리 해제
         
-        // 2. 대비 향상
-        imagefilter($image, IMG_FILTER_CONTRAST, 30);
+        // 대비 향상
+        imagefilter($resized, IMG_FILTER_CONTRAST, 30);
         
-        // 3. 선명도 향상
-        imagefilter($image, IMG_FILTER_SMOOTH, -5);
+        // 선명도 향상
+        imagefilter($resized, IMG_FILTER_SMOOTH, -5);
         
-        // 4. 노이즈 제거
-        imagefilter($image, IMG_FILTER_GAUSSIAN_BLUR);
-        imagefilter($image, IMG_FILTER_CONTRAST, 20);
+        // 노이즈 제거
+        imagefilter($resized, IMG_FILTER_GAUSSIAN_BLUR);
+        imagefilter($resized, IMG_FILTER_CONTRAST, 20);
         
-        // 5. 흑백 변환 (텍스트 문서에 효과적)
-        imagefilter($image, IMG_FILTER_GRAYSCALE);
-        
-        // 6. 이진화 (특히 테이블 구조에 효과적)
-        // 이진화 임계값 자동 계산을 위한 히스토그램 분석
-        $histogram = array_fill(0, 256, 0);
-        for ($y = 0; $y < imagesy($image); $y++) {
-            for ($x = 0; $x < imagesx($image); $x++) {
-                $rgb = imagecolorat($image, $x, $y);
-                $r = ($rgb >> 16) & 0xFF;
-                $g = ($rgb >> 8) & 0xFF;
-                $b = $rgb & 0xFF;
-                $gray = (int)(($r + $g + $b) / 3);
-                $histogram[$gray]++;
-            }
-        }
-        
-        // Otsu 알고리즘으로 최적 임계값 찾기
-        $total = imagesy($image) * imagesx($image);
-        $sum = 0;
-        for ($i = 0; $i < 256; $i++) {
-            $sum += $i * $histogram[$i];
-        }
-        
-        $sumBackground = 0;
-        $weightBackground = 0;
-        $weightForeground = 0;
-        $maxVariance = 0;
-        $threshold = 0;
-        
-        for ($i = 0; $i < 256; $i++) {
-            $weightBackground += $histogram[$i];
-            if ($weightBackground == 0) continue;
-            
-            $weightForeground = $total - $weightBackground;
-            if ($weightForeground == 0) break;
-            
-            $sumBackground += $i * $histogram[$i];
-            $meanBackground = $sumBackground / $weightBackground;
-            $meanForeground = ($sum - $sumBackground) / $weightForeground;
-            
-            $variance = $weightBackground * $weightForeground * ($meanBackground - $meanForeground) * ($meanBackground - $meanForeground);
-            if ($variance > $maxVariance) {
-                $maxVariance = $variance;
-                $threshold = $i;
-            }
-        }
-        
-        // 임계값 적용하여 이진화
-        $thresholdedImage = imagecreatetruecolor(imagesx($image), imagesy($image));
-        $white = imagecolorallocate($thresholdedImage, 255, 255, 255);
-        $black = imagecolorallocate($thresholdedImage, 0, 0, 0);
-        imagefill($thresholdedImage, 0, 0, $white);
-        
-        for ($y = 0; $y < imagesy($image); $y++) {
-            for ($x = 0; $x < imagesx($image); $x++) {
-                $rgb = imagecolorat($image, $x, $y);
-                $r = ($rgb >> 16) & 0xFF;
-                $g = ($rgb >> 8) & 0xFF;
-                $b = $rgb & 0xFF;
-                $gray = (int)(($r + $g + $b) / 3);
-                
-                if ($gray < $threshold) {
-                    imagesetpixel($thresholdedImage, $x, $y, $black);
-                }
-            }
-        }
+        // 흑백 변환
+        imagefilter($resized, IMG_FILTER_GRAYSCALE);
         
         // 결과 저장
         switch ($mimeType) {
             case 'image/jpeg':
-                $success = imagejpeg($thresholdedImage, $outputPath, 95);
+                $success = imagejpeg($resized, $outputPath, 90); // 품질 조정
                 break;
             case 'image/png':
-                $success = imagepng($thresholdedImage, $outputPath, 9);
+                $success = imagepng($resized, $outputPath, 6); // 압축 레벨 조정
                 break;
             case 'image/gif':
-                $success = imagegif($thresholdedImage, $outputPath);
+                $success = imagegif($resized, $outputPath);
                 break;
             default:
                 $success = false;
         }
         
         // 메모리 정리
-        imagedestroy($image);
-        imagedestroy($thresholdedImage);
+        imagedestroy($resized);
         
         if (!$success) {
             throw new Exception("이미지 저장 실패");

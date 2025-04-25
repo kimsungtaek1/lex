@@ -4,9 +4,115 @@
  * 카페24 웹호스팅 환경에 최적화됨
  */
 
+// 세션 시작
+session_start();
+
 require_once 'config.php';
 require_once 'process_monitor.php';
 require_once 'document_learning.php';
+require_once 'utils.php'; // 공통 유틸리티 함수 포함
+
+// CSRF 토큰 생성 함수
+function generateCSRFToken() {
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+// 안전한 파일 업로드 검증
+function validateUploadedFile($file) {
+    // 업로드 오류 확인
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        $errorMessages = [
+            UPLOAD_ERR_INI_SIZE => '파일이 PHP 설정 upload_max_filesize를 초과합니다.',
+            UPLOAD_ERR_FORM_SIZE => '파일이 폼에 지정된 MAX_FILE_SIZE를 초과합니다.',
+            UPLOAD_ERR_PARTIAL => '파일이 일부만 업로드되었습니다.',
+            UPLOAD_ERR_NO_FILE => '파일이 업로드되지 않았습니다.',
+            UPLOAD_ERR_NO_TMP_DIR => '임시 폴더가 없습니다.',
+            UPLOAD_ERR_CANT_WRITE => '디스크에 파일을 쓸 수 없습니다.',
+            UPLOAD_ERR_EXTENSION => 'PHP 확장에 의해 업로드가 중지되었습니다.'
+        ];
+        
+        $errorMessage = isset($errorMessages[$file['error']]) ? 
+            $errorMessages[$file['error']] : '알 수 없는 업로드 오류가 발생했습니다.';
+        
+        return ['success' => false, 'message' => $errorMessage];
+    }
+    
+    // 파일 크기 검증 (10MB 제한)
+    $maxSize = 10 * 1024 * 1024; // 10MB
+    if ($file['size'] > $maxSize) {
+        return ['success' => false, 'message' => '파일 크기가 10MB를 초과합니다.'];
+    }
+    
+    // MIME 타입 검증
+    $allowedTypes = [
+        'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 
+        'image/bmp', 'image/tiff', 'image/webp'
+    ];
+    
+    // finfo로 실제 파일 타입 확인 (MIME 스푸핑 방지)
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $realMimeType = $finfo->file($file['tmp_name']);
+    
+    if (!in_array($realMimeType, $allowedTypes)) {
+        return ['success' => false, 'message' => '지원하지 않는 파일 형식입니다. 이미지 파일만 업로드 가능합니다.'];
+    }
+    
+    // 이미지 파일 검증
+    $imageInfo = @getimagesize($file['tmp_name']);
+    if ($imageInfo === false) {
+        return ['success' => false, 'message' => '유효한 이미지 파일이 아닙니다.'];
+    }
+    
+    // 이미지 크기 검증 (최소 크기와 최대 크기)
+    $minWidth = 100;
+    $minHeight = 100;
+    $maxWidth = 8000;
+    $maxHeight = 8000;
+    
+    list($width, $height) = $imageInfo;
+    
+    if ($width < $minWidth || $height < $minHeight) {
+        return ['success' => false, 'message' => "이미지 크기가 너무 작습니다. 최소 {$minWidth}x{$minHeight} 픽셀 이상이어야 합니다."];
+    }
+    
+    if ($width > $maxWidth || $height > $maxHeight) {
+        return ['success' => false, 'message' => "이미지 크기가 너무 큽니다. 최대 {$maxWidth}x{$maxHeight} 픽셀 이하여야 합니다."];
+    }
+    
+    // 파일 이름 정리
+    $fileName = sanitizeFileName($file['name']);
+    
+    return [
+        'success' => true,
+        'mime_type' => $realMimeType,
+        'size' => $file['size'],
+        'width' => $width,
+        'height' => $height,
+        'tmp_name' => $file['tmp_name'],
+        'name' => $fileName
+    ];
+}
+
+// 파일 이름 정리 (보안 목적)
+function sanitizeFileName($fileName) {
+    // 경로 정보 제거
+    $fileName = basename($fileName);
+    // 특수 문자 제거
+    $fileName = preg_replace('/[\/\\\\:*?"<>|]/', '_', $fileName);
+    // 중복된 공백 제거
+    $fileName = preg_replace('/\s+/', ' ', $fileName);
+    // 공백 제거
+    $fileName = trim($fileName);
+    
+    if (empty($fileName)) {
+        return 'unnamed_file';
+    }
+    
+    return $fileName;
+}
 
 // 문서 학습 시스템 초기화
 $learningSystem = new DocumentLearningSystem();
@@ -22,8 +128,13 @@ if ($templateId) {
 // 사용 가능한 템플릿 목록 가져오기 (모든 템플릿)
 $templates = $learningSystem->getTemplates(true);
 
+// 오류 메시지 초기화
+$errorMessage = null;
+$successMessage = null;
+
 // 페이지 제목
 $pageTitle = '이미지 업로드 및 OCR 처리';
+$csrfToken = generateCSRFToken();
 ?>
 
 <!DOCTYPE html>
@@ -31,7 +142,7 @@ $pageTitle = '이미지 업로드 및 OCR 처리';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $pageTitle; ?></title>
+    <title><?php echo h($pageTitle); ?></title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -95,6 +206,11 @@ $pageTitle = '이미지 업로드 및 OCR 처리';
         #currentFile {
             font-weight: bold;
         }
+        .validation-error {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
     </style>
 </head>
 <body>
@@ -103,7 +219,21 @@ $pageTitle = '이미지 업로드 및 OCR 처리';
 
     <!-- 메인 컨텐츠 -->
     <div class="container mt-4">
-        <h1 class="mb-4"><?php echo $pageTitle; ?></h1>
+        <h1 class="mb-4"><?php echo h($pageTitle); ?></h1>
+        
+        <?php if ($errorMessage): ?>
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i><?php echo h($errorMessage); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <?php endif; ?>
+        
+        <?php if ($successMessage): ?>
+        <div class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle-fill me-2"></i><?php echo h($successMessage); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <?php endif; ?>
         
         <div class="row">
             <div class="col-lg-8 mx-auto">
@@ -113,9 +243,15 @@ $pageTitle = '이미지 업로드 및 OCR 처리';
                     </div>
                     <div class="card-body">
                         <form id="uploadForm" action="process_upload.php" method="post" enctype="multipart/form-data">
+                            <!-- CSRF 토큰 -->
+                            <input type="hidden" name="csrf_token" value="<?php echo h($csrfToken); ?>">
+                            
                             <div class="mb-3">
                                 <label for="jobName" class="form-label">작업 이름</label>
-                                <input type="text" class="form-control" id="jobName" name="job_name" required>
+                                <input type="text" class="form-control" id="jobName" name="job_name" required
+                                       maxlength="100" pattern="[A-Za-z0-9가-힣\s\-_]{1,100}">
+                                <div class="form-text">작업 식별을 위한 고유한 이름을 입력하세요.</div>
+                                <div class="validation-error" id="jobNameError"></div>
                             </div>
                             
                             <div class="mb-3">
@@ -123,9 +259,9 @@ $pageTitle = '이미지 업로드 및 OCR 처리';
                                 <select class="form-select" id="documentType" name="document_type">
                                     <option value="">자동 감지</option>
                                     <?php foreach ($templates as $template): ?>
-                                        <option value="<?php echo $template['id']; ?>"
+                                        <option value="<?php echo h($template['id']); ?>"
                                             <?php echo ($templateId == $template['id']) ? 'selected' : ''; ?>>
-                                            <?php echo htmlspecialchars($template['name']); ?>
+                                            <?php echo h($template['name']); ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
@@ -139,10 +275,12 @@ $pageTitle = '이미지 업로드 및 OCR 처리';
                                 <div id="dropArea" onclick="document.getElementById('fileInput').click();">
                                     <i class="bi bi-cloud-arrow-up-fill fs-1 text-primary"></i>
                                     <p class="mt-3">이미지 파일을 끌어다 놓거나 클릭하여 선택하세요</p>
-                                    <p class="text-muted small">지원 형식: JPG, JPEG, PNG, GIF, BMP, TIFF</p>
+                                    <p class="text-muted small">지원 형식: JPG, JPEG, PNG, GIF, BMP, TIFF, WEBP</p>
+                                    <p class="text-muted small">최대 파일 크기: 10MB</p>
                                 </div>
                                 <input type="file" id="fileInput" name="files[]" multiple accept="image/*" class="d-none">
                                 <div id="filePreview"></div>
+                                <div class="validation-error" id="fileError"></div>
                             </div>
                             
                             <div class="mb-3">
@@ -198,16 +336,20 @@ $pageTitle = '이미지 업로드 및 OCR 처리';
                 <?php if ($selectedTemplate): ?>
                 <div class="card">
                     <div class="card-header bg-info text-white">
-                        <i class="bi bi-file-text me-2"></i>선택된 템플릿: <?php echo htmlspecialchars($selectedTemplate['name']); ?>
+                        <i class="bi bi-file-text me-2"></i>선택된 템플릿: <?php echo h($selectedTemplate['name']); ?>
                     </div>
                     <div class="card-body">
-                        <p><?php echo htmlspecialchars($selectedTemplate['description'] ?? '설명 없음'); ?></p>
+                        <p><?php echo h($selectedTemplate['description'] ?? '설명 없음'); ?></p>
                         
                         <?php if (!empty($selectedTemplate['fields'])): ?>
                         <h6>인식 필드:</h6>
                         <ul>
                             <?php foreach ($selectedTemplate['fields'] as $field): ?>
-                                <li><?php echo htmlspecialchars($field['name']); ?></li>
+                                <li><?php echo h($field['name']); ?> 
+                                    <?php if (!empty($field['type'])): ?>
+                                        <span class="text-muted small">(<?php echo h($field['type']); ?>)</span>
+                                    <?php endif; ?>
+                                </li>
                             <?php endforeach; ?>
                         </ul>
                         <?php endif; ?>
@@ -219,7 +361,7 @@ $pageTitle = '이미지 업로드 및 OCR 처리';
                                 <thead>
                                     <tr>
                                         <?php foreach ($selectedTemplate['table_structure']['headers'] as $header): ?>
-                                            <th><?php echo htmlspecialchars($header); ?></th>
+                                            <th><?php echo h($header); ?></th>
                                         <?php endforeach; ?>
                                     </tr>
                                 </thead>
@@ -274,6 +416,36 @@ $pageTitle = '이미지 업로드 및 OCR 처리';
         const progressBar = document.getElementById('progressBar');
         const processingStatus = document.getElementById('processingStatus');
         const currentFile = document.getElementById('currentFile');
+        const jobNameInput = document.getElementById('jobName');
+        const jobNameError = document.getElementById('jobNameError');
+        const fileError = document.getElementById('fileError');
+        
+        // 클라이언트 측 유효성 검사
+        function validateForm() {
+            let isValid = true;
+            
+            // 작업 이름 검증
+            const jobName = jobNameInput.value.trim();
+            if (!jobName) {
+                jobNameError.textContent = '작업 이름은 필수입니다.';
+                isValid = false;
+            } else if (!/^[A-Za-z0-9가-힣\s\-_]{1,100}$/.test(jobName)) {
+                jobNameError.textContent = '작업 이름은 한글, 영문, 숫자, 공백, 하이픈, 언더스코어만 포함할 수 있습니다.';
+                isValid = false;
+            } else {
+                jobNameError.textContent = '';
+            }
+            
+            // 파일 검증
+            if (filePreview.children.length === 0) {
+                fileError.textContent = '최소 한 개 이상의 이미지 파일을 업로드해야 합니다.';
+                isValid = false;
+            } else {
+                fileError.textContent = '';
+            }
+            
+            return isValid;
+        }
         
         // 파일 드래그 앤 드롭 이벤트
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -307,8 +479,20 @@ $pageTitle = '이미지 업로드 및 OCR 처리';
         function handleDrop(e) {
             const dt = e.dataTransfer;
             const files = dt.files;
-            fileInput.files = files;
-            updateFilePreview(files);
+            
+            // 데이터 전송 객체에서 파일 목록을 생성
+            const fileList = new DataTransfer();
+            
+            // 모든 파일이 이미지인지 확인
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (file.type.match('image.*')) {
+                    fileList.items.add(file);
+                }
+            }
+            
+            fileInput.files = fileList.files;
+            updateFilePreview(fileList.files);
         }
         
         // 파일 선택 처리
@@ -316,24 +500,34 @@ $pageTitle = '이미지 업로드 및 OCR 처리';
             updateFilePreview(this.files);
         });
         
+        // 폼 입력 검증
+        jobNameInput.addEventListener('input', validateForm);
+        
         // 파일 미리보기 업데이트
         function updateFilePreview(files) {
             filePreview.innerHTML = '';
+            fileError.textContent = '';
             
             if (files.length > 0) {
-                uploadButton.disabled = false;
-                
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
                     
-                    // 이미지 파일만 허용
+                    // 이미지 파일 검증
                     if (!file.type.match('image.*')) {
+                        fileError.textContent = '이미지 파일만 업로드 가능합니다.';
+                        continue;
+                    }
+                    
+                    // 파일 크기 검증
+                    if (file.size > 10 * 1024 * 1024) { // 10MB
+                        fileError.textContent = '파일 크기는 10MB를 초과할 수 없습니다.';
                         continue;
                     }
                     
                     const reader = new FileReader();
                     const previewItem = document.createElement('div');
                     previewItem.className = 'preview-item';
+                    previewItem.dataset.index = i;
                     
                     reader.onload = function(e) {
                         previewItem.innerHTML = `
@@ -352,23 +546,37 @@ $pageTitle = '이미지 업로드 및 OCR 처리';
                     filePreview.appendChild(previewItem);
                 }
                 
+                // 업로드 버튼 활성화 여부 확인
+                validateForm();
+                uploadButton.disabled = filePreview.children.length === 0;
+                
                 // 제거 버튼 이벤트 연결
                 setTimeout(() => {
                     document.querySelectorAll('.preview-remove').forEach(button => {
                         button.addEventListener('click', function() {
-                            // 실제로는 FileList 객체를 직접 수정할 수 없으므로
-                            // 이 버튼이 속한 preview-item을 제거하고 제출 시 파일 목록 재구성
+                            const index = parseInt(this.dataset.index);
                             this.closest('.preview-item').remove();
+                            
+                            // FileList 재구성
+                            const newFileList = new DataTransfer();
+                            for (let i = 0; i < fileInput.files.length; i++) {
+                                if (i !== index) {
+                                    newFileList.items.add(fileInput.files[i]);
+                                }
+                            }
+                            fileInput.files = newFileList.files;
                             
                             // 모든 파일 제거된 경우 버튼 비활성화
                             if (filePreview.children.length === 0) {
                                 uploadButton.disabled = true;
+                                fileError.textContent = '최소 한 개 이상의 이미지 파일을 업로드해야 합니다.';
                             }
                         });
                     });
                 }, 100);
             } else {
                 uploadButton.disabled = true;
+                fileError.textContent = '최소 한 개 이상의 이미지 파일을 업로드해야 합니다.';
             }
         }
         
@@ -386,13 +594,24 @@ $pageTitle = '이미지 업로드 및 OCR 처리';
         uploadForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
+            // 폼 유효성 검사
+            if (!validateForm()) {
+                return;
+            }
+            
             // FormData 객체 생성
             const formData = new FormData(this);
             
+            // 선택된 파일이 있는지 확인
+            if (fileInput.files.length === 0) {
+                fileError.textContent = '최소 한 개 이상의 이미지 파일을 업로드해야 합니다.';
+                return;
+            }
+            
             // 작업 이름 검증
-            const jobName = document.getElementById('jobName').value.trim();
+            const jobName = jobNameInput.value.trim();
             if (!jobName) {
-                alert('작업 이름을 입력해주세요.');
+                jobNameError.textContent = '작업 이름을 입력해주세요.';
                 return;
             }
             
@@ -400,6 +619,7 @@ $pageTitle = '이미지 업로드 및 OCR 처리';
             uploadForm.style.display = 'none';
             progressContainer.style.display = 'block';
             processingStatus.textContent = '파일 업로드 중...';
+            processingStatus.className = 'alert alert-info';
             
             // AJAX 요청 - 파일 업로드 및 작업 생성
             $.ajax({
@@ -420,7 +640,7 @@ $pageTitle = '이미지 업로드 및 OCR 처리';
                     }
                 },
                 error: function(xhr, status, error) {
-                    showError('요청 실패: ' + error);
+                    showError('요청 실패: ' + (xhr.responseJSON ? xhr.responseJSON.message : error));
                 }
             });
         });
@@ -435,7 +655,10 @@ $pageTitle = '이미지 업로드 및 OCR 처리';
             $.ajax({
                 url: 'ajax_process_file.php',
                 type: 'POST',
-                data: { job_id: jobId },
+                data: { 
+                    job_id: jobId,
+                    csrf_token: '<?php echo h($csrfToken); ?>'
+                },
                 dataType: 'json',
                 success: function(response) {
                     if (response.success) {
@@ -470,11 +693,11 @@ $pageTitle = '이미지 업로드 및 OCR 처리';
                             }, 1000);
                         }
                     } else {
-                        showError('파일 처리 오류: ' + response.error);
+                        showError('파일 처리 오류: ' + response.message);
                     }
                 },
                 error: function(xhr, status, error) {
-                    showError('요청 실패: ' + error);
+                    showError('요청 실패: ' + (xhr.responseJSON ? xhr.responseJSON.message : error));
                 }
             });
         }
