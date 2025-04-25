@@ -1,0 +1,2103 @@
+{
+    "version": "V2",
+    "requestId": "680a9d148b560",
+    "timestamp": 1745526038218,
+    "images": [
+        {
+            "uid": "095fb0332d9f4ced8ebf9a66f2601de5",
+            "name": "04032024155339_26",
+            "inferResult": "SUCCESS",
+            "message": "SUCCESS",
+            "validationResult": {
+                "result": "NO_REQUESTED"
+            },
+            "convertedImageInfo": {
+                "width": 2480,
+                "height": 3508,
+                "pageIndex": 0,
+                "longImage": false
+            },
+            "fields": [
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 175,
+                                "y": 166
+                            },
+                            {
+                                "x": 329,
+                                "y": 166
+                            },
+                            {
+                                "x": 329,
+                                "y": 232
+                            },
+                            {
+                                "x": 175,
+                                "y": 232
+                            }
+                        ]
+                    },
+                    "inferText": "은행별",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 332,
+                                "y": 166
+                            },
+                            {
+                                "x": 532,
+                                "y": 166
+                            },
+                            {
+                                "x": 532,
+                                "y": 232
+                            },
+                            {
+                                "x": 332,
+                                "y": 232
+                            }
+                        ]
+                    },
+                    "inferText": "계좌내역",
+                    "inferConfidence": 0.9999,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 2161,
+                                "y": 169
+                            },
+                            {
+                                "x": 2246,
+                                "y": 169
+                            },
+                            {
+                                "x": 2246,
+                                "y": 219
+                            },
+                            {
+                                "x": 2161,
+                                "y": 219
+                            }
+                        ]
+                    },
+                    "inferText": "인쇄",
+                    "inferConfidence": 0.9998,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 207,
+                                "y": 382
+                            },
+                            {
+                                "x": 385,
+                                "y": 382
+                            },
+                            {
+                                "x": 385,
+                                "y": 457
+                            },
+                            {
+                                "x": 207,
+                                "y": 457
+                            }
+                        ]
+                    },
+                    "inferText": "은행별",
+                    "inferConfidence": 0.9999,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 392,
+                                "y": 381
+                            },
+                            {
+                                "x": 627,
+                                "y": 386
+                            },
+                            {
+                                "x": 626,
+                                "y": 463
+                            },
+                            {
+                                "x": 390,
+                                "y": 459
+                            }
+                        ]
+                    },
+                    "inferText": "계좌내역",
+                    "inferConfidence": 0.9999,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 633,
+                                "y": 401
+                            },
+                            {
+                                "x": 698,
+                                "y": 401
+                            },
+                            {
+                                "x": 698,
+                                "y": 451
+                            },
+                            {
+                                "x": 633,
+                                "y": 451
+                            }
+                        ]
+                    },
+                    "inferText": "(총",
+                    "inferConfidence": 0.9999,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 698,
+                                "y": 401
+                            },
+                            {
+                                "x": 868,
+                                "y": 401
+                            },
+                            {
+                                "x": 868,
+                                "y": 451
+                            },
+                            {
+                                "x": 698,
+                                "y": 451
+                            }
+                        ]
+                    },
+                    "inferText": "8개은행)",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 207,
+                                "y": 495
+                            },
+                            {
+                                "x": 849,
+                                "y": 498
+                            },
+                            {
+                                "x": 849,
+                                "y": 557
+                            },
+                            {
+                                "x": 207,
+                                "y": 554
+                            }
+                        ]
+                    },
+                    "inferText": "김우영(6101121******)님의",
+                    "inferConfidence": 0.9997,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 855,
+                                "y": 495
+                            },
+                            {
+                                "x": 1046,
+                                "y": 495
+                            },
+                            {
+                                "x": 1046,
+                                "y": 558
+                            },
+                            {
+                                "x": 855,
+                                "y": 558
+                            }
+                        ]
+                    },
+                    "inferText": "조회결과",
+                    "inferConfidence": 0.9991,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 1049,
+                                "y": 498
+                            },
+                            {
+                                "x": 1206,
+                                "y": 498
+                            },
+                            {
+                                "x": 1206,
+                                "y": 558
+                            },
+                            {
+                                "x": 1049,
+                                "y": 558
+                            }
+                        ]
+                    },
+                    "inferText": "입니다.",
+                    "inferConfidence": 0.9999,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 1704,
+                                "y": 579
+                            },
+                            {
+                                "x": 1989,
+                                "y": 579
+                            },
+                            {
+                                "x": 1989,
+                                "y": 639
+                            },
+                            {
+                                "x": 1704,
+                                "y": 639
+                            }
+                        ]
+                    },
+                    "inferText": "(조회기준일:",
+                    "inferConfidence": 0.9901,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 1986,
+                                "y": 583
+                            },
+                            {
+                                "x": 2274,
+                                "y": 583
+                            },
+                            {
+                                "x": 2274,
+                                "y": 636
+                            },
+                            {
+                                "x": 1986,
+                                "y": 636
+                            }
+                        ]
+                    },
+                    "inferText": "2024.02.22)",
+                    "inferConfidence": 0.9992,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 272,
+                                "y": 705
+                            },
+                            {
+                                "x": 404,
+                                "y": 705
+                            },
+                            {
+                                "x": 404,
+                                "y": 755
+                            },
+                            {
+                                "x": 272,
+                                "y": 755
+                            }
+                        ]
+                    },
+                    "inferText": "은행명",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 551,
+                                "y": 705
+                            },
+                            {
+                                "x": 642,
+                                "y": 705
+                            },
+                            {
+                                "x": 642,
+                                "y": 755
+                            },
+                            {
+                                "x": 551,
+                                "y": 755
+                            }
+                        ]
+                    },
+                    "inferText": "구분",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 730,
+                                "y": 702
+                            },
+                            {
+                                "x": 980,
+                                "y": 702
+                            },
+                            {
+                                "x": 980,
+                                "y": 761
+                            },
+                            {
+                                "x": 730,
+                                "y": 761
+                            }
+                        ]
+                    },
+                    "inferText": "수시입출금식",
+                    "inferConfidence": 0.9999,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 996,
+                                "y": 702
+                            },
+                            {
+                                "x": 1228,
+                                "y": 702
+                            },
+                            {
+                                "x": 1228,
+                                "y": 758
+                            },
+                            {
+                                "x": 996,
+                                "y": 758
+                            }
+                        ]
+                    },
+                    "inferText": "정기 예,적금",
+                    "inferConfidence": 0.998,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 1325,
+                                "y": 702
+                            },
+                            {
+                                "x": 1419,
+                                "y": 702
+                            },
+                            {
+                                "x": 1419,
+                                "y": 758
+                            },
+                            {
+                                "x": 1325,
+                                "y": 758
+                            }
+                        ]
+                    },
+                    "inferText": "신탁",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 1513,
+                                "y": 702
+                            },
+                            {
+                                "x": 1735,
+                                "y": 702
+                            },
+                            {
+                                "x": 1735,
+                                "y": 755
+                            },
+                            {
+                                "x": 1513,
+                                "y": 755
+                            }
+                        ]
+                    },
+                    "inferText": "ISA·펀드 등",
+                    "inferConfidence": 0.9859,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 1839,
+                                "y": 705
+                            },
+                            {
+                                "x": 1933,
+                                "y": 705
+                            },
+                            {
+                                "x": 1933,
+                                "y": 758
+                            },
+                            {
+                                "x": 1839,
+                                "y": 758
+                            }
+                        ]
+                    },
+                    "inferText": "외화",
+                    "inferConfidence": 0.9999,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 2099,
+                                "y": 702
+                            },
+                            {
+                                "x": 2189,
+                                "y": 702
+                            },
+                            {
+                                "x": 2189,
+                                "y": 758
+                            },
+                            {
+                                "x": 2099,
+                                "y": 758
+                            }
+                        ]
+                    },
+                    "inferText": "합계",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 483,
+                                "y": 805
+                            },
+                            {
+                                "x": 715,
+                                "y": 810
+                            },
+                            {
+                                "x": 714,
+                                "y": 863
+                            },
+                            {
+                                "x": 481,
+                                "y": 858
+                            }
+                        ]
+                    },
+                    "inferText": "비활동성계좌",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 821,
+                                "y": 811
+                            },
+                            {
+                                "x": 890,
+                                "y": 811
+                            },
+                            {
+                                "x": 890,
+                                "y": 858
+                            },
+                            {
+                                "x": 821,
+                                "y": 858
+                            }
+                        ]
+                    },
+                    "inferText": "1건",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 260,
+                                "y": 864
+                            },
+                            {
+                                "x": 417,
+                                "y": 864
+                            },
+                            {
+                                "x": 417,
+                                "y": 911
+                            },
+                            {
+                                "x": 260,
+                                "y": 911
+                            }
+                        ]
+                    },
+                    "inferText": "하나은행",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 2105,
+                                "y": 864
+                            },
+                            {
+                                "x": 2174,
+                                "y": 864
+                            },
+                            {
+                                "x": 2174,
+                                "y": 911
+                            },
+                            {
+                                "x": 2105,
+                                "y": 911
+                            }
+                        ]
+                    },
+                    "inferText": "3건",
+                    "inferConfidence": 0.9999,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 501,
+                                "y": 915
+                            },
+                            {
+                                "x": 695,
+                                "y": 915
+                            },
+                            {
+                                "x": 695,
+                                "y": 965
+                            },
+                            {
+                                "x": 501,
+                                "y": 965
+                            }
+                        ]
+                    },
+                    "inferText": "활동성계좌",
+                    "inferConfidence": 0.9999,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 821,
+                                "y": 915
+                            },
+                            {
+                                "x": 890,
+                                "y": 915
+                            },
+                            {
+                                "x": 890,
+                                "y": 962
+                            },
+                            {
+                                "x": 821,
+                                "y": 962
+                            }
+                        ]
+                    },
+                    "inferText": "1건",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 1077,
+                                "y": 915
+                            },
+                            {
+                                "x": 1146,
+                                "y": 915
+                            },
+                            {
+                                "x": 1146,
+                                "y": 965
+                            },
+                            {
+                                "x": 1077,
+                                "y": 965
+                            }
+                        ]
+                    },
+                    "inferText": "1건",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 482,
+                                "y": 1012
+                            },
+                            {
+                                "x": 714,
+                                "y": 1012
+                            },
+                            {
+                                "x": 714,
+                                "y": 1062
+                            },
+                            {
+                                "x": 482,
+                                "y": 1062
+                            }
+                        ]
+                    },
+                    "inferText": "비활동성계좌",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 821,
+                                "y": 1012
+                            },
+                            {
+                                "x": 890,
+                                "y": 1012
+                            },
+                            {
+                                "x": 890,
+                                "y": 1062
+                            },
+                            {
+                                "x": 821,
+                                "y": 1062
+                            }
+                        ]
+                    },
+                    "inferText": "1건",
+                    "inferConfidence": 0.9999,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 1106,
+                                "y": 1030
+                            },
+                            {
+                                "x": 1118,
+                                "y": 1030
+                            },
+                            {
+                                "x": 1118,
+                                "y": 1043
+                            },
+                            {
+                                "x": 1106,
+                                "y": 1043
+                            }
+                        ]
+                    },
+                    "inferText": "-",
+                    "inferConfidence": 0.9924,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 235,
+                                "y": 1068
+                            },
+                            {
+                                "x": 445,
+                                "y": 1068
+                            },
+                            {
+                                "x": 445,
+                                "y": 1115
+                            },
+                            {
+                                "x": 235,
+                                "y": 1115
+                            }
+                        ]
+                    },
+                    "inferText": "NH농협은행",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 2108,
+                                "y": 1068
+                            },
+                            {
+                                "x": 2174,
+                                "y": 1068
+                            },
+                            {
+                                "x": 2174,
+                                "y": 1115
+                            },
+                            {
+                                "x": 2108,
+                                "y": 1115
+                            }
+                        ]
+                    },
+                    "inferText": "1건",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 501,
+                                "y": 1118
+                            },
+                            {
+                                "x": 695,
+                                "y": 1118
+                            },
+                            {
+                                "x": 695,
+                                "y": 1168
+                            },
+                            {
+                                "x": 501,
+                                "y": 1168
+                            }
+                        ]
+                    },
+                    "inferText": "활동성계좌",
+                    "inferConfidence": 0.9999,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 849,
+                                "y": 1137
+                            },
+                            {
+                                "x": 861,
+                                "y": 1137
+                            },
+                            {
+                                "x": 861,
+                                "y": 1146
+                            },
+                            {
+                                "x": 849,
+                                "y": 1146
+                            }
+                        ]
+                    },
+                    "inferText": "-",
+                    "inferConfidence": 0.9894,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 1879,
+                                "y": 1137
+                            },
+                            {
+                                "x": 1892,
+                                "y": 1137
+                            },
+                            {
+                                "x": 1892,
+                                "y": 1146
+                            },
+                            {
+                                "x": 1879,
+                                "y": 1146
+                            }
+                        ]
+                    },
+                    "inferText": "-",
+                    "inferConfidence": 0.9729,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 482,
+                                "y": 1215
+                            },
+                            {
+                                "x": 714,
+                                "y": 1215
+                            },
+                            {
+                                "x": 714,
+                                "y": 1265
+                            },
+                            {
+                                "x": 482,
+                                "y": 1265
+                            }
+                        ]
+                    },
+                    "inferText": "비활동성계좌",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 817,
+                                "y": 1215
+                            },
+                            {
+                                "x": 890,
+                                "y": 1215
+                            },
+                            {
+                                "x": 890,
+                                "y": 1265
+                            },
+                            {
+                                "x": 817,
+                                "y": 1265
+                            }
+                        ]
+                    },
+                    "inferText": "2건",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 1879,
+                                "y": 1237
+                            },
+                            {
+                                "x": 1892,
+                                "y": 1237
+                            },
+                            {
+                                "x": 1892,
+                                "y": 1247
+                            },
+                            {
+                                "x": 1879,
+                                "y": 1247
+                            }
+                        ]
+                    },
+                    "inferText": "-",
+                    "inferConfidence": 0.9921,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 235,
+                                "y": 1269
+                            },
+                            {
+                                "x": 438,
+                                "y": 1269
+                            },
+                            {
+                                "x": 438,
+                                "y": 1319
+                            },
+                            {
+                                "x": 235,
+                                "y": 1319
+                            }
+                        ]
+                    },
+                    "inferText": "SC제일은행",
+                    "inferConfidence": 0.9999,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 2099,
+                                "y": 1275
+                            },
+                            {
+                                "x": 2186,
+                                "y": 1275
+                            },
+                            {
+                                "x": 2186,
+                                "y": 1319
+                            },
+                            {
+                                "x": 2099,
+                                "y": 1319
+                            }
+                        ]
+                    },
+                    "inferText": "10건",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 498,
+                                "y": 1319
+                            },
+                            {
+                                "x": 695,
+                                "y": 1319
+                            },
+                            {
+                                "x": 695,
+                                "y": 1372
+                            },
+                            {
+                                "x": 498,
+                                "y": 1372
+                            }
+                        ]
+                    },
+                    "inferText": "활동성계좌",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 817,
+                                "y": 1322
+                            },
+                            {
+                                "x": 890,
+                                "y": 1322
+                            },
+                            {
+                                "x": 890,
+                                "y": 1369
+                            },
+                            {
+                                "x": 817,
+                                "y": 1369
+                            }
+                        ]
+                    },
+                    "inferText": "7건",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 1594,
+                                "y": 1322
+                            },
+                            {
+                                "x": 1660,
+                                "y": 1322
+                            },
+                            {
+                                "x": 1660,
+                                "y": 1369
+                            },
+                            {
+                                "x": 1594,
+                                "y": 1369
+                            }
+                        ]
+                    },
+                    "inferText": "1건",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 1876,
+                                "y": 1337
+                            },
+                            {
+                                "x": 1892,
+                                "y": 1337
+                            },
+                            {
+                                "x": 1892,
+                                "y": 1350
+                            },
+                            {
+                                "x": 1876,
+                                "y": 1350
+                            }
+                        ]
+                    },
+                    "inferText": "-",
+                    "inferConfidence": 0.9988,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 482,
+                                "y": 1419
+                            },
+                            {
+                                "x": 714,
+                                "y": 1419
+                            },
+                            {
+                                "x": 714,
+                                "y": 1469
+                            },
+                            {
+                                "x": 482,
+                                "y": 1469
+                            }
+                        ]
+                    },
+                    "inferText": "비활동성계좌",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 817,
+                                "y": 1419
+                            },
+                            {
+                                "x": 890,
+                                "y": 1419
+                            },
+                            {
+                                "x": 890,
+                                "y": 1466
+                            },
+                            {
+                                "x": 817,
+                                "y": 1466
+                            }
+                        ]
+                    },
+                    "inferText": "2건",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 1879,
+                                "y": 1438
+                            },
+                            {
+                                "x": 1892,
+                                "y": 1438
+                            },
+                            {
+                                "x": 1892,
+                                "y": 1450
+                            },
+                            {
+                                "x": 1879,
+                                "y": 1450
+                            }
+                        ]
+                    },
+                    "inferText": "-",
+                    "inferConfidence": 0.9893,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 257,
+                                "y": 1472
+                            },
+                            {
+                                "x": 417,
+                                "y": 1472
+                            },
+                            {
+                                "x": 417,
+                                "y": 1522
+                            },
+                            {
+                                "x": 257,
+                                "y": 1522
+                            }
+                        ]
+                    },
+                    "inferText": "국민은행",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 2102,
+                                "y": 1472
+                            },
+                            {
+                                "x": 2180,
+                                "y": 1472
+                            },
+                            {
+                                "x": 2180,
+                                "y": 1525
+                            },
+                            {
+                                "x": 2102,
+                                "y": 1525
+                            }
+                        ]
+                    },
+                    "inferText": "4건",
+                    "inferConfidence": 0.9997,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 501,
+                                "y": 1522
+                            },
+                            {
+                                "x": 695,
+                                "y": 1522
+                            },
+                            {
+                                "x": 695,
+                                "y": 1572
+                            },
+                            {
+                                "x": 501,
+                                "y": 1572
+                            }
+                        ]
+                    },
+                    "inferText": "활동성계좌",
+                    "inferConfidence": 0.9999,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 817,
+                                "y": 1522
+                            },
+                            {
+                                "x": 890,
+                                "y": 1522
+                            },
+                            {
+                                "x": 890,
+                                "y": 1572
+                            },
+                            {
+                                "x": 817,
+                                "y": 1572
+                            }
+                        ]
+                    },
+                    "inferText": "2건",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 1879,
+                                "y": 1541
+                            },
+                            {
+                                "x": 1892,
+                                "y": 1541
+                            },
+                            {
+                                "x": 1892,
+                                "y": 1550
+                            },
+                            {
+                                "x": 1879,
+                                "y": 1550
+                            }
+                        ]
+                    },
+                    "inferText": "-",
+                    "inferConfidence": 0.954,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 482,
+                                "y": 1619
+                            },
+                            {
+                                "x": 714,
+                                "y": 1619
+                            },
+                            {
+                                "x": 714,
+                                "y": 1673
+                            },
+                            {
+                                "x": 482,
+                                "y": 1673
+                            }
+                        ]
+                    },
+                    "inferText": "비활동성계좌",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 817,
+                                "y": 1622
+                            },
+                            {
+                                "x": 890,
+                                "y": 1622
+                            },
+                            {
+                                "x": 890,
+                                "y": 1669
+                            },
+                            {
+                                "x": 817,
+                                "y": 1669
+                            }
+                        ]
+                    },
+                    "inferText": "3건",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 260,
+                                "y": 1676
+                            },
+                            {
+                                "x": 417,
+                                "y": 1676
+                            },
+                            {
+                                "x": 417,
+                                "y": 1726
+                            },
+                            {
+                                "x": 260,
+                                "y": 1726
+                            }
+                        ]
+                    },
+                    "inferText": "신한은행",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 2099,
+                                "y": 1673
+                            },
+                            {
+                                "x": 2180,
+                                "y": 1673
+                            },
+                            {
+                                "x": 2180,
+                                "y": 1729
+                            },
+                            {
+                                "x": 2099,
+                                "y": 1729
+                            }
+                        ]
+                    },
+                    "inferText": "3건",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 501,
+                                "y": 1726
+                            },
+                            {
+                                "x": 695,
+                                "y": 1726
+                            },
+                            {
+                                "x": 695,
+                                "y": 1776
+                            },
+                            {
+                                "x": 501,
+                                "y": 1776
+                            }
+                        ]
+                    },
+                    "inferText": "활동성계좌",
+                    "inferConfidence": 0.9999,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 1879,
+                                "y": 1745
+                            },
+                            {
+                                "x": 1892,
+                                "y": 1745
+                            },
+                            {
+                                "x": 1892,
+                                "y": 1754
+                            },
+                            {
+                                "x": 1879,
+                                "y": 1754
+                            }
+                        ]
+                    },
+                    "inferText": "-",
+                    "inferConfidence": 0.9614,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 482,
+                                "y": 1823
+                            },
+                            {
+                                "x": 714,
+                                "y": 1823
+                            },
+                            {
+                                "x": 714,
+                                "y": 1876
+                            },
+                            {
+                                "x": 482,
+                                "y": 1876
+                            }
+                        ]
+                    },
+                    "inferText": "비활동성계좌",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 817,
+                                "y": 1826
+                            },
+                            {
+                                "x": 890,
+                                "y": 1826
+                            },
+                            {
+                                "x": 890,
+                                "y": 1873
+                            },
+                            {
+                                "x": 817,
+                                "y": 1873
+                            }
+                        ]
+                    },
+                    "inferText": "2건",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 260,
+                                "y": 1879
+                            },
+                            {
+                                "x": 417,
+                                "y": 1879
+                            },
+                            {
+                                "x": 417,
+                                "y": 1926
+                            },
+                            {
+                                "x": 260,
+                                "y": 1926
+                            }
+                        ]
+                    },
+                    "inferText": "우리은행",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 2105,
+                                "y": 1879
+                            },
+                            {
+                                "x": 2174,
+                                "y": 1879
+                            },
+                            {
+                                "x": 2174,
+                                "y": 1926
+                            },
+                            {
+                                "x": 2105,
+                                "y": 1926
+                            }
+                        ]
+                    },
+                    "inferText": "2건",
+                    "inferConfidence": 0.9999,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 501,
+                                "y": 1929
+                            },
+                            {
+                                "x": 695,
+                                "y": 1929
+                            },
+                            {
+                                "x": 695,
+                                "y": 1980
+                            },
+                            {
+                                "x": 501,
+                                "y": 1980
+                            }
+                        ]
+                    },
+                    "inferText": "활동성계좌",
+                    "inferConfidence": 0.9999,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 1879,
+                                "y": 1948
+                            },
+                            {
+                                "x": 1892,
+                                "y": 1948
+                            },
+                            {
+                                "x": 1892,
+                                "y": 1958
+                            },
+                            {
+                                "x": 1879,
+                                "y": 1958
+                            }
+                        ]
+                    },
+                    "inferText": "-",
+                    "inferConfidence": 0.9814,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 482,
+                                "y": 2026
+                            },
+                            {
+                                "x": 714,
+                                "y": 2026
+                            },
+                            {
+                                "x": 714,
+                                "y": 2077
+                            },
+                            {
+                                "x": 482,
+                                "y": 2077
+                            }
+                        ]
+                    },
+                    "inferText": "비활동성계좌",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 1879,
+                                "y": 2045
+                            },
+                            {
+                                "x": 1889,
+                                "y": 2045
+                            },
+                            {
+                                "x": 1889,
+                                "y": 2055
+                            },
+                            {
+                                "x": 1879,
+                                "y": 2055
+                            }
+                        ]
+                    },
+                    "inferText": "-",
+                    "inferConfidence": 0.9232,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 263,
+                                "y": 2083
+                            },
+                            {
+                                "x": 417,
+                                "y": 2083
+                            },
+                            {
+                                "x": 417,
+                                "y": 2130
+                            },
+                            {
+                                "x": 263,
+                                "y": 2130
+                            }
+                        ]
+                    },
+                    "inferText": "케이뱅크",
+                    "inferConfidence": 0.9999,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 2105,
+                                "y": 2080
+                            },
+                            {
+                                "x": 2180,
+                                "y": 2080
+                            },
+                            {
+                                "x": 2180,
+                                "y": 2133
+                            },
+                            {
+                                "x": 2105,
+                                "y": 2133
+                            }
+                        ]
+                    },
+                    "inferText": "1건",
+                    "inferConfidence": 0.9999,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 501,
+                                "y": 2130
+                            },
+                            {
+                                "x": 695,
+                                "y": 2130
+                            },
+                            {
+                                "x": 695,
+                                "y": 2183
+                            },
+                            {
+                                "x": 501,
+                                "y": 2183
+                            }
+                        ]
+                    },
+                    "inferText": "활동성계좌",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 821,
+                                "y": 2133
+                            },
+                            {
+                                "x": 890,
+                                "y": 2133
+                            },
+                            {
+                                "x": 890,
+                                "y": 2180
+                            },
+                            {
+                                "x": 821,
+                                "y": 2180
+                            }
+                        ]
+                    },
+                    "inferText": "1건",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 1879,
+                                "y": 2152
+                            },
+                            {
+                                "x": 1892,
+                                "y": 2152
+                            },
+                            {
+                                "x": 1892,
+                                "y": 2161
+                            },
+                            {
+                                "x": 1879,
+                                "y": 2161
+                            }
+                        ]
+                    },
+                    "inferText": "-",
+                    "inferConfidence": 0.9805,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 482,
+                                "y": 2230
+                            },
+                            {
+                                "x": 714,
+                                "y": 2230
+                            },
+                            {
+                                "x": 714,
+                                "y": 2280
+                            },
+                            {
+                                "x": 482,
+                                "y": 2280
+                            }
+                        ]
+                    },
+                    "inferText": "비활동성계좌",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 849,
+                                "y": 2249
+                            },
+                            {
+                                "x": 861,
+                                "y": 2249
+                            },
+                            {
+                                "x": 861,
+                                "y": 2258
+                            },
+                            {
+                                "x": 849,
+                                "y": 2258
+                            }
+                        ]
+                    },
+                    "inferText": "-",
+                    "inferConfidence": 0.9857,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 244,
+                                "y": 2283
+                            },
+                            {
+                                "x": 435,
+                                "y": 2283
+                            },
+                            {
+                                "x": 435,
+                                "y": 2333
+                            },
+                            {
+                                "x": 244,
+                                "y": 2333
+                            }
+                        ]
+                    },
+                    "inferText": "카카오뱅크",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 2105,
+                                "y": 2283
+                            },
+                            {
+                                "x": 2180,
+                                "y": 2283
+                            },
+                            {
+                                "x": 2180,
+                                "y": 2337
+                            },
+                            {
+                                "x": 2105,
+                                "y": 2337
+                            }
+                        ]
+                    },
+                    "inferText": "1건",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 501,
+                                "y": 2333
+                            },
+                            {
+                                "x": 695,
+                                "y": 2333
+                            },
+                            {
+                                "x": 695,
+                                "y": 2387
+                            },
+                            {
+                                "x": 501,
+                                "y": 2387
+                            }
+                        ]
+                    },
+                    "inferText": "활동성계좌",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": false
+                },
+                {
+                    "valueType": "ALL",
+                    "boundingPoly": {
+                        "vertices": [
+                            {
+                                "x": 821,
+                                "y": 2337
+                            },
+                            {
+                                "x": 890,
+                                "y": 2337
+                            },
+                            {
+                                "x": 890,
+                                "y": 2384
+                            },
+                            {
+                                "x": 821,
+                                "y": 2384
+                            }
+                        ]
+                    },
+                    "inferText": "1건",
+                    "inferConfidence": 1,
+                    "type": "NORMAL",
+                    "lineBreak": true
+                }
+            ]
+        }
+    ]
+}
