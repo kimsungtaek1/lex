@@ -223,8 +223,39 @@ $pageTitle = '작업 상세 정보: ' . htmlspecialchars($jobDetails['job']['nam
                         </div>
                     </div>
                     
-                    <!-- OCR 결과 탭 개선 코드 -->
+<!-- OCR 결과 탭 개선 코드 -->
 <div class="tab-pane fade" id="results" role="tabpanel" aria-labelledby="results-tab">
+    <!-- 첫 번째 카드: 생성 결과 -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <i class="bi bi-robot me-2"></i>OCR 생성 결과
+        </div>
+        <div class="card-body">
+            <?php if ($jobDetails['job']['status'] !== 'completed'): ?>
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>작업이 완료되면 결과를 확인할 수 있습니다.
+                </div>
+            <?php elseif (empty($jobResults['files'])): ?>
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>처리된 결과가 없습니다.
+                </div>
+            <?php else: ?>
+                <div id="chatbot-container" class="chatbot-container">
+                    <div class="chat-loading">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">로딩중...</span>
+                        </div>
+                        <span class="ms-2">OCR 데이터 분석 중...</span>
+                    </div>
+                    <div class="chat-messages" style="display: none;">
+                        <!-- 챗봇 메시지는 JavaScript로 로드됩니다 -->
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+    
+    <!-- 두 번째 카드: 처리 결과 -->
     <div class="card">
         <div class="card-header bg-success text-white">
             <i class="bi bi-card-text me-2"></i>OCR 처리 결과

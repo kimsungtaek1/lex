@@ -227,3 +227,51 @@
 .provide-feedback-btn:hover {
     transform: translateY(-2px);
 }
+
+/* 챗봇 스타일 */
+.chatbot-container {
+    max-height: 500px;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    border: 1px solid #dee2e6;
+}
+
+.chat-message {
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.chat-avatar {
+    width: 36px;
+    height: 36px;
+    background-color: #0d6efd;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.chat-avatar i {
+    font-size: 18px;
+}
+
+.chat-content {
+    background-color: white;
+    padding: 12px 15px;
+    border-radius: 0 12px 12px 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    line-height: 1.6;
+    max-width: calc(100% - 60px);
+}
+
+.chat-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
