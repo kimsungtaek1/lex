@@ -4,9 +4,6 @@
  * 파일 업로드 및 작업 생성 처리
  */
 
-// 세션 시작
-session_start();
-
 require_once 'config.php';
 require_once 'process_monitor.php';
 require_once 'utils.php';

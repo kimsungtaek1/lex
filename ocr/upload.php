@@ -1,24 +1,17 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 /**
  * OCR 인식률 향상 시스템 - 파일 업로드 및 OCR 처리 페이지
  * 카페24 웹호스팅 환경에 최적화됨
  */
 
-// 세션 시작
-session_start();
-
 require_once 'config.php';
 require_once 'process_monitor.php';
 require_once 'document_learning.php';
-require_once 'utils.php'; // 공통 유틸리티 함수 포함
-
-// CSRF 토큰 생성 함수
-function generateCSRFToken() {
-    if (empty($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-    }
-    return $_SESSION['csrf_token'];
-}
+require_once 'utils.php';
 
 // 안전한 파일 업로드 검증
 function validateUploadedFile($file) {

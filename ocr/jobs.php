@@ -12,7 +12,7 @@ require_once 'document_learning.php';
 $jobId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 if ($jobId <= 0) {
-    header('Location: jobs.php');
+    echo "<script>alert('잘못된 접근입니다.'); history.back();</script>";
     exit;
 }
 
@@ -24,7 +24,7 @@ $jobDetails = $processMonitor->getJobDetails($jobId);
 
 // 작업이 존재하지 않는 경우
 if (!$jobDetails) {
-    header('Location: jobs.php');
+    echo "<script>alert('존재하지 않는 작업입니다.'); history.back();</script>";
     exit;
 }
 
