@@ -32,7 +32,7 @@ $config = [
     'db_pass' => getenv('DB_PASS'),
     
     // 네이버 Clova OCR API 설정
-    'clova_secret_key' => 'RmFaRmVTRlJ2b2F3REVNYXFRYkl4cmR3eklteGdQeGE=',  // 변경 필요
+    'clova_secret_key' => getenv('CLOVA_SECRET_KEY'),
     'clova_api_url' => 'https://fi843nx2lb.apigw.ntruss.com/custom/v1/41295/ac388ed51e923f188688af742326a2e342ac67854225127e0f917bcf1c08f1c1/general',
 
     // 파일 및 폴더 경로
@@ -43,10 +43,6 @@ $config = [
     
     // 학습 데이터 설정
     'learning_dataset_dir' => MODEL_PATH . '/learning_data',
-    
-    // 웹호스팅 최적화 설정
-    'max_execution_time' => 30,  // 카페24 기본 실행 시간 제한
-    'memory_limit' => '256M',    // 메모리 제한
     
     // 사용자 정의 사전
     'custom_dictionary' => [
@@ -110,7 +106,3 @@ function logMessage($message, $level = 'info') {
         echo $formattedMessage;
     }
 }
-
-// 메모리 및 실행 시간 최적화 설정
-ini_set('memory_limit', $config['memory_limit']);
-ini_set('max_execution_time', $config['max_execution_time']);
